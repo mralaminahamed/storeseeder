@@ -1,0 +1,740 @@
+# Copyright (C) 2025 Al Amin Ahamed
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Fluent Cart FakerPress 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fluent-cart-fakerpress\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-11-11T19:21:50+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: fluent-cart-fakerpress\n"
+
+#. Plugin Name of the plugin
+#: fluent-cart-fakerpress.php
+#: class-fluent-cart-fakerpress.php:132
+msgid "Fluent Cart FakerPress"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: fluent-cart-fakerpress.php
+msgid "https://github.com/mralaminahamed/fluent-cart-fakerpress"
+msgstr ""
+
+#. Description of the plugin
+#: fluent-cart-fakerpress.php
+msgid "Create realistic test data for your Fluent Cart store in seconds! Generate products, customers, orders, coupons and more with our intuitive admin interface. Perfect for development, testing, and demos. Features smart defaults, real-time validation, and seamless WordPress integration."
+msgstr ""
+
+#. Author of the plugin
+#: fluent-cart-fakerpress.php
+msgid "Al Amin Ahamed"
+msgstr ""
+
+#. Author URI of the plugin
+#: fluent-cart-fakerpress.php
+msgid "https://github.com/mralaminahamed/"
+msgstr ""
+
+#: class-fluent-cart-fakerpress.php:133
+msgid "FC FakerPress"
+msgstr ""
+
+#: class-fluent-cart-fakerpress.php:543
+msgid "Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:178
+msgid "Count parameter is required and must be greater than 0."
+msgstr ""
+
+#. translators: Total output.
+#: includes/Abstracts/Controller.php:209
+#, php-format
+msgid "%1$s item successfully created."
+msgid_plural "%1$s items successfully created."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Abstracts/Controller.php:262
+msgid "Sorry, you are not allowed to generate fake data."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:285
+msgid "Number of items to generate."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:294
+msgid "Locale for generated data (e.g., en_US, fr_FR, de_DE)."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:301
+msgid "Random seed for reproducible data generation."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:307
+msgid "Status filter for generated items."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:313
+msgid "Date range for generated items."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:317
+msgid "Start date (YYYY-MM-DD format)."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:324
+msgid "End date (YYYY-MM-DD format)."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:333
+msgid "Control relationship creation with existing data."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:337
+msgid "Create missing related items if needed."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:342
+msgid "Link to existing items when possible."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:349
+msgid "Metadata generation options."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:353
+msgid "Include additional metadata."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:358
+msgid "Generate custom fields."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:393
+msgid "Date must be in YYYY-MM-DD format."
+msgstr ""
+
+#: includes/Abstracts/Controller.php:419
+msgid "Count must be a number between 1 and 100."
+msgstr ""
+
+#. translators: Resource type.
+#: includes/Abstracts/Controller.php:441
+#, php-format
+msgid "%s Generation Response"
+msgstr ""
+
+#: includes/Abstracts/Controller.php:445
+msgid "Number of items generated."
+msgstr ""
+
+#. translators: %s: Error message
+#: includes/Abstracts/Generator.php:313
+#, php-format
+msgid "Generation failed: %s"
+msgstr ""
+
+#: includes/Abstracts/Generator.php:396
+msgid "Count must be a positive number."
+msgstr ""
+
+#. translators: %d: Maximum batch size
+#: includes/Abstracts/Generator.php:405
+#, php-format
+msgid "Count cannot exceed %d items per batch."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:43
+msgid "Cart Session"
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:78
+msgid "Type of customers for cart sessions."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:85
+msgid "Specific customer ID for cart sessions (when customer_type is \"specific\")."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:91
+msgid "Percentage of guest carts (0-100) when customer_type is \"mixed\"."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:99
+msgid "Cart abandonment rate percentage (0-100)."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:107
+msgid "Custom cart status distribution."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:111
+msgid "Percentage of pending carts."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:117
+msgid "Percentage of abandoned carts."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:123
+msgid "Percentage of completed carts."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:129
+msgid "Percentage of cancelled carts."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:137
+msgid "Cart value range for generated sessions."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:141
+msgid "Minimum cart value."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:147
+msgid "Maximum cart value."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:155
+msgid "Number of items per cart session."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:159
+msgid "Minimum items per cart."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:165
+msgid "Maximum items per cart."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:174
+msgid "Abandonment tracking settings."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:178
+msgid "Generate abandoned cart reminders."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:183
+msgid "Maximum number of reminders to generate."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:190
+msgid "Cart recovery rate percentage (0-100)."
+msgstr ""
+
+#: includes/Controllers/Cart_Session.php:211
+msgid "Generated cart sessions with items and customer data."
+msgstr ""
+
+#: includes/Controllers/Coupon.php:43
+msgid "Coupon"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:78
+msgid "Types of discount coupons to generate"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:88
+msgid "Discount value range"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:116
+msgid "Usage limitation settings"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:138
+msgid "Coupon validity period configuration"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:156
+msgid "Coupon usage restrictions"
+msgstr ""
+
+#: includes/Controllers/Coupon.php:190
+msgid "Generated coupons data."
+msgstr ""
+
+#: includes/Controllers/Customer.php:58
+msgid "Customer"
+msgstr ""
+
+#: includes/Controllers/Customer.php:96
+msgid "Type of customers to generate."
+msgstr ""
+
+#: includes/Controllers/Customer.php:103
+msgid "Focus generation on specific countries."
+msgstr ""
+
+#: includes/Controllers/Customer.php:111
+msgid "Include purchase history and loyalty data."
+msgstr ""
+
+#: includes/Controllers/Customer.php:116
+msgid "Focus on specific loyalty tiers."
+msgstr ""
+
+#: includes/Controllers/Customer.php:125
+msgid "Account status for generated customers."
+msgstr ""
+
+#: includes/Controllers/Customer.php:143
+msgid "Generated customers data."
+msgstr ""
+
+#: includes/Controllers/Location.php:43
+msgid "Location"
+msgstr ""
+
+#: includes/Controllers/Location.php:78
+msgid "Geographic regions to generate locations for."
+msgstr ""
+
+#: includes/Controllers/Location.php:105
+msgid "Specific countries to generate (ISO2, ISO3, or full names)."
+msgstr ""
+
+#: includes/Controllers/Location.php:113
+msgid "Maximum number of countries to generate."
+msgstr ""
+
+#: includes/Controllers/Location.php:121
+msgid "Include states/provinces for countries."
+msgstr ""
+
+#: includes/Controllers/Location.php:126
+msgid "Include cities for states/provinces."
+msgstr ""
+
+#: includes/Controllers/Location.php:131
+msgid "Maximum cities per state/province."
+msgstr ""
+
+#: includes/Controllers/Location.php:135
+msgid "Minimum cities per state."
+msgstr ""
+
+#: includes/Controllers/Location.php:141
+msgid "Maximum cities per state."
+msgstr ""
+
+#: includes/Controllers/Location.php:162
+msgid "Generated location hierarchy with countries, states, and cities."
+msgstr ""
+
+#: includes/Controllers/Order.php:58
+msgid "Order"
+msgstr ""
+
+#: includes/Controllers/Order.php:96
+msgid "Order status for generated orders."
+msgstr ""
+
+#: includes/Controllers/Order.php:106
+msgid "Payment methods to use for orders."
+msgstr ""
+
+#: includes/Controllers/Order.php:115
+msgid "Order total value range."
+msgstr ""
+
+#: includes/Controllers/Order.php:119
+msgid "Minimum order value."
+msgstr ""
+
+#: includes/Controllers/Order.php:125
+msgid "Maximum order value."
+msgstr ""
+
+#: includes/Controllers/Order.php:133
+msgid "Include customer data with orders."
+msgstr ""
+
+#: includes/Controllers/Order.php:138
+msgid "Number of items per order range."
+msgstr ""
+
+#: includes/Controllers/Order.php:156
+msgid "Include shipping costs in orders."
+msgstr ""
+
+#: includes/Controllers/Order.php:161
+msgid "Include tax calculations in orders."
+msgstr ""
+
+#: includes/Controllers/Order.php:178
+msgid "Generated orders data."
+msgstr ""
+
+#: includes/Controllers/Product.php:58
+msgid "Product"
+msgstr ""
+
+#: includes/Controllers/Product.php:96
+msgid "Type of products to generate."
+msgstr ""
+
+#: includes/Controllers/Product.php:103
+msgid "Price range for generated products."
+msgstr ""
+
+#: includes/Controllers/Product.php:107
+msgid "Minimum price."
+msgstr ""
+
+#: includes/Controllers/Product.php:113
+msgid "Maximum price."
+msgstr ""
+
+#: includes/Controllers/Product.php:121
+msgid "Product categories configuration."
+msgstr ""
+
+#: includes/Controllers/Product.php:125
+msgid "Create new categories if needed."
+msgstr ""
+
+#: includes/Controllers/Product.php:130
+msgid "Maximum categories per product."
+msgstr ""
+
+#: includes/Controllers/Product.php:139
+msgid "Product attributes configuration."
+msgstr ""
+
+#: includes/Controllers/Product.php:143
+msgid "Include product attributes."
+msgstr ""
+
+#: includes/Controllers/Product.php:148
+msgid "Number of variations for variable products."
+msgstr ""
+
+#: includes/Controllers/Product.php:157
+msgid "Inventory settings for generated products."
+msgstr ""
+
+#: includes/Controllers/Product.php:161
+msgid "Enable stock management."
+msgstr ""
+
+#: includes/Controllers/Product.php:166
+msgid "Stock quantity range."
+msgstr ""
+
+#: includes/Controllers/Product.php:184
+msgid "Product content generation options."
+msgstr ""
+
+#: includes/Controllers/Product.php:188
+msgid "Generate product images."
+msgstr ""
+
+#: includes/Controllers/Product.php:193
+msgid "Product description length."
+msgstr ""
+
+#: includes/Controllers/Product.php:213
+msgid "Generated products data."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:58
+msgid "Product Variation"
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:96
+msgid "Types of product variations to generate."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:106
+msgid "Number of attributes per variable product."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:110
+msgid "Minimum attributes per product."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:117
+msgid "Maximum attributes per product."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:126
+msgid "Number of variations per attribute."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:130
+msgid "Minimum variations per attribute."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:137
+msgid "Maximum variations per attribute."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:146
+msgid "Price variation range as percentage of base price."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:150
+msgid "Minimum price variation percentage."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:157
+msgid "Maximum price variation percentage."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:166
+msgid "Include inventory management for variations."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:171
+msgid "Generate unique SKUs for each variation."
+msgstr ""
+
+#: includes/Controllers/Product_Variation.php:188
+msgid "Generated product variations with attributes and pricing."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:43
+msgid "Shipping Plan"
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:78
+msgid "Types of shipping methods to generate."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:96
+msgid "Shipping cost range."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:100
+msgid "Minimum shipping cost."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:106
+msgid "Maximum shipping cost."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:114
+msgid "Geographic coverage areas."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:124
+msgid "Shipping calculation methods."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:134
+msgid "Delivery time ranges."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:138
+msgid "Minimum delivery days."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:144
+msgid "Maximum delivery days."
+msgstr ""
+
+#: includes/Controllers/Shipping_Plan.php:164
+msgid "Generated shipping plans with methods and regions."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:43
+msgid "Tax Class"
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:78
+msgid "Types of tax classes to generate."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:88
+msgid "Tax jurisdictions to generate rates for."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:98
+msgid "Tax rate ranges by type."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:102
+msgid "Standard tax rate range."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:120
+msgid "Reduced tax rate range."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:140
+msgid "Geographic coverage for tax rates."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:144
+msgid "Countries to generate tax rates for."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:153
+msgid "Include compound tax rates."
+msgstr ""
+
+#: includes/Controllers/Tax_Class.php:172
+msgid "Generated tax classes with location-based rates."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:58
+msgid "Transaction"
+msgstr ""
+
+#: includes/Controllers/Transaction.php:96
+msgid "Payment methods to generate transactions for."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:106
+msgid "Transaction statuses to generate."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:116
+msgid "Transaction amount range."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:120
+msgid "Minimum transaction amount."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:126
+msgid "Maximum transaction amount."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:134
+msgid "Include refund transactions."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:139
+msgid "Percentage of transactions that should be refunds."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:146
+msgid "Include payment gateway-specific metadata."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:151
+msgid "Associate transactions with existing orders."
+msgstr ""
+
+#: includes/Controllers/Transaction.php:168
+msgid "Generated transactions with payment details and metadata."
+msgstr ""
+
+#: includes/Generators/Cart_Session.php:63
+msgid "Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Cart_Session.php:70
+msgid "Failed to create cart session."
+msgstr ""
+
+#: includes/Generators/Coupon.php:63
+#: includes/Generators/Customer.php:93
+#: includes/Generators/Order.php:63
+#: includes/Generators/Product.php:63
+#: includes/Generators/Product_Variation.php:62
+#: includes/Generators/Tax_Class.php:63
+msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Coupon.php:74
+msgid "Failed to create coupon."
+msgstr ""
+
+#: includes/Generators/Coupon.php:142
+msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Coupon.php:165
+msgid "Failed to create coupon using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Customer.php:70
+msgid "Customer Profiles with Addresses and Metadata"
+msgstr ""
+
+#: includes/Generators/Customer.php:80
+msgid "Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems."
+msgstr ""
+
+#: includes/Generators/Customer.php:151
+msgid "A user with this email address already exists."
+msgstr ""
+
+#: includes/Generators/Customer.php:173
+msgid "Failed to create customer using Fluent Cart."
+msgstr ""
+
+#: includes/Generators/Customer.php:237
+msgid "Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Customer.php:260
+msgid "Failed to create customer using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Location.php:64
+msgid "Failed to create location."
+msgstr ""
+
+#: includes/Generators/Order.php:74
+msgid "Failed to create order."
+msgstr ""
+
+#: includes/Generators/Order.php:154
+msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Order.php:183
+msgid "Failed to create order using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Product.php:74
+msgid "Failed to create product."
+msgstr ""
+
+#: includes/Generators/Product.php:135
+msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Product_Variation.php:69
+msgid "Failed to create product variation."
+msgstr ""
+
+#: includes/Generators/Shipping_Plan.php:64
+msgid "Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Shipping_Plan.php:71
+msgid "Failed to create shipping method."
+msgstr ""
+
+#: includes/Generators/Tax_Class.php:74
+msgid "Failed to create tax class."
+msgstr ""
+
+#: includes/Generators/Tax_Class.php:126
+msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Tax_Class.php:150
+msgid "Failed to create tax class using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Transaction.php:63
+msgid "Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Transaction.php:70
+msgid "Failed to create transaction."
+msgstr ""

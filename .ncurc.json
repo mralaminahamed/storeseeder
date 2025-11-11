@@ -1,0 +1,11 @@
+{
+  "dep": [
+    "patch",
+    "minor"
+  ],
+  "filter": [
+    "@wordpress/*",
+    "react",
+    "react-dom"
+  ]
+}

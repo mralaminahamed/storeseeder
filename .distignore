@@ -1,0 +1,121 @@
+# Development and build files
+/node_modules/
+/src/
+webpack.config.js
+package.json
+composer.lock
+package-lock.json
+yarn.lock
+.babelrc
+.eslintrc.js
+postcss.config.js
+tailwind.config.js
+
+# Composer development files
+# composer.json - Needed for production dependencies
+# composer.lock - Needed for production dependencies
+
+# Development tools and configuration
+/.yarn/
+.ncurc.json
+.stylelintrc.js
+.yarnrc.yml
+.editorconfig
+.gitignore
+.distignore
+phpcs.xml
+phpcs.plugin-review.xml
+phpstan.neon
+phpunit.xml
+.eslintcache
+.stylelintcache
+
+# Documentation and project files
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+plugin-submission-review.md
+LICENSE
+/docs/
+/drafts/
+
+# Testing and CI
+tests/
+.github/
+.travis.yml
+.circleci/
+phpunit.xml.dist
+/.phpstan-cache/
+/coverage/
+/test-results/
+
+# IDE and editor files
+/.vscode/
+/.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build and release directories
+/release/
+/dist/
+
+# Git files
+/.git/
+.gitattributes
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+*.tmp
+*.log
+*.cache
+*.swp
+*.swo
+*~
+
+# Archives (development)
+*.zip
+*.tar.gz
+*.rar
+
+# Claude AI files
+/.claude/
+CLAUDE.md
+
+# WordPress specific files
+/.wordpress-org/
+wp-config.php
+wp-config-local.php
+
+# Sample data (downloaded at runtime from separate repository)
+/sample-data/
+/../fluent-cart-fakerpress-sample-data/
+/fluent-cart-fakerpress-sample-data/
+# Exclude parent directory files
+../*
+
+# Development configuration files
+AGENTS.md
+tsconfig.json
+components.json
+
+# Cache directories
+/.cache/
+/tmp/
+
+# Logs
+/logs/
+/*.log

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<ruleset name="FluentCartFakerPress">
+	<description>PHP CodeSniffer configuration for FluentCart FakerPress</description>
+
+	<!-- Use the WordPress Coding Standards -->
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+	</rule>
+
+	<!-- Use the WordPress Extra Coding Standards -->
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+	</rule>
+
+
+
+	<!-- Check all PHP files in the includes directory -->
+	<file>includes</file>
+
+	<!-- Exclude vendor and node_modules directories -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+
+	<!-- Set the minimum PHP version -->
+	<config name="minimum_supported_wp_version" value="5.0"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Custom rules -->
+	<rule ref="Squiz.Commenting.FunctionComment.MissingParamComment">
+		<severity>0</severity>
+	</rule>
+
+	<rule ref="Squiz.Commenting.FunctionComment.MissingReturn">
+		<severity>0</severity>
+	</rule>
+
+	<rule ref="WordPress.DB.PreparedSQL.NotPrepared">
+		<severity>0</severity>
+	</rule>
+</ruleset>

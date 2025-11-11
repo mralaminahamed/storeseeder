@@ -1,0 +1,30 @@
+{
+  "name": "Fluent Cart FakerPress",
+  "slug": "fluent-cart-fakerpress",
+  "version": "1.0.0",
+  "author": "Al Amin Ahamed",
+  "homepage": "https://github.com/mralaminahamed/fluent-cart-fakerpress",
+  "description": "Generate realistic test data for Fluent Cart stores",
+  "assets": {
+    "banner": "banner-1544x500.png",
+    "icon": "icon-256x256.png",
+    "screenshots": [
+      "screenshot-1.png",
+      "screenshot-2.png",
+      "screenshot-3.png"
+    ]
+  },
+  "tags": [
+    "ecommerce",
+    "faker",
+    "data-generation",
+    "testing",
+    "development"
+  ],
+  "requires": "5.0",
+  "tested": "6.8",
+  "requires_php": "7.4",
+  "contributors": [
+    "mralaminahamed"
+  ]
+}
