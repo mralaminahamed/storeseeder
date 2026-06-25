@@ -35,8 +35,14 @@ The plugin provides a comprehensive hook system allowing developers to customize
 - **Customers**: Features demographics, purchase history, and behavioral segmentation.
 - **Orders**: Covers payment processing, shipping calculations, and fulfillment workflows.
 - **Coupons**: Supports discount rules, usage limits, and targeting logic.
+- **Attributes**: Generates product attribute groups and taxonomy terms.
+- **Refunds**: Creates refund transactions against existing orders.
+- **Logs**: Generates activity log entries for audit trails.
 
 Generated data leverages the Faker library for authenticity while adhering to real-world e-commerce patterns, ensuring compatibility with Fluent Cart updates and extensions.
+
+**Model Context Protocol (MCP) Integration**:
+The plugin supports optional MCP integration for advanced AI-assisted data generation workflows. This feature requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. The MCP integration is completely optional and degrades gracefully—the plugin functions normally without these dependencies.
 
 == Installation ==
 

@@ -41,11 +41,12 @@ npm run build
 
 ## ✨ Key Features
 
-- 🛍️ **10 Smart Generators** - Create realistic products, customers, orders, coupons, and more
+- 🛍️ **13 Smart Generators** - Create realistic products, customers, orders, coupons, attributes, refunds, logs, and more
 - 🎯 **One-Click Generation** - Smart defaults with easy customization options
 - 🎨 **Beautiful Interface** - Modern design that matches your WordPress admin theme
 - ⚡ **Lightning Fast** - Generate thousands of items in seconds
 - 🔧 **Developer Friendly** - Extensive customization options and API access
+- 🤖 **MCP Integration** - Optional Model Context Protocol support for AI-assisted workflows
 
 ## 📸 Screenshots
 
@@ -97,6 +98,14 @@ npm run build            # Production build
 composer run lint        # PHP CodeSniffer
 composer run analyse     # PHP Static Analysis
 ```
+
+## 🤖 Model Context Protocol (MCP) Integration
+
+The plugin supports optional MCP integration for advanced AI-assisted data generation workflows. This feature requires:
+- **WordPress Abilities API** - Bundled in WordPress 6.9+, or installable separately
+- **MCP Adapter Plugin** - For model context protocol functionality
+
+The MCP integration is completely optional and degrades gracefully—the plugin functions normally without these dependencies.
 
 ## 🏗️ Built for Reliability
 
