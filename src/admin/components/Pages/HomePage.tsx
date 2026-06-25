@@ -1,405 +1,89 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { motion, Variants } from "framer-motion";
-import {
-  Package,
-  Users,
-  ShoppingCart,
-  Tag,
-  Settings,
-  Truck,
-  DollarSign,
-  CreditCard,
-  ShoppingBag,
-  MapPin,
-  Star,
-  ArrowRight,
-  type LucideIcon,
-} from "lucide-react";
-import { __, sprintf } from "@wordpress/i18n";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
-
-import ProductGenerator from "../Generators/ProductGenerator";
-import CustomerGenerator from "../Generators/CustomerGenerator";
-import OrderGenerator from "../Generators/OrderGenerator";
-import CouponGenerator from "../Generators/CouponGenerator";
-import ProductVariationGenerator from "../Generators/ProductVariationGenerator";
-import ShippingPlanGenerator from "../Generators/ShippingPlanGenerator";
-import TaxClassGenerator from "../Generators/TaxClassGenerator";
-import TransactionGenerator from "../Generators/TransactionGenerator";
-import CartSessionGenerator from "../Generators/CartSessionGenerator";
-import LocationGenerator from "../Generators/LocationGenerator";
-
-interface Generator {
-  name: string;
-  component: React.ComponentType<any>;
-  category: string;
-  order: number;
-  icon: LucideIcon;
-  description: string;
-  useCase?: string;
-  route: string;
-  popular?: boolean;
-}
-
-const generators: Generator[] = [
-  {
-    name: __("Products", "fluent-cart-fakerpress"),
-    component: ProductGenerator,
-    category: __("Core", "fluent-cart-fakerpress"),
-    order: 1,
-    icon: Package,
-    description: __(
-      "Create realistic products with prices, categories, inventory, and variations. Perfect for testing your Fluent Cart store catalog and product pages.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, theme developers, plugin testers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "products",
-    popular: true,
-  },
-  {
-    name: __("Customers", "fluent-cart-fakerpress"),
-    component: CustomerGenerator,
-    category: __("Core", "fluent-cart-fakerpress"),
-    order: 2,
-    icon: Users,
-    description: __(
-      "Generate customer profiles with addresses, purchase history, and loyalty data. Essential for testing user accounts and customer management in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, CRM developers, membership site testers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "customers",
-    popular: true,
-  },
-  {
-    name: __("Orders", "fluent-cart-fakerpress"),
-    component: OrderGenerator,
-    category: __("Core", "fluent-cart-fakerpress"),
-    order: 3,
-    icon: ShoppingCart,
-    description: __(
-      "Create complete order histories with payments, shipping, and tax calculations. Test your Fluent Cart checkout flow and order management system.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, payment gateway developers, shipping testers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "orders",
-    popular: true,
-  },
-  {
-    name: __("Coupons", "fluent-cart-fakerpress"),
-    component: CouponGenerator,
-    category: __("Core", "fluent-cart-fakerpress"),
-    order: 4,
-    icon: Tag,
-    description: __(
-      "Generate discount codes with various rules and restrictions. Perfect for testing promotional campaigns and discount logic in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, marketing teams, discount plugin developers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "coupons",
-  },
-  {
-    name: __("Product Variations", "fluent-cart-fakerpress"),
-    component: ProductVariationGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 1,
-    icon: Settings,
-    description: __(
-      "Create complex product variations with size, color, and material options. Essential for testing variable product functionality in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "E-commerce developers, product catalog managers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "product-variations",
-  },
-  {
-    name: __("Shipping Plans", "fluent-cart-fakerpress"),
-    component: ShippingPlanGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 2,
-    icon: Truck,
-    description: __(
-      "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, shipping plugin developers, logistics teams",
-      "fluent-cart-fakerpress",
-    ),
-    route: "shipping-plans",
-  },
-  {
-    name: __("Tax Classes", "fluent-cart-fakerpress"),
-    component: TaxClassGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 3,
-    icon: DollarSign,
-    description: __(
-      "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners, accountants, tax plugin developers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "tax_classes",
-  },
-  {
-    name: __("Transactions", "fluent-cart-fakerpress"),
-    component: TransactionGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 4,
-    icon: CreditCard,
-    description: __(
-      "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Payment gateway developers, accountants, financial analysts",
-      "fluent-cart-fakerpress",
-    ),
-    route: "transactions",
-  },
-  {
-    name: __("Cart Sessions", "fluent-cart-fakerpress"),
-    component: CartSessionGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 5,
-    icon: ShoppingBag,
-    description: __(
-      "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Marketing teams, cart recovery plugin developers",
-      "fluent-cart-fakerpress",
-    ),
-    route: "cart-sessions",
-  },
-  {
-    name: __("Locations", "fluent-cart-fakerpress"),
-    component: LocationGenerator,
-    category: __("Advanced", "fluent-cart-fakerpress"),
-    order: 6,
-    icon: MapPin,
-    description: __(
-      "Populate geographic data with countries, states, and cities. Foundation data for shipping, taxes, and regional features in Fluent Cart.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __(
-      "Store owners setting up multi-region stores",
-      "fluent-cart-fakerpress",
-    ),
-    route: "locations",
-  },
-];
+import { useNavigate } from "react-router-dom";
+import { __ } from "@wordpress/i18n";
+import { Button } from "@/admin/components/ui/button";
+import { SectionLabel } from "@/admin/components/ui/section-label";
+import { StatCard } from "@/admin/components/dashboard/StatCard";
+import { RecentActivity } from "@/admin/components/dashboard/RecentActivity";
+import { GeneratorGrid } from "@/admin/components/home/GeneratorGrid";
+import { useStats } from "@/admin/providers/StatsProvider";
 
 export default function HomePage() {
-  const groupedGenerators = generators.reduce(
-    (acc, generator) => {
-      if (!acc[generator.category]) {
-        acc[generator.category] = [];
-      }
-      acc[generator.category].push(generator);
-      return acc;
-    },
-    {} as Record<string, Generator[]>,
-  );
-
-  const sortedCategories = Object.keys(groupedGenerators).sort((a, b) => {
-    // Put "Core" category first
-    if (a === __("Core", "fluent-cart-fakerpress")) return -1;
-    if (b === __("Core", "fluent-cart-fakerpress")) return 1;
-    // Then sort alphabetically
-    return a.localeCompare(b);
-  });
-
-  // Animation variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const categoryVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: [0.4, 0.0, 0.2, 1],
-      },
-    },
-  };
-
-  const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: [0.4, 0.0, 0.2, 1],
-      },
-    },
-    hover: {
-      y: -8,
-      scale: 1.02,
-      transition: {
-        duration: 0.2,
-        ease: [0.4, 0.0, 0.2, 1],
-      },
-    },
-  };
+  const navigate = useNavigate();
+  const { counts, totalGenerated, recentRuns } = useStats();
 
   return (
-    <motion.div
-      className="max-w-7xl mx-auto px-6 space-y-12"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {sortedCategories.map((category, categoryIndex) => (
-        <motion.div
-          key={category}
-          variants={categoryVariants}
-          className="space-y-6"
+    <div className="fp-page wide fp-enter">
+      {/* Page header */}
+      <div className="fp-page-head">
+        <div>
+          <h1 className="fp-h1">{__("FakerPress", "easycommerce-fakerpress")}</h1>
+          <p className="fp-sub">
+            {__("Generate realistic test data for your EasyCommerce store.", "easycommerce-fakerpress")}
+          </p>
+        </div>
+        <Button
+          variant="primary"
+          icon="sparkles"
+          onClick={() => navigate("/generator/products")}
         >
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: categoryIndex * 0.1 + 0.3 }}
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              {sprintf(
-                __("%s Generators", "fluent-cart-fakerpress"),
-                category,
-              )}
-            </h2>
-            <motion.div
-              className="h-1 w-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto"
-              initial={{ width: 0 }}
-              animate={{ width: 96 }}
-              transition={{ delay: categoryIndex * 0.1 + 0.5, duration: 0.8 }}
-            />
-          </motion.div>
+          {__("New generation", "easycommerce-fakerpress")}
+        </Button>
+      </div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-            variants={containerVariants}
-          >
-            {groupedGenerators[category]
-              .sort((a, b) => a.order - b.order)
-              .map((generator, index) => {
-                const IconComponent = generator.icon;
-                return (
-                  <motion.div
-                    key={generator.name}
-                    variants={cardVariants}
-                    whileHover="hover"
-                    className="group"
-                  >
-                    <Link
-                      to={`/generator/${generator.route}`}
-                      className="block h-full"
-                    >
-                      <Card className="h-full transition-all duration-300 hover:shadow-lg border-2 hover:border-blue-200 bg-gradient-to-br from-white to-gray-50/50">
-                        <CardHeader className="pb-4">
-                          <div className="flex items-start justify-between">
-                            <motion.div
-                              className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl mb-4"
-                              whileHover={{ scale: 1.1, rotate: 5 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
-                              <IconComponent className="w-6 h-6 text-blue-600" />
-                            </motion.div>
-                            {generator.popular && (
-                              <motion.div
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{
-                                  delay: 0.3 + index * 0.1,
-                                  type: "spring",
-                                  stiffness: 200,
-                                }}
-                              >
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-gradient-to-r from-orange-400 to-red-500 text-white border-0"
-                                >
-                                  <Star className="w-3 h-3 mr-1" />
-                                  {__("Popular", "fluent-cart-fakerpress")}
-                                </Badge>
-                              </motion.div>
-                            )}
-                          </div>
-                          <CardTitle className="text-xl group-hover:text-blue-700 transition-colors">
-                            {generator.name}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <CardDescription className="text-sm leading-relaxed mb-4">
-                            {generator.description}
-                          </CardDescription>
-                          {generator.useCase && (
-                            <div className="pt-4 border-t border-gray-100">
-                              <p className="text-xs text-gray-500 font-medium flex items-center">
-                                <span className="inline-block w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                                {__("Best for:", "fluent-cart-fakerpress")}{" "}
-                                {generator.useCase}
-                              </p>
-                            </div>
-                          )}
-                          <motion.div
-                            className="mt-4 flex items-center text-sm text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-                            initial={{ x: -10 }}
-                            whileHover={{ x: 0 }}
-                          >
-                            {__("Get started", "fluent-cart-fakerpress")}
-                            <ArrowRight className="w-4 h-4 ml-1" />
-                          </motion.div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-          </motion.div>
-        </motion.div>
-      ))}
-    </motion.div>
+      {/* Stat cards */}
+      <div className="fp-stat-row">
+        <StatCard
+          iconName="box"
+          label={__("Products", "easycommerce-fakerpress")}
+          value={counts.products ?? 0}
+          empty={!counts.products}
+          delta={counts.products ?? 0}
+          spark={[4, 6, 5, 8, 7, 9, 10]}
+          accentVar="var(--accent)"
+          testId="stat-products"
+        />
+        <StatCard
+          iconName="users"
+          label={__("Customers", "easycommerce-fakerpress")}
+          value={counts.customers ?? 0}
+          empty={!counts.customers}
+          delta={counts.customers ?? 0}
+          spark={[2, 3, 3, 5, 6, 6, 8]}
+          accentVar="var(--violet)"
+          testId="stat-customers"
+        />
+        <StatCard
+          iconName="cart"
+          label={__("Orders", "easycommerce-fakerpress")}
+          value={counts.orders ?? 0}
+          empty={!counts.orders}
+          delta={counts.orders ?? 0}
+          spark={[1, 2, 4, 3, 6, 7, 9]}
+          accentVar="var(--sky)"
+          testId="stat-orders"
+        />
+        <StatCard
+          iconName="database"
+          label={__("Total Generated", "easycommerce-fakerpress")}
+          value={totalGenerated}
+          empty={!totalGenerated}
+          delta={totalGenerated}
+          spark={[3, 5, 8, 7, 11, 14, 18]}
+          accentVar="var(--green)"
+          testId="stat-total"
+        />
+      </div>
+
+      {/* Recent activity */}
+      <div className="fp-group-head">
+        <SectionLabel>{__("Recent activity", "easycommerce-fakerpress")}</SectionLabel>
+        <div className="fp-group-line" />
+      </div>
+      <RecentActivity runs={recentRuns} />
+
+      {/* Generator grid */}
+      <GeneratorGrid counts={counts} />
+    </div>
   );
 }
-
-// Export generators for use in other components
-export { generators };

@@ -1,8 +1,16 @@
-import { render } from "@wordpress/element";
-import App from "./components/App";
+import React from 'react';
 
-const container = document.getElementById("fluent-cart-fakerpress-admin");
+import domReady from '@wordpress/dom-ready';
+import { createRoot } from '@wordpress/element';
 
-if (container) {
-  render(<App />, container);
-}
+import App from '@/admin/components/App';
+import './styles.css';
+import '@/admin/components.css';
+
+domReady( () => {
+	const container = document.getElementById( 'easycommerce-fakerpress-root' )!;
+	if ( container ) {
+		const root = createRoot( container );
+		root.render( <App /> );
+	}
+} );
