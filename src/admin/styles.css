@@ -1,7 +1,7 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities) important;
-@import "../assets/fonts/fonts.css";
+@import "../../assets/fonts/fonts.css";
 
 @theme {
   --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
