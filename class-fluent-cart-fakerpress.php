@@ -25,6 +25,7 @@ use FluentCartFakerPress\Controllers\Transaction;
 use FluentCartFakerPress\Controllers\Cart_Session;
 use FluentCartFakerPress\Controllers\Location;
 use FluentCartFakerPress\Controllers\Attribute;
+use FluentCartFakerPress\Controllers\Refund;
 
 /**
  * Main Plugin Class for Fluent Cart FakerPress
@@ -284,6 +285,7 @@ class FluentCart_FakerPress {
 			new Product_Variation(),
 			new Transaction(),
 			new Attribute(),
+			new Refund(),
 		);
 
 		foreach ( $controllers as $controller ) {
