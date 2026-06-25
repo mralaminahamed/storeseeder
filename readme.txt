@@ -4,134 +4,129 @@ Tags: ecommerce, faker, data-generation, testing, development
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 2.0.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic Fluent Cart test data: smart generators, real-time validation, advanced config, and seamless admin integration.
+Generate realistic Fluent Cart test data with 13 smart generators, a modern React admin, schema-driven configuration, and optional MCP integration.
 
 == Description ==
 
-Fluent Cart FakerPress is a robust WordPress plugin designed to generate realistic test data for the Fluent Cart e-commerce platform. It supports developers, agencies, and store owners in creating sophisticated datasets for testing, demonstrations, and performance evaluation. Key features include:
+Fluent Cart FakerPress generates realistic test data for the Fluent Cart e-commerce platform. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
-* **Smart Generators**: For products, customers, orders, coupons, and more.
-* **Real-Time Validation**: Ensures data integrity with dependency checks and user-friendly feedback.
-* **Advanced Configuration**: Nested parameters, intelligent defaults, and extensible hooks.
-* **Comprehensive Hook System**: Filters and actions for complete data customization and workflow integration.
-* **Modern Interface**: Built with React Router v7, Tailwind CSS, and automatic WordPress admin color scheme adaptation.
-* **Enterprise-Grade Architecture**: PSR-4 compliant, with native Fluent Cart model integration.
+All data is created through native Fluent Cart models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with Fluent Cart updates.
 
-This plugin is ideal for enterprise development, QA testing, integration validation, and scalable performance assessments in non-production environments.
+**Highlights**
 
-**Extensibility & Customization**:
-The plugin provides a comprehensive hook system allowing developers to customize every aspect of data generation:
-- **Data Filters**: Modify generated data before creation with filters
-- **Result Filters**: Customize returned data with result filters
-- **Workflow Actions**: Integrate with generation process using strategic actions
-- **API Integration**: Filter REST responses with complete API customization
+* **13 smart generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, tax classes, attributes, cart sessions, locations, and activity logs.
+* **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
+* **Schema-driven configuration** — each generator renders its own fields from a parameter schema: nested options, ranges, toggles, and intelligent defaults.
+* **REST API** — every generator is exposed at `fluent-cart-fakerpress/v1/<resource>/generate` for programmatic use.
+* **Optional MCP integration** — expose generators as AI tools via the WordPress Abilities API (see below).
+* **Extensible** — filters and actions cover the full generation lifecycle.
 
-**Data Generation Highlights**:
-- **Products**: Includes attributes, pricing strategies, and inventory tracking.
-- **Customers**: Features demographics, purchase history, and behavioral segmentation.
-- **Orders**: Covers payment processing, shipping calculations, and fulfillment workflows.
-- **Coupons**: Supports discount rules, usage limits, and targeting logic.
-- **Attributes**: Generates product attribute groups and taxonomy terms.
-- **Refunds**: Creates refund transactions against existing orders.
-- **Logs**: Generates activity log entries for audit trails.
+**Generators**
 
-Generated data leverages the Faker library for authenticity while adhering to real-world e-commerce patterns, ensuring compatibility with Fluent Cart updates and extensions.
+* **Products** — pricing, inventory, categories, and content options.
+* **Product Variations** — variation sets for variable products.
+* **Customers** — demographics, addresses, purchase history, and contact preferences.
+* **Orders** — line items, payment, shipping, tax, and status distribution.
+* **Transactions** — payment transactions tied to orders.
+* **Refunds** — full and partial refunds created against existing successful charge transactions.
+* **Coupons** — discount types, usage limits, validity windows, and restrictions.
+* **Shipping Plans** — shipping methods and zones.
+* **Tax Classes** — tax classes and rates.
+* **Attributes** — attribute groups with taxonomy terms.
+* **Cart Sessions** — abandoned and active cart sessions.
+* **Locations** — geographic location data.
+* **Logs** — activity log entries across orders, products, customers, coupons, and subscriptions.
 
-**Model Context Protocol (MCP) Integration**:
-The plugin supports optional MCP integration for advanced AI-assisted data generation workflows. This feature requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. The MCP integration is completely optional and degrades gracefully—the plugin functions normally without these dependencies.
+**Model Context Protocol (MCP) Integration**
+
+The plugin can optionally expose every generator as an MCP tool so AI clients (e.g. Claude Desktop, IDE assistants) can generate data with natural language. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
 
 == Installation ==
 
-### Automatic Installation
-1. Navigate to **Plugins → Add New** in your WordPress admin dashboard.
+= Automatic Installation =
+1. Go to **Plugins → Add New** in your WordPress admin.
 2. Search for "Fluent Cart FakerPress".
 3. Click **Install Now**, then **Activate**.
-4. Access the plugin via the new **FC FakerPress** menu item.
+4. Open the new **FC FakerPress** menu item.
 
-### Manual Installation
-1. Download the plugin ZIP file.
+= Manual Installation =
+1. Download the plugin ZIP.
 2. Upload it to `/wp-content/plugins/fluent-cart-fakerpress/`.
 3. Run `composer install` in the plugin directory.
 4. Activate via the **Plugins** screen.
-5. Access via the **FC FakerPress** menu.
+5. Open the **FC FakerPress** menu.
 
-### Development Setup
-1. Clone the repository: `git clone https://github.com/mralaminahamed/fluent-cart-fakerpress.git`.
-2. Install dependencies: `composer install && yarn install`.
-3. Build assets: `yarn build`.
+= Development Setup =
+1. Clone: `git clone https://github.com/mralaminahamed/fluent-cart-fakerpress.git`
+2. Install dependencies: `composer install && yarn install`
+3. Build assets: `yarn build`
 4. Activate the plugin.
 
-**Requirements**:
-- WordPress 5.0+
-- PHP 7.4+ (8.0+ recommended)
-- Fluent Cart plugin (latest version required)
-- Minimum 256MB memory (512MB for large datasets)
-- 100MB disk space for files and data
+= Requirements =
+* WordPress 5.0+
+* PHP 7.4+ (8.0+ recommended)
+* Fluent Cart plugin (active)
+* 256MB memory minimum (512MB for large datasets)
+* MCP integration (optional): WordPress Abilities API + `mcp-adapter` plugin
 
 == Frequently Asked Questions ==
 
 = How does Fluent Cart integration work? =
-The plugin utilizes native Fluent Cart models for generation, ensuring data validation, relationship integrity, and compatibility with future updates. Direct database queries are avoided to maintain business logic enforcement.
+Generators persist through native Fluent Cart Eloquent models, preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data.
 
-= Can I generate data with complex relationships? =
-Yes. Examples include linking orders to existing customers/products with inventory adjustments, modeling purchase history for loyalty progression, and validating coupon rules against categories and user data.
+= How many generators are included? =
+Thirteen: products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, tax classes, attributes, cart sessions, locations, and activity logs.
 
-= How realistic is the generated data? =
-Data is crafted using Faker for authentic details combined with e-commerce-specific logic, such as seasonal pricing, geographic accuracy, and customer lifecycle patterns.
+= Why does the Refund generator say "no eligible transaction"? =
+Refunds are created against existing successful charge transactions. Generate some orders/transactions first, then run the Refund generator.
 
-= Is it safe for production use? =
-**Caution**: Use exclusively in development or staging environments. Always back up your database prior to generation, start with small datasets, and avoid live sites without thorough testing.
+= Is it safe for production? =
+Use only in development or staging. Always back up your database before generating, and start with small batches.
 
 = Can I customize generation? =
-Yes, extensively! The plugin includes a comprehensive hook system with filters and actions for complete customization. Use data filters to modify data before creation, result filters for customization, and workflow actions for integration.
+Yes. The plugin fires filters and actions across the generation lifecycle — modify parameters, transform generated items, and customize REST responses.
 
-= What about performance for large datasets? =
-Optimizations include batch processing, memory-efficient algorithms, and resumable progress tracking to handle extensive datasets without timeouts.
+= What is the MCP integration for? =
+It exposes generators as AI tools via the WordPress Abilities API, so an MCP-capable assistant can create test data conversationally. It is optional and off unless the Abilities API and `mcp-adapter` are present.
 
 = How do I remove generated data? =
-Employ WordPress deletion tools for items, bulk cleanup plugins, or targeted database queries (for advanced users). Back up data before any removal.
+Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before removing.
 
 == Screenshots ==
 
-1. Modern Admin Interface: React-based tabbed navigation with WordPress admin color integration.
-   *(Screenshot: Admin dashboard overview)*
-2. Product Generator: Controls for attributes, categories, and inventory.
-   *(Screenshot: Product generation form)*
-3. Customer Generator: Profile creation with demographics and loyalty tracking.
-   *(Screenshot: Customer profile form)*
+1. Modern React admin with a generator grid and WordPress color-scheme integration.
+2. Schema-driven generator page with live configuration and preview.
+3. Customer generator with demographics and loyalty options.
 
 == Changelog ==
 
+= 2.0.0 - June 25, 2026 =
+* **New React single-page admin** — sidebar shell, dashboard, schema-driven generator pages, command palette, batch tray, and toasts (React Router v7, Tailwind CSS v4).
+* **13 generators** — added Attributes, Refunds, and Logs, alongside products, variations, customers, orders, transactions, coupons, shipping plans, tax classes, cart sessions, and locations.
+* **Optional MCP integration** — generators exposed as MCP tools via the WordPress Abilities API + `mcp-adapter` (graceful no-op when absent).
+* **REST parity** — every generator served at `fluent-cart-fakerpress/v1/<resource>/generate`, with admin routes aligned to the REST bases.
+* **Fix** — corrected the Fluent Cart dependency guard (`FLUENTCART_VERSION`) that previously prevented generators from running.
+
 = 1.0.0 - November 11, 2025 =
-* **Initial Release**: Smart generators for products and customers
-* **Modern Interface**: React-based admin interface with WordPress admin color integration
-* **REST API**: Complete REST API endpoints for programmatic access
-* **Advanced Configuration**: Nested parameters and intelligent defaults
-* **Code Quality**: PSR-4 compliant architecture with comprehensive validation
-* **Extensibility**: Hook system for complete data customization and workflow integration
+* Initial release: product and customer generators, React admin, REST API, hook system.
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-This is the initial release of Fluent Cart FakerPress. No upgrade path from previous versions.
+= 2.0.0 =
+Major release: new React admin, 13 generators (Attributes/Refunds/Logs added), and optional MCP integration. Rebuild assets (`yarn build`) if installing from source.
 
 == Other Notes ==
 
-**Privacy & Data Handling**:
-- Data is stored solely in your WordPress database; no external transmissions occur.
-- Generated content is fictional and compliant with privacy standards.
-- **Security Tip**: Restrict to non-production use and maintain regular backups.
+**Privacy & Data Handling**
+* Data is stored only in your WordPress database; nothing is transmitted externally.
+* Generated content is fictional.
+* Restrict to non-production use and keep backups.
 
-**Contributing**:
-- Repository: [GitHub](https://github.com/mralaminahamed/fluent-cart-fakerpress)
-- Report issues or request features via GitHub Issues.
-- Submit pull requests with tests, adhering to WordPress Coding Standards and PSR-4.
-
-**Support**:
-- Documentation: Included in the plugin and GitHub wiki.
-- Forums: WordPress.org support threads.
-- Professional assistance: Available for custom integrations.
+**Contributing**
+* Repository: https://github.com/mralaminahamed/fluent-cart-fakerpress
+* Report issues or request features via GitHub Issues.
+* Submit pull requests with tests, following WordPress Coding Standards and PSR-4.
