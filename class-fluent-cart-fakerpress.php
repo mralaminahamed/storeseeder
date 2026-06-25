@@ -24,6 +24,7 @@ use FluentCartFakerPress\Controllers\Tax_Class;
 use FluentCartFakerPress\Controllers\Transaction;
 use FluentCartFakerPress\Controllers\Cart_Session;
 use FluentCartFakerPress\Controllers\Location;
+use FluentCartFakerPress\Controllers\Attribute;
 
 /**
  * Main Plugin Class for Fluent Cart FakerPress
@@ -282,6 +283,7 @@ class FluentCart_FakerPress {
 			new Order(),
 			new Product_Variation(),
 			new Transaction(),
+			new Attribute(),
 		);
 
 		foreach ( $controllers as $controller ) {
