@@ -470,7 +470,7 @@ export const generators: Generator[] = [
       "fluent-cart-fakerpress",
     ),
     useCase: __("Store owners, accountants, tax plugin developers", "fluent-cart-fakerpress"),
-    route: "tax-classes",
+    route: "tax_classes",
     parameterConfig: {
       tax_types: {
         description: __("Types of tax classes to generate", "fluent-cart-fakerpress"),
@@ -536,7 +536,7 @@ export const generators: Generator[] = [
       "fluent-cart-fakerpress",
     ),
     useCase: __("Payment gateway developers, accountants, financial analysts", "fluent-cart-fakerpress"),
-    route: "transaction",
+    route: "transactions",
     parameterConfig: {
       customer_type: {
         description: __("Type of customers for transactions", "fluent-cart-fakerpress"),
