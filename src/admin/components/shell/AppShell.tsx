@@ -63,7 +63,7 @@ export function AppShell() {
       const saved = localStorage.getItem("fp_locale");
       if (saved) return saved;
     } catch {}
-    return window.easycommerceFakerpressApi?.locale?.label ?? "English (United States)";
+    return window.fluentCartFakerpressApi?.locale?.label ?? "English (United States)";
   });
 
   const setLocale = (l: string) => {

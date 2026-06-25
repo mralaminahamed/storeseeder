@@ -18,14 +18,14 @@ const ACCENTS: { id: Accent; c: string }[] = [
 
 /** Tokens the user can recolor. `token` is the CSS var name without `--`. */
 const CUSTOM_TOKENS: { token: string; label: string }[] = [
-  { token: "accent", label: __("Accent", "easycommerce-fakerpress") },
-  { token: "bg-2", label: __("Background", "easycommerce-fakerpress") },
-  { token: "surface", label: __("Surface", "easycommerce-fakerpress") },
-  { token: "text", label: __("Text", "easycommerce-fakerpress") },
-  { token: "border", label: __("Border", "easycommerce-fakerpress") },
-  { token: "green", label: __("Success", "easycommerce-fakerpress") },
-  { token: "amber", label: __("Warning", "easycommerce-fakerpress") },
-  { token: "red", label: __("Danger", "easycommerce-fakerpress") },
+  { token: "accent", label: __("Accent", "fluent-cart-fakerpress") },
+  { token: "bg-2", label: __("Background", "fluent-cart-fakerpress") },
+  { token: "surface", label: __("Surface", "fluent-cart-fakerpress") },
+  { token: "text", label: __("Text", "fluent-cart-fakerpress") },
+  { token: "border", label: __("Border", "fluent-cart-fakerpress") },
+  { token: "green", label: __("Success", "fluent-cart-fakerpress") },
+  { token: "amber", label: __("Warning", "fluent-cart-fakerpress") },
+  { token: "red", label: __("Danger", "fluent-cart-fakerpress") },
 ];
 
 const HEX = (n: number) => n.toString(16).padStart(2, "0");
@@ -125,13 +125,13 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
         <div className="fp-tweaks-head">
           <Icon name="sliders" size={17} />
           <span className="fp-tweaks-title">
-            {__("Tweaks", "easycommerce-fakerpress")}
+            {__("Tweaks", "fluent-cart-fakerpress")}
           </span>
           <button
             type="button"
             className="fp-icon-btn"
             style={{ marginLeft: "auto", width: 30, height: 30, border: "none" }}
-            aria-label={__("Close", "easycommerce-fakerpress")}
+            aria-label={__("Close", "fluent-cart-fakerpress")}
             onClick={onClose}
           >
             <Icon name="x" size={17} />
@@ -142,20 +142,20 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
               then accent, density, and custom colors (power-user, least). */}
           <div className="fp-tweak-sec">
             <div className="fp-tweak-label">
-              {__("Appearance", "easycommerce-fakerpress")}
+              {__("Appearance", "fluent-cart-fakerpress")}
             </div>
             <Seg<Theme>
               value={theme}
               onChange={setTheme}
               options={[
-                { v: "light", label: __("Light", "easycommerce-fakerpress"), ic: "sun" },
-                { v: "dark", label: __("Dark", "easycommerce-fakerpress"), ic: "moon" },
+                { v: "light", label: __("Light", "fluent-cart-fakerpress"), ic: "sun" },
+                { v: "dark", label: __("Dark", "fluent-cart-fakerpress"), ic: "moon" },
               ]}
             />
           </div>
           <div className="fp-tweak-sec">
             <div className="fp-tweak-label">
-              {__("Accent color", "easycommerce-fakerpress")}
+              {__("Accent color", "fluent-cart-fakerpress")}
             </div>
             <div className="fp-swatches">
               {ACCENTS.map((a) => (
@@ -173,27 +173,27 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
           </div>
           <div className="fp-tweak-sec">
             <div className="fp-tweak-label">
-              {__("Density", "easycommerce-fakerpress")}
+              {__("Density", "fluent-cart-fakerpress")}
             </div>
             <Seg<Density>
               value={density}
               onChange={setDensity}
               options={[
-                { v: "comfortable", label: __("Comfortable", "easycommerce-fakerpress") },
-                { v: "compact", label: __("Compact", "easycommerce-fakerpress") },
+                { v: "comfortable", label: __("Comfortable", "fluent-cart-fakerpress") },
+                { v: "compact", label: __("Compact", "fluent-cart-fakerpress") },
               ]}
             />
           </div>
           <div className="fp-tweak-sec">
             <div className="fp-tweak-label" style={{ display: "flex", alignItems: "center" }}>
-              {__("Custom colors", "easycommerce-fakerpress")}
+              {__("Custom colors", "fluent-cart-fakerpress")}
               {Object.keys(customColors).length > 0 && (
                 <button
                   type="button"
                   className="fp-color-reset"
                   onClick={resetCustomColors}
                 >
-                  {__("Reset", "easycommerce-fakerpress")}
+                  {__("Reset", "fluent-cart-fakerpress")}
                 </button>
               )}
             </div>
@@ -210,8 +210,8 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
                       <button
                         type="button"
                         className="fp-color-revert"
-                        title={__("Revert", "easycommerce-fakerpress")}
-                        aria-label={__("Revert", "easycommerce-fakerpress")}
+                        title={__("Revert", "fluent-cart-fakerpress")}
+                        aria-label={__("Revert", "fluent-cart-fakerpress")}
                         onClick={() => setCustomColor(token, "")}
                       >
                         <Icon name="refresh" size={13} />
@@ -242,7 +242,7 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
           >
             {__(
               "These controls preview how the FakerPress admin would adapt to store-owner theme preferences.",
-              "easycommerce-fakerpress",
+              "fluent-cart-fakerpress",
             )}
           </p>
         </div>

@@ -13,7 +13,6 @@ import type { Generator } from "@/admin/types";
 
 const DEP: Record<string, string> = {
   refunds: "Targets existing completed / processing orders",
-  "product-reviews": "Auto-linked to existing products & customers",
   "product-variations": "Applied to existing variable products",
   transaction: "Generated against existing orders",
   "cart-sessions": "Uses your existing products & customers",
@@ -57,7 +56,7 @@ export function ConfigColumn({
               className="fp-tag"
               style={{ marginTop: 6, display: "inline-block" }}
             >
-              {__("Popular", "easycommerce-fakerpress")}
+              {__("Popular", "fluent-cart-fakerpress")}
             </span>
           )}
         </div>
@@ -70,7 +69,7 @@ export function ConfigColumn({
       {depNote && (
         <div className="fp-dep">
           <Icon name="info" size={15} />
-          {__(depNote, "easycommerce-fakerpress")}
+          {__(depNote, "fluent-cart-fakerpress")}
         </div>
       )}
 
@@ -80,7 +79,7 @@ export function ConfigColumn({
           <p style={{ color: "var(--text-faint)", fontSize: 13 }}>
             {__(
               "No extra options — just set a count and generate.",
-              "easycommerce-fakerpress",
+              "fluent-cart-fakerpress",
             )}
           </p>
         </div>

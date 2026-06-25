@@ -10,7 +10,7 @@ interface LocalePickerProps {
 }
 
 export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) {
-  const all = window.easycommerceFakerpressApi?.locale?.allLocales ?? {};
+  const all = window.fluentCartFakerpressApi?.locale?.allLocales ?? {};
   // Sorted list of human labels; fall back to the current locale if none provided.
   const labels = Object.values(all).filter(Boolean).sort();
   const options = labels.length > 0 ? labels : [locale];
@@ -34,7 +34,7 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
         <div className="fp-cmd-input-row">
           <Icon name="globe" size={18} />
           <span style={{ fontWeight: 600 }}>
-            {__("Default locale", "easycommerce-fakerpress")}
+            {__("Default locale", "fluent-cart-fakerpress")}
           </span>
         </div>
         <div className="fp-cmd-results">

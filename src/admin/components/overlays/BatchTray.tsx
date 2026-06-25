@@ -39,7 +39,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
         <div className="fp-tweaks-head">
           <Icon name="layers" size={17} />
           <span className="fp-tweaks-title">
-            {__("Batch queue", "easycommerce-fakerpress")}
+            {__("Batch queue", "fluent-cart-fakerpress")}
           </span>
           <span className="fp-badge tone-accent" style={{ marginLeft: 4 }}>
             {batch.length}
@@ -48,7 +48,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
             type="button"
             className="fp-icon-btn"
             style={{ marginLeft: "auto", width: 30, height: 30, border: "none" }}
-            aria-label={__("Close", "easycommerce-fakerpress")}
+            aria-label={__("Close", "fluent-cart-fakerpress")}
             onClick={onClose}
           >
             <Icon name="x" size={17} />
@@ -59,11 +59,11 @@ export function BatchTray({ onClose }: BatchTrayProps) {
           {batch.length === 0 ? (
             <div className="fp-empty" style={{ padding: 40 }}>
               <Icon name="layers" size={24} />
-              <div>{__("Queue is empty.", "easycommerce-fakerpress")}</div>
+              <div>{__("Queue is empty.", "fluent-cart-fakerpress")}</div>
               <div style={{ fontSize: 12 }}>
                 {__(
                   "Add generators with “Add to batch” to run them together.",
-                  "easycommerce-fakerpress",
+                  "fluent-cart-fakerpress",
                 )}
               </div>
             </div>
@@ -82,7 +82,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
                     <div style={{ fontSize: 12, color: "var(--text-3)" }}>
                       {sprintf(
                         /* translators: %s: item count */
-                        __("%s items", "easycommerce-fakerpress"),
+                        __("%s items", "fluent-cart-fakerpress"),
                         b.count.toLocaleString(),
                       )}
                     </div>
@@ -97,7 +97,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
                     type="button"
                     className="fp-icon-btn"
                     style={{ width: 32, height: 32 }}
-                    aria-label={__("Remove", "easycommerce-fakerpress")}
+                    aria-label={__("Remove", "fluent-cart-fakerpress")}
                     onClick={() => remove(i)}
                   >
                     <Icon name="trash" size={15} />
@@ -122,12 +122,12 @@ export function BatchTray({ onClose }: BatchTrayProps) {
             }}
           >
             <span style={{ color: "var(--text-3)" }}>
-              {__("Total", "easycommerce-fakerpress")}
+              {__("Total", "fluent-cart-fakerpress")}
             </span>
             <span style={{ fontWeight: 600 }}>
               {sprintf(
                 /* translators: %s: total item count */
-                __("%s items", "easycommerce-fakerpress"),
+                __("%s items", "fluent-cart-fakerpress"),
                 total.toLocaleString(),
               )}
             </span>
@@ -142,10 +142,10 @@ export function BatchTray({ onClose }: BatchTrayProps) {
             type="button"
           >
             {running
-              ? __("Generating…", "easycommerce-fakerpress")
+              ? __("Generating…", "fluent-cart-fakerpress")
               : sprintf(
                   /* translators: %s: number of queued generators */
-                  __("Run batch (%s)", "easycommerce-fakerpress"),
+                  __("Run batch (%s)", "fluent-cart-fakerpress"),
                   batch.length.toLocaleString(),
                 )}
           </Button>

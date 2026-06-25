@@ -273,7 +273,7 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
 }
 
 
-body:has(#easycommerce-fakerpress-root) #wpcontent {
+body:has(#fluent-cart-fakerpress-root) #wpcontent {
   padding-left: 0;
 
   /* Remove WP admin default focus styles from links */
@@ -285,11 +285,11 @@ body:has(#easycommerce-fakerpress-root) #wpcontent {
 /* The plugin app is a full-height takeover of the content area, so the
    WordPress admin footer ("Thank you for creating with WordPress…") would
    overlap the sticky run bar. Hide it on our screen only. */
-body:has(#easycommerce-fakerpress-root) #wpfooter {
+body:has(#fluent-cart-fakerpress-root) #wpfooter {
   display: none;
 }
 
 /* Reset WP core's reserved footer space so the app fills the content area. */
-body:has(#easycommerce-fakerpress-root) #wpbody-content {
+body:has(#fluent-cart-fakerpress-root) #wpbody-content {
   padding-bottom: 0;
 }

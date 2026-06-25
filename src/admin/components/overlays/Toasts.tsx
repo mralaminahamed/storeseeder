@@ -23,7 +23,7 @@ export function Toasts() {
           <button
             type="button"
             className="fp-toast-x"
-            aria-label={__("Dismiss", "easycommerce-fakerpress")}
+            aria-label={__("Dismiss", "fluent-cart-fakerpress")}
             onClick={() => dismiss(t.id)}
           >
             <Icon name="x" size={15} />

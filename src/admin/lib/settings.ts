@@ -11,7 +11,7 @@ const SETTINGS_KEY = "ec_fp_settings";
 function getDefaults(): AppSettings {
   return {
     defaultCount: 10,
-    defaultLocale: window.easycommerceFakerpressApi?.locale?.faker ?? "en_US",
+    defaultLocale: window.fluentCartFakerpressApi?.locale?.faker ?? "en_US",
     defaultSeed: "",
     defaultIncludeMeta: true,
     maxRunsPerGenerator: 10,

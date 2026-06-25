@@ -66,7 +66,7 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
 
       const locale =
         getSettings().defaultLocale ??
-        window.easycommerceFakerpressApi?.locale?.faker ??
+        window.fluentCartFakerpressApi?.locale?.faker ??
         "en_US";
 
       let ok = 0;
@@ -76,7 +76,7 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
         const item = items[i];
         try {
           const data = (await apiFetch({
-            path: `/easycommerce-fakerpress/v1/${item.route}/generate`,
+            path: `/fluent-cart-fakerpress/v1/${item.route}/generate`,
             method: "POST",
             data: { count: item.count, locale, include_meta: false },
           })) as GeneratorResult;
@@ -87,7 +87,7 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
           const errMsg =
             err instanceof Error
               ? err.message
-              : __("An error occurred.", "easycommerce-fakerpress");
+              : __("An error occurred.", "fluent-cart-fakerpress");
           recordRun(item.route, item.count, false, errMsg, { locale });
         }
         onProgress?.(i + 1, items.length);
@@ -97,7 +97,7 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
         toast(
           sprintf(
             /* translators: %1$s: total items, %2$s: number of generators */
-            __("Batch complete · %1$s items", "easycommerce-fakerpress"),
+            __("Batch complete · %1$s items", "fluent-cart-fakerpress"),
             total.toLocaleString(),
           ),
           sprintf(
@@ -106,13 +106,13 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
               "%s generator run",
               "%s generators run",
               ok,
-              "easycommerce-fakerpress",
+              "fluent-cart-fakerpress",
             ),
             ok.toLocaleString(),
           ),
         );
       } else {
-        toast(__("Batch failed", "easycommerce-fakerpress"));
+        toast(__("Batch failed", "fluent-cart-fakerpress"));
       }
 
       setBatch([]);

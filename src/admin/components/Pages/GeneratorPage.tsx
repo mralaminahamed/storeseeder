@@ -76,7 +76,7 @@ export default function GeneratorPage() {
   const [meta, setMeta] = useState<boolean>(settings.defaultIncludeMeta);
   const locale =
     getSettings().defaultLocale ??
-    window.easycommerceFakerpressApi?.locale?.faker ??
+    window.fluentCartFakerpressApi?.locale?.faker ??
     "en_US";
 
   // Generator-specific params — re-initialise on route change
@@ -155,7 +155,7 @@ export default function GeneratorPage() {
 
       try {
         const data = (await apiFetch({
-          path: `/easycommerce-fakerpress/v1/${generator.route}/generate`,
+          path: `/fluent-cart-fakerpress/v1/${generator.route}/generate`,
           method: "POST",
           data: body,
         })) as GeneratorResult;
@@ -167,20 +167,20 @@ export default function GeneratorPage() {
         toast(
           sprintf(
             /* translators: %1$s: count, %2$s: generator name */
-            __("Generated %1$s %2$s", "easycommerce-fakerpress"),
+            __("Generated %1$s %2$s", "fluent-cart-fakerpress"),
             count.toLocaleString(),
             generatorLabel,
           ),
-          __("Added to your EasyCommerce store", "easycommerce-fakerpress"),
+          __("Added to your Fluent Cart store", "fluent-cart-fakerpress"),
         );
       } catch (err) {
         const errMsg =
           err instanceof Error
             ? err.message
-            : __("An error occurred.", "easycommerce-fakerpress");
+            : __("An error occurred.", "fluent-cart-fakerpress");
 
         recordRun(generator.route, count, false, errMsg, { locale, seed });
-        toast(__("Generation failed", "easycommerce-fakerpress"), errMsg);
+        toast(__("Generation failed", "fluent-cart-fakerpress"), errMsg);
       } finally {
         setGenerating(false);
       }
@@ -198,7 +198,7 @@ export default function GeneratorPage() {
     toast(
       sprintf(
         /* translators: %1$s: count, %2$s: generator name */
-        __("Added %1$s %2$s to batch", "easycommerce-fakerpress"),
+        __("Added %1$s %2$s to batch", "fluent-cart-fakerpress"),
         count.toLocaleString(),
         generatorLabel,
       ),
@@ -224,7 +224,7 @@ export default function GeneratorPage() {
             <div className="fp-preview-head">
               <span className="fp-preview-title">
                 <span className="fp-live-dot" />
-                {__("Live preview", "easycommerce-fakerpress")}
+                {__("Live preview", "fluent-cart-fakerpress")}
               </span>
               <div className="fp-preview-actions">
                 <Button
@@ -234,7 +234,7 @@ export default function GeneratorPage() {
                   type="button"
                   onClick={() => setShuffleN((n) => n + 1)}
                 >
-                  {__("Shuffle", "easycommerce-fakerpress")}
+                  {__("Shuffle", "fluent-cart-fakerpress")}
                 </Button>
               </div>
             </div>
@@ -242,7 +242,7 @@ export default function GeneratorPage() {
             <p className="fp-preview-note">
               {__(
                 "Sample of what this run will create — updates as you change the settings.",
-                "easycommerce-fakerpress",
+                "fluent-cart-fakerpress",
               )}
             </p>
 
@@ -272,7 +272,7 @@ export default function GeneratorPage() {
                   <div style={{ fontWeight: 550, fontSize: 14 }}>
                     {sprintf(
                       /* translators: %1$s: count, %2$s: generator name */
-                      __("Generating %1$s %2$s…", "easycommerce-fakerpress"),
+                      __("Generating %1$s %2$s…", "fluent-cart-fakerpress"),
                       count.toLocaleString(),
                       generatorLabel,
                     )}

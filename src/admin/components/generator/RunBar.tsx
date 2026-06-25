@@ -36,12 +36,12 @@ export function RunBar({
     count === 1
       ? sprintf(
           /* translators: %s: formatted number */
-          __("Generate %s item", "easycommerce-fakerpress"),
+          __("Generate %s item", "fluent-cart-fakerpress"),
           count.toLocaleString(),
         )
       : sprintf(
           /* translators: %s: formatted number */
-          __("Generate %s items", "easycommerce-fakerpress"),
+          __("Generate %s items", "fluent-cart-fakerpress"),
           count.toLocaleString(),
         );
 
@@ -49,7 +49,7 @@ export function RunBar({
     <div className="fp-genbar" data-testid="generator-runbar">
       {/* Count group */}
       <div className="fp-genbar-ctl">
-        <span className="lbl">{__("Count", "easycommerce-fakerpress")}</span>
+        <span className="lbl">{__("Count", "fluent-cart-fakerpress")}</span>
         <Stepper value={count} onChange={onCount} min={1} max={100000} testId="count" />
       </div>
 
@@ -57,7 +57,7 @@ export function RunBar({
 
       {/* Seed group */}
       <div className="fp-genbar-ctl">
-        <span className="lbl">{__("Seed", "easycommerce-fakerpress")}</span>
+        <span className="lbl">{__("Seed", "fluent-cart-fakerpress")}</span>
         <div className="fp-seed-input">
           <TextField value={seed} ph="random" onChange={onSeed} />
         </div>
@@ -69,7 +69,7 @@ export function RunBar({
       <Toggle
         checked={meta}
         onChange={onMeta}
-        label={__("Metadata", "easycommerce-fakerpress")}
+        label={__("Metadata", "fluent-cart-fakerpress")}
       />
 
       <div className="fp-genbar-spacer" />
@@ -83,7 +83,7 @@ export function RunBar({
         type="button"
         data-testid="add-to-batch"
       >
-        {__("Add to batch", "easycommerce-fakerpress")}
+        {__("Add to batch", "fluent-cart-fakerpress")}
       </Button>
 
       {/* Generate */}

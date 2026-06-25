@@ -24,7 +24,7 @@ export function fetchPreview(
   params: Record<string, unknown>,
 ): Promise<PreviewData> {
   return apiFetch({
-    path: `/easycommerce-fakerpress/v1/${route}/preview`,
+    path: `/fluent-cart-fakerpress/v1/${route}/preview`,
     method: "POST",
     data: params,
   }) as Promise<PreviewData>;

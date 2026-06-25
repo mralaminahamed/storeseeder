@@ -29,7 +29,7 @@ export default function PluginsPage() {
       .then((data: { plugins?: WPPlugin[] }) => {
         setPlugins(
           (data.plugins ?? []).filter(
-            (p) => p.slug !== "easycommerce-fakerpress",
+            (p) => p.slug !== "fluent-cart-fakerpress",
           ),
         );
         setLoading(false);
@@ -38,7 +38,7 @@ export default function PluginsPage() {
         setError(
           __(
             "Could not load plugins. Check your internet connection.",
-            "easycommerce-fakerpress",
+            "fluent-cart-fakerpress",
           ),
         );
         setLoading(false);
@@ -50,12 +50,12 @@ export default function PluginsPage() {
       <div className="fp-page-head">
         <div>
           <h1 className="fp-h1">
-            {__("Our Plugins", "easycommerce-fakerpress")}
+            {__("Our Plugins", "fluent-cart-fakerpress")}
           </h1>
           <p className="fp-sub">
             {__(
               "Other plugins by the same author on WordPress.org.",
-              "easycommerce-fakerpress",
+              "fluent-cart-fakerpress",
             )}
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function PluginsPage() {
 
       {!loading && !error && plugins.length === 0 && (
         <p className="fp-sub">
-          {__("No plugins found.", "easycommerce-fakerpress")}
+          {__("No plugins found.", "fluent-cart-fakerpress")}
         </p>
       )}
 
@@ -159,7 +159,7 @@ function PluginCard({ plugin }: { plugin: WPPlugin }) {
         <span className="fp-plugin-active">
           {sprintf(
             /* translators: %s: formatted install count */
-            __("%s+ active", "easycommerce-fakerpress"),
+            __("%s+ active", "fluent-cart-fakerpress"),
             plugin.active_installs.toLocaleString(),
           )}
         </span>
@@ -173,7 +173,7 @@ function PluginCard({ plugin }: { plugin: WPPlugin }) {
         style={{ display: "block" }}
       >
         <Button variant="outline" size="sm" icon="external" className="full-w" type="button">
-          {__("View on WordPress.org", "easycommerce-fakerpress")}
+          {__("View on WordPress.org", "fluent-cart-fakerpress")}
         </Button>
       </a>
     </div>

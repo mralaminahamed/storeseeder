@@ -105,7 +105,7 @@ export function PreviewTable({
           setError(
             err instanceof Error
               ? err.message
-              : __("Could not load preview.", "easycommerce-fakerpress"),
+              : __("Could not load preview.", "fluent-cart-fakerpress"),
           );
           setLoading(false);
         });
@@ -120,16 +120,16 @@ export function PreviewTable({
 
   // Columns rendered, plus an optional metadata column.
   const cols: PreviewColumn[] = meta
-    ? [...columns, { key: "_meta", label: __("Metadata", "easycommerce-fakerpress") }]
+    ? [...columns, { key: "_meta", label: __("Metadata", "fluent-cart-fakerpress") }]
     : columns;
 
   const seedLabel = seed.trim()
     ? sprintf(
         /* translators: %s: seed value */
-        __("seed: %s", "easycommerce-fakerpress"),
+        __("seed: %s", "fluent-cart-fakerpress"),
         seed.trim(),
       )
-    : __("seed: random", "easycommerce-fakerpress");
+    : __("seed: random", "fluent-cart-fakerpress");
 
   return (
     <div className="fp-table-card" data-testid="preview-table">
@@ -142,8 +142,8 @@ export function PreviewTable({
         ) : columns.length === 0 ? (
           <div className="fp-preview-state">
             {loading
-              ? __("Loading preview…", "easycommerce-fakerpress")
-              : __("No preview available.", "easycommerce-fakerpress")}
+              ? __("Loading preview…", "fluent-cart-fakerpress")
+              : __("No preview available.", "fluent-cart-fakerpress")}
           </div>
         ) : (
           <table className="fp-table" style={loading ? { opacity: 0.55 } : undefined}>
@@ -180,7 +180,7 @@ export function PreviewTable({
         <span>
           {sprintf(
             /* translators: %1$s: visible row count, %2$s: total count */
-            __("Live preview · showing %1$s of %2$s", "easycommerce-fakerpress"),
+            __("Live preview · showing %1$s of %2$s", "fluent-cart-fakerpress"),
             visible.toLocaleString(),
             count.toLocaleString(),
           )}

@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 declare global {
   interface Window {
-    easycommerceFakerpressApi?: {
+    fluentCartFakerpressApi?: {
       restUrl?: string;
       restNonce?: string;
       ajaxUrl?: string;
