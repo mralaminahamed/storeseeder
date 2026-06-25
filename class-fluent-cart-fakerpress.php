@@ -27,6 +27,7 @@ use FluentCartFakerPress\Controllers\Location;
 use FluentCartFakerPress\Controllers\Attribute;
 use FluentCartFakerPress\Controllers\Refund;
 use FluentCartFakerPress\Controllers\Log;
+use FluentCartFakerPress\MCP\MCP_Server;
 
 /**
  * Main Plugin Class for Fluent Cart FakerPress
@@ -112,6 +113,29 @@ class FluentCart_FakerPress {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+
+		$this->init_mcp();
+	}
+
+	/**
+	 * Initialise the MCP server integration.
+	 *
+	 * Boots the MCP_Server class which registers abilities via the
+	 * WordPress Abilities API and exposes them as MCP tools through the
+	 * mcp-adapter plugin.
+	 *
+	 * If neither the abilities-api nor the mcp-adapter is present, this
+	 * method exits silently — no errors are thrown so existing functionality
+	 * is completely unaffected.
+	 *
+	 * @since 2.1.0
+	 * @return void
+	 */
+	private function init_mcp(): void {
+		// Both the abilities-api action hook and the mcp-adapter action hook
+		// are checked at their respective fire-times; here we just wire up the
+		// MCP_Server instance unconditionally so it can listen for those hooks.
+		( new MCP_Server() )->init();
 	}
 
 	/**
