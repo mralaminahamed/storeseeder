@@ -1,0 +1,11 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fluent Cart FakerPress">
+  <defs>
+    <linearGradient id="fcfpIcon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="60" fill="url(#fcfpIcon)"/>
+  <polygon points="127,52 147,110 204,130 147,150 127,208 107,150 50,130 107,110" fill="#ffffff"/>
+  <polygon points="196,56 202.6,75 222,82 202.6,89 196,108 189.4,89 170,82 189.4,75" fill="#ffffff" opacity="0.92"/>
+</svg>
