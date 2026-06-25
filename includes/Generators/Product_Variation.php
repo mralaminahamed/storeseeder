@@ -58,7 +58,7 @@ class Product_Variation extends Generator {
 	 */
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
-		if ( ! defined( 'FLUENT_CART_VERSION' ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 

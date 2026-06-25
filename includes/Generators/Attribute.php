@@ -61,7 +61,7 @@ class Attribute extends Generator {
 	 * {@inheritDoc}
 	 */
 	protected function generate_single_item() {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( AttributeGroup::class ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( AttributeGroup::class ) ) {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 

@@ -92,7 +92,7 @@ class Log extends Generator {
 	 * {@inheritDoc}
 	 */
 	protected function generate_single_item() {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( Activity::class ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( Activity::class ) ) {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 

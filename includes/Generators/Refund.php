@@ -66,7 +66,7 @@ class Refund extends Generator {
 	 * {@inheritDoc}
 	 */
 	protected function generate_single_item() {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( OrderTransaction::class ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( OrderTransaction::class ) ) {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart transaction model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 
