@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 
 class LogGeneratorTest extends TestCase {
 	public function test_generate_log_or_skips_without_fluent_cart(): void {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
 			$this->markTestSkipped( 'Fluent Cart not loaded in test env.' );
 		}
 		$gen = new Log();

@@ -3,8 +3,8 @@ use FluentCartFakerPress\Generators\Refund;
 use PHPUnit\Framework\TestCase;
 
 class RefundGeneratorTest extends TestCase {
-	public function test_generate_refund_or_reports_no_order(): void {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) ) {
+	public function test_generate_refund_or_reports_no_eligible_transaction(): void {
+		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
 			$this->markTestSkipped( 'Fluent Cart not loaded in test env.' );
 		}
 		$gen = new Refund();

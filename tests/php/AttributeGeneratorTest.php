@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 
 class AttributeGeneratorTest extends TestCase {
 	public function test_generate_single_attribute_returns_group_with_terms(): void {
-		if ( ! defined( 'FLUENT_CART_VERSION' ) ) {
+		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
 			$this->markTestSkipped( 'Fluent Cart not loaded in test env.' );
 		}
 		$gen = new Attribute();
