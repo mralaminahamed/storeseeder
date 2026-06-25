@@ -16,8 +16,8 @@ module.exports = {
     ...defaultConfig.resolve,
     alias: {
       ...defaultConfig.resolve?.alias,
-      "@": path.resolve(__dirname, "src/admin"),
-      "@src": path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "src"),
     },
+    extensions: [".tsx", ".ts", ".js", ".jsx"],
   },
 };

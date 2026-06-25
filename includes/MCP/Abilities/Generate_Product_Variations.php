@@ -1,0 +1,70 @@
+<?php
+/**
+ * MCP Ability: Generate Product Variations
+ *
+ * @package FluentCartFakerPress\MCP\Abilities
+ * @since   2.1.0
+ */
+
+namespace FluentCartFakerPress\MCP\Abilities;
+
+use FluentCartFakerPress\Abstracts\Ability;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Generate_Product_Variations
+ *
+ * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/product-variations/generate
+ *
+ * @since 2.1.0
+ */
+class Generate_Product_Variations extends Ability {
+
+	const REST_BASE = 'product-variations';
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @param array<string, mixed> $input Validated input from the MCP client.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public static function execute( array $input = array() ) {
+		return static::dispatch( static::build_payload( $input ) );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @param array<string, mixed> $input Raw MCP input.
+	 * @return array<string, mixed>
+	 */
+	protected static function build_payload( array $input ): array {
+		$payload = array(
+			'count'  => $input['count'] ?? 5,
+			'locale' => $input['locale'] ?? 'en_US',
+		);
+
+		if ( isset( $input['seed'] ) ) {
+			$payload['seed'] = (int) $input['seed'];
+		}
+
+		if ( isset( $input['specific_product_id'] ) ) {
+			$payload['specific_product_id'] = (int) $input['specific_product_id'];
+		}
+
+		if ( ! empty( $input['exclude_product_ids'] ) ) {
+			$payload['exclude_products'] = array_map( 'intval', (array) $input['exclude_product_ids'] );
+		}
+
+		$payload['stock_settings'] = array(
+			'manage_stock' => $input['manage_stock'] ?? true,
+			'stock_range'  => array(
+				'min' => $input['stock_min'] ?? 0,
+				'max' => $input['stock_max'] ?? 100,
+			),
+		);
+
+		return $payload;
+	}
+}

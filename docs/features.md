@@ -6,7 +6,7 @@ Fluent Cart FakerPress provides comprehensive test data generation capabilities 
 
 ### 🛍️ Smart Generators
 
-Generate realistic data for all major Fluent Cart entities:
+Generate realistic data for all major Fluent Cart entities (13 generators total):
 
 - **Products**: Simple and variable products with pricing, inventory, and attributes
 - **Customers**: Customer profiles with demographics and purchase history
@@ -14,6 +14,9 @@ Generate realistic data for all major Fluent Cart entities:
 - **Coupons**: Discount rules and promotional codes
 - **Categories**: Product organization and taxonomy
 - **Variations**: Product variations with attributes and pricing
+- **Attributes**: Product attribute groups and taxonomy terms
+- **Refunds**: Refund transactions against existing orders
+- **Logs**: Activity log entries for audit trails
 
 ### 🎯 One-Click Generation
 
@@ -140,6 +143,13 @@ add_filter( 'fluent_cart_fakerpress_validation_rules', 'custom_validation' );
 - **Multisite Compatible**: Works in WordPress multisite networks
 - **Plugin Conflicts**: Tested with popular plugin combinations
 - **Theme Agnostic**: Compatible with all WordPress themes
+
+### 🤖 Model Context Protocol (MCP) Integration
+
+- **AI-Assisted Workflows**: Optional MCP support for intelligent data generation
+- **WordPress Abilities API**: Leverages native WordPress capabilities (bundled in WP 6.9+)
+- **MCP Adapter Compatible**: Works with the mcp-adapter plugin for extended functionality
+- **Graceful Degradation**: Fully functional without MCP; optional for advanced use cases
 
 ## Development Features
 
