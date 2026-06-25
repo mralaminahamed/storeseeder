@@ -50,7 +50,7 @@ class Generate_Logs extends Ability {
 		}
 
 		if ( isset( $input['log_types'] ) ) {
-			$payload['log_types'] = $input['log_types'];
+			$payload['log_types'] = (array) $input['log_types'];
 		}
 
 		return $payload;

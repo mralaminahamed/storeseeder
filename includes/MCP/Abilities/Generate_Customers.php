@@ -61,7 +61,7 @@ class Generate_Customers extends Ability {
 
 		$payload['purchase_history'] = array(
 			'simulate_history' => $input['simulate_purchase_history'] ?? true,
-			'loyalty_tiers'    => $input['simulate_purchase_history'] ?? true,
+			'loyalty_tiers'    => $input['loyalty_tiers'] ?? true,
 		);
 
 		$payload['contact_preferences'] = array(
