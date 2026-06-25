@@ -1,0 +1,69 @@
+<?php
+/**
+ * MCP Ability: Generate Locations
+ *
+ * @package FluentCartFakerPress\MCP\Abilities
+ * @since   2.1.0
+ */
+
+namespace FluentCartFakerPress\MCP\Abilities;
+
+use FluentCartFakerPress\Abstracts\Ability;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Generate_Locations
+ *
+ * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/locations/generate
+ *
+ * @since 2.1.0
+ */
+class Generate_Locations extends Ability {
+
+	const REST_BASE = 'locations';
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @param array<string, mixed> $input Validated input from the MCP client.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public static function execute( array $input = array() ) {
+		return static::dispatch( static::build_payload( $input ) );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @param array<string, mixed> $input Raw MCP input.
+	 * @return array<string, mixed>
+	 */
+	protected static function build_payload( array $input ): array {
+		$payload = array(
+			'count'  => $input['count'] ?? 5,
+			'locale' => $input['locale'] ?? 'en_US',
+		);
+
+		if ( isset( $input['seed'] ) ) {
+			$payload['seed'] = (int) $input['seed'];
+		}
+
+		if ( ! empty( $input['regions'] ) ) {
+			$payload['regions'] = (array) $input['regions'];
+		}
+
+		if ( ! empty( $input['countries'] ) ) {
+			$payload['countries'] = (array) $input['countries'];
+		}
+
+		if ( isset( $input['max_countries'] ) ) {
+			$payload['max_countries'] = (int) $input['max_countries'];
+		}
+
+		$payload['include_states'] = $input['include_states'] ?? true;
+		$payload['include_cities'] = $input['include_cities'] ?? true;
+
+		return $payload;
+	}
+}
