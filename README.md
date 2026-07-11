@@ -149,7 +149,7 @@ GPL v2 or later — see [LICENSE](LICENSE).
 
 - Website: [alaminahamed.com](https://alaminahamed.com)
 - GitHub: [@mralaminahamed](https://github.com/mralaminahamed)
-- Email: me@alaminahamed.com
+- Email: alamin.ahamed.dev@gmail.com
 
 ## 🆘 Support
 
