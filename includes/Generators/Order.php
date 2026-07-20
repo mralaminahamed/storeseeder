@@ -9,7 +9,9 @@
 
 namespace FluentCartFakerPress\Generators;
 
+use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\Order as OrderModel;
+use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -205,19 +207,30 @@ class Order extends Generator {
 	 * @return array<int, object> Variation rows, possibly fewer than requested.
 	 */
 	private function random_variations( int $count ): array {
-		$variations = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT v.id, v.post_id, v.variation_title, p.post_title
-				 FROM {$this->wpdb->prefix}fct_product_variations AS v
-				 INNER JOIN {$this->wpdb->posts} AS p ON p.ID = v.post_id
-				 WHERE p.post_status = 'publish'
-				 ORDER BY RAND()
-				 LIMIT %d",
-				$count
-			)
-		);
+		$variations = ProductVariationModel::query()
+			->with( 'product' )
+			->inRandomOrder()
+			->limit( $count )
+			->get();
 
-		return is_array( $variations ) ? $variations : array();
+		$rows = array();
+
+		foreach ( $variations as $variation ) {
+			$product = $variation->product;
+
+			if ( ! $product || 'publish' !== $product->post_status ) {
+				continue;
+			}
+
+			$rows[] = (object) array(
+				'id'              => $variation->id,
+				'post_id'         => $variation->post_id,
+				'variation_title' => $variation->variation_title,
+				'post_title'      => $product->post_title,
+			);
+		}
+
+		return $rows;
 	}
 
 	/**
@@ -226,11 +239,9 @@ class Order extends Generator {
 	 * @return int|null Customer ID, or null when the store has no customers yet.
 	 */
 	private function random_customer_id(): ?int {
-		$customer_id = $this->wpdb->get_var(
-			"SELECT id FROM {$this->wpdb->prefix}fct_customers ORDER BY RAND() LIMIT 1"
-		);
+		$customer = CustomerModel::query()->inRandomOrder()->first();
 
-		return null === $customer_id ? null : (int) $customer_id;
+		return $customer ? (int) $customer->id : null;
 	}
 
 	/**

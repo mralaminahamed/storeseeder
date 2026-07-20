@@ -9,6 +9,7 @@
 
 namespace FluentCartFakerPress\Generators;
 
+use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderTransaction as OrderTransactionModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
@@ -109,9 +110,9 @@ class Transaction extends Generator {
 	/**
 	 * Draw a real order to attach the transaction to.
 	 *
-	 * order_id is a foreign key into fct_orders, and order_type has to match
-	 * the parent order. Inventing either produces transactions that belong to
-	 * no order and are dropped from every report that joins the two.
+	 * The order_id column is a foreign key into fct_orders, and order_type has
+	 * to match the parent order. Inventing either produces transactions that
+	 * belong to no order and are dropped from every report joining the two.
 	 *
 	 * @since 2.1.0
 	 *
@@ -119,9 +120,7 @@ class Transaction extends Generator {
 	 *                     has no orders yet.
 	 */
 	private function random_order(): ?object {
-		$order = $this->wpdb->get_row(
-			"SELECT id, type FROM {$this->wpdb->prefix}fct_orders ORDER BY RAND() LIMIT 1"
-		);
+		$order = OrderModel::query()->inRandomOrder()->first();
 
 		return $order ? $order : null;
 	}

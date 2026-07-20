@@ -485,18 +485,9 @@ class Customer extends Generator {
 	}
 
 	/**
-	 * Generate phone number based on country
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $country Country code.
-	 *
-	 * @return string Phone number.
-	 */
-	/**
 	 * Pick a country code from the sample data.
 	 *
-	 * customers/{locale}/countries.json holds objects, not bare codes:
+	 * The file customers/{locale}/countries.json holds objects, not bare codes:
 	 * `{"code":"US","name":"United States",...}`. Passing an element straight
 	 * through hands an array to callers that are typed `string`, which raises a
 	 * TypeError — and TypeError extends Error, not Exception, so the per-item
@@ -529,6 +520,15 @@ class Customer extends Generator {
 		return '' === $country ? 'US' : $country;
 	}
 
+	/**
+	 * Generate phone number based on country
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $country Country code.
+	 *
+	 * @return string Phone number.
+	 */
 	private function generate_phone_number( string $country ): string {
 		$sample_data = $this->load_sample_data();
 		$patterns    = $sample_data['phone_patterns'] ? $sample_data['phone_patterns'] : array(
