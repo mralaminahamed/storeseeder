@@ -64,7 +64,28 @@ class Order extends Generator {
 		}
 
 		$order_data = $this->generate_order_data();
-		$order_id   = $this->create_order( $order_data );
+
+		// An order with no line items is not a useful fixture, and inserting
+		// one leaves an orphan row behind. Fail before touching the database
+		// and say what is actually missing.
+		if ( empty( $order_data['items'] ) ) {
+			return new WP_Error(
+				'no_products',
+				__( 'No published products with variations were found. Generate products before generating orders.', 'fluent-cart-fakerpress' )
+			);
+		}
+
+		// Fluent Cart orders always belong to a customer; one without is
+		// invisible in the admin customer view and breaks lifetime-value
+		// reporting.
+		if ( null === $order_data['customer_id'] ) {
+			return new WP_Error(
+				'no_customers',
+				__( 'No customers were found. Generate customers before generating orders.', 'fluent-cart-fakerpress' )
+			);
+		}
+
+		$order_id = $this->create_order( $order_data );
 
 		if ( is_wp_error( $order_id ) ) {
 			return $order_id;
@@ -77,7 +98,9 @@ class Order extends Generator {
 		$result = array(
 			'id'          => $order_id,
 			'customer_id' => $order_data['customer_id'],
-			'total'       => $order_data['total'],
+			// Stored in cents; reported in major units so the UI shows 456.78
+			// rather than 45678.
+			'total'       => round( $order_data['total'] / 100, 2 ),
 			'status'      => $order_data['status'],
 			'items_count' => count( $order_data['items'] ),
 			'created_at'  => current_time( 'Y-m-d H:i:s' ),
@@ -106,39 +129,108 @@ class Order extends Generator {
 	private function generate_order_data(): array {
 		$items       = array();
 		$items_count = $this->get_faker()->numberBetween( 1, 3 );
-		$total       = 0;
+		$subtotal    = 0;
 
-		for ( $i = 0; $i < $items_count; $i++ ) {
-			$price    = $this->get_faker()->randomFloat( 2, 10, 500 );
-			$quantity = $this->get_faker()->numberBetween( 1, 2 );
-			$subtotal = $price * $quantity;
+		$variations = $this->random_variations( $items_count );
+
+		foreach ( $variations as $index => $variation ) {
+			// Every money column on fct_order_items is BIGINT holding integer
+			// cents, so the value has to be scaled on the way in. Storing
+			// dollars makes a $456.78 line render as $4.57.
+			$unit_price = $this->to_cent( $this->get_faker()->randomFloat( 2, 10, 500 ) );
+			$quantity   = $this->get_faker()->numberBetween( 1, 2 );
+			$line_total = $unit_price * $quantity;
 
 			$items[] = array(
-				'product_id' => $this->get_faker()->numberBetween( 1, 1000 ),
-				'name'       => $this->get_faker()->words( 3, true ),
-				'price'      => $price,
+				'post_id'    => (int) $variation->post_id,
+				'object_id'  => (int) $variation->id,
+				'title'      => $variation->variation_title,
+				'post_title' => $variation->post_title,
 				'quantity'   => $quantity,
-				'subtotal'   => $subtotal,
+				'unit_price' => $unit_price,
+				'subtotal'   => $line_total,
+				'cart_index' => $index,
 			);
 
-			$total += $subtotal;
+			$subtotal += $line_total;
 		}
 
+		$tax_total = (int) round( $subtotal * 0.08 );
+
 		return array(
-			'customer_id'     => $this->get_faker()->numberBetween( 1, 100 ),
-			'customer_email'  => $this->get_faker()->email(),
-			'customer_name'   => $this->get_faker()->name(),
+			'customer_id'     => $this->random_customer_id(),
 			'items'           => $items,
-			'total'           => $total,
-			'subtotal'        => $total,
-			'tax_amount'      => $total * 0.08, // 8% tax
-			'shipping_amount' => $this->get_faker()->randomFloat( 2, 0, 20 ),
+			'subtotal'        => $subtotal,
+			'tax_amount'      => $tax_total,
+			'total'           => $subtotal + $tax_total,
+			'shipping_amount' => 0,
 			'discount_amount' => 0,
 			'currency'        => 'USD',
-			'status'          => $this->get_faker()->randomElement( array( 'completed', 'processing', 'pending' ) ),
+			// Status::getOrderStatuses() is the allowed set. 'pending' is a
+			// payment_status, not an order status, and an order carrying it
+			// disappears from every admin status filter.
+			'status'          => $this->get_faker()->randomElement(
+				array( 'completed', 'processing', 'on-hold', 'canceled', 'failed' )
+			),
 			'payment_method'  => $this->get_faker()->randomElement( array( 'stripe', 'paypal', 'cod' ) ),
 			'created_at'      => current_time( 'Y-m-d H:i:s' ),
 		);
+	}
+
+	/**
+	 * Convert a dollar amount to the integer cents Fluent Cart stores.
+	 *
+	 * Mirrors FluentCart\App\Helpers\Helper::toCent(), reimplemented here so the
+	 * generator does not depend on a helper that is not part of Fluent Cart's
+	 * public surface.
+	 *
+	 * @param float $amount Amount in major currency units.
+	 *
+	 * @return int Amount in cents.
+	 */
+	private function to_cent( float $amount ): int {
+		return (int) round( $amount * 100 );
+	}
+
+	/**
+	 * Draw real product variations to put on the order.
+	 *
+	 * Order items are foreign keys into fct_product_variations and wp_posts.
+	 * Inventing the IDs produces line items pointing at products that do not
+	 * exist, which render blank in the admin and break every report that joins
+	 * back to the product.
+	 *
+	 * @param int $count How many variations are wanted.
+	 *
+	 * @return array<int, object> Variation rows, possibly fewer than requested.
+	 */
+	private function random_variations( int $count ): array {
+		$variations = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT v.id, v.post_id, v.variation_title, p.post_title
+				 FROM {$this->wpdb->prefix}fct_product_variations AS v
+				 INNER JOIN {$this->wpdb->posts} AS p ON p.ID = v.post_id
+				 WHERE p.post_status = 'publish'
+				 ORDER BY RAND()
+				 LIMIT %d",
+				$count
+			)
+		);
+
+		return is_array( $variations ) ? $variations : array();
+	}
+
+	/**
+	 * Draw a real customer ID.
+	 *
+	 * @return int|null Customer ID, or null when the store has no customers yet.
+	 */
+	private function random_customer_id(): ?int {
+		$customer_id = $this->wpdb->get_var(
+			"SELECT id FROM {$this->wpdb->prefix}fct_customers ORDER BY RAND() LIMIT 1"
+		);
+
+		return null === $customer_id ? null : (int) $customer_id;
 	}
 
 	/**
@@ -184,15 +276,24 @@ class Order extends Generator {
 		}
 
 		// Create order items if provided.
+		//
+		// The relation is order_items(), snake_case. Calling orderItems()
+		// resolves no relation, forwards to the query builder, and throws
+		// BadMethodCallException — after the order row is already inserted,
+		// leaving an orphan order with no line items.
 		if ( ! empty( $data['items'] ) ) {
 			foreach ( $data['items'] as $item ) {
-				$order->orderItems()->create(
+				$order->order_items()->create(
 					array(
-						'product_id' => $item['product_id'],
-						'item_name'  => $item['name'],
+						'post_id'    => $item['post_id'],
+						'object_id'  => $item['object_id'],
+						'post_title' => $item['post_title'],
+						'title'      => $item['title'],
 						'quantity'   => $item['quantity'],
-						'unit_price' => $item['price'],
+						'unit_price' => $item['unit_price'],
+						'subtotal'   => $item['subtotal'],
 						'line_total' => $item['subtotal'],
+						'cart_index' => $item['cart_index'],
 						'created_at' => $data['created_at'],
 					)
 				);
