@@ -63,7 +63,18 @@ class Transaction extends Generator {
 			return new WP_Error( 'missing_model', __( 'Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
 		}
 
-		$transaction_data = $this->generate_transaction_data();
+		// A transaction is a child of an order; without one there is nothing to
+		// attach it to, and order_id/order_type would have to be invented.
+		$order = $this->random_order();
+
+		if ( null === $order ) {
+			return new WP_Error(
+				'no_orders',
+				__( 'No orders were found. Generate orders before generating transactions.', 'fluent-cart-fakerpress' )
+			);
+		}
+
+		$transaction_data = $this->generate_transaction_data( $order );
 		$transaction      = $this->create_transaction( $transaction_data );
 
 		if ( ! $transaction ) {
@@ -96,21 +107,51 @@ class Transaction extends Generator {
 	}
 
 	/**
+	 * Draw a real order to attach the transaction to.
+	 *
+	 * order_id is a foreign key into fct_orders, and order_type has to match
+	 * the parent order. Inventing either produces transactions that belong to
+	 * no order and are dropped from every report that joins the two.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return object|null Order row with id and type, or null when the store
+	 *                     has no orders yet.
+	 */
+	private function random_order(): ?object {
+		$order = $this->wpdb->get_row(
+			"SELECT id, type FROM {$this->wpdb->prefix}fct_orders ORDER BY RAND() LIMIT 1"
+		);
+
+		return $order ? $order : null;
+	}
+
+	/**
 	 * Generate transaction data
+	 *
+	 * @param object $order Parent order row, carrying id and type.
 	 *
 	 * @return array Transaction data
 	 */
-	private function generate_transaction_data(): array {
+	private function generate_transaction_data( object $order ): array {
 		$methods  = array( 'stripe', 'paypal', 'bank_transfer', 'cod' );
 		$statuses = array( 'succeeded', 'pending', 'failed', 'refunded' );
-		$types    = array( 'payment', 'refund', 'chargeback' );
+		// Status::getTransactionTypes() allows charge, refund, dispute and
+		// signup_fee. 'payment' and 'chargeback' are not Fluent Cart values —
+		// transactions carrying them are invisible to the refund UI and to the
+		// Refund generator, which filters on transaction_type = 'charge'.
+		$types = array( 'charge', 'refund', 'dispute' );
 
 		$payment_method = $this->get_faker()->randomElement( $methods );
 		$status         = $this->get_faker()->randomElement( $statuses );
 
 		$data = array(
-			'order_id'            => $this->get_faker()->numberBetween( 1, 1000 ),
-			'order_type'          => 'order',
+			'order_id'            => (int) $order->id,
+			// Copied from the parent order, the way Fluent Cart does it. The
+			// allowed set is payment / subscription / renewal; 'order' is not
+			// one, and StatusHelper filters revenue reporting on 'payment', so
+			// generated transactions were excluded from every report.
+			'order_type'          => $order->type,
 			'vendor_charge_id'    => strtoupper( $this->get_faker()->bothify( 'CH-##########' ) ),
 			'payment_method'      => $payment_method,
 			'payment_mode'        => 'live',
@@ -118,7 +159,9 @@ class Transaction extends Generator {
 			'currency'            => 'USD',
 			'transaction_type'    => $this->get_faker()->randomElement( $types ),
 			'status'              => $status,
-			'total'               => $this->get_faker()->randomFloat( 2, 10, 1000 ),
+			// fct_order_transactions.total is a BIGINT of integer cents, read
+			// back through Helper::toDecimal(). Dollars here render 100x small.
+			'total'               => (int) round( $this->get_faker()->randomFloat( 2, 10, 1000 ) * 100 ),
 			'rate'                => 1.0,
 			'meta'                => array(
 				'payer' => array(
