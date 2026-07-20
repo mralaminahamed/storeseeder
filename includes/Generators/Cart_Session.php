@@ -145,7 +145,7 @@ class Cart_Session extends Generator {
 					'billing_email'     => $this->get_faker()->email(),
 					'billing_address_1' => $this->get_faker()->streetAddress(),
 					'billing_city'      => $this->get_faker()->city(),
-					'billing_state'     => $this->get_faker()->stateAbbr,
+					'billing_state'     => $this->get_faker()->stateAbbr(),
 					'billing_postcode'  => $this->get_faker()->postcode(),
 					'billing_country'   => 'US',
 				),
