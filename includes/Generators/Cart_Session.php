@@ -71,7 +71,9 @@ class Cart_Session extends Generator {
 		}
 
 		$result = array(
-			'id'             => $cart->id,
+			// fct_carts has no id column — the primary key is cart_hash, and
+			// the model sets $incrementing = false. $cart->id was always null.
+			'id'             => $cart->cart_hash,
 			'cart_hash'      => $cart->cart_hash,
 			'user_id'        => $cart->user_id,
 			'stage'          => $cart->stage,
@@ -100,20 +102,77 @@ class Cart_Session extends Generator {
 	 *
 	 * @return array Cart session data
 	 */
+	/**
+	 * Draw real product variation IDs for the cart contents.
+	 *
+	 * cart_data[].object_id is a foreign key into fct_product_variations.
+	 * Random integers produce carts full of products that do not exist.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $count How many are wanted.
+	 *
+	 * @return array<int, int> Variation IDs, possibly fewer than requested.
+	 */
+	private function random_variation_ids( int $count ): array {
+		$ids = $this->wpdb->get_col(
+			$this->wpdb->prepare(
+				"SELECT id FROM {$this->wpdb->prefix}fct_product_variations ORDER BY RAND() LIMIT %d",
+				$count
+			)
+		);
+
+		return array_map( 'intval', is_array( $ids ) ? $ids : array() );
+	}
+
+	/**
+	 * Draw a real customer ID.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return int|null Customer ID, or null when the store has no customers.
+	 */
+	private function random_customer_id(): ?int {
+		$customer_id = $this->wpdb->get_var(
+			"SELECT id FROM {$this->wpdb->prefix}fct_customers ORDER BY RAND() LIMIT 1"
+		);
+
+		return null === $customer_id ? null : (int) $customer_id;
+	}
+
+	/**
+	 * Draw a real WordPress user ID.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return int|null User ID, or null when no users match.
+	 */
+	private function random_user_id(): ?int {
+		$user_id = $this->wpdb->get_var(
+			"SELECT ID FROM {$this->wpdb->users} ORDER BY RAND() LIMIT 1"
+		);
+
+		return null === $user_id ? null : (int) $user_id;
+	}
+
 	private function generate_cart_session_data(): array {
-		$stages = array( 'checkout', 'cart', 'completed' );
+		// Fluent Cart only ever writes 'draft' (the column default), 'intended'
+		// and 'completed'. 'checkout' and 'cart' are not stages it recognises,
+		// so those carts matched no abandoned-cart or recovery query.
+		$stages = array( 'draft', 'intended', 'completed' );
 		$stage  = $this->get_faker()->randomElement( $stages );
 
-		$user_id = $this->get_faker()->boolean( 70 ) ? $this->get_faker()->numberBetween( 1, 100 ) : null; // 70% logged in users
+		$user_id = $this->get_faker()->boolean( 70 ) ? $this->random_user_id() : null; // 70% logged in users
 
 		$cart_items  = array();
 		$items_count = $this->get_faker()->numberBetween( 1, 5 );
 
-		for ( $i = 0; $i < $items_count; $i++ ) {
+		foreach ( $this->random_variation_ids( $items_count ) as $variation_id ) {
 			$cart_items[] = array(
-				'object_id'   => $this->get_faker()->numberBetween( 1, 1000 ),
+				'object_id'   => $variation_id,
 				'object_type' => 'product_variation',
-				'unit_price'  => $this->get_faker()->randomFloat( 2, 10, 500 ),
+				// Cart money is in integer cents, same as order items.
+				'unit_price'  => (int) round( $this->get_faker()->randomFloat( 2, 10, 500 ) * 100 ),
 				'quantity'    => $this->get_faker()->numberBetween( 1, 3 ),
 				'line_total'  => 0, // Will be calculated by Fluent Cart.
 				'other_info'  => array(),
@@ -121,11 +180,13 @@ class Cart_Session extends Generator {
 		}
 
 		$data = array(
-			'customer_id' => $user_id ? $this->get_faker()->numberBetween( 1, 100 ) : null,
+			'customer_id' => $user_id ? $this->random_customer_id() : null,
 			'user_id'     => $user_id,
 			'cart_data'   => $cart_items,
 			'stage'       => $stage,
-			'cart_group'  => 'default',
+			// 'global' is the column default Fluent Cart uses; 'default' is not
+			// a group it ever reads.
+			'cart_group'  => 'global',
 			'user_agent'  => $this->get_faker()->userAgent(),
 			'ip_address'  => $this->get_faker()->ipv4(),
 		);
