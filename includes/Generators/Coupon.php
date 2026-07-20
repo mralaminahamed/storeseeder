@@ -106,16 +106,24 @@ class Coupon extends Generator {
 	 * @return array Coupon data
 	 */
 	private function generate_coupon_data(): array {
-		$types = array( 'percentage', 'fixed_amount', 'free_shipping' );
+		// CouponRequest allows fixed, percentage, free_shipping and buy_x_get_y.
+		// 'fixed_amount' is not one of them, and DiscountService branches on
+		// `type === 'fixed'`, so a fixed_amount coupon applied no discount at
+		// all. buy_x_get_y is omitted because it needs buy/get product lists.
+		$types = array( 'percentage', 'fixed', 'free_shipping' );
 		$type  = $this->get_faker()->randomElement( $types );
 
 		$code = strtoupper( $this->get_faker()->bothify( 'SAVE####' ) );
 
 		$discount = 0;
 		if ( 'percentage' === $type ) {
+			// A percentage, not a money amount — used directly as a percent.
 			$discount = $this->get_faker()->numberBetween( 5, 50 );
-		} elseif ( 'fixed_amount' === $type ) {
-			$discount = $this->get_faker()->randomFloat( 2, 5, 100 );
+		} elseif ( 'fixed' === $type ) {
+			// Compared against the cart subtotal, which is in integer cents
+			// (DiscountService::calculateDiscountPercent). Storing dollars
+			// turns "$50 off" into 50 cents off.
+			$discount = (int) round( $this->get_faker()->randomFloat( 2, 5, 100 ) * 100 );
 		}
 
 		return array(
@@ -149,10 +157,19 @@ class Coupon extends Generator {
 			'status'           => $data['status'],
 			'type'             => $data['type'],
 			'amount'           => $data['discount'],
-			'max_uses'         => $data['usage_limit'],
+			// fct_coupons has no max_uses column — the limit lives inside the
+			// conditions JSON, which is where CanValidateCoupon and
+			// DiscountService both read it from. The top-level key was silently
+			// dropped by mass-assignment, leaving every coupon unlimited.
+			'conditions'       => array(
+				'max_uses' => $data['usage_limit'],
+			),
 			'notes'            => $data['description'],
-			'show_on_checkout' => true,
-			'stackable'        => false,
+			// Stored as VARCHAR(3) and compared against the literals 'yes' and
+			// 'no'. A boolean writes '1' or '', and '' matches neither — so
+			// stackability came out contradictory depending on which check ran.
+			'show_on_checkout' => 'yes',
+			'stackable'        => 'no',
 			'priority'         => 1,
 			'use_count'        => 0,
 			'end_date'         => $data['expires_at'],
