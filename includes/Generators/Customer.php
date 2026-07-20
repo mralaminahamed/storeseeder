@@ -320,8 +320,7 @@ class Customer extends Generator {
 	 * @return array Billing address data.
 	 */
 	private function generate_billing_address( string $first_name, string $last_name, string $email ): array {
-		$sample_data = $this->load_sample_data();
-		$country     = $this->get_faker()->randomElement( $sample_data['countries'] ? $sample_data['countries'] : array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' ) );
+		$country = $this->random_country_code();
 
 		return array(
 			'first_name' => $first_name,
@@ -356,10 +355,7 @@ class Customer extends Generator {
 		}
 
 		// 80% chance shipping address is in the same country
-		$sample_data = $this->load_sample_data();
-		$country     = $this->get_faker()->boolean( 80 ) ? $billing_country : $this->get_faker()->randomElement(
-			$sample_data['countries'] ? $sample_data['countries'] : array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' )
-		);
+		$country = $this->get_faker()->boolean( 80 ) ? $billing_country : $this->random_country_code();
 
 		return array(
 			'first_name'   => $first_name,
@@ -497,6 +493,42 @@ class Customer extends Generator {
 	 *
 	 * @return string Phone number.
 	 */
+	/**
+	 * Pick a country code from the sample data.
+	 *
+	 * customers/{locale}/countries.json holds objects, not bare codes:
+	 * `{"code":"US","name":"United States",...}`. Passing an element straight
+	 * through hands an array to callers that are typed `string`, which raises a
+	 * TypeError — and TypeError extends Error, not Exception, so the per-item
+	 * catch in Generator::generate() does not stop it. One bad element takes
+	 * down the whole batch as a PHP fatal.
+	 *
+	 * Both shapes are accepted so the generator keeps working whether or not
+	 * the companion sample-data plugin is installed.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Two-letter country code.
+	 */
+	private function random_country_code(): string {
+		$sample_data = $this->load_sample_data();
+		$countries   = ! empty( $sample_data['countries'] )
+			? $sample_data['countries']
+			: array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' );
+
+		$country = $this->get_faker()->randomElement( $countries );
+
+		if ( is_array( $country ) ) {
+			$country = $country['code'] ?? '';
+		} elseif ( is_object( $country ) ) {
+			$country = $country->code ?? '';
+		}
+
+		$country = (string) $country;
+
+		return '' === $country ? 'US' : $country;
+	}
+
 	private function generate_phone_number( string $country ): string {
 		$sample_data = $this->load_sample_data();
 		$patterns    = $sample_data['phone_patterns'] ? $sample_data['phone_patterns'] : array(
