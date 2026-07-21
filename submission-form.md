@@ -55,3 +55,20 @@ Before uploading, confirm the WordPress.org username in `readme.txt` (`Contribut
 - **External request:** one optional, admin-initiated GitHub download of JSON sample data (disclosed in `== External services ==`); a second browser-side request to `api.wordpress.org` on the "Our Plugins" page. Neither sends site, user, or store data.
 - **Source code:** the shipped `build/` bundle is compiled from `src/` (excluded from the zip); the full source and build steps are linked in the readme `== Source code ==` section.
 - **Dependency:** requires Fluent Cart, enforced by the `Requires Plugins: fluent-cart` header.
+
+---
+
+## Additional Information (paste into the form's "Additional Information" box)
+
+> Hello Plugins Team,
+>
+> StoreSeeder is a test-data generator for stores built on the Fluent Cart plugin (declared via the `Requires Plugins: fluent-cart` header). It creates realistic products, customers, orders, and 14 other record types through Fluent Cart's own models, for use on development and staging sites.
+>
+> A few notes to help the review:
+>
+> - **One optional external request.** The Settings page offers a "Sample Data Sync" that downloads a small zip of **JSON reference data only** (locale-specific names, addresses, tags) from a public GitHub repository. It contains no executable code, never runs on activation, is administrator-initiated, and is documented in the readme's `== External services ==` section.
+> - **Plugin Check.** The built zip is clean apart from two false positives — `wp_register_ability()` and `wp_register_ability_category()` flagged as requiring WordPress 6.9. Those calls are wrapped in `function_exists()` and only fire on the `wp_abilities_api_init` hooks, so they never run on the declared 6.5 minimum when the (optional) Abilities API is absent.
+> - **Source code.** The shipped `build/` bundle is compiled from the TypeScript and CSS in `src/` (excluded from the zip); the complete source and build steps are in the readme's `== Source code ==` section and the public repository.
+> - **No trialware.** Every feature is fully functional — no paywalls, license keys, or feature gates.
+>
+> Thank you for the review.
