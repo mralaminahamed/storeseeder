@@ -12,7 +12,7 @@ use WP_REST_Request;
 /**
  * Helper trait for building and asserting REST requests in tests.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 trait Wp_Rest_Request_Trait {
 

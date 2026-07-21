@@ -116,7 +116,7 @@ class Order_Tax_Rate extends Generator {
 		/**
 		 * Filters the order tax line generation result data.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 * @hook  fluent_cart_fakerpress_order_tax_rate_generation_result
 		 *
 		 * @param array $result The generation result data.

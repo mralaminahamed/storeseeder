@@ -104,7 +104,7 @@ abstract class Generator {
 	 * is indistinguishable from a batch that was never asked to do anything, and
 	 * the caller reports success for zero rows.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @var array<int, string>
 	 */
 	protected array $generation_errors = array();
@@ -115,7 +115,7 @@ abstract class Generator {
 	 * Reset at the start of every generate(), so it always describes the most
 	 * recent batch. Empty when every item succeeded.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return array<int, string> Failure messages, in the order they occurred.
 	 */

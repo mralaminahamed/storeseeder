@@ -106,7 +106,7 @@ class Cart_Session extends Generator {
 	 * fct_product_variations. Random integers produce carts full of products
 	 * that do not exist.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param int $count How many are wanted.
 	 *
@@ -130,7 +130,7 @@ class Cart_Session extends Generator {
 	/**
 	 * Draw a real customer ID.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return int|null Customer ID, or null when the store has no customers.
 	 */
@@ -143,7 +143,7 @@ class Cart_Session extends Generator {
 	/**
 	 * Draw a real WordPress user ID.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return int|null User ID, or null when no users match.
 	 */

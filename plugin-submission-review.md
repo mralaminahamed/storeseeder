@@ -1,6 +1,6 @@
 # WordPress.org Submission Checklist — Fluent Cart FakerPress
 
-Audited against the WordPress.org Plugin Directory submission requirements and the 18 plugin guidelines, using **easycommerce-fakerpress** (already published) as the reference. Status as of version **2.1.0**.
+Audited against the WordPress.org Plugin Directory submission requirements and the 18 plugin guidelines, using **easycommerce-fakerpress** (already published) as the reference. Status as of version **1.0.0**.
 
 Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 
@@ -8,13 +8,13 @@ Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 |---|----------------|--------|-------|
 | 1 | **Plugin name / slug — trademark** | ⚠️ | See "Remaining blocker" below. The name leads with the third-party "Fluent Cart" trademark. |
 | 2 | Main file name matches slug (`fluent-cart-fakerpress.php`) | ✅ | |
-| 3 | Plugin header complete + valid | 🔧 | Fixed `License` → `GPLv2 or later`, `License URI` → `https://www.gnu.org/licenses/gpl-2.0.html`, `Requires at least` → `6.5` (the `Requires Plugins` header needs WP 6.5+), `Version` → `2.1.0`. `Requires Plugins: fluent-cart`, `Text Domain`, `Domain Path` all present. |
-| 4 | `readme.txt` header fields | 🔧 | Added `Requires Plugins`, bumped `Requires at least` to 6.5, `Stable tag` → 2.1.0, `License` → `GPLv2 or later`; retuned tags away from generic terms. |
+| 3 | Plugin header complete + valid | 🔧 | Fixed `License` → `GPLv2 or later`, `License URI` → `https://www.gnu.org/licenses/gpl-2.0.html`, `Requires at least` → `6.5` (the `Requires Plugins` header needs WP 6.5+), `Version` → `1.0.0`. `Requires Plugins: fluent-cart`, `Text Domain`, `Domain Path` all present. |
+| 4 | `readme.txt` header fields | 🔧 | Added `Requires Plugins`, bumped `Requires at least` to 6.5, `Stable tag` → 1.0.0, `License` → `GPLv2 or later`; retuned tags away from generic terms. |
 | 5 | `readme.txt` `== External services ==` | 🔧 | **Added.** Discloses the two outbound requests (GitHub sample-data zip; `api.wordpress.org` for the Our Plugins page) with endpoint, trigger, data sent, and ToS/Privacy links. Required by WP.org. |
 | 6 | `readme.txt` `== Source code ==` | 🔧 | **Added.** Discloses that `build/` is compiled from `src/` (excluded from the zip) and links the public repo + build steps. Required because a minified bundle ships. |
 | 7 | `readme.txt` privacy accuracy | 🔧 | The old "Other Notes" claimed "nothing is transmitted externally" — false given the two services. Rewritten to match the disclosure. |
-| 8 | `readme.txt` content accuracy | 🔧 | Corrected "13 generators" → 17, removed the deleted **Locations** entry, added the five new generators, and added a `2.1.0` changelog + upgrade notice. |
-| 9 | Version sync (header / constant / stable tag) | 🔧 | All read `2.1.0` (`fluent-cart-fakerpress.php`, `FLUENT_CART_FAKERPRESS_VERSION`, class `@version`, `readme.txt` Stable tag). POT regenerated. |
+| 8 | `readme.txt` content accuracy | 🔧 | Corrected "13 generators" → 17, removed the deleted **Locations** entry, added the five new generators, and added a `1.0.0` changelog + upgrade notice. |
+| 9 | Version sync (header / constant / stable tag) | 🔧 | All read `1.0.0` (`fluent-cart-fakerpress.php`, `FLUENT_CART_FAKERPRESS_VERSION`, class `@version`, `readme.txt` Stable tag). POT regenerated. |
 | 10 | GPL-compatible license (code + assets) | ✅ | GPLv2-or-later; bundled deps (FakerPHP, faker-picsum) are MIT/GPL-compatible. |
 | 11 | Output escaping | ✅ | Only two PHP output sites; both are a static literal and an `esc_html__()`-escaped notice. All UI is React. |
 | 12 | Input sanitization | ✅ | No direct `$_GET/$_POST/$_REQUEST/$_SERVER`. All input flows through REST args with `sanitize_callback` + `validate_callback`. |
@@ -29,7 +29,7 @@ Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 | 21 | No external JS/CSS loading (CDN) | ✅ | All assets bundled locally in `build/`; no CDN `<script>`/`<link>`. |
 | 22 | No trialware / license gating (Guideline 5) | ✅ | Fully functional, no Pro key checks. Subscriptions note that active billing needs Fluent Cart Pro, but generation itself is unrestricted. |
 | 23 | No persistent admin nags (Guideline 11) | ✅ | Only a dependency notice when Fluent Cart is inactive; the "Our Plugins" page is opt-in navigation, not a nag. |
-| 24 | Screenshots | ⚠️ (minor) | `readme.txt` lists three screenshot captions but no `screenshot-N.png` files exist in `.wordpress-org/` yet. Not a blocker; add before publishing for a complete listing. Icon + banners are present (redesigned in 2.1.0). |
+| 24 | Screenshots | ⚠️ (minor) | `readme.txt` lists three screenshot captions but no `screenshot-N.png` files exist in `.wordpress-org/` yet. Not a blocker; add before publishing for a complete listing. Icon + banners are present (redesigned in 1.0.0). |
 | 25 | `readme.txt` passes the official validator | ⬜ | Run https://wordpress.org/plugins/developers/readme-validator/ on the final file (structure verified locally; validator run is the last manual step). |
 
 ## Remaining blocker — plugin name / slug (Guideline 17)

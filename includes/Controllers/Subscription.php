@@ -16,7 +16,7 @@ use FluentCartFakerPress\Generators\Subscription as SubscriptionGenerator;
  *
  * Handles REST API endpoints for subscription generation.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 class Subscription extends Controller {
 

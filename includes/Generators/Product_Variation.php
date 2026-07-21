@@ -121,7 +121,7 @@ class Product_Variation extends Generator {
 	 * Selecting a fct_product_details row guarantees both a wp_posts product and
 	 * the detail row whose price range has to be kept in sync.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return object|null Product detail row, or null when the store has no
 	 *                     products yet.
@@ -183,7 +183,7 @@ class Product_Variation extends Generator {
 	/**
 	 * Next free serial_index for a product's variations.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param int $post_id Parent product post ID.
 	 *
@@ -201,7 +201,7 @@ class Product_Variation extends Generator {
 	 * The fct_product_variations table carries a UNIQUE index on sku, so a
 	 * collision is a database error rather than a silently overwritten row.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return string Unused SKU.
 	 */
@@ -240,7 +240,7 @@ class Product_Variation extends Generator {
 	 * through the query builder keeps the stored values — which some listing and
 	 * sort queries read directly — in step with the variation just added.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param int $post_id Parent product post ID.
 	 *

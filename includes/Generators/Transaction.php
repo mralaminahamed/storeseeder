@@ -114,7 +114,7 @@ class Transaction extends Generator {
 	 * to match the parent order. Inventing either produces transactions that
 	 * belong to no order and are dropped from every report joining the two.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return object|null Order row with id and type, or null when the store
 	 *                     has no orders yet.

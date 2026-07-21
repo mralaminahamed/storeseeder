@@ -2,7 +2,7 @@
 
 # Fluent Cart FakerPress
 
-[![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)](https://github.com/mralaminahamed/fluent-cart-fakerpress/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/fluent-cart-fakerpress/releases)
 [![WordPress tested up to 6.8](https://img.shields.io/badge/WordPress-6.8-blue?style=flat-square)](https://wordpress.org/)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-8892BF?style=flat-square)](https://php.net/)
 [![License GPL v2 or later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue?style=flat-square)](LICENSE)

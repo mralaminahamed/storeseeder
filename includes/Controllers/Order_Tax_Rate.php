@@ -16,7 +16,7 @@ use FluentCartFakerPress\Generators\Order_Tax_Rate as OrderTaxRateGenerator;
  *
  * Handles REST API endpoints for order tax line generation.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 class Order_Tax_Rate extends Controller {
 

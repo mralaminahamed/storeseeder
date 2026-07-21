@@ -16,7 +16,7 @@ use FluentCartFakerPress\Generators\Shipping_Class as ShippingClassGenerator;
  *
  * Handles REST API endpoints for shipping class generation.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 class Shipping_Class extends Controller {
 

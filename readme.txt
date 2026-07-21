@@ -5,7 +5,7 @@ Requires at least: 6.5
 Tested up to: 6.8
 Requires PHP: 7.4
 Requires Plugins: fluent-cart
-Stable tag: 2.1.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,30 +112,18 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 
 == Changelog ==
 
-= 2.1.0 =
-* **New generators** — added Shipping Classes, Labels, Order Tax Lines, Product Downloads, and Subscriptions, bringing the total to 17.
-* **Data-integrity overhaul** — every generator now produces valid, sellable, correctly-priced records against Fluent Cart 1.5.0: products create the full post + detail + variation rows, orders carry real addresses and applied coupons, customers get address books, tax classes get real rate rows, and attributes link to real variations.
-* **Removed** — the Location generator, which had no corresponding Fluent Cart entity.
-* **Fixes** — money stored in the correct units (cents), valid status and type values, real foreign keys, and a TypeError that could abort a whole customer batch.
-* **Docs & tooling** — rewritten README, refreshed logo and banners, and a restructured PHPUnit suite covering every generator and controller.
-
-= 2.0.0 =
-* **New React single-page admin** — sidebar shell, dashboard, schema-driven generator pages, command palette, batch tray, and toasts (React Router v7, Tailwind CSS v4).
-* **13 generators** — added Attributes, Refunds, and Logs, alongside products, variations, customers, orders, transactions, coupons, shipping plans, tax classes, cart sessions, and locations.
-* **Optional MCP integration** — generators exposed as MCP tools via the WordPress Abilities API + `mcp-adapter` (graceful no-op when absent).
-* **REST parity** — every generator served at `fluent-cart-fakerpress/v1/<resource>/generate`, with admin routes aligned to the REST bases.
-* **Fix** — corrected the Fluent Cart dependency guard (`FLUENTCART_VERSION`) that previously prevented generators from running.
-
 = 1.0.0 =
-* Initial release: product and customer generators, React admin, REST API, hook system.
+* Initial release.
+* 17 generators — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs — all persisting through native Fluent Cart models.
+* Modern single-page React admin (React Router v7, Tailwind CSS v4) with live preview, command palette, and a batch queue.
+* REST API — every generator at `fluent-cart-fakerpress/v1/<resource>/generate`.
+* Optional MCP integration via the WordPress Abilities API + `mcp-adapter`.
+* Filters and actions across the generation lifecycle.
 
 == Upgrade Notice ==
 
-= 2.1.0 =
-Adds five generators (17 total), overhauls data integrity against Fluent Cart 1.5.0, and removes the Location generator. Rebuild assets (`yarn build`) if installing from source.
-
-= 2.0.0 =
-Major release: new React admin, 13 generators (Attributes/Refunds/Logs added), and optional MCP integration. Rebuild assets (`yarn build`) if installing from source.
+= 1.0.0 =
+Initial release.
 
 == External services ==
 
