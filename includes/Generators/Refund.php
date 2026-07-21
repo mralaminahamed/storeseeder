@@ -81,7 +81,7 @@ class Refund extends Generator {
 			return new WP_Error( 'no_eligible_transaction', __( 'No successful charge transactions found for refund generation. Generate orders/transactions first.', 'fluent-cart-fakerpress' ) );
 		}
 
-		$charge_total = (int) $charge->total; // integer cents
+		$charge_total = (int) $charge->total; // Integer cents.
 
 		if ( $this->get_faker()->boolean( 50 ) || $charge_total <= 0 ) {
 			$type   = 'full';

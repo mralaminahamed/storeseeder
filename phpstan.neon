@@ -86,12 +86,22 @@ parameters:
         - '#Parameter \#1 \$function_to_add of function add_action expects callable\(\): mixed, array given\.#'
         - '#Parameter \#1 \$function_to_add of function add_filter expects callable, array given\.#'
 
-        # Fluent Cart plugin dependencies (external plugin classes)
+        # Fluent Cart plugin dependencies (external plugin classes, runtime-only)
         - '#.*FluentCart\\Models\\.*#'
         - '#.*FluentCart\\Helpers\\.*#'
         - '#.*FluentCart\\App\\Models\\.*#'
+        - '#.*FluentCart\\App\\Helpers\\.*#'
         - '#Class FluentCart\\App\\Models\\.* not found\.#'
+        - '#Class FluentCart\\App\\Helpers\\.* not found\.#'
         - '#Call to static method query\(\) on an unknown class FluentCart\\App\\Models\\.*\.#'
+
+        # mcp-adapter plugin classes (runtime-only dependency, present only when
+        # the mcp-adapter plugin is active)
+        - '#Class WP\\MCP\\.* not found\.#'
+
+        # The REST namespace is a compile-time constant string and always
+        # non-empty; phpstan cannot narrow the property type to non-falsy-string.
+        - '#Parameter \#1 \$route_namespace of function register_rest_route expects non-falsy-string, string given\.#'
 
         # Array type specifications (PHP 7.4 compatibility)
         - '#Method .* has no value type specified in iterable type array\.#'
