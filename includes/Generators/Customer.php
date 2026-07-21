@@ -93,9 +93,9 @@ class Customer extends Generator {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 
-		$first_name = $this->get_faker()->firstName;
-		$last_name  = $this->get_faker()->lastName;
-		$email      = $this->get_faker()->unique()->safeEmail;
+		$first_name = $this->get_faker()->firstName();
+		$last_name  = $this->get_faker()->lastName();
+		$email      = $this->get_faker()->unique()->safeEmail();
 		$full_name  = $first_name . ' ' . $last_name;
 
 		// Generate comprehensive customer data.
@@ -320,18 +320,17 @@ class Customer extends Generator {
 	 * @return array Billing address data.
 	 */
 	private function generate_billing_address( string $first_name, string $last_name, string $email ): array {
-		$sample_data = $this->load_sample_data();
-		$country     = $this->get_faker()->randomElement( $sample_data['countries'] ? $sample_data['countries'] : array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' ) );
+		$country = $this->random_country_code();
 
 		return array(
 			'first_name' => $first_name,
 			'last_name'  => $last_name,
 			'email'      => $email,
 			'phone'      => $this->generate_phone_number( $country ),
-			'company'    => $this->get_faker()->optional( 0.25 )->company,
-			'address_1'  => $this->get_faker()->streetAddress,
-			'address_2'  => $this->get_faker()->optional( 0.35 )->secondaryAddress,
-			'city'       => $this->get_faker()->city,
+			'company'    => $this->get_faker()->optional( 0.25 )->company(),
+			'address_1'  => $this->get_faker()->streetAddress(),
+			'address_2'  => $this->get_faker()->optional( 0.35 )->secondaryAddress(),
+			'city'       => $this->get_faker()->city(),
 			'state'      => $this->generate_state( $country ),
 			'country'    => $country,
 			'postcode'   => $this->generate_postcode( $country ),
@@ -356,18 +355,15 @@ class Customer extends Generator {
 		}
 
 		// 80% chance shipping address is in the same country
-		$sample_data = $this->load_sample_data();
-		$country     = $this->get_faker()->boolean( 80 ) ? $billing_country : $this->get_faker()->randomElement(
-			$sample_data['countries'] ? $sample_data['countries'] : array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' )
-		);
+		$country = $this->get_faker()->boolean( 80 ) ? $billing_country : $this->random_country_code();
 
 		return array(
 			'first_name'   => $first_name,
 			'last_name'    => $last_name,
-			'company'      => $this->get_faker()->optional( 0.2 )->company,
-			'address_1'    => $this->get_faker()->streetAddress,
-			'address_2'    => $this->get_faker()->optional( 0.3 )->secondaryAddress,
-			'city'         => $this->get_faker()->city,
+			'company'      => $this->get_faker()->optional( 0.2 )->company(),
+			'address_1'    => $this->get_faker()->streetAddress(),
+			'address_2'    => $this->get_faker()->optional( 0.3 )->secondaryAddress(),
+			'city'         => $this->get_faker()->city(),
 			'state'        => $this->generate_state( $country ),
 			'country'      => $country,
 			'postcode'     => $this->generate_postcode( $country ),
@@ -405,7 +401,7 @@ class Customer extends Generator {
 					'currency'             => $this->get_faker()->randomElement(
 						$sample_data['currencies'] ? $sample_data['currencies'] : array( 'USD', 'CAD', 'GBP', 'AUD', 'EUR', 'JPY', 'INR', 'BRL', 'MXN' )
 					),
-					'timezone'             => $this->get_faker()->timezone,
+					'timezone'             => $this->get_faker()->timezone(),
 					'communication_method' => $this->get_faker()->randomElement( array( 'email', 'sms', 'both', 'none' ) ),
 					'preferred_categories' => $this->get_faker()->randomElements(
 						$sample_data['preferred_categories'] ? $sample_data['preferred_categories'] : array( 'Electronics', 'Fashion', 'Books', 'Home', 'Sports', 'Beauty' ),
@@ -427,7 +423,7 @@ class Customer extends Generator {
 				'gender'               => $this->get_faker()->optional( 0.55 )->randomElement(
 					array( 'male', 'female', 'non_binary', 'prefer_not_to_say' )
 				),
-				'occupation'           => $this->get_faker()->optional( 0.45 )->jobTitle,
+				'occupation'           => $this->get_faker()->optional( 0.45 )->jobTitle(),
 				'marital_status'       => $this->get_faker()->optional( 0.4 )->randomElement(
 					array( 'single', 'married', 'divorced', 'widowed' )
 				),
@@ -489,6 +485,42 @@ class Customer extends Generator {
 	}
 
 	/**
+	 * Pick a country code from the sample data.
+	 *
+	 * The file customers/{locale}/countries.json holds objects, not bare codes:
+	 * `{"code":"US","name":"United States",...}`. Passing an element straight
+	 * through hands an array to callers that are typed `string`, which raises a
+	 * TypeError — and TypeError extends Error, not Exception, so the per-item
+	 * catch in Generator::generate() does not stop it. One bad element takes
+	 * down the whole batch as a PHP fatal.
+	 *
+	 * Both shapes are accepted so the generator keeps working whether or not
+	 * the companion sample-data plugin is installed.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Two-letter country code.
+	 */
+	private function random_country_code(): string {
+		$sample_data = $this->load_sample_data();
+		$countries   = ! empty( $sample_data['countries'] )
+			? $sample_data['countries']
+			: array( 'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'JP', 'IN', 'BR', 'MX' );
+
+		$country = $this->get_faker()->randomElement( $countries );
+
+		if ( is_array( $country ) ) {
+			$country = $country['code'] ?? '';
+		} elseif ( is_object( $country ) ) {
+			$country = $country->code ?? '';
+		}
+
+		$country = (string) $country;
+
+		return '' === $country ? 'US' : $country;
+	}
+
+	/**
 	 * Generate phone number based on country
 	 *
 	 * @since 1.0.0
@@ -536,7 +568,7 @@ class Customer extends Generator {
 
 		switch ( $country ) {
 			case 'US':
-				return $this->get_faker()->stateAbbr;
+				return $this->get_faker()->stateAbbr();
 			case 'CA':
 				$provinces = $states_provinces['CA'] ?? array( 'AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT' );
 				return $this->get_faker()->randomElement( $provinces );
@@ -595,7 +627,7 @@ class Customer extends Generator {
 				);
 				return $this->get_faker()->randomElement( $states );
 			default:
-				return $this->get_faker()->state;
+				return $this->get_faker()->state();
 		}
 	}
 

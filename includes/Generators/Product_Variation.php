@@ -9,6 +9,8 @@
 
 namespace FluentCartFakerPress\Generators;
 
+use FluentCart\App\Models\ProductDetail as ProductDetailModel;
+use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -62,19 +64,39 @@ class Product_Variation extends Generator {
 			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
 		}
 
-		$variation_data = $this->generate_variation_data();
-		$variation_id   = $this->create_product_variation( $variation_data );
+		// A variation is a child of a product: post_id is a foreign key into
+		// wp_posts and the row is joined to fct_product_details. Inventing the
+		// post_id — as this generator used to, with numberBetween( 1, 1000 ) —
+		// produces variations attached to no product, invisible everywhere.
+		$detail = $this->random_product_detail();
 
-		if ( ! $variation_id ) {
+		if ( null === $detail ) {
+			return new WP_Error(
+				'no_products',
+				__( 'No products were found. Generate products before generating variations.', 'fluent-cart-fakerpress' )
+			);
+		}
+
+		$variation_data = $this->generate_variation_data( $detail );
+		$variation      = $this->create_product_variation( $variation_data );
+
+		if ( ! $variation ) {
 			return new WP_Error( 'variation_creation_failed', __( 'Failed to create product variation.', 'fluent-cart-fakerpress' ) );
 		}
 
+		// Keep the parent product's stored price range in step with its
+		// variations so listing queries that read the columns directly — rather
+		// than through ProductDetail's computed accessors — stay correct.
+		$this->sync_product_price_range( (int) $detail->post_id );
+
 		$result = array(
-			'id'         => $variation_id,
-			'product_id' => $variation_data['product_id'],
-			'attributes' => $variation_data['attributes'],
-			'price'      => $variation_data['price'],
-			'sku'        => $variation_data['sku'],
+			'id'         => $variation->id,
+			'product_id' => $variation->post_id,
+			'title'      => $variation->variation_title,
+			// Stored in cents; reported in major units so the UI shows 45.67
+			// rather than 4567.
+			'price'      => round( $variation->item_price / 100, 2 ),
+			'sku'        => $variation->sku,
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
@@ -90,33 +112,105 @@ class Product_Variation extends Generator {
 		 * @param int   $variation_id    The created product variation ID.
 		 * @param array $variation_data  The original product variation data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_product_variation_generation_result', $result, $variation_id, $variation_data );
+		return apply_filters( 'fluent_cart_fakerpress_product_variation_generation_result', $result, $variation->id, $variation_data );
+	}
+
+	/**
+	 * Draw a real product to attach the variation to.
+	 *
+	 * Selecting a fct_product_details row guarantees both a wp_posts product and
+	 * the detail row whose price range has to be kept in sync.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return object|null Product detail row, or null when the store has no
+	 *                     products yet.
+	 */
+	private function random_product_detail(): ?object {
+		$detail = ProductDetailModel::query()->inRandomOrder()->first();
+
+		return $detail ? $detail : null;
 	}
 
 	/**
 	 * Generate product variation data
 	 *
+	 * @param object $detail Parent product detail row, carrying post_id and
+	 *                       fulfillment_type.
+	 *
 	 * @return array Product variation data
 	 */
-	private function generate_variation_data(): array {
-		$attributes      = array();
-		$attribute_count = $this->get_faker()->numberBetween( 1, 2 );
+	private function generate_variation_data( object $detail ): array {
+		// A simple Fluent Cart product legitimately carries several variations as
+		// selectable price points; a size/colour label reads as a real option.
+		$size  = $this->get_faker()->randomElement( array( 'Small', 'Medium', 'Large', 'X-Large' ) );
+		$color = $this->get_faker()->randomElement( array( 'Red', 'Blue', 'Black', 'White', 'Green' ) );
+		$title = $size . ' / ' . $color;
 
-		for ( $i = 0; $i < $attribute_count; $i++ ) {
-			$attribute_name  = $this->get_faker()->randomElement( array( 'Size', 'Color', 'Style', 'Material' ) );
-			$attribute_value = $this->get_faker()->randomElement( array( 'Small', 'Medium', 'Large', 'Red', 'Blue', 'Black', 'Cotton', 'Polyester' ) );
+		$stock        = $this->get_faker()->numberBetween( 0, 100 );
+		$stock_status = $stock > 0 ? 'in-stock' : 'out-of-stock';
 
-			$attributes[ $attribute_name ] = $attribute_value;
-		}
+		$post_id = (int) $detail->post_id;
 
 		return array(
-			'product_id' => $this->get_faker()->numberBetween( 1, 1000 ),
-			'attributes' => $attributes,
-			'price'      => $this->get_faker()->randomFloat( 2, 10, 500 ),
-			'sku'        => strtoupper( $this->get_faker()->bothify( 'VAR-#####' ) ),
-			'stock'      => $this->get_faker()->numberBetween( 0, 50 ),
-			'status'     => 'active',
+			'post_id'          => $post_id,
+			// serial_index orders the variations on the product; colliding with an
+			// existing one hides the new row behind it in the admin list.
+			'serial_index'     => $this->next_serial_index( $post_id ),
+			'variation_title'  => $title,
+			'sku'              => $this->unique_sku(),
+			// item_price is integer cents, despite the column being a double —
+			// PricingTableRenderer reads it back through Helper::toDecimal().
+			'item_price'       => (int) round( $this->get_faker()->randomFloat( 2, 9.99, 999.99 ) * 100 ),
+			'manage_stock'     => 1,
+			'stock_status'     => $stock_status,
+			'total_stock'      => $stock,
+			'available'        => $stock,
+			'payment_type'     => 'onetime',
+			// Inherit the parent's fulfillment type so the variation does not
+			// claim to ship when the product is digital.
+			'fulfillment_type' => $detail->fulfillment_type ? $detail->fulfillment_type : 'physical',
+			'item_status'      => 'active',
+			'other_info'       => array(
+				'description'  => '',
+				'payment_type' => 'onetime',
+				'tax_class'    => 'standard',
+				'tax_exempt'   => 'no',
+			),
 		);
+	}
+
+	/**
+	 * Next free serial_index for a product's variations.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $post_id Parent product post ID.
+	 *
+	 * @return int One past the current highest serial_index.
+	 */
+	private function next_serial_index( int $post_id ): int {
+		$max = ProductVariationModel::query()->where( 'post_id', $post_id )->max( 'serial_index' );
+
+		return (int) $max + 1;
+	}
+
+	/**
+	 * Build an SKU that is not already taken.
+	 *
+	 * The fct_product_variations table carries a UNIQUE index on sku, so a
+	 * collision is a database error rather than a silently overwritten row.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Unused SKU.
+	 */
+	private function unique_sku(): string {
+		do {
+			$sku = strtoupper( $this->get_faker()->bothify( '??-#####' ) );
+		} while ( ProductVariationModel::query()->where( 'sku', $sku )->exists() );
+
+		return $sku;
 	}
 
 	/**
@@ -124,32 +218,43 @@ class Product_Variation extends Generator {
 	 *
 	 * @param array $data Product variation data.
 	 *
-	 * @return int|null Created product variation ID
+	 * @return ProductVariationModel|null Created variation instance
 	 */
-	private function create_product_variation( array $data ): ?int {
-		// Use Fluent Cart's product variation creation API if available.
-		if ( function_exists( 'fluentCartCreateProductVariation' ) ) {
-			return fluentCartCreateProductVariation( $data );
+	private function create_product_variation( array $data ): ?ProductVariationModel {
+		if ( ! class_exists( ProductVariationModel::class ) ) {
+			return null;
 		}
 
-		// Fallback: create as WordPress post.
-		$post_data = array(
-			'post_title'   => 'Variation for Product ' . $data['product_id'],
-			'post_content' => '',
-			'post_status'  => 'publish',
-			'post_type'    => 'fluentcart_variation',
-			'post_parent'  => $data['product_id'],
-			'meta_input'   => array(
-				'_attributes' => wp_json_encode( $data['attributes'] ),
-				'_price'      => $data['price'],
-				'_sku'        => $data['sku'],
-				'_stock'      => $data['stock'],
-				'_status'     => $data['status'],
-			),
+		try {
+			return ProductVariationModel::query()->create( $data );
+		} catch ( \Exception $e ) {
+			return null;
+		}
+	}
+
+	/**
+	 * Recompute a product's stored min/max price from its variations.
+	 *
+	 * ProductDetail shadows min_price and max_price with computed accessors, so a
+	 * plain model assignment would not persist reliably. Writing the columns
+	 * through the query builder keeps the stored values — which some listing and
+	 * sort queries read directly — in step with the variation just added.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $post_id Parent product post ID.
+	 *
+	 * @return void
+	 */
+	private function sync_product_price_range( int $post_id ): void {
+		$min = ProductVariationModel::query()->where( 'post_id', $post_id )->min( 'item_price' );
+		$max = ProductVariationModel::query()->where( 'post_id', $post_id )->max( 'item_price' );
+
+		ProductDetailModel::query()->where( 'post_id', $post_id )->update(
+			array(
+				'min_price' => (int) $min,
+				'max_price' => (int) $max,
+			)
 		);
-
-		$variation_id = wp_insert_post( $post_data );
-
-		return $variation_id ? $variation_id : null;
 	}
 }

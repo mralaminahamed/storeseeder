@@ -110,6 +110,14 @@ parameters:
         # Faker library dynamic properties
         - '#Access to an undefined property Faker\\Generator::\$[a-zA-Z_]+\.#'
 
+        # Locale-specific FakerPHP formatters. These are provided by the en_US
+        # Address provider at runtime and resolve through Generator::__call, but
+        # the analysed stub only models the base formatter set. Named one by one
+        # so a genuinely misspelled formatter still fails analysis.
+        - '#Call to an undefined method Faker\\Generator::stateAbbr\(\)\.#'
+        - '#Call to an undefined method Faker\\Generator::state\(\)\.#'
+        - '#Call to an undefined method Faker\\Generator::secondaryAddress\(\)\.#'
+
         # PHPDoc type issues (inheritance)
         - '#PHPDoc tag @return with type .* is not subtype of native type .*\.#'
 

@@ -85,7 +85,7 @@ class MCP_Server {
 			'fluent-cart-fakerpress',
 			array(
 				'label'       => __( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, and locations.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, and product attributes.', 'fluent-cart-fakerpress' ),
 			)
 		);
 	}
@@ -138,7 +138,7 @@ class MCP_Server {
 			self::REST_NAMESPACE,
 			self::REST_ROUTE,
 			__( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, geographic locations, and product attributes.', 'fluent-cart-fakerpress' ),
+			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, and product attributes.', 'fluent-cart-fakerpress' ),
 			FLUENT_CART_FAKERPRESS_VERSION,
 			array(
 				\WP\MCP\Transport\HttpTransport::class,
@@ -581,48 +581,6 @@ class MCP_Server {
 				),
 				'output_schema'       => $this->build_output_schema( 'cart_sessions', __( 'Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps.', 'fluent-cart-fakerpress' ) ),
 				'execute_callback'    => array( Abilities\Generate_Cart_Sessions::class, 'execute' ),
-				'permission_callback' => array( $this, 'permission_callback' ),
-			),
-
-			'fluent-cart-fakerpress/generate-locations'   => array(
-				'label'               => __( 'Generate Locations', 'fluent-cart-fakerpress' ),
-				'description'         => __( 'Generate geographic location hierarchies (countries → states/provinces → cities) with coordinates, timezones, currencies, and ISO codes. Writes a locations.json file consumed by the Fluent Cart shipping and tax systems.', 'fluent-cart-fakerpress' ),
-				'category'            => 'fluent-cart-fakerpress',
-				'input_schema'        => $this->build_input_schema(
-					array(
-						'regions'        => array(
-							'type'        => 'array',
-							'description' => __( 'Geographic regions to include. Examples: Americas, Europe, Asia, Africa, Oceania. Omit to include all available regions.', 'fluent-cart-fakerpress' ),
-							'items'       => array( 'type' => 'string' ),
-							'default'     => array(),
-						),
-						'countries'      => array(
-							'type'        => 'array',
-							'description' => __( 'Specific countries (ISO-2, ISO-3, or full names) to generate. Omit to use all countries in the selected regions.', 'fluent-cart-fakerpress' ),
-							'items'       => array( 'type' => 'string' ),
-							'default'     => array(),
-						),
-						'max_countries'  => array(
-							'type'        => 'integer',
-							'description' => __( 'Maximum number of countries to include (1–50). Default: 10.', 'fluent-cart-fakerpress' ),
-							'minimum'     => 1,
-							'maximum'     => 50,
-							'default'     => 10,
-						),
-						'include_states' => array(
-							'type'        => 'boolean',
-							'description' => __( 'Generate states/provinces for each country. Default: true.', 'fluent-cart-fakerpress' ),
-							'default'     => true,
-						),
-						'include_cities' => array(
-							'type'        => 'boolean',
-							'description' => __( 'Generate cities for each state/province. Default: true.', 'fluent-cart-fakerpress' ),
-							'default'     => true,
-						),
-					)
-				),
-				'output_schema'       => $this->build_output_schema( 'locations', __( 'Array of location-batch result objects with countries_created, total_states, total_cities, data_file_path, and created_date.', 'fluent-cart-fakerpress' ) ),
-				'execute_callback'    => array( Abilities\Generate_Locations::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 

@@ -102,11 +102,18 @@ class Shipping_Plan extends Generator {
 	 * @return array Shipping method data
 	 */
 	private function generate_shipping_plan_data(): array {
-		$types = array( 'flat_rate', 'free_shipping', 'local_pickup' );
+		// Fluent Cart recognises 'fixed' (charged by the stored amount) and
+		// 'free_shipping'. 'flat_rate' and 'local_pickup' are not method types it
+		// reads — CartHelper only special-cases 'free_shipping' and charges every
+		// other method by its amount, so those strings produced methods the admin
+		// UI could not edit.
+		$types = array( 'fixed', 'free_shipping' );
 		$type  = $this->get_faker()->randomElement( $types );
 
+		// amount is a DECIMAL(10,2) of major currency units — Fluent Cart scales
+		// it to cents at calculation time — so dollars go in here, not cents.
 		$amount = 0;
-		if ( 'flat_rate' === $type ) {
+		if ( 'free_shipping' !== $type ) {
 			$amount = $this->get_faker()->randomFloat( 2, 5, 50 );
 		}
 

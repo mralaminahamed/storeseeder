@@ -10,6 +10,8 @@
 namespace FluentCartFakerPress\Generators;
 
 use FluentCart\App\Models\Cart as CartModel;
+use FluentCart\App\Models\Customer as CustomerModel;
+use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -71,7 +73,9 @@ class Cart_Session extends Generator {
 		}
 
 		$result = array(
-			'id'             => $cart->id,
+			// fct_carts has no id column — the primary key is cart_hash, and
+			// the model sets $incrementing = false. $cart->id was always null.
+			'id'             => $cart->cart_hash,
 			'cart_hash'      => $cart->cart_hash,
 			'user_id'        => $cart->user_id,
 			'stage'          => $cart->stage,
@@ -92,7 +96,67 @@ class Cart_Session extends Generator {
 		 * @param int   $cart_id        The created cart ID.
 		 * @param array $session_data   The original cart session data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_cart_session_generation_result', $result, $cart->id, $session_data );
+		return apply_filters( 'fluent_cart_fakerpress_cart_session_generation_result', $result, $cart->cart_hash, $session_data );
+	}
+
+	/**
+	 * Draw real product variation IDs for the cart contents.
+	 *
+	 * Each cart_data entry's object_id is a foreign key into
+	 * fct_product_variations. Random integers produce carts full of products
+	 * that do not exist.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $count How many are wanted.
+	 *
+	 * @return array<int, int> Variation IDs, possibly fewer than requested.
+	 */
+	private function random_variation_ids( int $count ): array {
+		$variations = ProductVariationModel::query()
+			->inRandomOrder()
+			->limit( $count )
+			->get();
+
+		$ids = array();
+
+		foreach ( $variations as $variation ) {
+			$ids[] = (int) $variation->id;
+		}
+
+		return $ids;
+	}
+
+	/**
+	 * Draw a real customer ID.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return int|null Customer ID, or null when the store has no customers.
+	 */
+	private function random_customer_id(): ?int {
+		$customer = CustomerModel::query()->inRandomOrder()->first();
+
+		return $customer ? (int) $customer->id : null;
+	}
+
+	/**
+	 * Draw a real WordPress user ID.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return int|null User ID, or null when no users match.
+	 */
+	private function random_user_id(): ?int {
+		$user_ids = get_users(
+			array(
+				'number'  => 1,
+				'orderby' => 'rand',
+				'fields'  => 'ID',
+			)
+		);
+
+		return empty( $user_ids ) ? null : (int) $user_ids[0];
 	}
 
 	/**
@@ -101,19 +165,23 @@ class Cart_Session extends Generator {
 	 * @return array Cart session data
 	 */
 	private function generate_cart_session_data(): array {
-		$stages = array( 'checkout', 'cart', 'completed' );
+		// Fluent Cart only ever writes 'draft' (the column default), 'intended'
+		// and 'completed'. 'checkout' and 'cart' are not stages it recognises,
+		// so those carts matched no abandoned-cart or recovery query.
+		$stages = array( 'draft', 'intended', 'completed' );
 		$stage  = $this->get_faker()->randomElement( $stages );
 
-		$user_id = $this->get_faker()->boolean( 70 ) ? $this->get_faker()->numberBetween( 1, 100 ) : null; // 70% logged in users
+		$user_id = $this->get_faker()->boolean( 70 ) ? $this->random_user_id() : null; // 70% logged in users
 
 		$cart_items  = array();
 		$items_count = $this->get_faker()->numberBetween( 1, 5 );
 
-		for ( $i = 0; $i < $items_count; $i++ ) {
+		foreach ( $this->random_variation_ids( $items_count ) as $variation_id ) {
 			$cart_items[] = array(
-				'object_id'   => $this->get_faker()->numberBetween( 1, 1000 ),
+				'object_id'   => $variation_id,
 				'object_type' => 'product_variation',
-				'unit_price'  => $this->get_faker()->randomFloat( 2, 10, 500 ),
+				// Cart money is in integer cents, same as order items.
+				'unit_price'  => (int) round( $this->get_faker()->randomFloat( 2, 10, 500 ) * 100 ),
 				'quantity'    => $this->get_faker()->numberBetween( 1, 3 ),
 				'line_total'  => 0, // Will be calculated by Fluent Cart.
 				'other_info'  => array(),
@@ -121,11 +189,13 @@ class Cart_Session extends Generator {
 		}
 
 		$data = array(
-			'customer_id' => $user_id ? $this->get_faker()->numberBetween( 1, 100 ) : null,
+			'customer_id' => $user_id ? $this->random_customer_id() : null,
 			'user_id'     => $user_id,
 			'cart_data'   => $cart_items,
 			'stage'       => $stage,
-			'cart_group'  => 'default',
+			// 'global' is the column default Fluent Cart uses; 'default' is not
+			// a group it ever reads.
+			'cart_group'  => 'global',
 			'user_agent'  => $this->get_faker()->userAgent(),
 			'ip_address'  => $this->get_faker()->ipv4(),
 		);
@@ -137,15 +207,16 @@ class Cart_Session extends Generator {
 			$data['last_name']  = $this->get_faker()->lastName();
 		}
 
-		// Add checkout data for checkout stage.
-		if ( 'checkout' === $stage ) {
+		// Add checkout data for carts that reached checkout. 'intended' is the
+		// stage Fluent Cart sets once a cart enters the checkout flow.
+		if ( 'intended' === $stage ) {
 			$data['checkout_data'] = array(
 				'form_data' => array(
 					'billing_full_name' => $this->get_faker()->name(),
 					'billing_email'     => $this->get_faker()->email(),
 					'billing_address_1' => $this->get_faker()->streetAddress(),
 					'billing_city'      => $this->get_faker()->city(),
-					'billing_state'     => $this->get_faker()->stateAbbr,
+					'billing_state'     => $this->get_faker()->stateAbbr(),
 					'billing_postcode'  => $this->get_faker()->postcode(),
 					'billing_country'   => 'US',
 				),
