@@ -11,7 +11,9 @@ namespace FluentCartFakerPress\Generators;
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Models\AttributeGroup;
+use FluentCart\App\Models\AttributeRelation;
 use FluentCart\App\Models\AttributeTerm;
+use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -108,11 +110,68 @@ class Attribute extends Generator {
 			}
 		}
 
+		// Bind the terms to real product variations. Without this the attribute
+		// group and its terms exist but attach to nothing — fct_atts_relations
+		// stays empty, no product is genuinely variable, and the attribute is
+		// invisible on every product page.
+		$linked = $this->link_terms_to_variations( (int) $group->id, array_column( $values, 'id' ) );
+
 		return array(
 			'id'     => (int) $group->id,
 			'name'   => $title,
 			'slug'   => $slug,
 			'values' => $values,
+			'linked' => $linked,
 		);
+	}
+
+	/**
+	 * Attach this attribute group's terms to real product variations.
+	 *
+	 * The fct_atts_relations table binds a variation (object_id) to one term of a group.
+	 * A variation carries at most one term per group — it is one size, one
+	 * colour — so a variation that already has a term for this group is skipped.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int   $group_id Attribute group ID.
+	 * @param int[] $term_ids IDs of the group's terms.
+	 *
+	 * @return int Number of variations linked.
+	 */
+	private function link_terms_to_variations( int $group_id, array $term_ids ): int {
+		if ( empty( $term_ids ) || ! class_exists( AttributeRelation::class ) ) {
+			return 0;
+		}
+
+		$variations = ProductVariationModel::query()
+			->inRandomOrder()
+			->limit( $this->get_faker()->numberBetween( 2, 6 ) )
+			->get();
+
+		$linked = 0;
+
+		foreach ( $variations as $variation ) {
+			$already = AttributeRelation::query()
+				->where( 'object_id', $variation->id )
+				->where( 'group_id', $group_id )
+				->exists();
+
+			if ( $already ) {
+				continue;
+			}
+
+			AttributeRelation::query()->create(
+				array(
+					'object_id' => (int) $variation->id,
+					'group_id'  => $group_id,
+					'term_id'   => (int) $this->get_faker()->randomElement( $term_ids ),
+				)
+			);
+
+			++$linked;
+		}
+
+		return $linked;
 	}
 }

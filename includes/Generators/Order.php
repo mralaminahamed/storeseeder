@@ -9,8 +9,11 @@
 
 namespace FluentCartFakerPress\Generators;
 
+use FluentCart\App\Models\AppliedCoupon as AppliedCouponModel;
+use FluentCart\App\Models\Coupon as CouponModel;
 use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\Order as OrderModel;
+use FluentCart\App\Models\OrderAddress as OrderAddressModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
@@ -159,14 +162,27 @@ class Order extends Generator {
 
 		$tax_total = (int) round( $subtotal * 0.08 );
 
+		// Some orders carry a coupon. Drawing a real one and recording the
+		// discount ties the order to fct_applied_coupons, so coupon usage counts
+		// and revenue reports stop reading zero.
+		$coupon   = $this->random_applicable_coupon();
+		$discount = $this->coupon_discount( $coupon, $subtotal );
+
 		return array(
 			'customer_id'     => $this->random_customer_id(),
 			'items'           => $items,
 			'subtotal'        => $subtotal,
 			'tax_amount'      => $tax_total,
-			'total'           => $subtotal + $tax_total,
+			'total'           => max( 0, $subtotal + $tax_total - $discount ),
 			'shipping_amount' => 0,
-			'discount_amount' => 0,
+			'discount_amount' => $discount,
+			'coupon'          => ( $coupon && $discount > 0 )
+				? array(
+					'id'     => (int) $coupon->id,
+					'code'   => $coupon->code,
+					'amount' => $discount,
+				)
+				: null,
 			'currency'        => 'USD',
 			// Status::getOrderStatuses() is the allowed set. 'pending' is a
 			// payment_status, not an order status, and an order carrying it
@@ -311,6 +327,141 @@ class Order extends Generator {
 			}
 		}
 
+		// Give the order the billing and shipping addresses it was missing —
+		// without them the admin order view is blank and tax and shipping cannot
+		// resolve a region.
+		$this->create_order_addresses( $order );
+
+		// Record the applied coupon, if any, so the discount traces to a real
+		// coupon rather than an unexplained number.
+		if ( ! empty( $data['coupon'] ) ) {
+			$this->create_applied_coupon( $order, $data['coupon'] );
+		}
+
 		return $order->id;
+	}
+
+	/**
+	 * Draw a coupon whose discount can be applied to an order.
+	 *
+	 * Only 'fixed' and 'percentage' coupons map to a line discount; free_shipping
+	 * and other types are skipped. Returns null ~60% of the time so most orders
+	 * carry no coupon.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @return CouponModel|null Coupon model, or null.
+	 */
+	private function random_applicable_coupon(): ?CouponModel {
+		if ( ! class_exists( CouponModel::class ) || ! $this->get_faker()->boolean( 40 ) ) {
+			return null;
+		}
+
+		return CouponModel::query()
+			->whereIn( 'type', array( 'fixed', 'percentage' ) )
+			->inRandomOrder()
+			->first();
+	}
+
+	/**
+	 * Compute a coupon's discount in cents, capped at the subtotal.
+	 *
+	 * A 'fixed' coupon stores its amount in integer cents already; a 'percentage'
+	 * coupon stores the percent, applied against the subtotal.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param CouponModel|null $coupon   Coupon, or null.
+	 * @param int              $subtotal Order subtotal in cents.
+	 *
+	 * @return int Discount in cents.
+	 */
+	private function coupon_discount( ?CouponModel $coupon, int $subtotal ): int {
+		if ( null === $coupon ) {
+			return 0;
+		}
+
+		if ( 'percentage' === $coupon->type ) {
+			$discount = (int) round( $subtotal * (float) $coupon->amount / 100 );
+		} else {
+			$discount = (int) $coupon->amount;
+		}
+
+		return (int) min( $discount, $subtotal );
+	}
+
+	/**
+	 * Create the billing and shipping addresses for an order.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param OrderModel $order Parent order.
+	 *
+	 * @return void
+	 */
+	private function create_order_addresses( OrderModel $order ): void {
+		if ( ! class_exists( OrderAddressModel::class ) ) {
+			return;
+		}
+
+		foreach ( array( 'billing', 'shipping' ) as $type ) {
+			OrderAddressModel::query()->create( $this->generate_order_address( (int) $order->id, $type ) );
+		}
+	}
+
+	/**
+	 * Build one order address row.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int    $order_id Parent order ID.
+	 * @param string $type     'billing' or 'shipping'.
+	 *
+	 * @return array Column map for OrderAddress::create().
+	 */
+	private function generate_order_address( int $order_id, string $type ): array {
+		return array(
+			'order_id'  => $order_id,
+			'type'      => $type,
+			'name'      => $this->get_faker()->name(),
+			'address_1' => $this->get_faker()->streetAddress(),
+			'address_2' => $this->get_faker()->optional( 0.3 )->secondaryAddress() ?? '',
+			'city'      => $this->get_faker()->city(),
+			'state'     => $this->get_faker()->stateAbbr(),
+			'postcode'  => $this->get_faker()->postcode(),
+			'country'   => 'US',
+			// phone lives under meta.other_data, not as a column.
+			'meta'      => array(
+				'other_data' => array(
+					'phone' => $this->get_faker()->phoneNumber(),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Record a coupon applied to an order.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param OrderModel $order  Parent order.
+	 * @param array      $coupon Coupon data (id, code, amount in cents).
+	 *
+	 * @return void
+	 */
+	private function create_applied_coupon( OrderModel $order, array $coupon ): void {
+		if ( ! class_exists( AppliedCouponModel::class ) ) {
+			return;
+		}
+
+		AppliedCouponModel::query()->create(
+			array(
+				'order_id'  => (int) $order->id,
+				'coupon_id' => $coupon['id'],
+				'code'      => $coupon['code'],
+				// Stored in integer cents, like every other order money column.
+				'amount'    => $coupon['amount'],
+			)
+		);
 	}
 }

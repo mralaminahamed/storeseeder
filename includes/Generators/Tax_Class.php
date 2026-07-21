@@ -10,6 +10,7 @@
 namespace FluentCartFakerPress\Generators;
 
 use FluentCart\App\Models\TaxClass as TaxClassModel;
+use FluentCart\App\Models\TaxRate as TaxRateModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -74,13 +75,20 @@ class Tax_Class extends Generator {
 			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class.', 'fluent-cart-fakerpress' ) );
 		}
 
+		// Create the geographic rate rows. Without them the tax class exists but
+		// carries no rate that Fluent Cart can apply — fct_tax_rates stays empty,
+		// so no order is ever taxed and every tax report reads zero. The rate the
+		// old generator tucked into the class meta was read by nothing.
+		$rates_created = $this->create_tax_rates( (int) $tax_id, $tax_data );
+
 		$result = array(
-			'id'         => $tax_id,
-			'name'       => $tax_data['name'],
-			'rate'       => $tax_data['rate'],
-			'country'    => $tax_data['country'],
-			'status'     => $tax_data['status'],
-			'created_at' => current_time( 'Y-m-d H:i:s' ),
+			'id'            => $tax_id,
+			'name'          => $tax_data['name'],
+			'rate'          => $tax_data['rate'],
+			'country'       => $tax_data['country'],
+			'status'        => $tax_data['status'],
+			'rates_created' => $rates_created,
+			'created_at'    => current_time( 'Y-m-d H:i:s' ),
 		);
 
 		/**
@@ -96,6 +104,67 @@ class Tax_Class extends Generator {
 		 * @param array $tax_data  The original tax class data used for creation.
 		 */
 		return apply_filters( 'fluent_cart_fakerpress_tax_class_generation_result', $result, $tax_id, $tax_data );
+	}
+
+	/**
+	 * Create the geographic rate rows for a tax class.
+	 *
+	 * The fct_tax_rates.rate column is a percentage stored as a string ("8.5" = 8.5%), keyed
+	 * to the class by class_id and scoped by country/state. for_order marks the
+	 * rate as one Fluent Cart applies to orders.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int   $class_id Parent tax class ID.
+	 * @param array $tax_data Generated tax data (name, rate, country, state).
+	 *
+	 * @return int Number of rate rows created.
+	 */
+	private function create_tax_rates( int $class_id, array $tax_data ): int {
+		if ( ! class_exists( TaxRateModel::class ) ) {
+			return 0;
+		}
+
+		// The primary rate uses the class's own country/state/rate.
+		$rows = array(
+			array(
+				'country' => $tax_data['country'],
+				'state'   => $tax_data['state'],
+				'rate'    => (string) $tax_data['rate'],
+			),
+		);
+
+		// A tax class often spans several regions; add a few more.
+		$extra = $this->get_faker()->numberBetween( 0, 2 );
+		for ( $i = 0; $i < $extra; $i++ ) {
+			$rows[] = array(
+				'country' => $this->get_faker()->countryCode(),
+				'state'   => strtoupper( $this->get_faker()->lexify( '??' ) ),
+				'rate'    => (string) $this->get_faker()->randomFloat( 2, 0, 25 ),
+			);
+		}
+
+		$created  = 0;
+		$priority = 1;
+		foreach ( $rows as $row ) {
+			TaxRateModel::query()->create(
+				array(
+					'class_id'    => $class_id,
+					'country'     => $row['country'],
+					'state'       => $row['state'],
+					'rate'        => $row['rate'],
+					'name'        => $tax_data['name'] . ' - ' . $row['country'],
+					'priority'    => $priority,
+					'is_compound' => 0,
+					'for_order'   => 1,
+				)
+			);
+
+			++$created;
+			++$priority;
+		}
+
+		return $created;
 	}
 
 	/**
