@@ -382,7 +382,8 @@ class StoreSeeder {
 	public function sample_data_exists(): bool {
 		$sample_data_dir = $this->get_sample_data_directory();
 
-		// Check for key directories that should exist.
+		// Check for key directories that should exist under the Fluent Cart
+		// integration folder.
 		$required_dirs = array( 'products', 'customers' );
 
 		foreach ( $required_dirs as $dir ) {
@@ -405,7 +406,7 @@ class StoreSeeder {
 	 */
 	public function get_sample_data_directory(): string {
 		$upload_dir = wp_upload_dir();
-		return $upload_dir['basedir'] . '/fluent-cart-fakerpress-sample-data';
+		return $upload_dir['basedir'] . '/storeseeder-sample-data-fluent-cart';
 	}
 
 	/**
@@ -419,7 +420,7 @@ class StoreSeeder {
 	 */
 	private function download_sample_data(): bool {
 		$repo_owner = 'mralaminahamed';
-		$repo_name  = 'fluent-cart-fakerpress-sample-data';
+		$repo_name  = 'storeseeder-sample-data-fluent-cart';
 		$branch     = 'trunk';
 
 		// GitHub API URL for downloading the repository as zip.

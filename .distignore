@@ -104,8 +104,8 @@ wp-config-local.php
 
 # Sample data (downloaded at runtime from separate repository)
 /sample-data/
-/../fluent-cart-fakerpress-sample-data/
-/fluent-cart-fakerpress-sample-data/
+/../storeseeder-sample-data-fluent-cart/
+/storeseeder-sample-data-fluent-cart/
 # Exclude parent directory files
 ../*
 

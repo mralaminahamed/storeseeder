@@ -68,7 +68,7 @@ tmp/
 
 # Sample data
 sample-data/
-fluent-cart-fakerpress-sample-data/
+storeseeder-sample-data-fluent-cart/
 
 # Development tools
 .eslintcache

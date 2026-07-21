@@ -519,7 +519,7 @@ abstract class Generator {
 	protected function get_sample_data_path( string $resource_type, string $filename ): string {
 		$locale     = $this->get_faker_locale();
 		$upload_dir = wp_upload_dir();
-		return $upload_dir['basedir'] . "/fluent-cart-fakerpress-sample-data/{$resource_type}/{$locale}/{$filename}.json";
+		return $upload_dir['basedir'] . "/storeseeder-sample-data-fluent-cart/{$resource_type}/{$locale}/{$filename}.json";
 	}
 
 	/**

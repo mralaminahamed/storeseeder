@@ -150,7 +150,7 @@ Two outbound requests, both administrator-initiated. Neither sends any site, use
 
 | Service | Endpoint | Triggered by | Data sent |
 |---------|----------|--------------|-----------|
-| GitHub | `github.com/mralaminahamed/fluent-cart-fakerpress-sample-data/archive/refs/heads/<branch>.zip` | Clicking **Sync Sample Data** in Settings, or a generator needing sample data not yet downloaded | Unauthenticated `GET`; no payload |
+| GitHub | `github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/<branch>.zip` | Clicking **Sync Sample Data** in Settings, or a generator needing sample data not yet downloaded | Unauthenticated `GET`; no payload |
 | WordPress.org | `api.wordpress.org/plugins/info/1.2/` | Opening the **Our Plugins** page; the request is made by the browser | Author query string only; no payload |
 
 GitHub [terms](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) and [privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement). WordPress.org [about](https://wordpress.org/about/) and [privacy policy](https://wordpress.org/about/privacy/).

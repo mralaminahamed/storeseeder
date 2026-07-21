@@ -15,7 +15,7 @@ import { useToast } from "@/admin/providers/ToastProvider";
 const PLUGIN_VERSION = "2.0.0";
 const GITHUB_URL = "https://github.com/mralaminahamed/storeseeder";
 const SAMPLE_DATA_REPO_URL =
-  "https://github.com/mralaminahamed/fluent-cart-fakerpress-sample-data";
+  "https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart";
 const SUPPORT_URL =
   "https://github.com/mralaminahamed/storeseeder/issues";
 const DOCS_URL =
