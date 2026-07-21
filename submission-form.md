@@ -58,17 +58,13 @@ Before uploading, confirm the WordPress.org username in `readme.txt` (`Contribut
 
 ---
 
-## Additional Information (paste into the form's "Additional Information" box)
+## Additional Information (paste into the form's box)
 
-> Hello Plugins Team,
+> StoreSeeder makes test data — products, orders, customers, and more — for Fluent Cart stores, for use on dev/staging. It needs the Fluent Cart plugin.
 >
-> StoreSeeder is a test-data generator for stores built on the Fluent Cart plugin (declared via the `Requires Plugins: fluent-cart` header). It creates realistic products, customers, orders, and 14 other record types through Fluent Cart's own models, for use on development and staging sites.
+> Two things to flag:
 >
-> A few notes to help the review:
+> - The optional Sample Data Sync downloads a zip of JSON reference data (locale names, addresses, tags) from a public GitHub repo. Data only, no code, admin-triggered. It's listed under External services in the readme.
+> - Plugin Check flags `wp_register_ability()` and `wp_register_ability_category()` as needing WP 6.9. They're `function_exists()`-guarded and only run on the abilities-api hook, so they never fire on the 6.5 minimum.
 >
-> - **One optional external request.** The Settings page offers a "Sample Data Sync" that downloads a small zip of **JSON reference data only** (locale-specific names, addresses, tags) from a public GitHub repository. It contains no executable code, never runs on activation, is administrator-initiated, and is documented in the readme's `== External services ==` section.
-> - **Plugin Check.** The built zip is clean apart from two false positives — `wp_register_ability()` and `wp_register_ability_category()` flagged as requiring WordPress 6.9. Those calls are wrapped in `function_exists()` and only fire on the `wp_abilities_api_init` hooks, so they never run on the declared 6.5 minimum when the (optional) Abilities API is absent.
-> - **Source code.** The shipped `build/` bundle is compiled from the TypeScript and CSS in `src/` (excluded from the zip); the complete source and build steps are in the readme's `== Source code ==` section and the public repository.
-> - **No trialware.** Every feature is fully functional — no paywalls, license keys, or feature gates.
->
-> Thank you for the review.
+> Source is on GitHub (the `build/` bundle is compiled from `src/`), linked in the readme.
