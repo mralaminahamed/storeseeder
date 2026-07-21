@@ -53,7 +53,7 @@ use FluentCartFakerPress\MCP\MCP_Server;
  * - Multi-locale support for international data generation
  *
  * @since 1.0.0
- * @version 2.1.0
+ * @version 1.0.0
  */
 class FluentCart_FakerPress {
 
@@ -132,7 +132,7 @@ class FluentCart_FakerPress {
 	 * method exits silently — no errors are thrown so existing functionality
 	 * is completely unaffected.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	private function init_mcp(): void {
@@ -516,7 +516,7 @@ class FluentCart_FakerPress {
 	/**
 	 * Write a message to the PHP error log, but only when debugging is enabled.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param string $message Message to log.
 	 *

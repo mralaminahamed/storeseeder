@@ -24,14 +24,14 @@ defined( 'ABSPATH' ) || exit;
  * Hooks into `mcp_adapter_init` and creates one MCP server that exposes
  * every registered FakerPress ability as an MCP tool.
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 class MCP_Server {
 
 	/**
 	 * Unique server identifier used by the mcp-adapter.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const SERVER_ID = 'fluent-cart-fakerpress';
@@ -40,7 +40,7 @@ class MCP_Server {
 	 * REST API namespace for the MCP endpoint.
 	 * Results in: /wp-json/fluent-cart-fakerpress-mcp/mcp
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const REST_NAMESPACE = 'fluent-cart-fakerpress-mcp';
@@ -48,7 +48,7 @@ class MCP_Server {
 	/**
 	 * REST API route segment.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @var string
 	 */
 	const REST_ROUTE = 'mcp';
@@ -58,7 +58,7 @@ class MCP_Server {
 	 *
 	 * Called from the plugin's main init() method.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function init(): void {
@@ -73,7 +73,7 @@ class MCP_Server {
 	/**
 	 * Register the ability category that groups all FakerPress abilities.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function register_ability_categories(): void {
@@ -95,7 +95,7 @@ class MCP_Server {
 	 *
 	 * Each ability maps 1-to-1 with an existing REST controller / generator pair.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function register_abilities(): void {
@@ -122,7 +122,7 @@ class MCP_Server {
 	/**
 	 * Create the MCP server and expose all FakerPress abilities as tools.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @param mixed $adapter The MCP adapter instance provided by the hook.
 	 * @return void
 	 */
@@ -157,7 +157,7 @@ class MCP_Server {
 	 * Keeping all definitions in one place makes it trivial to add or remove
 	 * abilities without touching any other files.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_ability_definitions(): array {
@@ -683,7 +683,7 @@ class MCP_Server {
 	 * Build a JSON Schema input_schema array that always includes the common
 	 * count + locale + seed parameters, then merges in any resource-specific ones.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param array<string, array<string, mixed>> $extra_properties Additional properties.
 	 * @return array<string, mixed>
@@ -720,7 +720,7 @@ class MCP_Server {
 	/**
 	 * Build a standard JSON Schema output_schema for the generated-items envelope.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param string $resource_key  Key in the response object that holds the items array.
 	 * @param string $items_description  Human-readable description of the items.
@@ -750,7 +750,7 @@ class MCP_Server {
 	 * FakerPress abilities. This mirrors the existing REST API permission check
 	 * already enforced in Controller::generate_items_permissions_check().
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return bool
 	 */
 	public function permission_callback(): bool {
@@ -760,7 +760,7 @@ class MCP_Server {
 	/**
 	 * Return true only when both Fluent Cart and the Abilities API are active.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 * @return bool
 	 */
 	private function dependencies_met(): bool {

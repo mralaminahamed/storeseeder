@@ -104,7 +104,7 @@ class Label extends Generator {
 		/**
 		 * Filters the label generation result data.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 * @hook  fluent_cart_fakerpress_label_generation_result
 		 *
 		 * @param array $result The label generation result data.

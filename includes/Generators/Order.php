@@ -348,7 +348,7 @@ class Order extends Generator {
 	 * and other types are skipped. Returns null ~60% of the time so most orders
 	 * carry no coupon.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @return CouponModel|null Coupon model, or null.
 	 */
@@ -369,7 +369,7 @@ class Order extends Generator {
 	 * A 'fixed' coupon stores its amount in integer cents already; a 'percentage'
 	 * coupon stores the percent, applied against the subtotal.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param CouponModel|null $coupon   Coupon, or null.
 	 * @param int              $subtotal Order subtotal in cents.
@@ -393,7 +393,7 @@ class Order extends Generator {
 	/**
 	 * Create the billing and shipping addresses for an order.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param OrderModel $order Parent order.
 	 *
@@ -412,7 +412,7 @@ class Order extends Generator {
 	/**
 	 * Build one order address row.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param int    $order_id Parent order ID.
 	 * @param string $type     'billing' or 'shipping'.
@@ -442,7 +442,7 @@ class Order extends Generator {
 	/**
 	 * Record a coupon applied to an order.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param OrderModel $order  Parent order.
 	 * @param array      $coupon Coupon data (id, code, amount in cents).

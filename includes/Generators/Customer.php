@@ -291,7 +291,7 @@ class Customer extends Generator {
 	/**
 	 * Persist a customer's billing and shipping addresses.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param int   $customer_id Customer row ID.
 	 * @param array $billing     Billing address fields.
@@ -321,7 +321,7 @@ class Customer extends Generator {
 	/**
 	 * Shape a generated address array for the CustomerAddresses model.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param int    $customer_id Customer row ID.
 	 * @param array  $addr        Generated address fields.
@@ -574,7 +574,7 @@ class Customer extends Generator {
 	 * Both shapes are accepted so the generator keeps working whether or not
 	 * the companion sample-data plugin is installed.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return string Two-letter country code.
 	 */

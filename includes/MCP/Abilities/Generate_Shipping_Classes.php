@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/shipping_classes/generate
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 class Generate_Shipping_Classes extends Ability {
 

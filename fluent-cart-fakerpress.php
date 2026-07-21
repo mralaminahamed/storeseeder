@@ -11,7 +11,7 @@
  * Plugin Name:       Fluent Cart FakerPress
  * Plugin URI:        https://github.com/mralaminahamed/fluent-cart-fakerpress
  * Description:       Create realistic test data for your Fluent Cart store in seconds! Generate products, customers, orders, coupons and more with our intuitive admin interface. Perfect for development, testing, and demos. Features smart defaults, real-time validation, and seamless WordPress integration.
- * Version:           2.1.0
+ * Version:           1.0.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Author:            Al Amin Ahamed
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'FLUENT_CART_FAKERPRESS_VERSION', '2.1.0' );
+define( 'FLUENT_CART_FAKERPRESS_VERSION', '1.0.0' );
 define( 'FLUENT_CART_FAKERPRESS_PLUGIN_FILE', __FILE__ );
 define( 'FLUENT_CART_FAKERPRESS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'FLUENT_CART_FAKERPRESS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );

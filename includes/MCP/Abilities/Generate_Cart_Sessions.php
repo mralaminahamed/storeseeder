@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/cart-sessions/generate
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 class Generate_Cart_Sessions extends Ability {
 

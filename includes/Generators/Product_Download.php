@@ -98,7 +98,7 @@ class Product_Download extends Generator {
 		/**
 		 * Filters the product download generation result data.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 * @hook  fluent_cart_fakerpress_product_download_generation_result
 		 *
 		 * @param array $result The generation result data.

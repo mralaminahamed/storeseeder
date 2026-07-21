@@ -125,7 +125,7 @@ class Subscription extends Generator {
 		/**
 		 * Filters the subscription generation result data.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 * @hook  fluent_cart_fakerpress_subscription_generation_result
 		 *
 		 * @param array $result The generation result data.

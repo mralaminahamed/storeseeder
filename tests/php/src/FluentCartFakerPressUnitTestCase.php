@@ -18,7 +18,7 @@ use WP_UnitTestCase;
  * Provides REST helpers, user factories, and hook assertions shared across the
  * generator and controller test suites.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 abstract class FluentCartFakerPressUnitTestCase extends WP_UnitTestCase {
 
@@ -66,7 +66,7 @@ abstract class FluentCartFakerPressUnitTestCase extends WP_UnitTestCase {
 		/**
 		 * Fires when preparing to serve a REST API request.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 *
 		 * @param WP_REST_Server $wp_rest_server Server object.
 		 */

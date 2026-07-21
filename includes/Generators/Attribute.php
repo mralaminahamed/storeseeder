@@ -132,7 +132,7 @@ class Attribute extends Generator {
 	 * A variation carries at most one term per group — it is one size, one
 	 * colour — so a variation that already has a term for this group is skipped.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param int   $group_id Attribute group ID.
 	 * @param int[] $term_ids IDs of the group's terms.

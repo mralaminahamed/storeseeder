@@ -113,7 +113,7 @@ class Tax_Class extends Generator {
 	 * to the class by class_id and scoped by country/state. for_order marks the
 	 * rate as one Fluent Cart applies to orders.
 	 *
-	 * @since 2.4.0
+	 * @since 1.0.0
 	 *
 	 * @param int   $class_id Parent tax class ID.
 	 * @param array $tax_data Generated tax data (name, rate, country, state).

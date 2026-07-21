@@ -16,7 +16,7 @@ use FluentCartFakerPress\Generators\Product_Download as ProductDownloadGenerator
  *
  * Handles REST API endpoints for product download generation.
  *
- * @since 2.4.0
+ * @since 1.0.0
  */
 class Product_Download extends Controller {
 

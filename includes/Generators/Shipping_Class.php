@@ -102,7 +102,7 @@ class Shipping_Class extends Generator {
 		/**
 		 * Filters the shipping class generation result data.
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 * @hook  fluent_cart_fakerpress_shipping_class_generation_result
 		 *
 		 * @param array $result The shipping class generation result data.

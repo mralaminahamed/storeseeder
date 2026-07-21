@@ -25,7 +25,7 @@ use WP_REST_Request;
 /**
  * Abstract_Ability
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 abstract class Ability {
 
@@ -33,21 +33,21 @@ abstract class Ability {
 	 * The REST route base (e.g. "products", "customers", "orders").
 	 * Concrete classes must define this constant.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 */
 	const REST_BASE = '';
 
 	/**
 	 * REST namespace shared by all FakerPress endpoints.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 */
 	const REST_NAMESPACE = 'fluent-cart-fakerpress/v1';
 
 	/**
 	 * Entry point called by the Abilities API.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $input Validated input from the MCP client.
 	 * @return array<string, mixed>|WP_Error
@@ -59,7 +59,7 @@ abstract class Ability {
 	/**
 	 * Dispatch an internal REST request and return the decoded response body.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $params Parameters to forward as JSON body.
 	 * @return array<string, mixed>|WP_Error
@@ -95,7 +95,7 @@ abstract class Ability {
 	 *
 	 * Concrete classes override this when their endpoint expects nested params.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $input Raw MCP input.
 	 * @return array<string, mixed> Payload ready for the REST endpoint.

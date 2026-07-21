@@ -136,7 +136,7 @@ class Product extends Generator {
 	 * The fct_product_variations table carries a UNIQUE index on sku, so a
 	 * collision is a database error rather than a silently overwritten row.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return string Unused SKU.
 	 */
