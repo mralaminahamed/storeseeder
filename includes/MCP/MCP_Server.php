@@ -163,7 +163,7 @@ class MCP_Server {
 	private function get_ability_definitions(): array {
 		return array(
 
-			'fluent-cart-fakerpress/generate-products'    => array(
+			'fluent-cart-fakerpress/generate-products'     => array(
 				'label'               => __( 'Generate Products', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -215,7 +215,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-customers'   => array(
+			'fluent-cart-fakerpress/generate-customers'    => array(
 				'label'               => __( 'Generate Customers', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate realistic WordPress customer accounts with billing/shipping addresses, demographic metadata, purchase history, and loyalty tier assignments.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -263,7 +263,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-orders'      => array(
+			'fluent-cart-fakerpress/generate-orders'       => array(
 				'label'               => __( 'Generate Orders', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate realistic Fluent Cart orders with line items, addresses, payment details, shipping calculations, tax breakdowns, and fulfilment status. Requires at least one product with variations and one customer to exist.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -322,7 +322,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-coupons'     => array(
+			'fluent-cart-fakerpress/generate-coupons'      => array(
 				'label'               => __( 'Generate Coupons', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate realistic Fluent Cart discount coupons with various discount types, usage limits, validity periods, and product or customer restrictions.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -468,7 +468,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-tax-classes' => array(
+			'fluent-cart-fakerpress/generate-tax-classes'  => array(
 				'label'               => __( 'Generate Tax Classes', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate tax classes with country/state/city-level rate tables, compound tax configurations, and priority settings for a Fluent Cart store.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -584,7 +584,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-attributes'  => array(
+			'fluent-cart-fakerpress/generate-attributes'   => array(
 				'label'               => __( 'Generate Attributes', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -594,7 +594,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-refunds'     => array(
+			'fluent-cart-fakerpress/generate-refunds'      => array(
 				'label'               => __( 'Generate Refunds', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate refund records against existing Fluent Cart orders. Requires completed or processing orders to exist. Returns refund IDs, amounts, statuses, and gateway transaction IDs.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -604,7 +604,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-logs'        => array(
+			'fluent-cart-fakerpress/generate-logs'         => array(
 				'label'               => __( 'Generate Logs', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate activity log entries for orders, products, customers, coupons, refunds, carts, transactions, and system events. Returns log IDs, object types, actions, and severity levels.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',
@@ -636,7 +636,7 @@ class MCP_Server {
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
-			'fluent-cart-fakerpress/generate-labels'      => array(
+			'fluent-cart-fakerpress/generate-labels'       => array(
 				'label'               => __( 'Generate Labels', 'fluent-cart-fakerpress' ),
 				'description'         => __( 'Generate labels (tags) and attach them to existing orders and customers for testing Fluent Cart segmentation. Requires existing orders or customers to attach to.', 'fluent-cart-fakerpress' ),
 				'category'            => 'fluent-cart-fakerpress',

@@ -104,7 +104,7 @@ class Log extends Generator {
 		);
 		$log_type     = $this->get_faker()->randomElement( self::LOG_TYPES );
 		$title        = sprintf( $this->get_faker()->randomElement( self::TITLES ), ucfirst( $module_name ) );
-		$user_id      = (int) ( get_current_user_id() ?: 1 );
+		$user_id      = max( 1, get_current_user_id() );
 
 		$activity = Activity::query()->create(
 			array(
