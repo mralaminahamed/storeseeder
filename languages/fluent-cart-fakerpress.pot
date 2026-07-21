@@ -7,22 +7,22 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-21T03:48:00+00:00\n"
+"POT-Creation-Date: 2026-07-21T05:46:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.13.0-alpha-3eb2dd7\n"
 "X-Domain: fluent-cart-fakerpress\n"
 
-#: class-fluent-cart-fakerpress.php:162
+#: class-fluent-cart-fakerpress.php:163
 #: includes/MCP/MCP_Server.php:87
 #: includes/MCP/MCP_Server.php:140
 msgid "Fluent Cart FakerPress"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:163
+#: class-fluent-cart-fakerpress.php:164
 msgid "FC FakerPress"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:579
+#: class-fluent-cart-fakerpress.php:581
 msgid "Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active."
 msgstr ""
 
@@ -523,6 +523,10 @@ msgstr ""
 msgid "Generated shipping plans with methods and regions."
 msgstr ""
 
+#: includes/Controllers/Subscription.php:39
+msgid "Subscription"
+msgstr ""
+
 #: includes/Controllers/Tax_Class.php:43
 msgid "Tax Class"
 msgstr ""
@@ -812,6 +816,22 @@ msgstr ""
 msgid "Failed to create shipping method."
 msgstr ""
 
+#: includes/Generators/Subscription.php:81
+msgid "Fluent Cart Subscription model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Subscription.php:91
+msgid "No orders were found. Generate orders before generating subscriptions."
+msgstr ""
+
+#: includes/Generators/Subscription.php:102
+msgid "No product variations were found. Generate products before generating subscriptions."
+msgstr ""
+
+#: includes/Generators/Subscription.php:110
+msgid "Failed to create subscription."
+msgstr ""
+
 #: includes/Generators/Tax_Class.php:75
 msgid "Failed to create tax class."
 msgstr ""
@@ -837,11 +857,11 @@ msgid "Failed to create transaction."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:88
-msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads."
+msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:141
-msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads."
+msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:167
@@ -1248,18 +1268,30 @@ msgstr ""
 msgid "Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:685
+#: includes/MCP/MCP_Server.php:670
+msgid "Generate Subscriptions"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:671
+msgid "Generate subscription records against existing orders for testing Fluent Cart recurring-billing views. The subscriptions table ships in core, but active billing requires Fluent Cart Pro. Requires existing orders and products."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:674
+msgid "Array of generated subscription objects with id, uuid, customer_id, item_name, billing_interval, status, and recurring_total."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:695
 msgid "Number of items to generate (1–100). Required."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:691
+#: includes/MCP/MCP_Server.php:701
 msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:696
+#: includes/MCP/MCP_Server.php:706
 msgid "Optional integer seed for reproducible data generation. Omit for random output."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:725
+#: includes/MCP/MCP_Server.php:735
 msgid "Human-readable summary of the generation result."
 msgstr ""

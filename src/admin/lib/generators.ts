@@ -16,6 +16,7 @@ import {
   Tags,
   Percent,
   Download,
+  Repeat,
 } from "lucide-react";
 
 import { __ } from "@wordpress/i18n";
@@ -785,6 +786,20 @@ export const generators: Generator[] = [
     ),
     useCase: __("Developers testing digital-product fulfillment", "fluent-cart-fakerpress"),
     route: "product_downloads",
+    parameterConfig: {},
+  },
+  {
+    name: __("Subscriptions", "fluent-cart-fakerpress"),
+    category: __("Advanced", "fluent-cart-fakerpress"),
+    order: 13,
+    icon: Repeat,
+    iconName: "repeat",
+    description: __(
+      "Generate subscription records against existing orders. The table ships in core; active billing requires Fluent Cart Pro. Requires existing orders and products.",
+      "fluent-cart-fakerpress",
+    ),
+    useCase: __("Developers testing recurring-billing views and reports", "fluent-cart-fakerpress"),
+    route: "subscriptions",
     parameterConfig: {},
   },
 ];
