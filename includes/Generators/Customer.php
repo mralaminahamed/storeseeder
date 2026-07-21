@@ -9,6 +9,7 @@
 namespace FluentCartFakerPress\Generators;
 
 use FluentCart\App\Models\Customer as CustomerModel;
+use FluentCart\App\Models\CustomerAddresses as CustomerAddressModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 use WP_User;
@@ -278,7 +279,83 @@ class Customer extends Generator {
 			}
 		}
 
+		// Persist the generated addresses to fct_customer_addresses. They were
+		// built and then discarded, leaving the customer with an empty address
+		// book that pre-filled nothing at checkout and showed no address in the
+		// admin profile.
+		$this->create_customer_addresses( (int) $customer->id, $billing_addr, $shipping_addr );
+
 		return $customer->id;
+	}
+
+	/**
+	 * Persist a customer's billing and shipping addresses.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int   $customer_id Customer row ID.
+	 * @param array $billing     Billing address fields.
+	 * @param array $shipping    Shipping address fields, empty when it matches
+	 *                           billing.
+	 *
+	 * @return void
+	 */
+	private function create_customer_addresses( int $customer_id, array $billing, array $shipping ): void {
+		if ( ! class_exists( CustomerAddressModel::class ) || empty( $billing ) ) {
+			return;
+		}
+
+		CustomerAddressModel::query()->create(
+			$this->map_customer_address( $customer_id, $billing, 'billing' )
+		);
+
+		// generate_shipping_address() returns an empty array when the customer
+		// ships to their billing address, so only store a distinct one.
+		if ( ! empty( $shipping ) ) {
+			CustomerAddressModel::query()->create(
+				$this->map_customer_address( $customer_id, $shipping, 'shipping' )
+			);
+		}
+	}
+
+	/**
+	 * Shape a generated address array for the CustomerAddresses model.
+	 *
+	 * @since 2.4.0
+	 *
+	 * @param int    $customer_id Customer row ID.
+	 * @param array  $addr        Generated address fields.
+	 * @param string $type        'billing' or 'shipping'.
+	 *
+	 * @return array Column map for CustomerAddresses::create().
+	 */
+	private function map_customer_address( int $customer_id, array $addr, string $type ): array {
+		$name = trim( ( $addr['first_name'] ?? '' ) . ' ' . ( $addr['last_name'] ?? '' ) );
+
+		return array(
+			'customer_id' => $customer_id,
+			// Each type carries its own primary; Fluent Cart resolves the default
+			// billing and default shipping address separately.
+			'is_primary'  => 1,
+			'type'        => $type,
+			'status'      => 'active',
+			'label'       => ucfirst( $type ),
+			'name'        => $name,
+			'address_1'   => $addr['address_1'] ?? '',
+			'address_2'   => $addr['address_2'] ?? '',
+			'city'        => $addr['city'] ?? '',
+			'state'       => $addr['state'] ?? '',
+			'postcode'    => $addr['postcode'] ?? '',
+			'country'     => $addr['country'] ?? '',
+			'phone'       => $addr['phone'] ?? '',
+			'email'       => $addr['email'] ?? '',
+			// company_name is not fillable; it lives under meta.other_data.
+			'meta'        => array(
+				'other_data' => array(
+					'company_name' => $addr['company'] ?? '',
+				),
+			),
+		);
 	}
 
 	/**
