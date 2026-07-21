@@ -1,51 +1,33 @@
-# Copyright (C) 2025 Al Amin Ahamed
-# This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Fluent Cart FakerPress 2.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/fluent-cart-fakerpress\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-11T19:21:50+00:00\n"
+"POT-Creation-Date: 2026-07-21T02:53:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
+"X-Generator: WP-CLI 2.13.0-alpha-3eb2dd7\n"
 "X-Domain: fluent-cart-fakerpress\n"
 
-#. Plugin Name of the plugin
-#: fluent-cart-fakerpress.php
-#: class-fluent-cart-fakerpress.php:132
+#: class-fluent-cart-fakerpress.php:158
+#: includes/MCP/MCP_Server.php:87
+#: includes/MCP/MCP_Server.php:140
 msgid "Fluent Cart FakerPress"
 msgstr ""
 
-#. Plugin URI of the plugin
-#: fluent-cart-fakerpress.php
-msgid "https://github.com/mralaminahamed/fluent-cart-fakerpress"
-msgstr ""
-
-#. Description of the plugin
-#: fluent-cart-fakerpress.php
-msgid "Create realistic test data for your Fluent Cart store in seconds! Generate products, customers, orders, coupons and more with our intuitive admin interface. Perfect for development, testing, and demos. Features smart defaults, real-time validation, and seamless WordPress integration."
-msgstr ""
-
-#. Author of the plugin
-#: fluent-cart-fakerpress.php
-msgid "Al Amin Ahamed"
-msgstr ""
-
-#. Author URI of the plugin
-#: fluent-cart-fakerpress.php
-msgid "https://github.com/mralaminahamed/"
-msgstr ""
-
-#: class-fluent-cart-fakerpress.php:133
+#: class-fluent-cart-fakerpress.php:159
 msgid "FC FakerPress"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:543
+#: class-fluent-cart-fakerpress.php:571
 msgid "Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active."
+msgstr ""
+
+#: includes/Abstracts/Ability.php:85
+msgid "Unknown REST error."
 msgstr ""
 
 #: includes/Abstracts/Controller.php:178
@@ -53,101 +35,108 @@ msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Abstracts/Controller.php:209
-#, php-format
+#: includes/Abstracts/Controller.php:226
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Abstracts/Controller.php:262
+#. translators: %s: number of items that could not be created.
+#: includes/Abstracts/Controller.php:233
+msgid "%s could not be created."
+msgid_plural "%s could not be created."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Abstracts/Controller.php:294
 msgid "Sorry, you are not allowed to generate fake data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:285
+#: includes/Abstracts/Controller.php:317
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:294
+#: includes/Abstracts/Controller.php:326
 msgid "Locale for generated data (e.g., en_US, fr_FR, de_DE)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:301
+#: includes/Abstracts/Controller.php:333
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:307
+#: includes/Abstracts/Controller.php:339
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:313
+#: includes/Abstracts/Controller.php:345
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:317
+#: includes/Abstracts/Controller.php:349
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:324
+#: includes/Abstracts/Controller.php:356
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:333
+#: includes/Abstracts/Controller.php:365
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:337
+#: includes/Abstracts/Controller.php:369
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:342
+#: includes/Abstracts/Controller.php:374
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:349
+#: includes/Abstracts/Controller.php:381
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:353
+#: includes/Abstracts/Controller.php:385
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:358
+#: includes/Abstracts/Controller.php:390
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:393
+#: includes/Abstracts/Controller.php:425
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:419
+#: includes/Abstracts/Controller.php:451
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Abstracts/Controller.php:441
-#, php-format
+#: includes/Abstracts/Controller.php:473
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Abstracts/Controller.php:445
+#: includes/Abstracts/Controller.php:477
 msgid "Number of items generated."
 msgstr ""
 
 #. translators: %s: Error message
-#: includes/Abstracts/Generator.php:313
-#, php-format
+#: includes/Abstracts/Generator.php:343
 msgid "Generation failed: %s"
 msgstr ""
 
-#: includes/Abstracts/Generator.php:396
+#: includes/Abstracts/Generator.php:426
 msgid "Count must be a positive number."
 msgstr ""
 
 #. translators: %d: Maximum batch size
-#: includes/Abstracts/Generator.php:405
-#, php-format
+#: includes/Abstracts/Generator.php:435
 msgid "Count cannot exceed %d items per batch."
+msgstr ""
+
+#: includes/Controllers/Attribute.php:35
+msgid "Attribute"
 msgstr ""
 
 #: includes/Controllers/Cart_Session.php:43
@@ -290,44 +279,12 @@ msgstr ""
 msgid "Generated customers data."
 msgstr ""
 
-#: includes/Controllers/Location.php:43
-msgid "Location"
+#: includes/Controllers/Log.php:35
+msgid "Log"
 msgstr ""
 
-#: includes/Controllers/Location.php:78
-msgid "Geographic regions to generate locations for."
-msgstr ""
-
-#: includes/Controllers/Location.php:105
-msgid "Specific countries to generate (ISO2, ISO3, or full names)."
-msgstr ""
-
-#: includes/Controllers/Location.php:113
-msgid "Maximum number of countries to generate."
-msgstr ""
-
-#: includes/Controllers/Location.php:121
-msgid "Include states/provinces for countries."
-msgstr ""
-
-#: includes/Controllers/Location.php:126
-msgid "Include cities for states/provinces."
-msgstr ""
-
-#: includes/Controllers/Location.php:131
-msgid "Maximum cities per state/province."
-msgstr ""
-
-#: includes/Controllers/Location.php:135
-msgid "Minimum cities per state."
-msgstr ""
-
-#: includes/Controllers/Location.php:141
-msgid "Maximum cities per state."
-msgstr ""
-
-#: includes/Controllers/Location.php:162
-msgid "Generated location hierarchy with countries, states, and cities."
+#: includes/Controllers/Log.php:58
+msgid "Severity types to generate."
 msgstr ""
 
 #: includes/Controllers/Order.php:58
@@ -502,6 +459,10 @@ msgstr ""
 msgid "Generated product variations with attributes and pricing."
 msgstr ""
 
+#: includes/Controllers/Refund.php:35
+msgid "Refund"
+msgstr ""
+
 #: includes/Controllers/Shipping_Plan.php:43
 msgid "Shipping Plan"
 msgstr ""
@@ -630,19 +591,31 @@ msgstr ""
 msgid "Generated transactions with payment details and metadata."
 msgstr ""
 
-#: includes/Generators/Cart_Session.php:63
+#: includes/Generators/Attribute.php:50
+msgid "Product Attribute Groups with Terms"
+msgstr ""
+
+#: includes/Generators/Attribute.php:65
+msgid "Fluent Cart attribute models not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Attribute.php:84
+msgid "Failed to create attribute group."
+msgstr ""
+
+#: includes/Generators/Cart_Session.php:65
 msgid "Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Cart_Session.php:70
+#: includes/Generators/Cart_Session.php:72
 msgid "Failed to create cart session."
 msgstr ""
 
 #: includes/Generators/Coupon.php:63
 #: includes/Generators/Customer.php:93
-#: includes/Generators/Order.php:63
-#: includes/Generators/Product.php:63
-#: includes/Generators/Product_Variation.php:62
+#: includes/Generators/Order.php:65
+#: includes/Generators/Product.php:65
+#: includes/Generators/Product_Variation.php:64
 #: includes/Generators/Tax_Class.php:63
 msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
 msgstr ""
@@ -651,11 +624,11 @@ msgstr ""
 msgid "Failed to create coupon."
 msgstr ""
 
-#: includes/Generators/Coupon.php:142
+#: includes/Generators/Coupon.php:150
 msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Coupon.php:165
+#: includes/Generators/Coupon.php:182
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
@@ -683,32 +656,88 @@ msgstr ""
 msgid "Failed to create customer using Fluent Cart model."
 msgstr ""
 
-#: includes/Generators/Location.php:64
-msgid "Failed to create location."
+#: includes/Generators/Log.php:77
+msgid "Info"
 msgstr ""
 
-#: includes/Generators/Order.php:74
+#: includes/Generators/Log.php:78
+msgid "Warning"
+msgstr ""
+
+#: includes/Generators/Log.php:79
+msgid "Error"
+msgstr ""
+
+#: includes/Generators/Log.php:80
+msgid "Success"
+msgstr ""
+
+#: includes/Generators/Log.php:96
+msgid "Fluent Cart Activity model not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Log.php:125
+msgid "Failed to create activity log entry."
+msgstr ""
+
+#: includes/Generators/Order.php:76
+msgid "No published products with variations were found. Generate products before generating orders."
+msgstr ""
+
+#: includes/Generators/Order.php:86
+msgid "No customers were found. Generate customers before generating orders."
+msgstr ""
+
+#: includes/Generators/Order.php:97
 msgid "Failed to create order."
 msgstr ""
 
-#: includes/Generators/Order.php:154
+#: includes/Generators/Order.php:257
 msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Order.php:183
+#: includes/Generators/Order.php:286
 msgid "Failed to create order using Fluent Cart model."
 msgstr ""
 
-#: includes/Generators/Product.php:74
+#: includes/Generators/Product.php:76
 msgid "Failed to create product."
 msgstr ""
 
-#: includes/Generators/Product.php:135
+#: includes/Generators/Product.php:163
 msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Product_Variation.php:69
+#: includes/Generators/Product_Variation.php:76
+msgid "No products were found. Generate products before generating variations."
+msgstr ""
+
+#: includes/Generators/Product_Variation.php:84
 msgid "Failed to create product variation."
+msgstr ""
+
+#: includes/Generators/Refund.php:53
+msgid "Full refund"
+msgstr ""
+
+#: includes/Generators/Refund.php:54
+msgid "Partial refund"
+msgstr ""
+
+#: includes/Generators/Refund.php:70
+msgid "Fluent Cart transaction model not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Refund.php:81
+msgid "No successful charge transactions found for refund generation. Generate orders/transactions first."
+msgstr ""
+
+#: includes/Generators/Refund.php:95
+msgid "Computed refund amount is zero; source transaction has no value."
+msgstr ""
+
+#: includes/Generators/Refund.php:122
+msgid "Failed to create refund transaction."
 msgstr ""
 
 #: includes/Generators/Shipping_Plan.php:64
@@ -731,10 +760,394 @@ msgstr ""
 msgid "Failed to create tax class using Fluent Cart model."
 msgstr ""
 
-#: includes/Generators/Transaction.php:63
+#: includes/Generators/Transaction.php:64
 msgid "Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Transaction.php:70
+#: includes/Generators/Transaction.php:74
+msgid "No orders were found. Generate orders before generating transactions."
+msgstr ""
+
+#: includes/Generators/Transaction.php:82
 msgid "Failed to create transaction."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:88
+msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, and product attributes."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:141
+msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, and product attributes."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:167
+msgid "Generate Products"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:168
+msgid "Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:174
+msgid "Type of products to generate. Allowed: simple, variable, grouped, external, digital, mixed. Default: mixed."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:180
+msgid "Minimum product price (USD). Default: 10."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:185
+msgid "Maximum product price (USD). Default: 500."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:190
+msgid "Generate product attributes (size, colour, material). Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:195
+msgid "Number of variations per variable product (1–20). Default: 5."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:202
+msgid "Enable stock management and generate inventory levels. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:207
+msgid "Length of product descriptions. Allowed: short, medium, long. Default: medium."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:213
+msgid "Array of generated product objects with id, title, type, variations count, price_range, and stock_status."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:219
+msgid "Generate Customers"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:220
+msgid "Generate realistic WordPress customer accounts with billing/shipping addresses, demographic metadata, purchase history, and loyalty tier assignments."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:226
+msgid "Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: [\"regular\",\"returning\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:232
+msgid "Generate billing addresses. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:237
+msgid "Generate shipping addresses. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:242
+msgid "Percentage of customers with a different shipping address (0–100). Default: 30."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:249
+msgid "Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:254
+msgid "Percentage of customers opted into marketing emails (0–100). Default: 65."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:261
+msgid "Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:267
+msgid "Generate Orders"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:268
+msgid "Generate realistic Fluent Cart orders with line items, addresses, payment details, shipping calculations, tax breakdowns, and fulfilment status. Requires at least one product with variations and one customer to exist."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:274
+msgid "Status of generated orders. Allowed: pending, processing, completed, cancelled, on_hold, refunded, mixed. Default: mixed."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:280
+msgid "Whose customer accounts to attach. Allowed: existing, new, mixed, specific. Default: mixed."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:286
+msgid "WordPress user ID to attach all orders to. Only used when customer_type is \"specific\"."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:291
+msgid "Minimum order total (USD). Default: 10."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:296
+msgid "Maximum order total (USD). Default: 1000."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:301
+msgid "Minimum line items per order. Default: 1."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:307
+msgid "Maximum line items per order (1–20). Default: 5."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:314
+msgid "Payment methods to distribute across orders. Allowed: stripe, paypal, bank_transfer, cash_on_delivery, credit_card. Default: [\"stripe\",\"paypal\",\"bank_transfer\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:320
+msgid "Array of generated order objects with id, order_number, status, total, payment_method, and item count."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:326
+msgid "Generate Coupons"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:327
+msgid "Generate realistic Fluent Cart discount coupons with various discount types, usage limits, validity periods, and product or customer restrictions."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:333
+msgid "Discount types to include. Allowed: percentage, fixed, free_shipping, products. Default: [\"percentage\",\"fixed\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:339
+msgid "Minimum percentage discount (5–95). Default: 10."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:346
+msgid "Maximum percentage discount (5–95). Default: 50."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:353
+msgid "Minimum fixed discount amount (USD). Default: 5."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:358
+msgid "Maximum fixed discount amount (USD). Default: 100."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:363
+msgid "Add usage-limit rules to coupons. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:368
+msgid "Maximum total uses per coupon when set_usage_limits is true (1–1000). Default: 100."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:375
+msgid "Minimum coupon validity period in days. Default: 7."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:381
+msgid "Maximum coupon validity period in days (1–365). Default: 90."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:388
+msgid "Array of generated coupon objects with id, code, type, offer, status, usage_limit, and validity dates."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:394
+msgid "Generate Product Variations"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:395
+msgid "Generate product variations (size/colour/storage combinations) for existing products. Creates variation records with unique SKUs, individual pricing, stock levels, and dimension metadata. Requires products to exist."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:401
+msgid "Generate variations only for this product ID. Omit to pick a random eligible product."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:406
+msgid "Array of product IDs to skip during generation."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:412
+msgid "Enable inventory tracking for variations. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:417
+msgid "Minimum stock quantity per variation. Default: 0."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:423
+msgid "Maximum stock quantity per variation. Default: 100."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:429
+msgid "Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:435
+msgid "Generate Shipping Plans"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:436
+msgid "Generate realistic shipping plans with tiered pricing methods (price-based, weight-based, quantity-based), regional coverage, delivery timeframes, and taxability settings."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:442
+msgid "Shipping method types. Allowed: standard, express, overnight, pickup, free, weight_based, flat_rate. Default: [\"standard\",\"express\",\"free\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:448
+msgid "Minimum shipping cost (USD). Default: 0."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:454
+msgid "Maximum shipping cost (USD). Default: 50."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:460
+msgid "Geographic coverage. Allowed: domestic, international, regional, worldwide. Default: [\"domestic\",\"international\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:466
+msgid "Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:472
+msgid "Generate Tax Classes"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:473
+msgid "Generate tax classes with country/state/city-level rate tables, compound tax configurations, and priority settings for a Fluent Cart store."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:479
+msgid "Tax class types to generate. Allowed: standard, reduced, zero, exempt, digital. Default: [\"standard\",\"reduced\",\"zero\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:485
+msgid "ISO-2 country codes to generate tax rates for. Default: [\"US\",\"CA\",\"GB\",\"AU\",\"DE\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:491
+msgid "Include compound tax rate configurations. Default: true."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:496
+msgid "Array of generated tax class objects with id, name, active status, rates array, and covered regions."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:502
+msgid "Generate Transactions"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:503
+msgid "Generate realistic payment transaction records linked to existing orders. Creates transactions with gateway-specific IDs, amounts, statuses, and currency assignments. Requires orders to exist."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:509
+msgid "Filter orders by customer type. Allowed: all, specific, existing_customers_only, new_customers_only. Default: all."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:515
+msgid "Only create transactions for orders belonging to this customer ID. Requires customer_type=\"specific\"."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:520
+msgid "Transaction types to generate. Allowed: payment, refund, adjustment, fee, commission. Default: [\"payment\",\"refund\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:526
+msgid "Payment gateways to use. Allowed: stripe, paypal, square, authorize_net, braintree, razorpay, mollie. Default: [\"stripe\",\"paypal\",\"square\"]."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:532
+msgid "Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:538
+msgid "Generate Cart Sessions"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:539
+msgid "Generate realistic shopping cart sessions including pending, abandoned, completed, and cancelled states. Useful for testing abandoned-cart recovery workflows and marketing-automation integrations."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:545
+msgid "Cart owner type. Allowed: existing, new, mixed, specific, guest_only. Default: mixed."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:551
+msgid "Attach all carts to this customer ID. Requires customer_type=\"specific\"."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:556
+msgid "Percentage of guest (unauthenticated) carts when customer_type is \"mixed\" (0–100). Default: 40."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:563
+msgid "Percentage of carts with \"abandoned\" status (0–100). Default: 30."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:570
+msgid "Minimum cart value (USD). Default: 5."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:576
+msgid "Maximum cart value (USD). Default: 500."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:582
+msgid "Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:588
+msgid "Generate Attributes"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:589
+msgid "Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:592
+msgid "Array of generated attribute objects with id, name, type, slug, and values array."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:598
+msgid "Generate Refunds"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:599
+msgid "Generate refund records against existing Fluent Cart orders. Requires completed or processing orders to exist. Returns refund IDs, amounts, statuses, and gateway transaction IDs."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:602
+msgid "Array of generated refund objects with id, order_id, amount, status, and payment_gateway."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:608
+msgid "Generate Logs"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:609
+msgid "Generate activity log entries for orders, products, customers, coupons, refunds, carts, transactions, and system events. Returns log IDs, object types, actions, and severity levels."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:615
+msgid "Log severity types to generate. Default: all types."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:624
+msgid "Array of generated log objects with id, object, action, type, note, and is_public."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:645
+msgid "Number of items to generate (1–100). Required."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:651
+msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:656
+msgid "Optional integer seed for reproducible data generation. Omit for random output."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:685
+msgid "Human-readable summary of the generation result."
 msgstr ""

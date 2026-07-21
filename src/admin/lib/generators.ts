@@ -9,7 +9,6 @@ import {
   DollarSign,
   CreditCard,
   ShoppingBag,
-  MapPin,
   Layers,
   ReceiptText,
   ScrollText,
@@ -725,59 +724,6 @@ export const generators: Generator[] = [
         type: "array",
         items: { type: "string", enum: ["order", "product", "customer", "coupon", "refund", "cart", "transaction", "system"] },
         default: ["order", "product", "customer", "coupon", "refund", "cart", "transaction", "system"],
-      },
-    },
-  },
-  {
-    name: __("Locations", "fluent-cart-fakerpress"),
-    category: __("Enhanced", "fluent-cart-fakerpress"),
-    order: 10,
-    icon: MapPin,
-    iconName: "pin",
-    description: __(
-      "Generate geographic data including countries, states, and cities for multi-region stores.",
-      "fluent-cart-fakerpress",
-    ),
-    useCase: __("Store owners setting up multi-region stores", "fluent-cart-fakerpress"),
-    route: "locations",
-    parameterConfig: {
-      regions: {
-        description: __("Geographic regions to generate locations for", "fluent-cart-fakerpress"),
-        type: "array",
-        items: {
-          type: "string",
-          enum: ["Americas", "Europe", "Asia", "Africa", "Oceania", "Northern America", "Western Europe", "Eastern Europe", "Southern Europe", "Northern Europe", "Southeast Asia", "East Asia", "South Asia", "Western Asia", "North Africa", "Sub-Saharan Africa", "Australia and New Zealand"],
-        },
-      },
-      max_countries: {
-        description: __("Maximum number of countries to generate", "fluent-cart-fakerpress"),
-        type: "integer",
-        minimum: 1,
-        maximum: 50,
-        default: 10,
-      },
-      include_states: {
-        description: __("Include states/provinces for countries", "fluent-cart-fakerpress"),
-        type: "boolean",
-        default: true,
-      },
-      include_cities: {
-        description: __("Include cities for states/provinces", "fluent-cart-fakerpress"),
-        type: "boolean",
-        default: true,
-      },
-      cities_per_state: {
-        description: __("Maximum cities per state/province", "fluent-cart-fakerpress"),
-        type: "object",
-        properties: {
-          min: { description: __("Minimum cities per state", "fluent-cart-fakerpress"), type: "integer", minimum: 1, default: 3 },
-          max: { description: __("Maximum cities per state", "fluent-cart-fakerpress"), type: "integer", minimum: 1, maximum: 50, default: 15 },
-        },
-      },
-      include_coordinates: {
-        description: __("Include latitude/longitude coordinates", "fluent-cart-fakerpress"),
-        type: "boolean",
-        default: true,
       },
     },
   },

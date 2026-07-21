@@ -23,7 +23,6 @@ use FluentCartFakerPress\Controllers\Shipping_Plan;
 use FluentCartFakerPress\Controllers\Tax_Class;
 use FluentCartFakerPress\Controllers\Transaction;
 use FluentCartFakerPress\Controllers\Cart_Session;
-use FluentCartFakerPress\Controllers\Location;
 use FluentCartFakerPress\Controllers\Attribute;
 use FluentCartFakerPress\Controllers\Refund;
 use FluentCartFakerPress\Controllers\Log;
@@ -305,7 +304,6 @@ class FluentCart_FakerPress {
 			new Cart_Session(),
 			new Shipping_Plan(),
 			new Tax_Class(),
-			new Location(),
 			new Order(),
 			new Product_Variation(),
 			new Transaction(),
