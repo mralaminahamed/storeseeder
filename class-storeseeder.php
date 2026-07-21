@@ -176,16 +176,12 @@ class StoreSeeder {
 	 * Outputs the HTML container element where the React admin interface will be mounted.
 	 * This method serves as the callback for the WordPress add_menu_page() function,
 	 * providing the entry point for the React Router v7 application.
-	 * Also ensures sample data is downloaded when the page is first visited.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function render_admin_page(): void {
-		// Ensure sample data is available when admin page is visited.
-		$this->ensure_sample_data();
-
 		echo '<div id="storeseeder-root"></div>';
 	}
 
@@ -325,6 +321,30 @@ class StoreSeeder {
 		foreach ( $controllers as $controller ) {
 			$controller->register_routes();
 		}
+
+		// Register the sample-data download endpoint.
+		register_rest_route(
+			'storeseeder/v1',
+			'/download-sample',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_sample_data_status' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_download_sample_data' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -410,6 +430,75 @@ class StoreSeeder {
 	}
 
 	/**
+	 * REST permission check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return bool True when the current user may manage the plugin.
+	 */
+	public function rest_permission_check(): bool {
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * REST callback: report sample-data status.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return WP_REST_Response Status payload.
+	 */
+	public function rest_sample_data_status(): WP_REST_Response {
+		$exists = $this->sample_data_exists();
+		$dir    = $this->get_sample_data_directory();
+
+		return new WP_REST_Response(
+			array(
+				'exists'      => $exists,
+				'last_synced' => $exists && is_dir( $dir ) ? gmdate( 'c', (int) filemtime( $dir ) ) : null,
+				'repo_url'    => 'https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart',
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback: download / re-sync sample data.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `force` re-downloads.
+	 * @return WP_REST_Response|WP_Error Sync result payload.
+	 */
+	public function rest_download_sample_data( WP_REST_Request $request ) {
+		$force = (bool) $request->get_param( 'force' );
+
+		if ( $force ) {
+			$dir = $this->get_sample_data_directory();
+			global $wp_filesystem;
+			if ( ! $wp_filesystem ) {
+				require_once ABSPATH . '/wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+			foreach ( array( 'products', 'customers' ) as $subdir ) {
+				$wp_filesystem->delete( $dir . '/' . $subdir, true );
+			}
+		}
+
+		$result = $this->ensure_sample_data();
+		if ( ! $result ) {
+			return new WP_Error( 'download_failed', 'Failed to download sample data', array( 'status' => 500 ) );
+		}
+
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => 'Sample data synced successfully.',
+			),
+			200
+		);
+	}
+
+	/**
 	 * Download sample data from remote repository
 	 *
 	 * Downloads the sample data archive from GitHub and extracts it to the local directory.
@@ -454,7 +543,7 @@ class StoreSeeder {
 			return false;
 		}
 
-		// Save zip file temporarily
+		// Save zip file temporarily.
 		if ( ! $wp_filesystem->put_contents( $temp_zip_file, $zip_content ) ) {
 			return false;
 		}
@@ -550,13 +639,13 @@ class StoreSeeder {
 			$dest_path   = $dest_dir . '/' . $item['name'];
 
 			if ( 'd' === $item['type'] ) {
-				// Directory
+				// Directory.
 				if ( ! $wp_filesystem->exists( $dest_path ) ) {
 					$wp_filesystem->mkdir( $dest_path );
 				}
 				$this->move_directory_contents( $source_path, $dest_path );
 			} else {
-				// File
+				// File.
 				$wp_filesystem->move( $source_path, $dest_path );
 			}
 		}
