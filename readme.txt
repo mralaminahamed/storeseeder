@@ -131,11 +131,11 @@ This plugin connects to two external services. Neither is contacted on activatio
 
 **1. GitHub — sample data repository**
 
-The Settings page offers an optional "Sample Data Sync" action that downloads locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic.
+Sample data (locale-specific reference data — product names, addresses, customer tags — used to make generated content more realistic) is downloaded only after an administrator grants consent: either by accepting the one-time consent prompt shown on the plugin admin page, or by clicking "Sync now" on the Settings page. No data about the site is ever transmitted, and declining the prompt still leaves every generator working from built-in defaults. The decision is site-wide and can be changed from Settings at any time.
 
 Service: GitHub
 Endpoint: [https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip](https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip)
-When data is sent: Only when an administrator clicks "Sync Sample Data" on the plugin Settings page, or when a generator requires sample data that has not been downloaded yet.
+When data is sent: Only after an administrator grants consent — either by accepting the consent prompt shown on the plugin admin page, or by clicking "Sync now" on the Settings page.
 Data sent: An unauthenticated HTTP GET request. No site, user, or store data is included — only the request itself (and the IP address and user agent inherent to any HTTP request).
 Terms of Service: [https://docs.github.com/en/site-policy/github-terms/github-terms-of-service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)
 Privacy Policy: [https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)

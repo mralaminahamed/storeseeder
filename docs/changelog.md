@@ -5,6 +5,16 @@ All notable changes to StoreSeeder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Sample data now downloads only after an administrator accepts a one-time consent prompt shown on the plugin admin page (or via Sync on Settings). The prompt explains what is fetched and that no site data is sent; declining still leaves generators working via built-in defaults. The decision is site-wide and changeable from Settings.
+
+### Changed
+
+- **Breaking:** the plugin no longer downloads sample data automatically when the admin page loads; the download is now consent-gated and REST-driven.
+
 ## [1.0.0] - 2026-07-21
 
 Initial release.
