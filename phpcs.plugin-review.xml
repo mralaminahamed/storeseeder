@@ -18,8 +18,8 @@
 
     <!-- Specify files and directories to check -->
     <file>./includes</file>
-    <file>./class-fluent-cart-fakerpress.php</file>
-    <file>./fluent-cart-fakerpress.php</file>
+    <file>./class-storeseeder.php</file>
+    <file>./storeseeder.php</file>
 
     <!-- Exclude paths -->
     <exclude-pattern>*/tgm-plugin-activation/*</exclude-pattern>

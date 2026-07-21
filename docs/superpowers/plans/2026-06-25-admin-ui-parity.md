@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace `fluent-cart-fakerpress`'s basic nav-tab admin UI with the `easycommerce-fakerpress` React SPA, rebranded for Fluent Cart, and bring the backend to parity (3 new generators + MCP layer).
+**Goal:** Replace `storeseeder`'s basic nav-tab admin UI with the `easycommerce-fakerpress` React SPA, rebranded for Fluent Cart, and bring the backend to parity (3 new generators + MCP layer).
 
 **Architecture:** Port ref's data-driven `src/admin/` SPA (hash router + provider stack + schema-driven generator pages) into the target, applying mechanical rewire rules (data var, root id, text domain, namespace, bundle entry). Add 3 backend generators (`Attribute`, `Refund`, `Log`) bound to Fluent Cart Eloquent models, their REST controllers, and the WordPress Abilities-API MCP layer.
 
@@ -10,18 +10,18 @@
 
 ## Global Constraints
 
-- Text domain: `fluent-cart-fakerpress` (every `__()/_n()/sprintf()` text-domain arg).
-- PHP namespace root: `FluentCartFakerPress\`.
-- REST namespace: `fluent-cart-fakerpress/v1`.
-- Localized JS global: `fluentCartFakerpressApi`.
-- Root DOM id: `fluent-cart-fakerpress-root` (matches `render_admin_page()`).
+- Text domain: `storeseeder` (every `__()/_n()/sprintf()` text-domain arg).
+- PHP namespace root: `StoreSeeder\`.
+- REST namespace: `storeseeder/v1`.
+- Localized JS global: `storeseederApi`.
+- Root DOM id: `storeseeder-root` (matches `render_admin_page()`).
 - Webpack entry name: `admin` → emits `build/admin.js` + `build/admin.css`.
 - `@/` path alias resolves to `src/`.
-- MCP server id: `fluent-cart-fakerpress`; MCP namespace `FluentCartFakerPress\MCP`.
-- Branding URLs stay on `mralaminahamed/fluent-cart-fakerpress`; sample-data repo `fluent-cart-fakerpress-sample-data`. Author query for Plugins page: `mralaminahamed`.
+- MCP server id: `storeseeder`; MCP namespace `StoreSeeder\MCP`.
+- Branding URLs stay on `mralaminahamed/storeseeder`; sample-data repo `fluent-cart-fakerpress-sample-data`. Author query for Plugins page: `mralaminahamed`.
 - Product_Review is NOT built (no Fluent Cart review model).
 - Generators persist via Fluent Cart models only (no raw inserts), except read-only eligibility lookups.
-- Paths below are relative to the plugin root: `wp-content/plugins/fluent-cart-fakerpress/`.
+- Paths below are relative to the plugin root: `wp-content/plugins/storeseeder/`.
 - Ref (source) root: `wp-content/plugins/easycommerce-fakerpress/`.
 
 ---
@@ -47,7 +47,7 @@
 - `includes/Abstracts/Ability.php`
 - `includes/MCP/MCP_Server.php`
 - `includes/MCP/Abilities/Generate_*.php` (13 — one per generator, no Product_Reviews)
-- Modify: `class-fluent-cart-fakerpress.php` (route registration, MCP bootstrap, index id already correct)
+- Modify: `class-storeseeder.php` (route registration, MCP bootstrap, index id already correct)
 
 **Removed:** target's existing `src/admin/components/Generators/*`, `src/admin/components/GeneratorBase.tsx`, old `src/admin/components/App.tsx`, old `src/admin/components/Pages/*`, old `src/admin/components/ui/*`, `src/admin/lib/utils.ts`, `src/admin/utils/cn.ts` — replaced by the ported tree.
 
@@ -63,7 +63,7 @@
 - [ ] **Step 1: Create feature branch**
 
 ```bash
-cd wp-content/plugins/fluent-cart-fakerpress
+cd wp-content/plugins/storeseeder
 git checkout -b feat/admin-ui-parity
 ```
 
@@ -93,7 +93,7 @@ grep -rln "product-review\|ProductReview\|product_review" src/admin || echo "no 
 - [ ] **Step 5: Commit the raw copy (pre-rewire checkpoint)**
 
 ```bash
-git add -A && git commit -m "chore: copy easycommerce-fakerpress admin SPA into fluent-cart-fakerpress (pre-rewire)"
+git add -A && git commit -m "chore: copy easycommerce-fakerpress admin SPA into storeseeder (pre-rewire)"
 ```
 
 ### Task 2: Apply rewire substitutions across `src/admin/`
@@ -113,7 +113,7 @@ import './styles.css';
 import '@/admin/components.css';
 
 domReady( () => {
-	const container = document.getElementById( 'fluent-cart-fakerpress-root' )!;
+	const container = document.getElementById( 'storeseeder-root' )!;
 	if ( container ) {
 		const root = createRoot( container );
 		root.render( <App /> );
@@ -125,24 +125,24 @@ domReady( () => {
 
 ```bash
 # Localized JS global
-grep -rl "easycommerceFakerpressApi" src/admin | xargs sed -i 's/easycommerceFakerpressApi/fluentCartFakerpressApi/g'
+grep -rl "easycommerceFakerpressApi" src/admin | xargs sed -i 's/easycommerceFakerpressApi/storeseederApi/g'
 # Root id (any remaining refs)
-grep -rl "easycommerce-fakerpress-root" src/admin | xargs sed -i 's/easycommerce-fakerpress-root/fluent-cart-fakerpress-root/g'
+grep -rl "easycommerce-fakerpress-root" src/admin | xargs sed -i 's/easycommerce-fakerpress-root/storeseeder-root/g'
 # Display name
-grep -rl "EasyCommerce FakerPress" src/admin | xargs sed -i 's/EasyCommerce FakerPress/Fluent Cart FakerPress/g'
+grep -rl "EasyCommerce FakerPress" src/admin | xargs sed -i 's/EasyCommerce FakerPress/StoreSeeder/g'
 # Slug + text domain + URLs + sample-data repo (covers easycommerce-fakerpress-sample-data → fluent-cart-fakerpress-sample-data)
-grep -rl "easycommerce-fakerpress" src/admin | xargs sed -i 's/easycommerce-fakerpress/fluent-cart-fakerpress/g'
+grep -rl "easycommerce-fakerpress" src/admin | xargs sed -i 's/easycommerce-fakerpress/storeseeder/g'
 # Generic product label phrasing left as-is; verify no stray "EasyCommerce" brand text
 grep -rn "EasyCommerce\|easycommerce" src/admin || echo "clean"
 ```
 
 - [ ] **Step 3: Verify Plugins page author query + self-filter**
 
-In `src/admin/components/Pages/PluginsPage.tsx` confirm `request[author]=mralaminahamed` is retained and the self-filter excludes `fluent-cart-fakerpress` (the global sed already converted the slug). Confirm REST/data var reads via `fluentCartFakerpressApi`.
+In `src/admin/components/Pages/PluginsPage.tsx` confirm `request[author]=mralaminahamed` is retained and the self-filter excludes `storeseeder` (the global sed already converted the slug). Confirm REST/data var reads via `storeseederApi`.
 
 - [ ] **Step 4: Verify Settings page URLs**
 
-In `src/admin/components/Pages/SettingsPage.tsx` confirm constants now point to `github.com/mralaminahamed/fluent-cart-fakerpress`, sample-data repo `fluent-cart-fakerpress-sample-data`, and `PLUGIN_VERSION` matches the target plugin header version (read from `fluent-cart-fakerpress.php`). Update `PLUGIN_VERSION` literal to the target's current version if different.
+In `src/admin/components/Pages/SettingsPage.tsx` confirm constants now point to `github.com/mralaminahamed/storeseeder`, sample-data repo `fluent-cart-fakerpress-sample-data`, and `PLUGIN_VERSION` matches the target plugin header version (read from `storeseeder.php`). Update `PLUGIN_VERSION` literal to the target's current version if different.
 
 - [ ] **Step 5: Remove Product_Review entry from `lib/generators.ts`**
 
@@ -224,19 +224,19 @@ git add -A && git commit -m "build: reconcile webpack/tsconfig/tailwind/deps for
 
 ## Phase 2 — Backend Generators (Attribute, Refund, Log)
 
-> Pattern reference: `includes/Generators/Coupon.php` (generate flow) and `includes/Controllers/Coupon.php` (controller). All three generators extend `FluentCartFakerPress\Abstracts\Generator` and implement `get_resource_type()`, `get_supported_types()`, `get_description()`, `generate_single_item()`. Controllers extend `FluentCartFakerPress\Abstracts\Controller` and implement `get_resource_type()`, `get_resource_type_label()`, `get_rest_base()`, `get_generator_instance()`, plus optional `get_resource_specific_params()`.
+> Pattern reference: `includes/Generators/Coupon.php` (generate flow) and `includes/Controllers/Coupon.php` (controller). All three generators extend `StoreSeeder\Abstracts\Generator` and implement `get_resource_type()`, `get_supported_types()`, `get_description()`, `generate_single_item()`. Controllers extend `StoreSeeder\Abstracts\Controller` and implement `get_resource_type()`, `get_resource_type_label()`, `get_rest_base()`, `get_generator_instance()`, plus optional `get_resource_specific_params()`.
 
 ### Task 4: Attribute generator + controller
 
 **Files:**
 - Create: `includes/Generators/Attribute.php`
 - Create: `includes/Controllers/Attribute.php`
-- Modify: `class-fluent-cart-fakerpress.php` (register route)
+- Modify: `class-storeseeder.php` (register route)
 - Test: `tests/php/AttributeGeneratorTest.php`
 
 **Interfaces:**
-- Produces: `FluentCartFakerPress\Generators\Attribute::generate_single_item()` → `array{id:int,name:string,slug:string,values:array}` | `WP_Error`.
-- Produces: `FluentCartFakerPress\Controllers\Attribute` REST base `attributes`, endpoint `POST /fluent-cart-fakerpress/v1/attributes/generate`.
+- Produces: `StoreSeeder\Generators\Attribute::generate_single_item()` → `array{id:int,name:string,slug:string,values:array}` | `WP_Error`.
+- Produces: `StoreSeeder\Controllers\Attribute` REST base `attributes`, endpoint `POST /storeseeder/v1/attributes/generate`.
 
 - [ ] **Step 1: Write the generator**
 
@@ -248,16 +248,16 @@ git add -A && git commit -m "build: reconcile webpack/tsconfig/tailwind/deps for
  * Attribute Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Models\AttributeGroup;
 use FluentCart\App\Models\AttributeTerm;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -292,7 +292,7 @@ class Attribute extends Generator {
 	 * {@inheritDoc}
 	 */
 	public function get_supported_types(): array {
-		return array( 'attributes' => __( 'Product Attribute Groups with Terms', 'fluent-cart-fakerpress' ) );
+		return array( 'attributes' => __( 'Product Attribute Groups with Terms', 'storeseeder' ) );
 	}
 
 	/**
@@ -307,7 +307,7 @@ class Attribute extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( AttributeGroup::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$set_names = array_keys( self::ATTRIBUTE_SETS );
@@ -326,7 +326,7 @@ class Attribute extends Generator {
 		);
 
 		if ( ! $group || ! $group->id ) {
-			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'storeseeder' ) );
 		}
 
 		$all_terms = self::ATTRIBUTE_SETS[ $base_name ];
@@ -373,14 +373,14 @@ class Attribute extends Generator {
  * Attribute Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Attribute as AttributeGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Attribute as AttributeGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -402,7 +402,7 @@ class Attribute extends Controller {
 	 * {@inheritDoc}
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Attribute', 'fluent-cart-fakerpress' );
+		return __( 'Attribute', 'storeseeder' );
 	}
 
 	/**
@@ -423,7 +423,7 @@ class Attribute extends Controller {
 
 - [ ] **Step 3: Register the route**
 
-In `class-fluent-cart-fakerpress.php`, add `use FluentCartFakerPress\Controllers\Attribute;` with the other controller imports, and add `new Attribute(),` to the `$controllers` array in `register_rest_routes()`.
+In `class-storeseeder.php`, add `use StoreSeeder\Controllers\Attribute;` with the other controller imports, and add `new Attribute(),` to the `$controllers` array in `register_rest_routes()`.
 
 - [ ] **Step 4: Write the smoke test**
 
@@ -431,7 +431,7 @@ In `class-fluent-cart-fakerpress.php`, add `use FluentCartFakerPress\Controllers
 
 ```php
 <?php
-use FluentCartFakerPress\Generators\Attribute;
+use StoreSeeder\Generators\Attribute;
 use PHPUnit\Framework\TestCase;
 
 class AttributeGeneratorTest extends TestCase {
@@ -464,7 +464,7 @@ Expected: PASS, or SKIPPED if Fluent Cart isn't loaded in the harness (log which
 - [ ] **Step 6: Commit**
 
 ```bash
-git add includes/Generators/Attribute.php includes/Controllers/Attribute.php class-fluent-cart-fakerpress.php tests/php/AttributeGeneratorTest.php
+git add includes/Generators/Attribute.php includes/Controllers/Attribute.php class-storeseeder.php tests/php/AttributeGeneratorTest.php
 git commit -m "feat: add Attribute generator + REST controller"
 ```
 
@@ -473,12 +473,12 @@ git commit -m "feat: add Attribute generator + REST controller"
 **Files:**
 - Create: `includes/Generators/Refund.php`
 - Create: `includes/Controllers/Refund.php`
-- Modify: `class-fluent-cart-fakerpress.php`
+- Modify: `class-storeseeder.php`
 - Test: `tests/php/RefundGeneratorTest.php`
 
 **Interfaces:**
-- Produces: `FluentCartFakerPress\Generators\Refund::generate_single_item()` → `array{id:int,order_id:int,amount:float,status:string,type:string}` | `WP_Error`.
-- Produces: REST base `refunds`, `POST /fluent-cart-fakerpress/v1/refunds/generate`.
+- Produces: `StoreSeeder\Generators\Refund::generate_single_item()` → `array{id:int,order_id:int,amount:float,status:string,type:string}` | `WP_Error`.
+- Produces: REST base `refunds`, `POST /storeseeder/v1/refunds/generate`.
 
 - [ ] **Step 1: Write the generator**
 
@@ -490,17 +490,17 @@ git commit -m "feat: add Attribute generator + REST controller"
  * Refund Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Helpers\Status;
 use FluentCart\App\Models\Order;
 use FluentCart\App\Models\OrderTransaction;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -529,8 +529,8 @@ class Refund extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'full'    => __( 'Full refund', 'fluent-cart-fakerpress' ),
-			'partial' => __( 'Partial refund', 'fluent-cart-fakerpress' ),
+			'full'    => __( 'Full refund', 'storeseeder' ),
+			'partial' => __( 'Partial refund', 'storeseeder' ),
 		);
 	}
 
@@ -546,12 +546,12 @@ class Refund extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( OrderTransaction::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart transaction model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart transaction model not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$order = Order::query()->inRandomOrder()->first();
 		if ( ! $order ) {
-			return new WP_Error( 'no_eligible_order', __( 'No orders found for refund generation. Generate some orders first.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'no_eligible_order', __( 'No orders found for refund generation. Generate some orders first.', 'storeseeder' ) );
 		}
 
 		$total    = (float) ( $order->total_amount ?? $order->total ?? 0 );
@@ -585,7 +585,7 @@ class Refund extends Generator {
 		);
 
 		if ( ! $txn || ! $txn->id ) {
-			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'storeseeder' ) );
 		}
 
 		return array(
@@ -607,16 +607,16 @@ class Refund extends Generator {
 
 `includes/Controllers/Refund.php` — identical shape to Task 4 Step 2 with:
 - `get_resource_type()` → `'refund'`
-- `get_resource_type_label()` → `__( 'Refund', 'fluent-cart-fakerpress' )`
+- `get_resource_type_label()` → `__( 'Refund', 'storeseeder' )`
 - `get_rest_base()` → `'refunds'`
-- `get_generator_instance()` → `new \FluentCartFakerPress\Generators\Refund()` (import `Refund as RefundGenerator`)
+- `get_generator_instance()` → `new \StoreSeeder\Generators\Refund()` (import `Refund as RefundGenerator`)
 - Add `get_resource_specific_params()`:
 
 ```php
 protected function get_resource_specific_params(): array {
 	return array(
 		'payment_gateways' => array(
-			'description'       => __( 'Payment gateways to attribute refunds to.', 'fluent-cart-fakerpress' ),
+			'description'       => __( 'Payment gateways to attribute refunds to.', 'storeseeder' ),
 			'type'              => 'array',
 			'items'             => array(
 				'type' => 'string',
@@ -637,14 +637,14 @@ Full file:
  * Refund Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Refund as RefundGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Refund as RefundGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -660,7 +660,7 @@ class Refund extends Controller {
 	}
 
 	protected function get_resource_type_label(): string {
-		return __( 'Refund', 'fluent-cart-fakerpress' );
+		return __( 'Refund', 'storeseeder' );
 	}
 
 	protected function get_rest_base(): string {
@@ -674,7 +674,7 @@ class Refund extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'payment_gateways' => array(
-				'description'       => __( 'Payment gateways to attribute refunds to.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Payment gateways to attribute refunds to.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -690,15 +690,15 @@ class Refund extends Controller {
 
 - [ ] **Step 3: Register the route**
 
-Add `use FluentCartFakerPress\Controllers\Refund;` and `new Refund(),` to `$controllers` in `register_rest_routes()`.
+Add `use StoreSeeder\Controllers\Refund;` and `new Refund(),` to `$controllers` in `register_rest_routes()`.
 
 - [ ] **Step 4: Write the smoke test**
 
-`tests/php/RefundGeneratorTest.php` — mirror Task 4 Step 4 (class `RefundGeneratorTest`, generator `FluentCartFakerPress\Generators\Refund`). Assert result has `order_id` and `amount` keys; allow `WP_Error` (skip-assert) when no orders exist:
+`tests/php/RefundGeneratorTest.php` — mirror Task 4 Step 4 (class `RefundGeneratorTest`, generator `StoreSeeder\Generators\Refund`). Assert result has `order_id` and `amount` keys; allow `WP_Error` (skip-assert) when no orders exist:
 
 ```php
 <?php
-use FluentCartFakerPress\Generators\Refund;
+use StoreSeeder\Generators\Refund;
 use PHPUnit\Framework\TestCase;
 
 class RefundGeneratorTest extends TestCase {
@@ -731,7 +731,7 @@ Expected: PASS or SKIPPED.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add includes/Generators/Refund.php includes/Controllers/Refund.php class-fluent-cart-fakerpress.php tests/php/RefundGeneratorTest.php
+git add includes/Generators/Refund.php includes/Controllers/Refund.php class-storeseeder.php tests/php/RefundGeneratorTest.php
 git commit -m "feat: add Refund generator + REST controller"
 ```
 
@@ -740,12 +740,12 @@ git commit -m "feat: add Refund generator + REST controller"
 **Files:**
 - Create: `includes/Generators/Log.php`
 - Create: `includes/Controllers/Log.php`
-- Modify: `class-fluent-cart-fakerpress.php`
+- Modify: `class-storeseeder.php`
 - Test: `tests/php/LogGeneratorTest.php`
 
 **Interfaces:**
-- Produces: `FluentCartFakerPress\Generators\Log::generate_single_item()` → `array{id:int,module_type:string,title:string,log_type:string}` | `WP_Error`.
-- Produces: REST base `logs`, `POST /fluent-cart-fakerpress/v1/logs/generate`.
+- Produces: `StoreSeeder\Generators\Log::generate_single_item()` → `array{id:int,module_type:string,title:string,log_type:string}` | `WP_Error`.
+- Produces: REST base `logs`, `POST /storeseeder/v1/logs/generate`.
 
 - [ ] **Step 1: Write the generator**
 
@@ -757,15 +757,15 @@ git commit -m "feat: add Refund generator + REST controller"
  * Log (Activity) Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Models\Activity;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -821,10 +821,10 @@ class Log extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'info'    => __( 'Info', 'fluent-cart-fakerpress' ),
-			'warning' => __( 'Warning', 'fluent-cart-fakerpress' ),
-			'error'   => __( 'Error', 'fluent-cart-fakerpress' ),
-			'success' => __( 'Success', 'fluent-cart-fakerpress' ),
+			'info'    => __( 'Info', 'storeseeder' ),
+			'warning' => __( 'Warning', 'storeseeder' ),
+			'error'   => __( 'Error', 'storeseeder' ),
+			'success' => __( 'Success', 'storeseeder' ),
 		);
 	}
 
@@ -840,7 +840,7 @@ class Log extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENT_CART_VERSION' ) || ! class_exists( Activity::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$module_names = array_keys( self::MODULES );
@@ -867,7 +867,7 @@ class Log extends Generator {
 		);
 
 		if ( ! $activity || ! $activity->id ) {
-			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'storeseeder' ) );
 		}
 
 		return array(
@@ -891,14 +891,14 @@ class Log extends Generator {
  * Log Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Log as LogGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Log as LogGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -914,7 +914,7 @@ class Log extends Controller {
 	}
 
 	protected function get_resource_type_label(): string {
-		return __( 'Log', 'fluent-cart-fakerpress' );
+		return __( 'Log', 'storeseeder' );
 	}
 
 	protected function get_rest_base(): string {
@@ -928,7 +928,7 @@ class Log extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'log_types' => array(
-				'description'       => __( 'Severity types to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Severity types to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -944,11 +944,11 @@ class Log extends Controller {
 
 - [ ] **Step 3: Register the route**
 
-Add `use FluentCartFakerPress\Controllers\Log;` and `new Log(),` to `$controllers`.
+Add `use StoreSeeder\Controllers\Log;` and `new Log(),` to `$controllers`.
 
 - [ ] **Step 4: Write the smoke test**
 
-`tests/php/LogGeneratorTest.php` — mirror Task 4 Step 4 (class `LogGeneratorTest`, generator `FluentCartFakerPress\Generators\Log`); assert `module_type` + `title` keys present.
+`tests/php/LogGeneratorTest.php` — mirror Task 4 Step 4 (class `LogGeneratorTest`, generator `StoreSeeder\Generators\Log`); assert `module_type` + `title` keys present.
 
 - [ ] **Step 5: Run the test**
 
@@ -961,7 +961,7 @@ Expected: PASS or SKIPPED.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add includes/Generators/Log.php includes/Controllers/Log.php class-fluent-cart-fakerpress.php tests/php/LogGeneratorTest.php
+git add includes/Generators/Log.php includes/Controllers/Log.php class-storeseeder.php tests/php/LogGeneratorTest.php
 git commit -m "feat: add Log (Activity) generator + REST controller"
 ```
 
@@ -976,20 +976,20 @@ git commit -m "feat: add Log (Activity) generator + REST controller"
 **Files:**
 - Create: `includes/Abstracts/Ability.php`
 - Create: `includes/MCP/MCP_Server.php`
-- Modify: `class-fluent-cart-fakerpress.php` (bootstrap MCP server)
+- Modify: `class-storeseeder.php` (bootstrap MCP server)
 
 **Interfaces:**
-- Produces: `FluentCartFakerPress\Abstracts\Ability` base class (matches ref's public surface).
-- Produces: `FluentCartFakerPress\MCP\MCP_Server` with `const SERVER_ID = 'fluent-cart-fakerpress'`.
+- Produces: `StoreSeeder\Abstracts\Ability` base class (matches ref's public surface).
+- Produces: `StoreSeeder\MCP\MCP_Server` with `const SERVER_ID = 'storeseeder'`.
 
 - [ ] **Step 1: Copy + rewire the Ability abstract**
 
 ```bash
 cp ../easycommerce-fakerpress/includes/Abstracts/Ability.php includes/Abstracts/Ability.php
 sed -i \
-  -e 's/EasyCommerceFakerPress/FluentCartFakerPress/g' \
-  -e 's/easycommerce-fakerpress/fluent-cart-fakerpress/g' \
-  -e 's/EasyCommerce FakerPress/Fluent Cart FakerPress/g' \
+  -e 's/EasyCommerceFakerPress/StoreSeeder/g' \
+  -e 's/easycommerce-fakerpress/storeseeder/g' \
+  -e 's/EasyCommerce FakerPress/StoreSeeder/g' \
   includes/Abstracts/Ability.php
 ```
 
@@ -998,9 +998,9 @@ sed -i \
 ```bash
 cp ../easycommerce-fakerpress/includes/MCP/MCP_Server.php includes/MCP/MCP_Server.php
 sed -i \
-  -e 's/EasyCommerceFakerPress/FluentCartFakerPress/g' \
-  -e 's/easycommerce-fakerpress/fluent-cart-fakerpress/g' \
-  -e 's/EasyCommerce FakerPress/Fluent Cart FakerPress/g' \
+  -e 's/EasyCommerceFakerPress/StoreSeeder/g' \
+  -e 's/easycommerce-fakerpress/storeseeder/g' \
+  -e 's/EasyCommerce FakerPress/StoreSeeder/g' \
   includes/MCP/MCP_Server.php
 ```
 
@@ -1010,7 +1010,7 @@ Open `includes/MCP/MCP_Server.php`. Find where it lists/registers the `Generate_
 
 - [ ] **Step 4: Bootstrap the MCP server**
 
-In `class-fluent-cart-fakerpress.php`, in the same init path that registers REST routes (guarded by `check_dependencies()`), instantiate/boot the MCP server (mirror how ref's main class calls `MCP_Server`). Add the `use FluentCartFakerPress\MCP\MCP_Server;` import. Confirm the boot is hooked (ref hooks `mcp_adapter_init` inside the class), not called eagerly.
+In `class-storeseeder.php`, in the same init path that registers REST routes (guarded by `check_dependencies()`), instantiate/boot the MCP server (mirror how ref's main class calls `MCP_Server`). Add the `use StoreSeeder\MCP\MCP_Server;` import. Confirm the boot is hooked (ref hooks `mcp_adapter_init` inside the class), not called eagerly.
 
 - [ ] **Step 5: Lint**
 
@@ -1025,7 +1025,7 @@ Expected: `No syntax errors detected` for both.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add includes/Abstracts/Ability.php includes/MCP/MCP_Server.php class-fluent-cart-fakerpress.php
+git add includes/Abstracts/Ability.php includes/MCP/MCP_Server.php class-storeseeder.php
 git commit -m "feat: port MCP server + Ability abstract (WordPress Abilities API)"
 ```
 
@@ -1035,8 +1035,8 @@ git commit -m "feat: port MCP server + Ability abstract (WordPress Abilities API
 - Create: `includes/MCP/Abilities/Generate_*.php` (13)
 
 **Interfaces:**
-- Consumes: `FluentCartFakerPress\Abstracts\Ability`, the existing 10 generators + the 3 from Phase 2.
-- Each ability id namespaced `fluent-cart-fakerpress/generate-<resource>`.
+- Consumes: `StoreSeeder\Abstracts\Ability`, the existing 10 generators + the 3 from Phase 2.
+- Each ability id namespaced `storeseeder/generate-<resource>`.
 
 - [ ] **Step 1: Copy all abilities except Product_Reviews + rewire**
 
@@ -1048,16 +1048,16 @@ for f in ../easycommerce-fakerpress/includes/MCP/Abilities/Generate_*.php; do
   cp "$f" "includes/MCP/Abilities/$base"
 done
 sed -i \
-  -e 's/EasyCommerceFakerPress/FluentCartFakerPress/g' \
-  -e 's/easycommerce-fakerpress/fluent-cart-fakerpress/g' \
-  -e 's/EasyCommerce FakerPress/Fluent Cart FakerPress/g' \
+  -e 's/EasyCommerceFakerPress/StoreSeeder/g' \
+  -e 's/easycommerce-fakerpress/storeseeder/g' \
+  -e 's/EasyCommerce FakerPress/StoreSeeder/g' \
   -e 's/EasyCommerce/Fluent Cart/g' \
   includes/MCP/Abilities/*.php
 ```
 
 - [ ] **Step 2: Verify each ability references an existing generator + supported params**
 
-For each `Generate_*.php`, confirm the generator class it instantiates exists under `FluentCartFakerPress\Generators\` and the input schema matches that generator's controller `get_resource_specific_params()`. Fix any ability whose schema still describes EasyCommerce-only params (e.g. attribute `type` values) to match the Fluent Cart generators authored in Phase 2.
+For each `Generate_*.php`, confirm the generator class it instantiates exists under `StoreSeeder\Generators\` and the input schema matches that generator's controller `get_resource_specific_params()`. Fix any ability whose schema still describes EasyCommerce-only params (e.g. attribute `type` values) to match the Fluent Cart generators authored in Phase 2.
 
 - [ ] **Step 3: Confirm no Product_Review ability remains**
 
@@ -1119,14 +1119,14 @@ Expected: green; `build/admin.js` + `build/admin.css` present.
 
 - [ ] **Step 2: Load admin page in a real browser (Chrome DevTools MCP)**
 
-Use the `wp-dev-skills:wp-admin-browser` skill / Chrome DevTools MCP: log into WP admin, navigate to the Fluent Cart FakerPress menu page. Confirm:
-- SPA mounts on `#fluent-cart-fakerpress-root` (no console errors).
+Use the `wp-dev-skills:wp-admin-browser` skill / Chrome DevTools MCP: log into WP admin, navigate to the StoreSeeder menu page. Confirm:
+- SPA mounts on `#storeseeder-root` (no console errors).
 - Sidebar + home generator grid render with 13 generators.
 - Navigating to `#/generator/attributes` (and `/refunds`, `/logs`) renders the schema-driven config form.
 
 - [ ] **Step 3: Run a small batch end-to-end**
 
-In the Products generator, set count = 2, run. Confirm REST `POST /fluent-cart-fakerpress/v1/products/generate` returns 200, a success toast appears, and recent-activity/preview updates.
+In the Products generator, set count = 2, run. Confirm REST `POST /storeseeder/v1/products/generate` returns 200, a success toast appears, and recent-activity/preview updates.
 
 - [ ] **Step 4: Run each new generator with count = 1**
 

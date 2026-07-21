@@ -17,9 +17,9 @@ export default function HomePage() {
       {/* Page header */}
       <div className="fp-page-head">
         <div>
-          <h1 className="fp-h1">{__("FakerPress", "fluent-cart-fakerpress")}</h1>
+          <h1 className="fp-h1">{__("FakerPress", "storeseeder")}</h1>
           <p className="fp-sub">
-            {__("Generate realistic test data for your Fluent Cart store.", "fluent-cart-fakerpress")}
+            {__("Generate realistic test data for your Fluent Cart store.", "storeseeder")}
           </p>
         </div>
         <Button
@@ -27,7 +27,7 @@ export default function HomePage() {
           icon="sparkles"
           onClick={() => navigate("/generator/products")}
         >
-          {__("New generation", "fluent-cart-fakerpress")}
+          {__("New generation", "storeseeder")}
         </Button>
       </div>
 
@@ -35,7 +35,7 @@ export default function HomePage() {
       <div className="fp-stat-row">
         <StatCard
           iconName="box"
-          label={__("Products", "fluent-cart-fakerpress")}
+          label={__("Products", "storeseeder")}
           value={counts.products ?? 0}
           empty={!counts.products}
           delta={counts.products ?? 0}
@@ -45,7 +45,7 @@ export default function HomePage() {
         />
         <StatCard
           iconName="users"
-          label={__("Customers", "fluent-cart-fakerpress")}
+          label={__("Customers", "storeseeder")}
           value={counts.customers ?? 0}
           empty={!counts.customers}
           delta={counts.customers ?? 0}
@@ -55,7 +55,7 @@ export default function HomePage() {
         />
         <StatCard
           iconName="cart"
-          label={__("Orders", "fluent-cart-fakerpress")}
+          label={__("Orders", "storeseeder")}
           value={counts.orders ?? 0}
           empty={!counts.orders}
           delta={counts.orders ?? 0}
@@ -65,7 +65,7 @@ export default function HomePage() {
         />
         <StatCard
           iconName="database"
-          label={__("Total Generated", "fluent-cart-fakerpress")}
+          label={__("Total Generated", "storeseeder")}
           value={totalGenerated}
           empty={!totalGenerated}
           delta={totalGenerated}
@@ -77,7 +77,7 @@ export default function HomePage() {
 
       {/* Recent activity */}
       <div className="fp-group-head">
-        <SectionLabel>{__("Recent activity", "fluent-cart-fakerpress")}</SectionLabel>
+        <SectionLabel>{__("Recent activity", "storeseeder")}</SectionLabel>
         <div className="fp-group-line" />
       </div>
       <RecentActivity runs={recentRuns} />

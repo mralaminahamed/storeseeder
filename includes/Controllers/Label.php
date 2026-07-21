@@ -3,13 +3,13 @@
  * Label REST Controller
  *
  * @since   2.4.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Label as LabelGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Label as LabelGenerator;
 
 /**
  * Label REST Controller Class
@@ -36,7 +36,7 @@ class Label extends Controller {
 	 * @return string The translated label for the resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Label', 'fluent-cart-fakerpress' );
+		return __( 'Label', 'storeseeder' );
 	}
 
 	/**

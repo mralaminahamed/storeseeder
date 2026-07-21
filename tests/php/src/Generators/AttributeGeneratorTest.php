@@ -2,20 +2,20 @@
 /**
  * Test class for the Attribute generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Attribute;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Attribute;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Attribute generator.
  *
- * @covers \FluentCartFakerPress\Generators\Attribute
+ * @covers \StoreSeeder\Generators\Attribute
  */
-class AttributeGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class AttributeGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

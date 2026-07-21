@@ -1,18 +1,18 @@
 <?php
 /**
- * Subscription Generator Class for Fluent Cart FakerPress Plugin
+ * Subscription Generator Class for StoreSeeder Plugin
  *
  * @since      2.4.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCart\App\Models\Subscription as SubscriptionModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -78,7 +78,7 @@ class Subscription extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( SubscriptionModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Subscription model not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Subscription model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		// A subscription belongs to a parent order and its customer; without one
@@ -88,7 +88,7 @@ class Subscription extends Generator {
 		if ( ! $order ) {
 			return new WP_Error(
 				'no_orders',
-				__( 'No orders were found. Generate orders before generating subscriptions.', 'fluent-cart-fakerpress' )
+				__( 'No orders were found. Generate orders before generating subscriptions.', 'storeseeder' )
 			);
 		}
 
@@ -99,7 +99,7 @@ class Subscription extends Generator {
 		if ( ! $variation ) {
 			return new WP_Error(
 				'no_products',
-				__( 'No product variations were found. Generate products before generating subscriptions.', 'fluent-cart-fakerpress' )
+				__( 'No product variations were found. Generate products before generating subscriptions.', 'storeseeder' )
 			);
 		}
 
@@ -107,7 +107,7 @@ class Subscription extends Generator {
 		$subscription = $this->create_subscription( $data );
 
 		if ( ! $subscription ) {
-			return new WP_Error( 'subscription_creation_failed', __( 'Failed to create subscription.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'subscription_creation_failed', __( 'Failed to create subscription.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -126,13 +126,13 @@ class Subscription extends Generator {
 		 * Filters the subscription generation result data.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_subscription_generation_result
+		 * @hook  storeseeder_subscription_generation_result
 		 *
 		 * @param array $result The generation result data.
 		 * @param int   $id     The created subscription ID.
 		 * @param array $data   The original data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_subscription_generation_result', $result, $subscription->id, $data );
+		return apply_filters( 'storeseeder_subscription_generation_result', $result, $subscription->id, $data );
 	}
 
 	/**

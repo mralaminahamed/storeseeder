@@ -1,8 +1,8 @@
 <div align="center">
 
-# Fluent Cart FakerPress
+# StoreSeeder
 
-[![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/fluent-cart-fakerpress/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress tested up to 6.8](https://img.shields.io/badge/WordPress-6.8-blue?style=flat-square)](https://wordpress.org/)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-8892BF?style=flat-square)](https://php.net/)
 [![License GPL v2 or later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue?style=flat-square)](LICENSE)
@@ -14,17 +14,17 @@ Generate realistic test data for Fluent Cart stores — 17 generators, live prev
 > [!WARNING]
 > This plugin writes large volumes of fake data directly into your store. Use it only on development or staging sites, and back up your database before generating large datasets.
 
-![Fluent Cart FakerPress banner](.wordpress-org/banner-1544x500.png)
+![StoreSeeder banner](.wordpress-org/banner-1544x500.png)
 
 ## Quick Start
 
-Fluent Cart FakerPress is distributed from GitHub. Download the latest release zip and install it from **Plugins → Add New → Upload Plugin**, then **Activate**. The plugin appears as **FC FakerPress** in the admin menu.
+StoreSeeder is distributed from GitHub. Download the latest release zip and install it from **Plugins → Add New → Upload Plugin**, then **Activate**. The plugin appears as **StoreSeeder** in the admin menu.
 
 To run it from source instead:
 
 ```bash
-git clone https://github.com/mralaminahamed/fluent-cart-fakerpress.git
-cd fluent-cart-fakerpress
+git clone https://github.com/mralaminahamed/storeseeder.git
+cd storeseeder
 composer install
 yarn install
 yarn build
@@ -34,7 +34,7 @@ Requires [Fluent Cart](https://wordpress.org/plugins/fluent-cart/), declared as 
 
 ## What It Does
 
-Fluent Cart FakerPress populates your Fluent Cart store with realistic fake data for development, testing, and demos. Choose a generator, configure the parameters, and click Generate. Every record is created through native Fluent Cart models, so it respects the same schema, relationships, and money handling as real data.
+StoreSeeder populates your Fluent Cart store with realistic fake data for development, testing, and demos. Choose a generator, configure the parameters, and click Generate. Every record is created through native Fluent Cart models, so it respects the same schema, relationships, and money handling as real data.
 
 - Developing features that need existing store data
 - Testing plugins, themes, and integrations against realistic datasets
@@ -77,7 +77,7 @@ Seventeen generators, grouped by category in the admin.
 | Settings | Default count, locale, seed, metadata preference, run-history limit, and sample-data sync |
 | Sample data sync | One-click download of locale-specific reference data from the companion repository |
 | Hook system | Filters and actions across the generation lifecycle for data customization |
-| REST API | 17 controllers under `fluent-cart-fakerpress/v1` |
+| REST API | 17 controllers under `storeseeder/v1` |
 | MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
 
 ## Development
@@ -102,18 +102,18 @@ composer zip:dev             # Build a development zip in release/dev/
 
 ```mermaid
 flowchart LR
-    A["React admin<br/>src/admin"] -->|"POST /fluent-cart-fakerpress/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
+    A["React admin<br/>src/admin"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
     B -->|"JSON Schema validation"| C["Generator<br/>generate()"]
     C -->|FakerPHP| D["Fluent Cart models"]
     D --> E["WordPress database"]
     C -->|"{ id, message, metadata }"| A
 ```
 
-PHP lives under the PSR-4 namespace `FluentCartFakerPress\`:
+PHP lives under the PSR-4 namespace `StoreSeeder\`:
 
 ```
-fluent-cart-fakerpress.php           Plugin bootstrap
-class-fluent-cart-fakerpress.php     Singleton orchestrator
+storeseeder.php           Plugin bootstrap
+class-storeseeder.php     Singleton orchestrator
 includes/
   Abstracts/Generator.php            Base generator (FakerPHP, batch, logging)
   Abstracts/Controller.php           Base REST controller (WP_REST_Controller)
@@ -128,18 +128,18 @@ The admin app is React 18, React Router v7, Radix UI, and Tailwind CSS v4. Entry
 
 ```php
 // Modify generated data before creation
-add_filter( 'fluent_cart_fakerpress_customer_data_before_create', function( $data ) {
+add_filter( 'storeseeder_customer_data_before_create', function( $data ) {
     $data['first_name'] = 'Test';
     return $data;
 } );
 
 // Hook after an item is created
-add_action( 'fluent_cart_fakerpress_after_customer_created', function( $customer_id, $result, $data ) {
+add_action( 'storeseeder_after_customer_created', function( $customer_id, $result, $data ) {
     // custom logic
 }, 10, 3 );
 
 // Filter a generation result
-add_filter( 'fluent_cart_fakerpress_product_generation_result', function( $result, $product_id, $data ) {
+add_filter( 'storeseeder_product_generation_result', function( $result, $product_id, $data ) {
     return $result;
 }, 10, 3 );
 ```
@@ -170,7 +170,7 @@ The version history lives in [docs/changelog.md](docs/changelog.md). [`readme.tx
 
 ## Contributing
 
-Bug reports, feature requests, and pull requests are welcome. Read the [development guide](docs/development.md) before opening a pull request, and file issues on the [issue tracker](https://github.com/mralaminahamed/fluent-cart-fakerpress/issues).
+Bug reports, feature requests, and pull requests are welcome. Read the [development guide](docs/development.md) before opening a pull request, and file issues on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues).
 
 ## Maintainer
 

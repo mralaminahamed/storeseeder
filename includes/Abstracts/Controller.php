@@ -1,16 +1,16 @@
 <?php
 /**
- * Abstract REST Controller Class for Fluent Cart FakerPress
+ * Abstract REST Controller Class for StoreSeeder
  *
  * Base class for all REST API controllers providing common functionality for
  * data generation endpoints. Extends WordPress REST Controller with additional
  * features for parameter validation, schema generation, and generator integration.
  *
- * @package FluentCartFakerPress\Abstracts
+ * @package StoreSeeder\Abstracts
  * @since   1.0.0
  */
 
-namespace FluentCartFakerPress\Abstracts;
+namespace StoreSeeder\Abstracts;
 
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Abstract REST Controller Class
  *
- * Provides the foundation for all REST API controllers in Fluent Cart FakerPress.
+ * Provides the foundation for all REST API controllers in StoreSeeder.
  * Extends WordPress REST Controller with specialized functionality for data
  * generation endpoints, including parameter validation, schema generation,
  * and seamless integration with generator classes.
@@ -50,7 +50,7 @@ abstract class Controller extends WP_REST_Controller {
 	 * @since 1.0.0
 	 * @var   string
 	 */
-	protected $namespace = 'fluent-cart-fakerpress/v1';
+	protected $namespace = 'storeseeder/v1';
 
 	/**
 	 * Get REST base for the endpoint
@@ -132,11 +132,11 @@ abstract class Controller extends WP_REST_Controller {
 		 * new options for particular resource types.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_rest_params_{$rest_base}
+		 * @hook  storeseeder_rest_params_{$rest_base}
 		 *
 		 * @param array<string, mixed> $params Default generation parameters from get_generation_params().
 		 */
-		$params = apply_filters( "fluent_cart_fakerpress_rest_params_{$rest_base}", $this->get_generation_params() );
+		$params = apply_filters( "storeseeder_rest_params_{$rest_base}", $this->get_generation_params() );
 
 		register_rest_route(
 			$this->namespace,
@@ -175,7 +175,7 @@ abstract class Controller extends WP_REST_Controller {
 		if ( ! $count || $count <= 0 ) {
 			return new WP_Error(
 				'invalid_count',
-				__( 'Count parameter is required and must be greater than 0.', 'fluent-cart-fakerpress' ),
+				__( 'Count parameter is required and must be greater than 0.', 'storeseeder' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -223,14 +223,14 @@ abstract class Controller extends WP_REST_Controller {
 
 		$message = sprintf(
 			// translators: Total output.
-			_n( '%1$s item successfully created.', '%1$s items successfully created.', $total_output, 'fluent-cart-fakerpress' ),
+			_n( '%1$s item successfully created.', '%1$s items successfully created.', $total_output, 'storeseeder' ),
 			$total_output
 		);
 
 		if ( $failed > 0 ) {
 			$message .= ' ' . sprintf(
 				// translators: %s: number of items that could not be created.
-				_n( '%s could not be created.', '%s could not be created.', $failed, 'fluent-cart-fakerpress' ),
+				_n( '%s could not be created.', '%s could not be created.', $failed, 'storeseeder' ),
 				$failed
 			);
 		}
@@ -242,13 +242,13 @@ abstract class Controller extends WP_REST_Controller {
 		 * to the API response based on the generated results.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_rest_message
+		 * @hook  storeseeder_rest_message
 		 *
 		 * @param string $message         The default success message.
 		 * @param array  $result          The generation results array.
 		 * @param string $resource_type   The type of resource that was generated.
 		 */
-		$message = apply_filters( 'fluent_cart_fakerpress_rest_message', $message, $result, $this->get_resource_type() );
+		$message = apply_filters( 'storeseeder_rest_message', $message, $result, $this->get_resource_type() );
 
 		$response = array(
 			'message'                  => $message,
@@ -268,14 +268,14 @@ abstract class Controller extends WP_REST_Controller {
 		 * Allows developers to modify the response data before it's returned to the client.
 		 *
 		 * @since 1.0.0
-		 * @hook fluent_cart_fakerpress_rest_response
+		 * @hook storeseeder_rest_response
 		 *
 		 * @param array           $response     The REST API response data array.
 		 * @param array           $result       The generation results array.
 		 * @param string          $resource_type The type of resource that was generated.
 		 * @param WP_REST_Request $request      Full data about the original request.
 		 */
-		$response = apply_filters( 'fluent_cart_fakerpress_rest_response', $response, $result, $this->get_resource_type(), $request );
+		$response = apply_filters( 'storeseeder_rest_response', $response, $result, $this->get_resource_type(), $request );
 
 		return new WP_REST_Response( $response, 200 );
 	}
@@ -291,7 +291,7 @@ abstract class Controller extends WP_REST_Controller {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to generate fake data.', 'fluent-cart-fakerpress' ),
+				__( 'Sorry, you are not allowed to generate fake data.', 'storeseeder' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -314,7 +314,7 @@ abstract class Controller extends WP_REST_Controller {
 	public function get_generation_params(): array {
 		$base_params = array(
 			'count'         => array(
-				'description'       => __( 'Number of items to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Number of items to generate.', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 1,
 				'maximum'           => 100,
@@ -323,37 +323,37 @@ abstract class Controller extends WP_REST_Controller {
 				'validate_callback' => array( $this, 'validate_count' ),
 			),
 			'locale'        => array(
-				'description'       => __( 'Locale for generated data (e.g., en_US, fr_FR, de_DE).', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Locale for generated data (e.g., en_US, fr_FR, de_DE).', 'storeseeder' ),
 				'type'              => 'string',
 				'default'           => 'en_US',
 				'enum'              => array( 'en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'pt_BR' ), // Basic locales for now.
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'seed'          => array(
-				'description'       => __( 'Random seed for reproducible data generation.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Random seed for reproducible data generation.', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
 			),
 			'status'        => array(
-				'description'       => __( 'Status filter for generated items.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Status filter for generated items.', 'storeseeder' ),
 				'type'              => 'string',
 				'enum'              => array( 'active', 'inactive', 'draft', 'pending', 'completed', 'cancelled' ),
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'date_range'    => array(
-				'description' => __( 'Date range for generated items.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Date range for generated items.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'start' => array(
-						'description'       => __( 'Start date (YYYY-MM-DD format).', 'fluent-cart-fakerpress' ),
+						'description'       => __( 'Start date (YYYY-MM-DD format).', 'storeseeder' ),
 						'type'              => 'string',
 						'format'            => 'date',
 						'sanitize_callback' => 'sanitize_text_field',
 						'validate_callback' => array( $this, 'validate_date' ),
 					),
 					'end'   => array(
-						'description'       => __( 'End date (YYYY-MM-DD format).', 'fluent-cart-fakerpress' ),
+						'description'       => __( 'End date (YYYY-MM-DD format).', 'storeseeder' ),
 						'type'              => 'string',
 						'format'            => 'date',
 						'sanitize_callback' => 'sanitize_text_field',
@@ -362,32 +362,32 @@ abstract class Controller extends WP_REST_Controller {
 				),
 			),
 			'relationships' => array(
-				'description' => __( 'Control relationship creation with existing data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Control relationship creation with existing data.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'create_missing' => array(
-						'description' => __( 'Create missing related items if needed.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Create missing related items if needed.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'link_existing'  => array(
-						'description' => __( 'Link to existing items when possible.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Link to existing items when possible.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 				),
 			),
 			'meta_options'  => array(
-				'description' => __( 'Metadata generation options.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Metadata generation options.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'include_meta'  => array(
-						'description' => __( 'Include additional metadata.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Include additional metadata.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'custom_fields' => array(
-						'description' => __( 'Generate custom fields.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Generate custom fields.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => false,
 					),
@@ -422,7 +422,7 @@ abstract class Controller extends WP_REST_Controller {
 		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value ) ) {
 			return new WP_Error(
 				'invalid_date',
-				__( 'Date must be in YYYY-MM-DD format.', 'fluent-cart-fakerpress' )
+				__( 'Date must be in YYYY-MM-DD format.', 'storeseeder' )
 			);
 		}
 		return true;
@@ -448,7 +448,7 @@ abstract class Controller extends WP_REST_Controller {
 		if ( ! is_numeric( $value ) || $int_value <= 0 || $int_value > 100 ) {
 			return new WP_Error(
 				'invalid_count',
-				__( 'Count must be a number between 1 and 100.', 'fluent-cart-fakerpress' )
+				__( 'Count must be a number between 1 and 100.', 'storeseeder' )
 			);
 		}
 
@@ -470,11 +470,11 @@ abstract class Controller extends WP_REST_Controller {
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			// translators: Resource type.
-			'title'      => sprintf( __( '%s Generation Response', 'fluent-cart-fakerpress' ), $this->get_resource_type_label() ),
+			'title'      => sprintf( __( '%s Generation Response', 'storeseeder' ), $this->get_resource_type_label() ),
 			'type'       => 'object',
 			'properties' => array(
 				'generated' => array(
-					'description' => __( 'Number of items generated.', 'fluent-cart-fakerpress' ),
+					'description' => __( 'Number of items generated.', 'storeseeder' ),
 					'type'        => 'integer',
 					'context'     => array( 'view' ),
 					'readonly'    => true,

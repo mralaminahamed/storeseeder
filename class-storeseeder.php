@@ -1,12 +1,12 @@
 <?php
 /**
- * Main Plugin Class for Fluent Cart FakerPress
+ * Main Plugin Class for StoreSeeder
  *
- * The main plugin class that orchestrates the entire Fluent Cart FakerPress plugin functionality.
+ * The main plugin class that orchestrates the entire StoreSeeder plugin functionality.
  * This class handles plugin initialization, admin interface setup, REST API registration,
  * asset management, and WordPress admin color scheme integration.
  *
- * @package FluentCartFakerPress
+ * @package StoreSeeder
  * @since   1.0.0
  */
 
@@ -14,29 +14,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use FluentCartFakerPress\Controllers\Product;
-use FluentCartFakerPress\Controllers\Customer;
-use FluentCartFakerPress\Controllers\Order;
-use FluentCartFakerPress\Controllers\Coupon;
-use FluentCartFakerPress\Controllers\Product_Variation;
-use FluentCartFakerPress\Controllers\Shipping_Plan;
-use FluentCartFakerPress\Controllers\Tax_Class;
-use FluentCartFakerPress\Controllers\Transaction;
-use FluentCartFakerPress\Controllers\Cart_Session;
-use FluentCartFakerPress\Controllers\Attribute;
-use FluentCartFakerPress\Controllers\Refund;
-use FluentCartFakerPress\Controllers\Log;
-use FluentCartFakerPress\Controllers\Shipping_Class;
-use FluentCartFakerPress\Controllers\Label;
-use FluentCartFakerPress\Controllers\Order_Tax_Rate;
-use FluentCartFakerPress\Controllers\Product_Download;
-use FluentCartFakerPress\Controllers\Subscription;
-use FluentCartFakerPress\MCP\MCP_Server;
+use StoreSeeder\Controllers\Product;
+use StoreSeeder\Controllers\Customer;
+use StoreSeeder\Controllers\Order;
+use StoreSeeder\Controllers\Coupon;
+use StoreSeeder\Controllers\Product_Variation;
+use StoreSeeder\Controllers\Shipping_Plan;
+use StoreSeeder\Controllers\Tax_Class;
+use StoreSeeder\Controllers\Transaction;
+use StoreSeeder\Controllers\Cart_Session;
+use StoreSeeder\Controllers\Attribute;
+use StoreSeeder\Controllers\Refund;
+use StoreSeeder\Controllers\Log;
+use StoreSeeder\Controllers\Shipping_Class;
+use StoreSeeder\Controllers\Label;
+use StoreSeeder\Controllers\Order_Tax_Rate;
+use StoreSeeder\Controllers\Product_Download;
+use StoreSeeder\Controllers\Subscription;
+use StoreSeeder\MCP\MCP_Server;
 
 /**
- * Main Plugin Class for Fluent Cart FakerPress
+ * Main Plugin Class for StoreSeeder
  *
- * This class serves as the central orchestrator for the Fluent Cart FakerPress plugin,
+ * This class serves as the central orchestrator for the StoreSeeder plugin,
  * providing comprehensive test data generation capabilities for Fluent Cart stores.
  * It manages specialized generators, implements real-time validation, features a
  * modern React Router v7 interface, integrates with WordPress admin color schemes,
@@ -55,7 +55,7 @@ use FluentCartFakerPress\MCP\MCP_Server;
  * @since 1.0.0
  * @version 1.0.0
  */
-class FluentCart_FakerPress {
+class StoreSeeder {
 
 	/**
 	 * Single instance of the plugin class
@@ -72,13 +72,13 @@ class FluentCart_FakerPress {
 	/**
 	 * Plugin version number
 	 *
-	 * Stores the current version of the Fluent Cart FakerPress plugin.
+	 * Stores the current version of the StoreSeeder plugin.
 	 * Used for asset versioning, database migrations, and compatibility checks.
 	 *
 	 * @since 1.0.0
 	 * @var string
 	 */
-	public string $version = FLUENT_CART_FAKERPRESS_VERSION;
+	public string $version = STORESEEDER_VERSION;
 
 	/**
 	 * Get single instance of the plugin class
@@ -110,8 +110,8 @@ class FluentCart_FakerPress {
 	 * @return void
 	 */
 	public function init(): void {
-		register_activation_hook( FLUENT_CART_FAKERPRESS_PLUGIN_FILE, array( $this, 'activate_plugin' ) );
-		register_deactivation_hook( FLUENT_CART_FAKERPRESS_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
+		register_activation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'activate_plugin' ) );
+		register_deactivation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
 
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -145,7 +145,7 @@ class FluentCart_FakerPress {
 	/**
 	 * Add admin menu page
 	 *
-	 * Creates the main admin menu page for the Fluent Cart FakerPress interface.
+	 * Creates the main admin menu page for the StoreSeeder interface.
 	 * Adds a top-level menu item in the WordPress admin sidebar with the plugin icon.
 	 * Only registers the menu if dependencies are met (Fluent Cart is active).
 	 *
@@ -160,10 +160,10 @@ class FluentCart_FakerPress {
 		}
 
 		add_menu_page(
-			__( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-			__( 'FC FakerPress', 'fluent-cart-fakerpress' ),
+			__( 'StoreSeeder', 'storeseeder' ),
+			__( 'StoreSeeder', 'storeseeder' ),
 			'manage_options',
-			'fluent-cart-fakerpress',
+			'storeseeder',
 			array( $this, 'render_admin_page' ),
 			'dashicons-randomize',
 			30
@@ -186,7 +186,7 @@ class FluentCart_FakerPress {
 		// Ensure sample data is available when admin page is visited.
 		$this->ensure_sample_data();
 
-		echo '<div id="fluent-cart-fakerpress-root"></div>';
+		echo '<div id="storeseeder-root"></div>';
 	}
 
 	/**
@@ -207,11 +207,11 @@ class FluentCart_FakerPress {
 	public function enqueue_admin_assets( string $hook ): void {
 		global $_wp_admin_css_colors;
 
-		if ( 'toplevel_page_fluent-cart-fakerpress' !== $hook ) {
+		if ( 'toplevel_page_storeseeder' !== $hook ) {
 			return;
 		}
 
-		$asset_file = FLUENT_CART_FAKERPRESS_PLUGIN_PATH . 'build/admin.asset.php';
+		$asset_file = STORESEEDER_PLUGIN_PATH . 'build/admin.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
@@ -232,16 +232,16 @@ class FluentCart_FakerPress {
 		);
 
 		wp_enqueue_script(
-			'fluent-cart-fakerpress-admin',
-			FLUENT_CART_FAKERPRESS_PLUGIN_URL . 'build/admin.js',
+			'storeseeder-admin',
+			STORESEEDER_PLUGIN_URL . 'build/admin.js',
 			$deps,
 			$version,
 			true
 		);
 
 		wp_enqueue_style(
-			'fluent-cart-fakerpress-admin',
-			FLUENT_CART_FAKERPRESS_PLUGIN_URL . 'build/admin.css',
+			'storeseeder-admin',
+			STORESEEDER_PLUGIN_URL . 'build/admin.css',
 			array(),
 			$version
 		);
@@ -254,7 +254,7 @@ class FluentCart_FakerPress {
 			esc_attr( $admin_colors['highlight'] ),
 			esc_attr( $admin_colors['accent'] )
 		);
-		wp_add_inline_style( 'fluent-cart-fakerpress-admin', $css_vars );
+		wp_add_inline_style( 'storeseeder-admin', $css_vars );
 
 		// Get locale information for frontend display.
 		$wp_locale     = get_locale();
@@ -262,10 +262,10 @@ class FluentCart_FakerPress {
 		$locale_labels = $this->get_locale_labels();
 
 		wp_localize_script(
-			'fluent-cart-fakerpress-admin',
-			'fluentCartFakerpressApi',
+			'storeseeder-admin',
+			'storeseederApi',
 			array(
-				'restUrl'     => rest_url( 'fluent-cart-fakerpress/v1/' ),
+				'restUrl'     => rest_url( 'storeseeder/v1/' ),
 				'restNonce'   => wp_create_nonce( 'wp_rest' ),
 				'adminColors' => $admin_colors,
 				'colorScheme' => $current_color,
@@ -278,7 +278,7 @@ class FluentCart_FakerPress {
 			)
 		);
 
-		wp_set_script_translations( 'fluent-cart-fakerpress-admin', 'fluent-cart-fakerpress' );
+		wp_set_script_translations( 'storeseeder-admin', 'storeseeder' );
 	}
 
 	/**
@@ -493,18 +493,18 @@ class FluentCart_FakerPress {
 	 */
 	private function extract_zip( string $zip_file, string $extract_to ): bool {
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			$this->debug_log( 'Fluent Cart FakerPress: ZipArchive class not available' );
+			$this->debug_log( 'StoreSeeder: ZipArchive class not available' );
 			return false;
 		}
 
 		$zip = new ZipArchive();
 		if ( $zip->open( $zip_file ) !== true ) {
-			$this->debug_log( 'Fluent Cart FakerPress: Failed to open zip file' );
+			$this->debug_log( 'StoreSeeder: Failed to open zip file' );
 			return false;
 		}
 
 		if ( ! $zip->extractTo( $extract_to ) ) {
-			$this->debug_log( 'Fluent Cart FakerPress: Failed to extract zip file' );
+			$this->debug_log( 'StoreSeeder: Failed to extract zip file' );
 			$zip->close();
 			return false;
 		}
@@ -593,7 +593,7 @@ class FluentCart_FakerPress {
 		if ( ! $this->is_fluent_cart_active() ) {
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
-				esc_html__( 'Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active.', 'fluent-cart-fakerpress' )
+				esc_html__( 'StoreSeeder requires Fluent Cart plugin to be installed and active.', 'storeseeder' )
 			);
 		}
 	}
@@ -677,16 +677,16 @@ class FluentCart_FakerPress {
 		/**
 		 * Filters the locale used for test data generation.
 		 *
-		 * Allows developers to override the default locale used by Fluent Cart FakerPress
+		 * Allows developers to override the default locale used by StoreSeeder
 		 * for generating test data. Useful for generating data in specific languages
 		 * or regional formats regardless of the site's locale setting.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_locale
+		 * @hook  storeseeder_locale
 		 *
 		 * @param string $locale The current WordPress locale code (e.g., 'en_US').
 		 */
-		$custom_locale = apply_filters( 'fluent_cart_fakerpress_locale', $locale );
+		$custom_locale = apply_filters( 'storeseeder_locale', $locale );
 
 		// Get supported locales.
 		$supported_locales = array_keys( $this->get_locale_labels() );

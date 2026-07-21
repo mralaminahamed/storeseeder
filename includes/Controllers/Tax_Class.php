@@ -3,13 +3,13 @@
  * Tax REST Controller
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Tax_Class as TaxClassGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Tax_Class as TaxClassGenerator;
 
 /**
  * Tax REST Controller Class
@@ -40,7 +40,7 @@ class Tax_Class extends Controller {
 	 * @return string The translated label for tax class resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Tax Class', 'fluent-cart-fakerpress' );
+		return __( 'Tax Class', 'storeseeder' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Tax_Class extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'tax_types'         => array(
-				'description'       => __( 'Types of tax classes to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Types of tax classes to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -85,7 +85,7 @@ class Tax_Class extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'jurisdictions'     => array(
-				'description'       => __( 'Tax jurisdictions to generate rates for.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Tax jurisdictions to generate rates for.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -95,11 +95,11 @@ class Tax_Class extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'rate_ranges'       => array(
-				'description' => __( 'Tax rate ranges by type.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Tax rate ranges by type.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'standard' => array(
-						'description' => __( 'Standard tax rate range.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Standard tax rate range.', 'storeseeder' ),
 						'type'        => 'object',
 						'properties'  => array(
 							'min' => array(
@@ -117,7 +117,7 @@ class Tax_Class extends Controller {
 						),
 					),
 					'reduced'  => array(
-						'description' => __( 'Reduced tax rate range.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Reduced tax rate range.', 'storeseeder' ),
 						'type'        => 'object',
 						'properties'  => array(
 							'min' => array(
@@ -137,11 +137,11 @@ class Tax_Class extends Controller {
 				),
 			),
 			'location_coverage' => array(
-				'description' => __( 'Geographic coverage for tax rates.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Geographic coverage for tax rates.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'countries'        => array(
-						'description'       => __( 'Countries to generate tax rates for.', 'fluent-cart-fakerpress' ),
+						'description'       => __( 'Countries to generate tax rates for.', 'storeseeder' ),
 						'type'              => 'array',
 						'items'             => array(
 							'type' => 'string',
@@ -150,7 +150,7 @@ class Tax_Class extends Controller {
 						'sanitize_callback' => array( $this, 'sanitize_array' ),
 					),
 					'include_compound' => array(
-						'description' => __( 'Include compound tax rates.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Include compound tax rates.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
@@ -169,7 +169,7 @@ class Tax_Class extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'tax_classes' => array(
-				'description' => __( 'Generated tax classes with location-based rates.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated tax classes with location-based rates.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

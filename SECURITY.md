@@ -10,7 +10,7 @@ We actively maintain and provide security updates for the following versions:
 
 ## Reporting a Vulnerability
 
-We take security vulnerabilities seriously. If you discover a security vulnerability in Fluent Cart FakerPress, please report it responsibly.
+We take security vulnerabilities seriously. If you discover a security vulnerability in StoreSeeder, please report it responsibly.
 
 ### How to Report
 
@@ -19,7 +19,7 @@ We take security vulnerabilities seriously. If you discover a security vulnerabi
 Instead, please report security vulnerabilities by emailing:
 
 - **Email**: me@alaminahamed.com
-- **Subject**: [SECURITY] Fluent Cart FakerPress - Brief Description
+- **Subject**: [SECURITY] StoreSeeder - Brief Description
 
 ### What to Include
 
@@ -113,7 +113,7 @@ $count = absint( $_POST['count'] ?? 0 );
 
 // Good - Validation
 if ( empty( $type ) || $count <= 0 ) {
-    wp_send_json_error( __( 'Invalid parameters.', 'fluent-cart-fakerpress' ) );
+    wp_send_json_error( __( 'Invalid parameters.', 'storeseeder' ) );
 }
 ```
 
@@ -134,7 +134,7 @@ echo wp_kses_post( $description );
 ```php
 // Good - Permission verification
 if ( ! current_user_can( 'manage_options' ) ) {
-    wp_die( __( 'Insufficient permissions.', 'fluent-cart-fakerpress' ) );
+    wp_die( __( 'Insufficient permissions.', 'storeseeder' ) );
 }
 ```
 
@@ -142,7 +142,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 ```php
 // Good - CSRF protection
-check_ajax_referer( 'fluent_cart_fakerpress_nonce', 'nonce' );
+check_ajax_referer( 'storeseeder_nonce', 'nonce' );
 ```
 
 ### React Component Security
@@ -301,7 +301,7 @@ Security researchers who responsibly disclose vulnerabilities will be:
 ### Security Team
 
 - **Primary Email**: me@alaminahamed.com
-- **Website**: https://github.com/mralaminahamed/fluent-cart-fakerpress/security
+- **Website**: https://github.com/mralaminahamed/storeseeder/security
 - **Response Time**: Within 48 hours
 
 ### Encrypted Communication
@@ -320,6 +320,6 @@ If primary email is unresponsive:
 
 ---
 
-**Thank you for helping keep Fluent Cart FakerPress and its users secure!**
+**Thank you for helping keep StoreSeeder and its users secure!**
 
 _This security policy is reviewed and updated regularly to reflect current best practices and emerging threats._

@@ -2,20 +2,20 @@
 /**
  * Test class for the Attribute REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Attribute;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Attribute;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Attribute REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Attribute
+ * @covers \StoreSeeder\Controllers\Attribute
  */
-class AttributeRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class AttributeRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

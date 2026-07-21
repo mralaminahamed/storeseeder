@@ -3,14 +3,14 @@
  * Refund Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Refund as RefundGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Refund as RefundGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,7 +32,7 @@ class Refund extends Controller {
 	 * {@inheritDoc}
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Refund', 'fluent-cart-fakerpress' );
+		return __( 'Refund', 'storeseeder' );
 	}
 
 	/**

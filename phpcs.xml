@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="FluentCartFakerPress">
+<ruleset name="StoreSeeder">
 	<description>PHP CodeSniffer configuration for FluentCart FakerPress</description>
 
 	<!-- Use the WordPress Coding Standards -->

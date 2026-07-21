@@ -2,20 +2,20 @@
 /**
  * Test class for the Log generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Log;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Log;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Log generator.
  *
- * @covers \FluentCartFakerPress\Generators\Log
+ * @covers \StoreSeeder\Generators\Log
  */
-class LogGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class LogGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

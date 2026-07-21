@@ -2,17 +2,17 @@
 /**
  * Customer Generator REST Controller
  *
- * Handles REST API endpoints for customer data generation in Fluent Cart FakerPress.
+ * Handles REST API endpoints for customer data generation in StoreSeeder.
  * Provides endpoints for generating customers with addresses, metadata, and preferences.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Customer as CustomerGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Customer as CustomerGenerator;
 
 /**
  * Customer Generator REST Controller
@@ -22,7 +22,7 @@ use FluentCartFakerPress\Generators\Customer as CustomerGenerator;
  * purchase history, and metadata through the REST API.
  *
  * Endpoints:
- * - POST /wp-json/fluent-cart-fakerpress/v1/customers/generate
+ * - POST /wp-json/storeseeder/v1/customers/generate
  *
  * Features:
  * - Full customer creation with Fluent Cart integration
@@ -55,14 +55,14 @@ class Customer extends Controller {
 	 * @return string The translated label for customer resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Customer', 'fluent-cart-fakerpress' );
+		return __( 'Customer', 'storeseeder' );
 	}
 
 	/**
 	 * Get REST base for the endpoint
 	 *
 	 * Returns the REST API base path for customer generation endpoints.
-	 * Forms the endpoint URL: /wp-json/fluent-cart-fakerpress/v1/customers/generate
+	 * Forms the endpoint URL: /wp-json/storeseeder/v1/customers/generate
 	 *
 	 * @since 1.0.0
 	 *
@@ -93,14 +93,14 @@ class Customer extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'customer_type'      => array(
-				'description'       => __( 'Type of customers to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Type of customers to generate.', 'storeseeder' ),
 				'type'              => 'string',
 				'enum'              => array( 'individual', 'business', 'mixed' ),
 				'default'           => 'mixed',
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'country_focus'      => array(
-				'description' => __( 'Focus generation on specific countries.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Focus generation on specific countries.', 'storeseeder' ),
 				'type'        => 'array',
 				'items'       => array(
 					'type' => 'string',
@@ -108,12 +108,12 @@ class Customer extends Controller {
 				'default'     => array(),
 			),
 			'include_history'    => array(
-				'description' => __( 'Include purchase history and loyalty data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include purchase history and loyalty data.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'loyalty_tier_focus' => array(
-				'description' => __( 'Focus on specific loyalty tiers.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Focus on specific loyalty tiers.', 'storeseeder' ),
 				'type'        => 'array',
 				'items'       => array(
 					'type' => 'string',
@@ -122,7 +122,7 @@ class Customer extends Controller {
 				'default'     => array(),
 			),
 			'account_status'     => array(
-				'description' => __( 'Account status for generated customers.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Account status for generated customers.', 'storeseeder' ),
 				'type'        => 'string',
 				'enum'        => array( 'active', 'inactive', 'pending' ),
 				'default'     => 'active',
@@ -140,7 +140,7 @@ class Customer extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'customers' => array(
-				'description' => __( 'Generated customers data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated customers data.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

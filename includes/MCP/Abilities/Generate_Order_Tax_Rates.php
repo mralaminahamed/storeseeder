@@ -2,20 +2,20 @@
 /**
  * MCP Ability: Generate Order Tax Rates
  *
- * @package FluentCartFakerPress\MCP\Abilities
+ * @package StoreSeeder\MCP\Abilities
  * @since   2.4.0
  */
 
-namespace FluentCartFakerPress\MCP\Abilities;
+namespace StoreSeeder\MCP\Abilities;
 
-use FluentCartFakerPress\Abstracts\Ability;
+use StoreSeeder\Abstracts\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Generate_Order_Tax_Rates
  *
- * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/order_tax_rates/generate
+ * Maps to REST endpoint: POST /storeseeder/v1/order_tax_rates/generate
  *
  * @since 1.0.0
  */

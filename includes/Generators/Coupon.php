@@ -1,16 +1,16 @@
 <?php
 /**
- * Coupon Generator Class for Fluent Cart FakerPress Plugin
+ * Coupon Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Coupon as CouponModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -60,7 +60,7 @@ class Coupon extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$coupon_data = $this->generate_coupon_data();
@@ -71,7 +71,7 @@ class Coupon extends Generator {
 		}
 
 		if ( ! $coupon_id ) {
-			return new WP_Error( 'coupon_creation_failed', __( 'Failed to create coupon.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'coupon_creation_failed', __( 'Failed to create coupon.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -91,13 +91,13 @@ class Coupon extends Generator {
 		 * Allows developers to modify the returned coupon data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_coupon_generation_result
+		 * @hook  storeseeder_coupon_generation_result
 		 *
 		 * @param array $result       The coupon generation result data.
 		 * @param int   $coupon_id    The created coupon ID.
 		 * @param array $coupon_data  The original coupon data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_coupon_generation_result', $result, $coupon_id, $coupon_data );
+		return apply_filters( 'storeseeder_coupon_generation_result', $result, $coupon_id, $coupon_data );
 	}
 
 	/**
@@ -147,7 +147,7 @@ class Coupon extends Generator {
 	private function create_coupon( array $data ) {
 		// Check if Fluent Cart Coupon model is available.
 		if ( ! class_exists( CouponModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// Prepare coupon data for Fluent Cart Coupon model.
@@ -179,7 +179,7 @@ class Coupon extends Generator {
 		$coupon = CouponModel::query()->create( $coupon_data );
 
 		if ( ! $coupon ) {
-			return new WP_Error( 'coupon_creation_failed', __( 'Failed to create coupon using Fluent Cart model.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'coupon_creation_failed', __( 'Failed to create coupon using Fluent Cart model.', 'storeseeder' ) );
 		}
 
 		return $coupon->id;

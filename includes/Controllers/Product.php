@@ -2,17 +2,17 @@
 /**
  * Product Generator REST Controller
  *
- * Handles REST API endpoints for product data generation in Fluent Cart FakerPress.
+ * Handles REST API endpoints for product data generation in StoreSeeder.
  * Provides endpoints for generating products with attributes, variations, and metadata.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Product as ProductGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Product as ProductGenerator;
 
 /**
  * Product Generator REST Controller
@@ -22,7 +22,7 @@ use FluentCartFakerPress\Generators\Product as ProductGenerator;
  * categories, pricing, and inventory management through the REST API.
  *
  * Endpoints:
- * - POST /wp-json/fluent-cart-fakerpress/v1/products/generate
+ * - POST /wp-json/storeseeder/v1/products/generate
  *
  * Features:
  * - Full product creation with Fluent Cart model integration
@@ -55,14 +55,14 @@ class Product extends Controller {
 	 * @return string The translated label for product resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Product', 'fluent-cart-fakerpress' );
+		return __( 'Product', 'storeseeder' );
 	}
 
 	/**
 	 * Get REST base for the endpoint
 	 *
 	 * Returns the REST API base path for product generation endpoints.
-	 * Forms the endpoint URL: /wp-json/fluent-cart-fakerpress/v1/products/generate
+	 * Forms the endpoint URL: /wp-json/storeseeder/v1/products/generate
 	 *
 	 * @since 1.0.0
 	 *
@@ -93,24 +93,24 @@ class Product extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'product_type'    => array(
-				'description'       => __( 'Type of products to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Type of products to generate.', 'storeseeder' ),
 				'type'              => 'string',
 				'enum'              => array( 'simple', 'variable', 'grouped', 'external', 'digital', 'mixed' ),
 				'default'           => 'mixed',
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'price_range'     => array(
-				'description' => __( 'Price range for generated products.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Price range for generated products.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum price.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum price.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
 						'default'     => 10,
 					),
 					'max' => array(
-						'description' => __( 'Maximum price.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum price.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 1,
 						'default'     => 500,
@@ -118,16 +118,16 @@ class Product extends Controller {
 				),
 			),
 			'categories'      => array(
-				'description' => __( 'Product categories configuration.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Product categories configuration.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'create_new'      => array(
-						'description' => __( 'Create new categories if needed.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Create new categories if needed.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'max_per_product' => array(
-						'description' => __( 'Maximum categories per product.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum categories per product.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'maximum'     => 10,
@@ -136,16 +136,16 @@ class Product extends Controller {
 				),
 			),
 			'attributes'      => array(
-				'description' => __( 'Product attributes configuration.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Product attributes configuration.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'include_attributes' => array(
-						'description' => __( 'Include product attributes.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Include product attributes.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'variation_count'    => array(
-						'description' => __( 'Number of variations for variable products.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Number of variations for variable products.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'maximum'     => 20,
@@ -154,16 +154,16 @@ class Product extends Controller {
 				),
 			),
 			'inventory'       => array(
-				'description' => __( 'Inventory settings for generated products.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Inventory settings for generated products.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'manage_stock' => array(
-						'description' => __( 'Enable stock management.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Enable stock management.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'stock_range'  => array(
-						'description' => __( 'Stock quantity range.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Stock quantity range.', 'storeseeder' ),
 						'type'        => 'object',
 						'properties'  => array(
 							'min' => array(
@@ -181,16 +181,16 @@ class Product extends Controller {
 				),
 			),
 			'content_options' => array(
-				'description' => __( 'Product content generation options.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Product content generation options.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'include_images'     => array(
-						'description' => __( 'Generate product images.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Generate product images.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => false,
 					),
 					'description_length' => array(
-						'description' => __( 'Product description length.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Product description length.', 'storeseeder' ),
 						'type'        => 'string',
 						'enum'        => array( 'short', 'medium', 'long' ),
 						'default'     => 'medium',
@@ -210,7 +210,7 @@ class Product extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'products' => array(
-				'description' => __( 'Generated products data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated products data.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

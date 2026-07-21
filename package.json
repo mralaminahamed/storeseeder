@@ -1,5 +1,5 @@
 {
-  "name": "@mralaminahamed/fluent-cart-fakerpress",
+  "name": "@mralaminahamed/storeseeder",
   "version": "2.0.0",
   "description": "Comprehensive Fluent Cart test data generator with 10 specialized generators, real-time validation, advanced parameter configuration, WordPress admin color integration, and modern React Router v7 interface.",
   "scripts": {
@@ -24,13 +24,13 @@
   ],
   "author": "Al Amin Ahamed <me@alaminahamed.com> (https://github.com/mralaminahamed/)",
   "license": "GPL-2.0-or-later",
-  "homepage": "https://github.com/mralaminahamed/fluent-cart-fakerpress",
+  "homepage": "https://github.com/mralaminahamed/storeseeder",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mralaminahamed/fluent-cart-fakerpress.git"
+    "url": "https://github.com/mralaminahamed/storeseeder.git"
   },
   "bugs": {
-    "url": "https://github.com/mralaminahamed/fluent-cart-fakerpress/issues"
+    "url": "https://github.com/mralaminahamed/storeseeder/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",

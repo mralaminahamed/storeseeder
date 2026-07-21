@@ -11,11 +11,11 @@
  * current user is already verified by the permission_callback before
  * execute() is ever called.
  *
- * @package FluentCartFakerPress\MCP\Abilities
+ * @package StoreSeeder\MCP\Abilities
  * @since   2.1.0
  */
 
-namespace FluentCartFakerPress\Abstracts;
+namespace StoreSeeder\Abstracts;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -42,7 +42,7 @@ abstract class Ability {
 	 *
 	 * @since 1.0.0
 	 */
-	const REST_NAMESPACE = 'fluent-cart-fakerpress/v1';
+	const REST_NAMESPACE = 'storeseeder/v1';
 
 	/**
 	 * Entry point called by the Abilities API.
@@ -82,7 +82,7 @@ abstract class Ability {
 
 		if ( $response->is_error() ) {
 			$status  = $response->get_status();
-			$message = isset( $data['message'] ) ? (string) $data['message'] : __( 'Unknown REST error.', 'fluent-cart-fakerpress' ); // @phpstan-ignore isset.offset
+			$message = isset( $data['message'] ) ? (string) $data['message'] : __( 'Unknown REST error.', 'storeseeder' ); // @phpstan-ignore isset.offset
 			return new WP_Error( 'ecfp_rest_error', $message, array( 'status' => $status ) );
 		}
 

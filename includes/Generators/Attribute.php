@@ -3,10 +3,10 @@
  * Attribute Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -14,7 +14,7 @@ use FluentCart\App\Models\AttributeGroup;
 use FluentCart\App\Models\AttributeRelation;
 use FluentCart\App\Models\AttributeTerm;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -49,7 +49,7 @@ class Attribute extends Generator {
 	 * {@inheritDoc}
 	 */
 	public function get_supported_types(): array {
-		return array( 'attributes' => __( 'Product Attribute Groups with Terms', 'fluent-cart-fakerpress' ) );
+		return array( 'attributes' => __( 'Product Attribute Groups with Terms', 'storeseeder' ) );
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Attribute extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( AttributeGroup::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$set_names = array_keys( self::ATTRIBUTE_SETS );
@@ -83,7 +83,7 @@ class Attribute extends Generator {
 		);
 
 		if ( ! $group || ! $group->id ) {
-			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'storeseeder' ) );
 		}
 
 		$all_terms = self::ATTRIBUTE_SETS[ $base_name ];

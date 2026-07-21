@@ -3,13 +3,13 @@
  * Coupon Generator REST Controller
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Coupon as CouponGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Coupon as CouponGenerator;
 
 /**
  * Coupon Generator REST Controller
@@ -40,7 +40,7 @@ class Coupon extends Controller {
 	 * @return string The translated label for coupon resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Coupon', 'fluent-cart-fakerpress' );
+		return __( 'Coupon', 'storeseeder' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Coupon extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'discount_types'  => array(
-				'description'       => __( 'Types of discount coupons to generate', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Types of discount coupons to generate', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -85,7 +85,7 @@ class Coupon extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'discount_range'  => array(
-				'description' => __( 'Discount value range', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Discount value range', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min_percentage' => array(
@@ -113,7 +113,7 @@ class Coupon extends Controller {
 				),
 			),
 			'usage_limits'    => array(
-				'description' => __( 'Usage limitation settings', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Usage limitation settings', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'set_usage_limits'  => array(
@@ -135,7 +135,7 @@ class Coupon extends Controller {
 				),
 			),
 			'validity_period' => array(
-				'description' => __( 'Coupon validity period configuration', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Coupon validity period configuration', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min_days' => array(
@@ -153,7 +153,7 @@ class Coupon extends Controller {
 				),
 			),
 			'restrictions'    => array(
-				'description' => __( 'Coupon usage restrictions', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Coupon usage restrictions', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'minimum_spend'        => array(
@@ -187,7 +187,7 @@ class Coupon extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'coupons' => array(
-				'description' => __( 'Generated coupons data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated coupons data.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

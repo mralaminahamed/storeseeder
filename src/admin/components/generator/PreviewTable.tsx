@@ -105,7 +105,7 @@ export function PreviewTable({
           setError(
             err instanceof Error
               ? err.message
-              : __("Could not load preview.", "fluent-cart-fakerpress"),
+              : __("Could not load preview.", "storeseeder"),
           );
           setLoading(false);
         });
@@ -120,16 +120,16 @@ export function PreviewTable({
 
   // Columns rendered, plus an optional metadata column.
   const cols: PreviewColumn[] = meta
-    ? [...columns, { key: "_meta", label: __("Metadata", "fluent-cart-fakerpress") }]
+    ? [...columns, { key: "_meta", label: __("Metadata", "storeseeder") }]
     : columns;
 
   const seedLabel = seed.trim()
     ? sprintf(
         /* translators: %s: seed value */
-        __("seed: %s", "fluent-cart-fakerpress"),
+        __("seed: %s", "storeseeder"),
         seed.trim(),
       )
-    : __("seed: random", "fluent-cart-fakerpress");
+    : __("seed: random", "storeseeder");
 
   return (
     <div className="fp-table-card" data-testid="preview-table">
@@ -142,8 +142,8 @@ export function PreviewTable({
         ) : columns.length === 0 ? (
           <div className="fp-preview-state">
             {loading
-              ? __("Loading preview…", "fluent-cart-fakerpress")
-              : __("No preview available.", "fluent-cart-fakerpress")}
+              ? __("Loading preview…", "storeseeder")
+              : __("No preview available.", "storeseeder")}
           </div>
         ) : (
           <table className="fp-table" style={loading ? { opacity: 0.55 } : undefined}>
@@ -180,7 +180,7 @@ export function PreviewTable({
         <span>
           {sprintf(
             /* translators: %1$s: visible row count, %2$s: total count */
-            __("Live preview · showing %1$s of %2$s", "fluent-cart-fakerpress"),
+            __("Live preview · showing %1$s of %2$s", "storeseeder"),
             visible.toLocaleString(),
             count.toLocaleString(),
           )}

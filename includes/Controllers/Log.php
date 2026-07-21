@@ -3,14 +3,14 @@
  * Log Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Log as LogGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Log as LogGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,7 +32,7 @@ class Log extends Controller {
 	 * {@inheritDoc}
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Log', 'fluent-cart-fakerpress' );
+		return __( 'Log', 'storeseeder' );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Log extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'log_types' => array(
-				'description'       => __( 'Severity types to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Severity types to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',

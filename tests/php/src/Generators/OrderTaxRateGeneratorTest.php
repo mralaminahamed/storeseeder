@@ -2,20 +2,20 @@
 /**
  * Test class for the Order_Tax_Rate generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Order_Tax_Rate;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Order_Tax_Rate;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order_Tax_Rate generator.
  *
- * @covers \FluentCartFakerPress\Generators\Order_Tax_Rate
+ * @covers \StoreSeeder\Generators\Order_Tax_Rate
  */
-class OrderTaxRateGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class OrderTaxRateGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

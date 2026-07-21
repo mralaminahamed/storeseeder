@@ -1,5 +1,5 @@
 {
-  "name": "mralaminahamed/fluent-cart-fakerpress",
+  "name": "mralaminahamed/storeseeder",
   "description": "Comprehensive Fluent Cart test data generator with 10 specialized generators, real-time validation, advanced parameter configuration, WordPress admin color integration, and modern React Router v7 interface.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
@@ -10,10 +10,10 @@
       "homepage": "https://github.com/mralaminahamed/"
     }
   ],
-  "homepage": "https://github.com/mralaminahamed/fluent-cart-fakerpress",
+  "homepage": "https://github.com/mralaminahamed/storeseeder",
   "support": {
-    "issues": "https://github.com/mralaminahamed/fluent-cart-fakerpress/issues",
-    "source": "https://github.com/mralaminahamed/fluent-cart-fakerpress"
+    "issues": "https://github.com/mralaminahamed/storeseeder/issues",
+    "source": "https://github.com/mralaminahamed/storeseeder"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
@@ -47,15 +47,15 @@
   },
   "autoload": {
     "classmap": [
-      "class-fluent-cart-fakerpress.php"
+      "class-storeseeder.php"
     ],
     "psr-4": {
-      "FluentCartFakerPress\\": "includes/"
+      "StoreSeeder\\": "includes/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "FluentCartFakerPress\\Tests\\": "tests/php/src/"
+      "StoreSeeder\\Tests\\": "tests/php/src/"
     }
   },
   "scripts": {
@@ -78,7 +78,7 @@
     "phpstan": "phpstan analyse --memory-limit 2G",
     "test": "phpunit",
     "test:coverage": "phpunit --coverage-html=tests/coverage/html",
-    "makepot": "wp i18n make-pot . languages/fluent-cart-fakerpress.pot --exclude=node_modules,vendor,drafts,docs,build,release,tests",
+    "makepot": "wp i18n make-pot . languages/storeseeder.pot --exclude=node_modules,vendor,drafts,docs,build,release,tests",
     "release": [
       "@lint",
       "@analyse",
@@ -87,8 +87,8 @@
       "@makepot",
       "mkdir -p release",
       "composer install --no-dev --optimize-autoloader",
-      "rsync -av --exclude-from=.distignore . release/fluent-cart-fakerpress/",
-      "cd release && zip -r fluent-cart-fakerpress.zip fluent-cart-fakerpress/",
+      "rsync -av --exclude-from=.distignore . release/storeseeder/",
+      "cd release && zip -r storeseeder.zip storeseeder/",
       "composer install"
     ],
     "zip:dev": [
@@ -97,11 +97,11 @@
       "@makepot",
       "composer update --no-dev",
       "mkdir -p release/dev",
-      "rsync -av --exclude='.*' --exclude='CLAUDE.md' --exclude='AGENTS.md' --exclude='node_modules' --exclude='release' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.log' . release/dev/fluent-cart-fakerpress/",
-      "cd release/dev && zip -r fluent-cart-fakerpress.zip fluent-cart-fakerpress/",
-      "rm -rf release/dev/fluent-cart-fakerpress/",
+      "rsync -av --exclude='.*' --exclude='CLAUDE.md' --exclude='AGENTS.md' --exclude='node_modules' --exclude='release' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.log' . release/dev/storeseeder/",
+      "cd release/dev && zip -r storeseeder.zip storeseeder/",
+      "rm -rf release/dev/storeseeder/",
       "composer install",
-      "echo 'Dev zip: release/dev/fluent-cart-fakerpress.zip'"
+      "echo 'Dev zip: release/dev/storeseeder.zip'"
     ],
     "format": "@phpcbf",
     "lint": "@phpcs",

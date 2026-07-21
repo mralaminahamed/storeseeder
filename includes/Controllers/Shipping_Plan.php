@@ -3,13 +3,13 @@
  * Shipping Plan REST Controller
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Shipping_Plan as ShippingPlanGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Shipping_Plan as ShippingPlanGenerator;
 
 /**
  * Shipping Plan REST Controller Class
@@ -40,7 +40,7 @@ class Shipping_Plan extends Controller {
 	 * @return string The translated label for shipping plan resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Shipping Plan', 'fluent-cart-fakerpress' );
+		return __( 'Shipping Plan', 'storeseeder' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Shipping_Plan extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'shipping_types'      => array(
-				'description'       => __( 'Types of shipping methods to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Types of shipping methods to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -93,17 +93,17 @@ class Shipping_Plan extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'cost_range'          => array(
-				'description' => __( 'Shipping cost range.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Shipping cost range.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum shipping cost.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum shipping cost.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
 						'default'     => 0,
 					),
 					'max' => array(
-						'description' => __( 'Maximum shipping cost.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum shipping cost.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
 						'default'     => 50,
@@ -111,7 +111,7 @@ class Shipping_Plan extends Controller {
 				),
 			),
 			'coverage_areas'      => array(
-				'description'       => __( 'Geographic coverage areas.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Geographic coverage areas.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -121,7 +121,7 @@ class Shipping_Plan extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'calculation_methods' => array(
-				'description'       => __( 'Shipping calculation methods.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Shipping calculation methods.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -131,17 +131,17 @@ class Shipping_Plan extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'delivery_timeframes' => array(
-				'description' => __( 'Delivery time ranges.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Delivery time ranges.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min_days' => array(
-						'description' => __( 'Minimum delivery days.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum delivery days.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'default'     => 1,
 					),
 					'max_days' => array(
-						'description' => __( 'Maximum delivery days.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum delivery days.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'default'     => 14,
@@ -161,7 +161,7 @@ class Shipping_Plan extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'shipping_plans' => array(
-				'description' => __( 'Generated shipping plans with methods and regions.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated shipping plans with methods and regions.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

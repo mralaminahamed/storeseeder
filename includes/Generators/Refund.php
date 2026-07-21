@@ -3,16 +3,16 @@
  * Refund Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Helpers\Status;
 use FluentCart\App\Models\OrderTransaction;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -50,8 +50,8 @@ class Refund extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'full'    => __( 'Full refund', 'fluent-cart-fakerpress' ),
-			'partial' => __( 'Partial refund', 'fluent-cart-fakerpress' ),
+			'full'    => __( 'Full refund', 'storeseeder' ),
+			'partial' => __( 'Partial refund', 'storeseeder' ),
 		);
 	}
 
@@ -67,7 +67,7 @@ class Refund extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( OrderTransaction::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart transaction model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart transaction model not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		// Base the refund on an existing successful charge so the integer-cents scale matches the schema.
@@ -78,7 +78,7 @@ class Refund extends Generator {
 			->first();
 
 		if ( ! $charge ) {
-			return new WP_Error( 'no_eligible_transaction', __( 'No successful charge transactions found for refund generation. Generate orders/transactions first.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'no_eligible_transaction', __( 'No successful charge transactions found for refund generation. Generate orders/transactions first.', 'storeseeder' ) );
 		}
 
 		$charge_total = (int) $charge->total; // Integer cents.
@@ -92,7 +92,7 @@ class Refund extends Generator {
 		}
 
 		if ( $amount <= 0 ) {
-			return new WP_Error( 'invalid_refund_amount', __( 'Computed refund amount is zero; source transaction has no value.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'invalid_refund_amount', __( 'Computed refund amount is zero; source transaction has no value.', 'storeseeder' ) );
 		}
 
 		$reason     = $this->get_faker()->randomElement( self::REASONS );
@@ -119,7 +119,7 @@ class Refund extends Generator {
 		);
 
 		if ( ! $refund || ! $refund->id ) {
-			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'storeseeder' ) );
 		}
 
 		return array(

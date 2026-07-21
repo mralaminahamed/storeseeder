@@ -2,17 +2,17 @@
 /**
  * Transaction Generator REST Controller
  *
- * Handles REST API endpoints for transaction data generation in Fluent Cart FakerPress.
+ * Handles REST API endpoints for transaction data generation in StoreSeeder.
  * Provides endpoints for generating payment transactions with various methods and statuses.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Transaction as TransactionGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Transaction as TransactionGenerator;
 
 /**
  * Transaction Generator REST Controller
@@ -22,7 +22,7 @@ use FluentCartFakerPress\Generators\Transaction as TransactionGenerator;
  * transaction statuses, amounts, and order associations.
  *
  * Endpoints:
- * - POST /wp-json/fluent-cart-fakerpress/v1/transactions/generate
+ * - POST /wp-json/storeseeder/v1/transactions/generate
  *
  * Features:
  * - Full transaction creation with Fluent Cart integration
@@ -55,14 +55,14 @@ class Transaction extends Controller {
 	 * @return string The translated label for transaction resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Transaction', 'fluent-cart-fakerpress' );
+		return __( 'Transaction', 'storeseeder' );
 	}
 
 	/**
 	 * Get REST base for the endpoint
 	 *
 	 * Returns the REST API base path for transaction generation endpoints.
-	 * Forms the endpoint URL: /wp-json/fluent-cart-fakerpress/v1/transactions/generate
+	 * Forms the endpoint URL: /wp-json/storeseeder/v1/transactions/generate
 	 *
 	 * @since 1.0.0
 	 *
@@ -93,7 +93,7 @@ class Transaction extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'payment_methods'          => array(
-				'description'       => __( 'Payment methods to generate transactions for.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Payment methods to generate transactions for.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -103,7 +103,7 @@ class Transaction extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'transaction_statuses'     => array(
-				'description'       => __( 'Transaction statuses to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Transaction statuses to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -113,17 +113,17 @@ class Transaction extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'amount_range'             => array(
-				'description' => __( 'Transaction amount range.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Transaction amount range.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum transaction amount.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum transaction amount.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0.01,
 						'default'     => 10,
 					),
 					'max' => array(
-						'description' => __( 'Maximum transaction amount.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum transaction amount.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0.01,
 						'default'     => 1000,
@@ -131,24 +131,24 @@ class Transaction extends Controller {
 				),
 			),
 			'include_refunds'          => array(
-				'description' => __( 'Include refund transactions.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include refund transactions.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'refund_percentage'        => array(
-				'description' => __( 'Percentage of transactions that should be refunds.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Percentage of transactions that should be refunds.', 'storeseeder' ),
 				'type'        => 'number',
 				'minimum'     => 0,
 				'maximum'     => 50,
 				'default'     => 5,
 			),
 			'include_gateway_metadata' => array(
-				'description' => __( 'Include payment gateway-specific metadata.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include payment gateway-specific metadata.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'associate_with_orders'    => array(
-				'description' => __( 'Associate transactions with existing orders.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Associate transactions with existing orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
@@ -165,7 +165,7 @@ class Transaction extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'transactions' => array(
-				'description' => __( 'Generated transactions with payment details and metadata.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated transactions with payment details and metadata.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

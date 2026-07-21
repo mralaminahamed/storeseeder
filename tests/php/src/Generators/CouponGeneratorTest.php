@@ -2,20 +2,20 @@
 /**
  * Test class for the Coupon generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Coupon;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Coupon;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Coupon generator.
  *
- * @covers \FluentCartFakerPress\Generators\Coupon
+ * @covers \StoreSeeder\Generators\Coupon
  */
-class CouponGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class CouponGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

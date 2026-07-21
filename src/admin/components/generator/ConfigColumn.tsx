@@ -56,7 +56,7 @@ export function ConfigColumn({
               className="fp-tag"
               style={{ marginTop: 6, display: "inline-block" }}
             >
-              {__("Popular", "fluent-cart-fakerpress")}
+              {__("Popular", "storeseeder")}
             </span>
           )}
         </div>
@@ -69,7 +69,7 @@ export function ConfigColumn({
       {depNote && (
         <div className="fp-dep">
           <Icon name="info" size={15} />
-          {__(depNote, "fluent-cart-fakerpress")}
+          {__(depNote, "storeseeder")}
         </div>
       )}
 
@@ -79,7 +79,7 @@ export function ConfigColumn({
           <p style={{ color: "var(--text-faint)", fontSize: 13 }}>
             {__(
               "No extra options — just set a count and generate.",
-              "fluent-cart-fakerpress",
+              "storeseeder",
             )}
           </p>
         </div>

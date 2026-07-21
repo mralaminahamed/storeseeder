@@ -2,20 +2,20 @@
 /**
  * Test class for the Shipping_Class REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Shipping_Class;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Shipping_Class;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Shipping_Class REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Shipping_Class
+ * @covers \StoreSeeder\Controllers\Shipping_Class
  */
-class ShippingClassRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class ShippingClassRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

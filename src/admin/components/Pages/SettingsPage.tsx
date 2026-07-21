@@ -13,13 +13,13 @@ import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
 
 const PLUGIN_VERSION = "2.0.0";
-const GITHUB_URL = "https://github.com/mralaminahamed/fluent-cart-fakerpress";
+const GITHUB_URL = "https://github.com/mralaminahamed/storeseeder";
 const SAMPLE_DATA_REPO_URL =
   "https://github.com/mralaminahamed/fluent-cart-fakerpress-sample-data";
 const SUPPORT_URL =
-  "https://github.com/mralaminahamed/fluent-cart-fakerpress/issues";
+  "https://github.com/mralaminahamed/storeseeder/issues";
 const DOCS_URL =
-  "https://github.com/mralaminahamed/fluent-cart-fakerpress#readme";
+  "https://github.com/mralaminahamed/storeseeder#readme";
 
 interface SyncStatus {
   exists: boolean;
@@ -92,9 +92,9 @@ export default function SettingsPage() {
     message: string;
   } | null>(null);
 
-  const nonce = window.fluentCartFakerpressApi?.restNonce ?? "";
-  const restUrl = window.fluentCartFakerpressApi?.restUrl ?? "";
-  const allLocales = window.fluentCartFakerpressApi?.locale?.allLocales ?? {};
+  const nonce = window.storeseederApi?.restNonce ?? "";
+  const restUrl = window.storeseederApi?.restUrl ?? "";
+  const allLocales = window.storeseederApi?.locale?.allLocales ?? {};
 
   // Map between faker code (stored) and human label (displayed).
   const codeToLabel = (code: string) => allLocales[code] ?? code;
@@ -150,7 +150,7 @@ export default function SettingsPage() {
           message:
             err instanceof Error
               ? err.message
-              : __("Sync failed.", "fluent-cart-fakerpress"),
+              : __("Sync failed.", "storeseeder"),
         });
       } finally {
         setSyncing(false);
@@ -161,7 +161,7 @@ export default function SettingsPage() {
 
   const handleClearData = () => {
     clearStats();
-    toast(__("Run history cleared", "fluent-cart-fakerpress"));
+    toast(__("Run history cleared", "storeseeder"));
   };
 
   const handleClearSettings = () => {
@@ -172,7 +172,7 @@ export default function SettingsPage() {
       return getSettings();
     })();
     setSettings(defaults);
-    toast(__("Settings reset to defaults", "fluent-cart-fakerpress"));
+    toast(__("Settings reset to defaults", "storeseeder"));
   };
 
   const formatDate = (iso: string | null) => {
@@ -194,11 +194,11 @@ export default function SettingsPage() {
     <div className="fp-page fp-enter">
       <div className="fp-page-head">
         <div>
-          <h1 className="fp-h1">{__("Settings", "fluent-cart-fakerpress")}</h1>
+          <h1 className="fp-h1">{__("Settings", "storeseeder")}</h1>
           <p className="fp-sub">
             {__(
               "Configure default behaviour for data generation.",
-              "fluent-cart-fakerpress",
+              "storeseeder",
             )}
           </p>
         </div>
@@ -208,21 +208,21 @@ export default function SettingsPage() {
         {/* Generation defaults */}
         <SetCard
           icon="sliders"
-          title={__("Generation defaults", "fluent-cart-fakerpress")}
+          title={__("Generation defaults", "storeseeder")}
           desc={__(
             "Pre-fill values on every generator page.",
-            "fluent-cart-fakerpress",
+            "storeseeder",
           )}
         >
           <div>
             <div className="fp-set-field">
               <label className="fp-set-label">
-                {__("Default count", "fluent-cart-fakerpress")}
+                {__("Default count", "storeseeder")}
               </label>
               <p className="fp-set-hint">
                 {__(
                   "Number of items pre-filled on every generator page.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
               <NumberField
@@ -236,12 +236,12 @@ export default function SettingsPage() {
 
             <div className="fp-set-field">
               <label className="fp-set-label">
-                {__("Default locale", "fluent-cart-fakerpress")}
+                {__("Default locale", "storeseeder")}
               </label>
               <p className="fp-set-hint">
                 {__(
                   "Faker locale used when generating data.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
               <FieldSelect
@@ -254,18 +254,18 @@ export default function SettingsPage() {
 
             <div className="fp-set-field">
               <label className="fp-set-label">
-                {__("Default seed", "fluent-cart-fakerpress")}
+                {__("Default seed", "storeseeder")}
               </label>
               <p className="fp-set-hint">
                 {__(
                   "Fixed seed for reproducible runs. Leave blank for random output.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
               <div style={{ maxWidth: 220 }}>
                 <TextField
                   value={settings.defaultSeed}
-                  ph={__("random (leave blank)", "fluent-cart-fakerpress")}
+                  ph={__("random (leave blank)", "storeseeder")}
                   onChange={(v) => set("defaultSeed", v)}
                 />
               </div>
@@ -277,19 +277,19 @@ export default function SettingsPage() {
                 onChange={(v) => set("defaultIncludeMeta", v)}
                 label={__(
                   "Include metadata by default",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
                 hint={__(
                   "Pre-check the Include Metadata toggle on every generator.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               />
             </div>
 
             <Button variant="primary" icon="check" onClick={handleSave}>
               {saved
-                ? __("Saved!", "fluent-cart-fakerpress")
-                : __("Save settings", "fluent-cart-fakerpress")}
+                ? __("Saved!", "storeseeder")
+                : __("Save settings", "storeseeder")}
             </Button>
           </div>
         </SetCard>
@@ -297,21 +297,21 @@ export default function SettingsPage() {
         {/* Run history */}
         <SetCard
           icon="history"
-          title={__("Run history", "fluent-cart-fakerpress")}
+          title={__("Run history", "storeseeder")}
           desc={__(
             "Control how much history is retained.",
-            "fluent-cart-fakerpress",
+            "storeseeder",
           )}
         >
           <div>
             <div className="fp-set-field">
               <label className="fp-set-label">
-                {__("Max runs per generator", "fluent-cart-fakerpress")}
+                {__("Max runs per generator", "storeseeder")}
               </label>
               <p className="fp-set-hint">
                 {__(
                   "How many recent runs to store in history per generator type.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
               <NumberField
@@ -327,8 +327,8 @@ export default function SettingsPage() {
             </div>
             <Button variant="primary" icon="check" onClick={handleSave}>
               {saved
-                ? __("Saved!", "fluent-cart-fakerpress")
-                : __("Save settings", "fluent-cart-fakerpress")}
+                ? __("Saved!", "storeseeder")
+                : __("Save settings", "storeseeder")}
             </Button>
           </div>
         </SetCard>
@@ -336,10 +336,10 @@ export default function SettingsPage() {
         {/* Sample data */}
         <SetCard
           icon="database"
-          title={__("Sample data", "fluent-cart-fakerpress")}
+          title={__("Sample data", "storeseeder")}
           desc={__(
             "Locale-specific reference data used by generators to produce realistic output.",
-            "fluent-cart-fakerpress",
+            "storeseeder",
           )}
         >
           <div>
@@ -359,18 +359,18 @@ export default function SettingsPage() {
               <div>
                 {statusLoading ? (
                   <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                    {__("Checking status…", "fluent-cart-fakerpress")}
+                    {__("Checking status…", "storeseeder")}
                   </div>
                 ) : syncStatus?.exists ? (
                   <>
                     <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                      {__("Sample data is synced", "fluent-cart-fakerpress")}
+                      {__("Sample data is synced", "storeseeder")}
                     </div>
                     {syncStatus.last_synced && (
                       <div style={{ fontSize: 12, color: "var(--text-3)" }}>
                         {sprintf(
                           /* translators: %s: date string */
-                          __("Last updated: %s", "fluent-cart-fakerpress"),
+                          __("Last updated: %s", "storeseeder"),
                           formatDate(syncStatus.last_synced),
                         )}
                       </div>
@@ -379,12 +379,12 @@ export default function SettingsPage() {
                 ) : (
                   <>
                     <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                      {__("Sample data not found", "fluent-cart-fakerpress")}
+                      {__("Sample data not found", "storeseeder")}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text-3)" }}>
                       {__(
                         "Sync to download locale-specific reference data.",
-                        "fluent-cart-fakerpress",
+                        "storeseeder",
                       )}
                     </div>
                   </>
@@ -412,8 +412,8 @@ export default function SettingsPage() {
                 disabled={syncing}
               >
                 {syncing
-                  ? __("Syncing…", "fluent-cart-fakerpress")
-                  : __("Sync now", "fluent-cart-fakerpress")}
+                  ? __("Syncing…", "storeseeder")
+                  : __("Sync now", "storeseeder")}
               </Button>
               <Button
                 variant="outline"
@@ -421,7 +421,7 @@ export default function SettingsPage() {
                 onClick={() => handleSync(true)}
                 disabled={syncing}
               >
-                {__("Force re-sync", "fluent-cart-fakerpress")}
+                {__("Force re-sync", "storeseeder")}
               </Button>
             </div>
 
@@ -434,7 +434,7 @@ export default function SettingsPage() {
                 <Button variant="ghost" size="sm" icon="external" type="button">
                   {__(
                     "View sample data repository",
-                    "fluent-cart-fakerpress",
+                    "storeseeder",
                   )}
                 </Button>
               </a>
@@ -445,27 +445,27 @@ export default function SettingsPage() {
         {/* About */}
         <SetCard
           icon="info"
-          title={__("About", "fluent-cart-fakerpress")}
+          title={__("About", "storeseeder")}
           desc={sprintf(
             /* translators: %s: version number */
-            __("Fluent Cart FakerPress · Version %s", "fluent-cart-fakerpress"),
+            __("StoreSeeder · Version %s", "storeseeder"),
             PLUGIN_VERSION,
           )}
         >
           <div style={{ display: "flex", gap: 8 }}>
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" icon="github" type="button">
-                {__("GitHub", "fluent-cart-fakerpress")}
+                {__("GitHub", "storeseeder")}
               </Button>
             </a>
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" icon="book" type="button">
-                {__("Documentation", "fluent-cart-fakerpress")}
+                {__("Documentation", "storeseeder")}
               </Button>
             </a>
             <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" icon="external" type="button">
-                {__("Support", "fluent-cart-fakerpress")}
+                {__("Support", "storeseeder")}
               </Button>
             </a>
           </div>
@@ -474,8 +474,8 @@ export default function SettingsPage() {
         {/* Danger zone */}
         <SetCard
           icon="trash"
-          title={__("Danger zone", "fluent-cart-fakerpress")}
-          desc={__("These actions cannot be undone.", "fluent-cart-fakerpress")}
+          title={__("Danger zone", "storeseeder")}
+          desc={__("These actions cannot be undone.", "storeseeder")}
           danger
         >
           <div>
@@ -484,14 +484,14 @@ export default function SettingsPage() {
                 <Button variant="danger" icon="trash" onClick={handleClearData}>
                   {__(
                     "Clear run history & stats",
-                    "fluent-cart-fakerpress",
+                    "storeseeder",
                   )}
                 </Button>
               </div>
               <p className="fp-set-hint" style={{ marginTop: 7 }}>
                 {__(
                   "Removes locally stored generation stats and run history. Does not delete data in your database.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
             </div>
@@ -504,14 +504,14 @@ export default function SettingsPage() {
                 >
                   {__(
                     "Reset settings to defaults",
-                    "fluent-cart-fakerpress",
+                    "storeseeder",
                   )}
                 </Button>
               </div>
               <p className="fp-set-hint" style={{ marginTop: 7 }}>
                 {__(
                   "Resets all settings to their default values.",
-                  "fluent-cart-fakerpress",
+                  "storeseeder",
                 )}
               </p>
             </div>

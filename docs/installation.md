@@ -2,7 +2,7 @@
 
 ## Requirements
 
-Before installing Fluent Cart FakerPress, ensure your system meets these requirements:
+Before installing StoreSeeder, ensure your system meets these requirements:
 
 - **WordPress**: 5.0 or higher
 - **PHP**: 7.4 or higher (8.0+ recommended)
@@ -23,13 +23,13 @@ Before installing Fluent Cart FakerPress, ensure your system meets these require
 
 1. **Download**: Get the plugin ZIP file
 2. **Extract**: Unzip the file on your local computer
-3. **Upload**: Upload the `fluent-cart-fakerpress` folder to `/wp-content/plugins/`
+3. **Upload**: Upload the `storeseeder` folder to `/wp-content/plugins/`
 4. **Activate**: Go to **Plugins** in WordPress admin and activate
 
 ### Method 3: Composer (For Developers)
 
 ```bash
-composer require mralaminahamed/fluent-cart-fakerpress
+composer require mralaminahamed/storeseeder
 ```
 
 ## Post-Installation Setup
@@ -39,11 +39,11 @@ composer require mralaminahamed/fluent-cart-fakerpress
 The plugin will automatically check for Fluent Cart. If missing:
 - Install and activate Fluent Cart plugin
 - Refresh the plugins page
-- Fluent Cart FakerPress should now be available
+- StoreSeeder should now be available
 
 ### 2. Initial Configuration
 
-1. Navigate to **FC FakerPress** in the WordPress admin menu
+1. Navigate to **StoreSeeder** in the WordPress admin menu
 2. The plugin will automatically download sample data on first visit
 3. Configure your preferences in the settings panel
 
@@ -93,8 +93,8 @@ define( 'WP_DEBUG_LOG', true );
 
 ### Getting Help
 
-- Check the [FAQ](https://github.com/mralaminahamed/fluent-cart-fakerpress/wiki/FAQ)
-- Review [GitHub Issues](https://github.com/mralaminahamed/fluent-cart-fakerpress/issues)
+- Check the [FAQ](https://github.com/mralaminahamed/storeseeder/wiki/FAQ)
+- Review [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
 - Contact support via the WordPress.org forums
 
 ## Updating

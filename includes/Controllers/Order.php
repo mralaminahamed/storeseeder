@@ -2,17 +2,17 @@
 /**
  * Order Generator REST Controller
  *
- * Handles REST API endpoints for order data generation in Fluent Cart FakerPress.
+ * Handles REST API endpoints for order data generation in StoreSeeder.
  * Provides endpoints for generating orders with customer data, items, and payments.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Order as OrderGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Order as OrderGenerator;
 
 /**
  * Order Generator REST Controller
@@ -22,7 +22,7 @@ use FluentCartFakerPress\Generators\Order as OrderGenerator;
  * payments, shipping, and order status through the REST API.
  *
  * Endpoints:
- * - POST /wp-json/fluent-cart-fakerpress/v1/orders/generate
+ * - POST /wp-json/storeseeder/v1/orders/generate
  *
  * Features:
  * - Full order creation with Fluent Cart integration
@@ -55,14 +55,14 @@ class Order extends Controller {
 	 * @return string The translated label for order resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Order', 'fluent-cart-fakerpress' );
+		return __( 'Order', 'storeseeder' );
 	}
 
 	/**
 	 * Get REST base for the endpoint
 	 *
 	 * Returns the REST API base path for order generation endpoints.
-	 * Forms the endpoint URL: /wp-json/fluent-cart-fakerpress/v1/orders/generate
+	 * Forms the endpoint URL: /wp-json/storeseeder/v1/orders/generate
 	 *
 	 * @since 1.0.0
 	 *
@@ -93,7 +93,7 @@ class Order extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'order_status'      => array(
-				'description'       => __( 'Order status for generated orders.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Order status for generated orders.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -103,7 +103,7 @@ class Order extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'payment_methods'   => array(
-				'description' => __( 'Payment methods to use for orders.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Payment methods to use for orders.', 'storeseeder' ),
 				'type'        => 'array',
 				'items'       => array(
 					'type' => 'string',
@@ -112,17 +112,17 @@ class Order extends Controller {
 				'default'     => array( 'stripe', 'paypal', 'cod' ),
 			),
 			'order_value_range' => array(
-				'description' => __( 'Order total value range.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Order total value range.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum order value.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum order value.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 1,
 						'default'     => 10,
 					),
 					'max' => array(
-						'description' => __( 'Maximum order value.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum order value.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 1,
 						'default'     => 1000,
@@ -130,12 +130,12 @@ class Order extends Controller {
 				),
 			),
 			'include_customer'  => array(
-				'description' => __( 'Include customer data with orders.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include customer data with orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'items_per_order'   => array(
-				'description' => __( 'Number of items per order range.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Number of items per order range.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
@@ -153,12 +153,12 @@ class Order extends Controller {
 				),
 			),
 			'include_shipping'  => array(
-				'description' => __( 'Include shipping costs in orders.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include shipping costs in orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'include_tax'       => array(
-				'description' => __( 'Include tax calculations in orders.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include tax calculations in orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
@@ -175,7 +175,7 @@ class Order extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'orders' => array(
-				'description' => __( 'Generated orders data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated orders data.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

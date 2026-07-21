@@ -3,14 +3,14 @@
  * Attribute Generator REST Controller.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Abstracts\Generator;
-use FluentCartFakerPress\Generators\Attribute as AttributeGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Abstracts\Generator;
+use StoreSeeder\Generators\Attribute as AttributeGenerator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,7 +32,7 @@ class Attribute extends Controller {
 	 * {@inheritDoc}
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Attribute', 'fluent-cart-fakerpress' );
+		return __( 'Attribute', 'storeseeder' );
 	}
 
 	/**

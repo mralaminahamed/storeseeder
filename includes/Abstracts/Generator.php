@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract Generator Class for Fluent Cart FakerPress
+ * Abstract Generator Class for StoreSeeder
  *
  * Base class providing common functionality for all data generators in the plugin.
  * Implements the Template Method pattern for consistent generation workflows across
@@ -8,10 +8,10 @@
  * WordPress hooks for extensibility.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Abstracts
+ * @package StoreSeeder\Abstracts
  */
 
-namespace FluentCartFakerPress\Abstracts;
+namespace StoreSeeder\Abstracts;
 
 use Exception;
 use Faker\Factory;
@@ -23,7 +23,7 @@ use wpdb;
 /**
  * Abstract Generator Class
  *
- * Provides the foundation for all data generators in Fluent Cart FakerPress.
+ * Provides the foundation for all data generators in StoreSeeder.
  * Implements common functionality including FakerPHP integration, WordPress
  * database access, logging, validation, and the core generation workflow.
  * Uses the Template Method pattern to ensure consistent behavior across all generators.
@@ -246,7 +246,7 @@ abstract class Generator {
 		 *
 		 * @param array<string, mixed> $generation_params Current generation parameters.
 		 */
-		$this->generation_params = apply_filters( "fluent_cart_fakerpress_generation_params_{$resource_type}", $this->generation_params );
+		$this->generation_params = apply_filters( "storeseeder_generation_params_{$resource_type}", $this->generation_params );
 
 		// Apply seed for reproducibility if provided.
 		$seed = $this->generation_params['seed'] ?? null;
@@ -267,9 +267,9 @@ abstract class Generator {
 				 * such as logging, validation, or setup operations.
 				 *
 				 * @since 1.0.0
-				 * @hook  fluent_cart_fakerpress_before_generate_single_item_{$resource_type}
+				 * @hook  storeseeder_before_generate_single_item_{$resource_type}
 				 */
-				do_action( "fluent_cart_fakerpress_before_generate_single_item_{$resource_type}" );
+				do_action( "storeseeder_before_generate_single_item_{$resource_type}" );
 
 				try {
 					$item_result = $this->generate_single_item();
@@ -288,12 +288,12 @@ abstract class Generator {
 					 * or additional processing.
 					 *
 					 * @since 1.0.0
-					 * @hook  fluent_cart_fakerpress_generated_item_{$resource_type}
+					 * @hook  storeseeder_generated_item_{$resource_type}
 					 *
 					 * @param array<string, mixed>|WP_Error $item_result The generated item result.
 					 * @param int                           $i           The current item index in the generation loop.
 					 */
-					$item_result = apply_filters( "fluent_cart_fakerpress_generated_item_{$resource_type}", $item_result, $i );
+					$item_result = apply_filters( "storeseeder_generated_item_{$resource_type}", $item_result, $i );
 
 					if ( $item_result && ! is_wp_error( $item_result ) ) {
 						$results[] = $item_result;
@@ -306,12 +306,12 @@ abstract class Generator {
 					 * such as cleanup, logging, or triggering related processes.
 					 *
 					 * @since 1.0.0
-					 * @hook  fluent_cart_fakerpress_after_generate_single_item_{$resource_type}
+					 * @hook  storeseeder_after_generate_single_item_{$resource_type}
 					 *
 					 * @param array<string, mixed>|WP_Error $item_result The generated item result.
 					 * @param int                           $i           The current item index in the generation loop.
 					 */
-					do_action( "fluent_cart_fakerpress_after_generate_single_item_{$resource_type}", $item_result, $i );
+					do_action( "storeseeder_after_generate_single_item_{$resource_type}", $item_result, $i );
 				} catch ( Exception $e ) {
 					$this->log( "Per-item exception: {$e->getMessage()}", 'error' );
 					$this->generation_errors[] = $e->getMessage();
@@ -326,12 +326,12 @@ abstract class Generator {
 			 * generated, such as cache clearing, search index updates, or notification sending.
 			 *
 			 * @since 1.0.0
-			 * @hook  fluent_cart_fakerpress_after_batch_generate_{$resource_type}
+			 * @hook  storeseeder_after_batch_generate_{$resource_type}
 			 *
 			 * @param array<int, mixed> $results All successfully generated items in the batch.
 			 * @param int               $count   Total number of items attempted to generate.
 			 */
-			do_action( "fluent_cart_fakerpress_after_batch_generate_{$resource_type}", $results, $count );
+			do_action( "storeseeder_after_batch_generate_{$resource_type}", $results, $count );
 
 			return $results;
 		} catch ( Exception $e ) {
@@ -340,7 +340,7 @@ abstract class Generator {
 				'generation_failed',
 				sprintf(
 				/* translators: %s: Error message */
-					__( 'Generation failed: %s', 'fluent-cart-fakerpress' ),
+					__( 'Generation failed: %s', 'storeseeder' ),
 					$e->getMessage()
 				)
 			);
@@ -423,7 +423,7 @@ abstract class Generator {
 		if ( $count <= 0 ) {
 			return new WP_Error(
 				'invalid_count',
-				__( 'Count must be a positive number.', 'fluent-cart-fakerpress' )
+				__( 'Count must be a positive number.', 'storeseeder' )
 			);
 		}
 
@@ -432,7 +432,7 @@ abstract class Generator {
 				'count_too_large',
 				sprintf(
 				/* translators: %d: Maximum batch size */
-					__( 'Count cannot exceed %d items per batch.', 'fluent-cart-fakerpress' ),
+					__( 'Count cannot exceed %d items per batch.', 'storeseeder' ),
 					$this->max_batch_size
 				)
 			);
@@ -542,7 +542,7 @@ abstract class Generator {
 		if ( function_exists( 'error_log' ) && WP_DEBUG_LOG ) {
 			$context['resource_type'] = $this->get_resource_type();
 			$log_message              = sprintf(
-				'[Fluent Cart FakerPress] [%s] [%s] %s %s',
+				'[StoreSeeder] [%s] [%s] %s %s',
 				strtoupper( $level ),
 				$this->get_resource_type(),
 				$message,

@@ -2,20 +2,20 @@
 /**
  * MCP Ability: Generate Attributes
  *
- * @package FluentCartFakerPress\MCP\Abilities
+ * @package StoreSeeder\MCP\Abilities
  * @since   2.1.0
  */
 
-namespace FluentCartFakerPress\MCP\Abilities;
+namespace StoreSeeder\MCP\Abilities;
 
-use FluentCartFakerPress\Abstracts\Ability;
+use StoreSeeder\Abstracts\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Generate_Attributes
  *
- * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/attributes/generate
+ * Maps to REST endpoint: POST /storeseeder/v1/attributes/generate
  *
  * @since 1.0.0
  */

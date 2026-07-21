@@ -2,20 +2,20 @@
 /**
  * Test class for the Product_Download REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Product_Download;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Product_Download;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Download REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Product_Download
+ * @covers \StoreSeeder\Controllers\Product_Download
  */
-class ProductDownloadRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class ProductDownloadRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

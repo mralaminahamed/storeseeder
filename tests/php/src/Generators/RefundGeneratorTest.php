@@ -2,20 +2,20 @@
 /**
  * Test class for the Refund generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Refund;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Refund;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Refund generator.
  *
- * @covers \FluentCartFakerPress\Generators\Refund
+ * @covers \StoreSeeder\Generators\Refund
  */
-class RefundGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class RefundGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

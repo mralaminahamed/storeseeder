@@ -1,9 +1,9 @@
-# Design: Admin UI Parity — Port `easycommerce-fakerpress` SPA into `fluent-cart-fakerpress`
+# Design: Admin UI Parity — Port `easycommerce-fakerpress` SPA into `storeseeder`
 
 **Date:** 2026-06-25
 **Status:** Approved (design), pending spec review
 **Reference plugin:** `easycommerce-fakerpress` (the "ref")
-**Target plugin:** `fluent-cart-fakerpress`
+**Target plugin:** `storeseeder`
 
 ## Goal
 
@@ -41,13 +41,13 @@ New (3, add): **Attribute**, **Refund**, **Log**.
 | Refund | `Refund` | `FluentCart\App\Models\OrderTransaction` with `transaction_type = Status::TRANSACTION_TYPE_REFUND` ('refund') against an existing `Order` | Full + partial refunds; status via `Status` helper. |
 | Log | `Log` | `FluentCart\App\Models\Activity` | Activity entries across orders/products/customers/coupons. |
 
-Each new generator extends `FluentCartFakerPress\Abstracts\Generator`, follows the
+Each new generator extends `StoreSeeder\Abstracts\Generator`, follows the
 existing generator pattern (see `includes/Generators/Product.php`):
 `get_resource_type()`, `get_supported_types()`, `get_description()`,
 `generate_single_item()`. Each gets a matching controller extending
-`FluentCartFakerPress\Abstracts\Controller`, registered in
-`register_rest_routes()` in `class-fluent-cart-fakerpress.php`. REST namespace stays
-`fluent-cart-fakerpress/v1/`.
+`StoreSeeder\Abstracts\Controller`, registered in
+`register_rest_routes()` in `class-storeseeder.php`. REST namespace stays
+`storeseeder/v1/`.
 
 ## Frontend architecture (port of ref `src/admin/`)
 
@@ -56,7 +56,7 @@ auto-derived from a JSON-schema-like `parameterConfig` in `lib/generators.ts`.
 
 ```
 src/admin/
-  index.tsx                      entry → mounts <App/> on #fluent-cart-fakerpress-root
+  index.tsx                      entry → mounts <App/> on #storeseeder-root
   styles.css, components.css
   components/
     App.tsx                      createHashRouter + provider stack
@@ -86,18 +86,18 @@ existing shadcn set; keep `cn`/`utils` helpers consolidated to match ref.
 
 | Concern | Ref value | Target value |
 |---------|-----------|--------------|
-| Localized JS data var | `easycommerceFakerpressApi` | `fluentCartFakerpressApi` |
-| Root DOM id | `easycommerce-fakerpress-root` | `fluent-cart-fakerpress-root` (matches PHP `render_admin_page`) |
-| Text domain | `easycommerce-fakerpress` | `fluent-cart-fakerpress` |
-| REST base | `easycommerce-fakerpress/v1/` | `fluent-cart-fakerpress/v1/` |
+| Localized JS data var | `easycommerceFakerpressApi` | `storeseederApi` |
+| Root DOM id | `easycommerce-fakerpress-root` | `storeseeder-root` (matches PHP `render_admin_page`) |
+| Text domain | `easycommerce-fakerpress` | `storeseeder` |
+| REST base | `easycommerce-fakerpress/v1/` | `storeseeder/v1/` |
 | Webpack entry / bundle | `app` → `build/app.js` | `admin` → `build/admin.js` (target PHP enqueues `build/admin.js`/`.css`) |
-| PHP namespace | `EasyCommerceFakerPress\*` | `FluentCartFakerPress\*` |
-| MCP server id / NS | `easycommerce-fakerpress` / `EasyCommerceFakerPress\MCP` | `fluent-cart-fakerpress` / `FluentCartFakerPress\MCP` |
-| Plugins page author query | `mralaminahamed` (self-filter `easycommerce-fakerpress`) | `mralaminahamed` (self-filter `fluent-cart-fakerpress`) |
-| Settings URLs | `.../easycommerce-fakerpress` | `.../fluent-cart-fakerpress`, sample data `fluent-cart-fakerpress-sample-data` |
+| PHP namespace | `EasyCommerceFakerPress\*` | `StoreSeeder\*` |
+| MCP server id / NS | `easycommerce-fakerpress` / `EasyCommerceFakerPress\MCP` | `storeseeder` / `StoreSeeder\MCP` |
+| Plugins page author query | `mralaminahamed` (self-filter `easycommerce-fakerpress`) | `mralaminahamed` (self-filter `storeseeder`) |
+| Settings URLs | `.../easycommerce-fakerpress` | `.../storeseeder`, sample data `fluent-cart-fakerpress-sample-data` |
 
 `@/` path alias must resolve to `src/` (check `tsconfig.json` + webpack resolve).
-Strings: every `__()/sprintf()` second arg flips to `fluent-cart-fakerpress`.
+Strings: every `__()/sprintf()` second arg flips to `storeseeder`.
 
 ## `lib/generators.ts`
 
@@ -128,8 +128,8 @@ shared + Attribute, Refund, Log; remove Product_Review.
 
 1. `yarn build` — no TS/webpack errors; `build/admin.js` + `build/admin.css` emitted.
 2. PHP: `composer dump-autoload`; lint new classes (phpcs config exists).
-3. Browser smoke (Chrome DevTools MCP): open Fluent Cart FakerPress admin page →
-   SPA mounts on `#fluent-cart-fakerpress-root`; sidebar + home grid render; navigate
+3. Browser smoke (Chrome DevTools MCP): open StoreSeeder admin page →
+   SPA mounts on `#storeseeder-root`; sidebar + home grid render; navigate
    to a generator route; run a small batch (e.g. 2 products) → REST 200, toast success,
    preview/recent-activity updates.
 4. New generators: run Attribute, Refund, Log with count=1 each; confirm rows created

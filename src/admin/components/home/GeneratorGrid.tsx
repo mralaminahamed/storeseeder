@@ -10,9 +10,9 @@ interface GeneratorGridProps {
 }
 
 const CATEGORY_ORDER = [
-  __("Core", "fluent-cart-fakerpress"),
-  __("Advanced", "fluent-cart-fakerpress"),
-  __("Enhanced", "fluent-cart-fakerpress"),
+  __("Core", "storeseeder"),
+  __("Advanced", "storeseeder"),
+  __("Enhanced", "storeseeder"),
 ];
 
 export function GeneratorGrid({ counts }: GeneratorGridProps) {
@@ -33,7 +33,7 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
           <div key={category}>
             <div className="fp-group-head">
               <SectionLabel>
-                {category} {__("generators", "fluent-cart-fakerpress")}
+                {category} {__("generators", "storeseeder")}
               </SectionLabel>
               <div className="fp-group-line" />
             </div>
@@ -51,7 +51,7 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
                     </span>
                     {g.popular && (
                       <span className="fp-tag">
-                        {__("Popular", "fluent-cart-fakerpress")}
+                        {__("Popular", "storeseeder")}
                       </span>
                     )}
                   </div>
@@ -60,8 +60,8 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
                   <div className="fp-gen-foot">
                     <span className="fp-gen-gen">
                       {counts[g.route]
-                        ? `${counts[g.route]} ${__("generated", "fluent-cart-fakerpress")}`
-                        : __("Not run yet", "fluent-cart-fakerpress")}
+                        ? `${counts[g.route]} ${__("generated", "storeseeder")}`
+                        : __("Not run yet", "storeseeder")}
                     </span>
                     <Icon name="chevright" size={16} className="fp-gen-arrow" />
                   </div>

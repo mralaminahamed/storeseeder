@@ -1,15 +1,15 @@
 # Architecture Documentation
 
-Welcome to the comprehensive architecture guide for Fluent Cart FakerPress. This document provides detailed insights into the plugin's modern, enterprise-grade architecture designed for scalability, maintainability, and developer experience.
+Welcome to the comprehensive architecture guide for StoreSeeder. This document provides detailed insights into the plugin's modern, enterprise-grade architecture designed for scalability, maintainability, and developer experience.
 
 ## 🏗️ Modern Plugin Structure
 
-Fluent Cart FakerPress follows a clean, modular architecture that separates concerns while maintaining tight integration with WordPress and Fluent Cart standards.
+StoreSeeder follows a clean, modular architecture that separates concerns while maintaining tight integration with WordPress and Fluent Cart standards.
 
 ```
-fluent-cart-fakerpress/
-├── 📄 fluent-cart-fakerpress.php           # Main plugin file with WordPress headers
-├── 📄 class-fluent-cart-fakerpress.php     # Main plugin class with admin integration
+storeseeder/
+├── 📄 storeseeder.php           # Main plugin file with WordPress headers
+├── 📄 class-storeseeder.php     # Main plugin class with admin integration
 ├── 📁 includes/                            # PHP backend code
 │   ├── 📁 Abstracts/                       # Abstract base classes for consistency
 │   │   ├── 📄 Controller.php               # Base REST controller with validation
@@ -81,7 +81,7 @@ fluent-cart-fakerpress/
 
 ## 🔗 Deep Fluent Cart Integration
 
-Fluent Cart FakerPress is built as a native extension of the Fluent Cart ecosystem, ensuring seamless compatibility and data integrity.
+StoreSeeder is built as a native extension of the Fluent Cart ecosystem, ensuring seamless compatibility and data integrity.
 
 ### 🎯 Native Model Integration
 
@@ -116,7 +116,7 @@ The plugin leverages Fluent Cart's core data models directly:
 
 ## 🎨 Design Patterns & Best Practices
 
-Fluent Cart FakerPress implements proven design patterns to ensure maintainability, extensibility, and code quality.
+StoreSeeder implements proven design patterns to ensure maintainability, extensibility, and code quality.
 
 ### 📋 Abstract Base Classes
 
@@ -205,9 +205,9 @@ Configurable generation strategies for different scenarios:
 
 Event-driven architecture for extensibility:
 
-- **Generation Hooks**: `fluent_cart_fakerpress_before_generation`
-- **Progress Tracking**: `fluent_cart_fakerpress_generation_progress`
-- **Cleanup Hooks**: `fluent_cart_fakerpress_after_generation`
+- **Generation Hooks**: `storeseeder_before_generation`
+- **Progress Tracking**: `storeseeder_generation_progress`
+- **Cleanup Hooks**: `storeseeder_after_generation`
 
 ## ⚛️ Modern Frontend Architecture
 
@@ -215,7 +215,7 @@ The frontend is built with React 18 and React Router v7, providing a modern, mai
 
 ### 🚦 React Router v7 Implementation
 
-Fluent Cart FakerPress uses React Router v7's data router for optimal WordPress admin integration:
+StoreSeeder uses React Router v7's data router for optimal WordPress admin integration:
 
 #### Router Configuration
 
@@ -321,7 +321,7 @@ User Action → Page Component → Generator Component → REST API → PHP Cont
 
 ## ⚡ Performance Optimization
 
-Fluent Cart FakerPress is designed for high-performance data generation, even with large datasets and complex relationships.
+StoreSeeder is designed for high-performance data generation, even with large datasets and complex relationships.
 
 ### 📊 Batch Processing Architecture
 
