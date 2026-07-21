@@ -549,8 +549,10 @@ class StoreSeeder {
 				require_once ABSPATH . '/wp-admin/includes/file.php';
 				WP_Filesystem();
 			}
-			foreach ( array( 'products', 'customers' ) as $subdir ) {
-				$wp_filesystem->delete( $dir . '/' . $subdir, true );
+			if ( $wp_filesystem ) {
+				foreach ( array( 'products', 'customers' ) as $subdir ) {
+					$wp_filesystem->delete( $dir . '/' . $subdir, true );
+				}
 			}
 		}
 
