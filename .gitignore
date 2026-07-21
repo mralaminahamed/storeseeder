@@ -84,3 +84,7 @@ storeseeder-sample-data-fluent-cart/
 
 # Release build artifacts
 release/
+
+# Local submission helper docs (untracked; excluded from the zip via .distignore)
+/plugin-submission-review.md
+/submission-form.md
