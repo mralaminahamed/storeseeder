@@ -70,4 +70,45 @@ class SampleDataConsentTest extends StoreSeederUnitTestCase {
 		wp_set_current_user( $admin_id );
 		$this->assertTrue( $this->plugin->rest_permission_check() );
 	}
+
+	public function test_consent_defaults_to_empty(): void {
+		$this->assertSame( '', $this->plugin->get_sample_data_consent() );
+	}
+
+	public function test_set_consent_persists_granted(): void {
+		$this->plugin->set_sample_data_consent( 'granted' );
+		$this->assertSame( 'granted', $this->plugin->get_sample_data_consent() );
+	}
+
+	public function test_set_consent_ignores_invalid(): void {
+		$this->plugin->set_sample_data_consent( 'maybe' );
+		$this->assertSame( '', $this->plugin->get_sample_data_consent() );
+	}
+
+	public function test_status_reports_null_consent_when_undecided(): void {
+		$data = $this->plugin->rest_sample_data_status()->get_data();
+		$this->assertArrayHasKey( 'consent', $data );
+		$this->assertNull( $data['consent'] );
+	}
+
+	public function test_consent_route_records_declined(): void {
+		$request = new WP_REST_Request( 'POST', '/storeseeder/v1/download-sample/consent' );
+		$request->set_param( 'granted', false );
+		$response = $this->plugin->rest_set_sample_data_consent( $request );
+		$this->assertSame( 'declined', $this->plugin->get_sample_data_consent() );
+		$this->assertSame( 'declined', $response->get_data()['consent'] );
+	}
+
+	public function test_consent_route_records_granted(): void {
+		$request = new WP_REST_Request( 'POST', '/storeseeder/v1/download-sample/consent' );
+		$request->set_param( 'granted', true );
+		$response = $this->plugin->rest_set_sample_data_consent( $request );
+		$this->assertSame( 'granted', $this->plugin->get_sample_data_consent() );
+		$this->assertSame( 'granted', $response->get_data()['consent'] );
+	}
+
+	public function test_consent_route_is_registered(): void {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/storeseeder/v1/download-sample/consent', $routes );
+	}
 }
