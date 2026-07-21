@@ -1,18 +1,18 @@
 <?php
 /**
- * Order Tax Rate Generator Class for Fluent Cart FakerPress Plugin
+ * Order Tax Rate Generator Class for StoreSeeder Plugin
  *
  * @since      2.4.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderTaxRate as OrderTaxRateModel;
 use FluentCart\App\Models\TaxRate as TaxRateModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -62,7 +62,7 @@ class Order_Tax_Rate extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( OrderTaxRateModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$order = OrderModel::query()->inRandomOrder()->first();
@@ -70,7 +70,7 @@ class Order_Tax_Rate extends Generator {
 		if ( ! $order ) {
 			return new WP_Error(
 				'no_orders',
-				__( 'No orders were found. Generate orders before generating order tax lines.', 'fluent-cart-fakerpress' )
+				__( 'No orders were found. Generate orders before generating order tax lines.', 'storeseeder' )
 			);
 		}
 
@@ -79,7 +79,7 @@ class Order_Tax_Rate extends Generator {
 		if ( ! $tax_rate ) {
 			return new WP_Error(
 				'no_tax_rates',
-				__( 'No tax rates were found. Generate tax classes before generating order tax lines.', 'fluent-cart-fakerpress' )
+				__( 'No tax rates were found. Generate tax classes before generating order tax lines.', 'storeseeder' )
 			);
 		}
 
@@ -93,7 +93,7 @@ class Order_Tax_Rate extends Generator {
 		if ( $exists ) {
 			return new WP_Error(
 				'duplicate_order_tax_rate',
-				__( 'The drawn order already carries this tax rate. Try again.', 'fluent-cart-fakerpress' )
+				__( 'The drawn order already carries this tax rate. Try again.', 'storeseeder' )
 			);
 		}
 
@@ -101,7 +101,7 @@ class Order_Tax_Rate extends Generator {
 		$tax_line = $this->create_tax_line( $data );
 
 		if ( ! $tax_line ) {
-			return new WP_Error( 'order_tax_rate_creation_failed', __( 'Failed to create order tax line.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'order_tax_rate_creation_failed', __( 'Failed to create order tax line.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -117,13 +117,13 @@ class Order_Tax_Rate extends Generator {
 		 * Filters the order tax line generation result data.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_order_tax_rate_generation_result
+		 * @hook  storeseeder_order_tax_rate_generation_result
 		 *
 		 * @param array $result The generation result data.
 		 * @param int   $id     The created row ID.
 		 * @param array $data   The original data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_order_tax_rate_generation_result', $result, $tax_line->id, $data );
+		return apply_filters( 'storeseeder_order_tax_rate_generation_result', $result, $tax_line->id, $data );
 	}
 
 	/**

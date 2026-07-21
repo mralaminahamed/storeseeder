@@ -1,4 +1,4 @@
-# Agent Instructions for fluent-cart-fakerpress
+# Agent Instructions for storeseeder
 
 ## Reference Plugins
 
@@ -29,7 +29,7 @@ This plugin is based on and maintains compatibility with the following reference
 ### PHP
 
 - Follow WordPress coding standards (WPCS)
-- Use PSR-4 autoloading (`FluentCartFakerPress\` namespace)
+- Use PSR-4 autoloading (`StoreSeeder\` namespace)
 - PHP 7.4+ minimum, support up to current WordPress requirements
 - Class names: PascalCase (e.g., `ProductGenerator`)
 - Method/variable names: camelCase

@@ -2332,9 +2332,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mralaminahamed/fluent-cart-fakerpress@workspace:.":
+"@mralaminahamed/storeseeder@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@mralaminahamed/fluent-cart-fakerpress@workspace:."
+  resolution: "@mralaminahamed/storeseeder@workspace:."
   dependencies:
     "@babel/core": "npm:^7.28.5"
     "@heroicons/react": "npm:^2.2.0"

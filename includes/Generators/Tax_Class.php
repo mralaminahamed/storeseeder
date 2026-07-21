@@ -1,17 +1,17 @@
 <?php
 /**
- * Tax Class Generator Class for Fluent Cart FakerPress Plugin
+ * Tax Class Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\TaxClass as TaxClassModel;
 use FluentCart\App\Models\TaxRate as TaxRateModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -61,7 +61,7 @@ class Tax_Class extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$tax_data = $this->generate_tax_class_data();
@@ -72,7 +72,7 @@ class Tax_Class extends Generator {
 		}
 
 		if ( ! $tax_id ) {
-			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class.', 'storeseeder' ) );
 		}
 
 		// Create the geographic rate rows. Without them the tax class exists but
@@ -97,13 +97,13 @@ class Tax_Class extends Generator {
 		 * Allows developers to modify the returned tax class data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_tax_class_generation_result
+		 * @hook  storeseeder_tax_class_generation_result
 		 *
 		 * @param array $result    The tax class generation result data.
 		 * @param int   $tax_id    The created tax class ID.
 		 * @param array $tax_data  The original tax class data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_tax_class_generation_result', $result, $tax_id, $tax_data );
+		return apply_filters( 'storeseeder_tax_class_generation_result', $result, $tax_id, $tax_data );
 	}
 
 	/**
@@ -192,7 +192,7 @@ class Tax_Class extends Generator {
 	private function create_tax_class( array $data ) {
 		// Check if Fluent Cart TaxClass model is available.
 		if ( ! class_exists( TaxClassModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// Prepare tax class data for Fluent Cart TaxClass model.
@@ -216,7 +216,7 @@ class Tax_Class extends Generator {
 		}
 
 		if ( ! $tax_class ) {
-			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class using Fluent Cart model.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class using Fluent Cart model.', 'storeseeder' ) );
 		}
 
 		return $tax_class->id;

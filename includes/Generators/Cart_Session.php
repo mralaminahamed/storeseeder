@@ -1,18 +1,18 @@
 <?php
 /**
- * Cart Session Generator Class for Fluent Cart FakerPress Plugin
+ * Cart Session Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Cart as CartModel;
 use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -62,14 +62,14 @@ class Cart_Session extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart Cart model is available.
 		if ( ! class_exists( CartModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		$session_data = $this->generate_cart_session_data();
 		$cart         = $this->create_cart_session( $session_data );
 
 		if ( ! $cart ) {
-			return new WP_Error( 'cart_session_creation_failed', __( 'Failed to create cart session.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'cart_session_creation_failed', __( 'Failed to create cart session.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -90,13 +90,13 @@ class Cart_Session extends Generator {
 		 * Allows developers to modify the returned cart session data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_cart_session_generation_result
+		 * @hook  storeseeder_cart_session_generation_result
 		 *
 		 * @param array $result         The cart session generation result data.
 		 * @param int   $cart_id        The created cart ID.
 		 * @param array $session_data   The original cart session data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_cart_session_generation_result', $result, $cart->cart_hash, $session_data );
+		return apply_filters( 'storeseeder_cart_session_generation_result', $result, $cart->cart_hash, $session_data );
 	}
 
 	/**

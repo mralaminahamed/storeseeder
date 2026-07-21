@@ -2,20 +2,20 @@
 /**
  * Test class for the Order_Tax_Rate REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Order_Tax_Rate;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Order_Tax_Rate;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order_Tax_Rate REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Order_Tax_Rate
+ * @covers \StoreSeeder\Controllers\Order_Tax_Rate
  */
-class OrderTaxRateRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class OrderTaxRateRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

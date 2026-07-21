@@ -1,27 +1,27 @@
 <?php
 /**
- * Test class for the main Fluent Cart FakerPress plugin.
+ * Test class for the main StoreSeeder plugin.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests;
+namespace StoreSeeder\Tests;
 
-use FluentCart_FakerPress;
+use StoreSeeder;
 
 /**
- * Test class for the main Fluent Cart FakerPress plugin.
+ * Test class for the main StoreSeeder plugin.
  *
- * @covers \FluentCart_FakerPress
+ * @covers \StoreSeeder
  */
-class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
+class StoreSeederTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The plugin instance.
 	 *
-	 * @var FluentCart_FakerPress
+	 * @var StoreSeeder
 	 */
-	private FluentCart_FakerPress $plugin;
+	private StoreSeeder $plugin;
 
 	/**
 	 * Set up before each test.
@@ -30,7 +30,7 @@ class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
-		$this->plugin = fluent_cart_fakerpress();
+		$this->plugin = storeseeder();
 	}
 
 	/**
@@ -39,7 +39,7 @@ class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
 	 * @return void
 	 */
 	public function test_constants_defined(): void {
-		$this->assertTrue( defined( 'FLUENT_CART_FAKERPRESS_VERSION' ) );
+		$this->assertTrue( defined( 'STORESEEDER_VERSION' ) );
 	}
 
 	/**
@@ -48,8 +48,8 @@ class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
 	 * @return void
 	 */
 	public function test_instance_is_singleton(): void {
-		$this->assertInstanceOf( FluentCart_FakerPress::class, FluentCart_FakerPress::get_instance() );
-		$this->assertSame( FluentCart_FakerPress::get_instance(), FluentCart_FakerPress::get_instance() );
+		$this->assertInstanceOf( StoreSeeder::class, StoreSeeder::get_instance() );
+		$this->assertSame( StoreSeeder::get_instance(), StoreSeeder::get_instance() );
 	}
 
 	/**
@@ -58,7 +58,7 @@ class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
 	 * @return void
 	 */
 	public function test_helper_returns_instance(): void {
-		$this->assertSame( FluentCart_FakerPress::get_instance(), fluent_cart_fakerpress() );
+		$this->assertSame( StoreSeeder::get_instance(), storeseeder() );
 	}
 
 	/**
@@ -67,7 +67,7 @@ class FluentCartFakerPressTest extends FluentCartFakerPressUnitTestCase {
 	 * @return void
 	 */
 	public function test_version_matches_constant(): void {
-		$this->assertEquals( FLUENT_CART_FAKERPRESS_VERSION, $this->plugin->version );
+		$this->assertEquals( STORESEEDER_VERSION, $this->plugin->version );
 	}
 
 	/**

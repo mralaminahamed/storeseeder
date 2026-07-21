@@ -1,6 +1,6 @@
 # 🛠️ Development Guide
 
-Welcome to the Fluent Cart FakerPress v2.0.0 development guide! This comprehensive resource will help you contribute effectively to the project, now featuring complete TypeScript support and parameter schema alignment.
+Welcome to the StoreSeeder v1.0.0 development guide! This comprehensive resource will help you contribute effectively to the project, now featuring complete TypeScript support and parameter schema alignment.
 
 ## 🚀 Quick Development Setup
 
@@ -17,12 +17,12 @@ Welcome to the Fluent Cart FakerPress v2.0.0 development guide! This comprehensi
 
 ```bash
 # Clone and setup in one go
-git clone https://github.com/mralaminahamed/fluent-cart-fakerpress.git
-cd fluent-cart-fakerpress
+git clone https://github.com/mralaminahamed/storeseeder.git
+cd storeseeder
 composer install && npm install && npm run build
 ```
 
-### v2.0.0: TypeScript Migration
+### v1.0.0: TypeScript Migration
 
 **All React components have been migrated to TypeScript (.tsx) for better type safety and developer experience.**
 
@@ -106,7 +106,7 @@ phpunit
 
 ```php
 <?php
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 class MyNewGenerator extends Generator {
     protected function validate_dependencies(): bool {
@@ -139,7 +139,7 @@ class MyNewGenerator extends Generator {
 
 ```php
 <?php
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
 class MyNew extends Controller {
     protected function validate_request_params(WP_REST_Request $request): array {
@@ -152,7 +152,7 @@ class MyNew extends Controller {
         return [
             'success' => true,
             'data' => $data,
-            'message' => __('Items generated successfully', 'fluent-cart-fakerpress'),
+            'message' => __('Items generated successfully', 'storeseeder'),
         ];
     }
 
@@ -194,7 +194,7 @@ export default function MyNewGenerator() {
         setIsGenerating(true);
         try {
             const response = await apiFetch({
-                path: '/fluent-cart-fakerpress/v1/my-new',
+                path: '/storeseeder/v1/my-new',
                 method: 'POST',
                 data: params,
             });
@@ -212,14 +212,14 @@ export default function MyNewGenerator() {
     return (
         <div className="space-y-6">
             <h3 className="text-lg font-medium">
-                {__('My New Generator', 'fluent-cart-fakerpress')}
+                {__('My New Generator', 'storeseeder')}
             </h3>
 
             {/* Form controls */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        {__('Count', 'fluent-cart-fakerpress')}
+                        {__('Count', 'storeseeder')}
                     </label>
                     <input
                         type="number"
@@ -234,7 +234,7 @@ export default function MyNewGenerator() {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        {__('Type', 'fluent-cart-fakerpress')}
+                        {__('Type', 'storeseeder')}
                     </label>
                     <select
                         value={params.type}
@@ -245,10 +245,10 @@ export default function MyNewGenerator() {
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                         <option value="basic">
-                            {__('Basic', 'fluent-cart-fakerpress')}
+                            {__('Basic', 'storeseeder')}
                         </option>
                         <option value="advanced">
-                            {__('Advanced', 'fluent-cart-fakerpress')}
+                            {__('Advanced', 'storeseeder')}
                         </option>
                     </select>
                 </div>
@@ -267,10 +267,10 @@ export default function MyNewGenerator() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            {__('Generating...', 'fluent-cart-fakerpress')}
+                            {__('Generating...', 'storeseeder')}
                         </>
                     ) : (
-                        __('Generate Items', 'fluent-cart-fakerpress')
+                        __('Generate Items', 'storeseeder')
                     )}
                 </button>
             </div>
@@ -286,7 +286,7 @@ export default function MyNewGenerator() {
 ```php
 <?php
 use PHPUnit\Framework\TestCase;
-use FluentCartFakerPress\Generators\ProductGenerator;
+use StoreSeeder\Generators\ProductGenerator;
 
 class ProductGeneratorTest extends TestCase {
     private $generator;
@@ -318,7 +318,7 @@ public function test_rest_api_integration(): void {
     $admin_user = $this->create_admin_user();
     wp_set_current_user($admin_user);
 
-    $request = $this->create_request('POST', '/fluent-cart-fakerpress/v1/products', [
+    $request = $this->create_request('POST', '/storeseeder/v1/products', [
         'count' => 5,
         'product_type' => 'simple',
     ]);
@@ -421,8 +421,8 @@ define('WP_DEBUG', true);
 define('WP_DEBUG_LOG', true);
 
 // Check plugin activation
-if (!function_exists('fluent_cart_fakerpress')) {
-    error_log('Fluent Cart FakerPress not loaded');
+if (!function_exists('storeseeder')) {
+    error_log('StoreSeeder not loaded');
 }
 ```
 
@@ -430,7 +430,7 @@ if (!function_exists('fluent_cart_fakerpress')) {
 
 ```javascript
 // Enable API debugging in browser console
-localStorage.setItem('debug', 'fluent-cart-fakerpress:*');
+localStorage.setItem('debug', 'storeseeder:*');
 
 // Log API requests
 wp.apiFetch.use((options, next) => {

@@ -2,20 +2,20 @@
 /**
  * MCP Ability: Generate Product Downloads
  *
- * @package FluentCartFakerPress\MCP\Abilities
+ * @package StoreSeeder\MCP\Abilities
  * @since   2.4.0
  */
 
-namespace FluentCartFakerPress\MCP\Abilities;
+namespace StoreSeeder\MCP\Abilities;
 
-use FluentCartFakerPress\Abstracts\Ability;
+use StoreSeeder\Abstracts\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Generate_Product_Downloads
  *
- * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/product_downloads/generate
+ * Maps to REST endpoint: POST /storeseeder/v1/product_downloads/generate
  *
  * @since 1.0.0
  */

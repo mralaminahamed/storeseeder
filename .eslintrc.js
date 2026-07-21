@@ -13,7 +13,7 @@ module.exports = {
   },
   globals: {
     wp: "readonly",
-    fluentCartFakerpressApi: "readonly",
+    storeseederApi: "readonly",
     ajaxurl: "readonly",
     console: "readonly",
   },
@@ -44,7 +44,7 @@ module.exports = {
     "@wordpress/i18n-text-domain": [
       "error",
       {
-        allowedTextDomain: "fluent-cart-fakerpress",
+        allowedTextDomain: "storeseeder",
       },
     ],
     "@wordpress/i18n-translator-comments": "error",

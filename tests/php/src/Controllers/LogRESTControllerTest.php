@@ -2,20 +2,20 @@
 /**
  * Test class for the Log REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Log;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Log;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Log REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Log
+ * @covers \StoreSeeder\Controllers\Log
  */
-class LogRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class LogRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

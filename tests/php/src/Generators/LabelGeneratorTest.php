@@ -2,20 +2,20 @@
 /**
  * Test class for the Label generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Label;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Label;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Label generator.
  *
- * @covers \FluentCartFakerPress\Generators\Label
+ * @covers \StoreSeeder\Generators\Label
  */
-class LabelGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class LabelGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

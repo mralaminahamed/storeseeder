@@ -2,17 +2,17 @@
 /**
  * Product Variation Generator REST Controller
  *
- * Handles REST API endpoints for product variation data generation in Fluent Cart FakerPress.
+ * Handles REST API endpoints for product variation data generation in StoreSeeder.
  * Provides endpoints for generating product variations with attributes and pricing.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Product_Variation as ProductVariationGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Product_Variation as ProductVariationGenerator;
 
 /**
  * Product Variation Generator REST Controller
@@ -22,7 +22,7 @@ use FluentCartFakerPress\Generators\Product_Variation as ProductVariationGenerat
  * pricing variations, inventory, and variable product relationships.
  *
  * Endpoints:
- * - POST /wp-json/fluent-cart-fakerpress/v1/product-variations/generate
+ * - POST /wp-json/storeseeder/v1/product-variations/generate
  *
  * Features:
  * - Full product variation creation with Fluent Cart integration
@@ -55,14 +55,14 @@ class Product_Variation extends Controller {
 	 * @return string The translated label for product variation resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Product Variation', 'fluent-cart-fakerpress' );
+		return __( 'Product Variation', 'storeseeder' );
 	}
 
 	/**
 	 * Get REST base for the endpoint
 	 *
 	 * Returns the REST API base path for product variation generation endpoints.
-	 * Forms the endpoint URL: /wp-json/fluent-cart-fakerpress/v1/product-variations/generate
+	 * Forms the endpoint URL: /wp-json/storeseeder/v1/product-variations/generate
 	 *
 	 * @since 1.0.0
 	 *
@@ -93,7 +93,7 @@ class Product_Variation extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'variation_types'          => array(
-				'description'       => __( 'Types of product variations to generate.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Types of product variations to generate.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -103,18 +103,18 @@ class Product_Variation extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'attributes_per_product'   => array(
-				'description' => __( 'Number of attributes per variable product.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Number of attributes per variable product.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum attributes per product.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum attributes per product.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'maximum'     => 5,
 						'default'     => 1,
 					),
 					'max' => array(
-						'description' => __( 'Maximum attributes per product.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum attributes per product.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'maximum'     => 5,
@@ -123,18 +123,18 @@ class Product_Variation extends Controller {
 				),
 			),
 			'variations_per_attribute' => array(
-				'description' => __( 'Number of variations per attribute.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Number of variations per attribute.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum variations per attribute.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum variations per attribute.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 2,
 						'maximum'     => 10,
 						'default'     => 3,
 					),
 					'max' => array(
-						'description' => __( 'Maximum variations per attribute.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum variations per attribute.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 2,
 						'maximum'     => 20,
@@ -143,18 +143,18 @@ class Product_Variation extends Controller {
 				),
 			),
 			'price_variation_range'    => array(
-				'description' => __( 'Price variation range as percentage of base price.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Price variation range as percentage of base price.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min_percentage' => array(
-						'description' => __( 'Minimum price variation percentage.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum price variation percentage.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => -50,
 						'maximum'     => 0,
 						'default'     => -20,
 					),
 					'max_percentage' => array(
-						'description' => __( 'Maximum price variation percentage.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum price variation percentage.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
 						'maximum'     => 200,
@@ -163,12 +163,12 @@ class Product_Variation extends Controller {
 				),
 			),
 			'include_inventory'        => array(
-				'description' => __( 'Include inventory management for variations.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Include inventory management for variations.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
 			'generate_skus'            => array(
-				'description' => __( 'Generate unique SKUs for each variation.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generate unique SKUs for each variation.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
@@ -185,7 +185,7 @@ class Product_Variation extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'product_variations' => array(
-				'description' => __( 'Generated product variations with attributes and pricing.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated product variations with attributes and pricing.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,

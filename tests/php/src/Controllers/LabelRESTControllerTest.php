@@ -2,20 +2,20 @@
 /**
  * Test class for the Label REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Label;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Label;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Label REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Label
+ * @covers \StoreSeeder\Controllers\Label
  */
-class LabelRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class LabelRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

@@ -1,17 +1,17 @@
 <?php
 /**
- * Shipping Plan Generator Class for Fluent Cart FakerPress Plugin
+ * Shipping Plan Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\ShippingMethod as ShippingMethodModel;
 use FluentCart\App\Models\ShippingZone as ShippingZoneModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -61,14 +61,14 @@ class Shipping_Plan extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart ShippingMethod model is available.
 		if ( ! class_exists( ShippingMethodModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		$plan_data       = $this->generate_shipping_plan_data();
 		$shipping_method = $this->create_shipping_method( $plan_data );
 
 		if ( ! $shipping_method ) {
-			return new WP_Error( 'shipping_method_creation_failed', __( 'Failed to create shipping method.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'shipping_method_creation_failed', __( 'Failed to create shipping method.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -87,13 +87,13 @@ class Shipping_Plan extends Generator {
 		 * Allows developers to modify the returned shipping method data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_shipping_method_generation_result
+		 * @hook  storeseeder_shipping_method_generation_result
 		 *
 		 * @param array $result          The shipping method generation result data.
 		 * @param int   $method_id       The created shipping method ID.
 		 * @param array $plan_data       The original shipping method data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_shipping_method_generation_result', $result, $shipping_method->id, $plan_data );
+		return apply_filters( 'storeseeder_shipping_method_generation_result', $result, $shipping_method->id, $plan_data );
 	}
 
 	/**

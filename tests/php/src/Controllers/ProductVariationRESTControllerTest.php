@@ -2,20 +2,20 @@
 /**
  * Test class for the Product_Variation REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Product_Variation;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Product_Variation;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Variation REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Product_Variation
+ * @covers \StoreSeeder\Controllers\Product_Variation
  */
-class ProductVariationRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class ProductVariationRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

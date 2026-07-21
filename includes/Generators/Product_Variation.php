@@ -1,17 +1,17 @@
 <?php
 /**
- * Product Variation Generator Class for Fluent Cart FakerPress Plugin
+ * Product Variation Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\ProductDetail as ProductDetailModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -61,7 +61,7 @@ class Product_Variation extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		// A variation is a child of a product: post_id is a foreign key into
@@ -73,7 +73,7 @@ class Product_Variation extends Generator {
 		if ( null === $detail ) {
 			return new WP_Error(
 				'no_products',
-				__( 'No products were found. Generate products before generating variations.', 'fluent-cart-fakerpress' )
+				__( 'No products were found. Generate products before generating variations.', 'storeseeder' )
 			);
 		}
 
@@ -81,7 +81,7 @@ class Product_Variation extends Generator {
 		$variation      = $this->create_product_variation( $variation_data );
 
 		if ( ! $variation ) {
-			return new WP_Error( 'variation_creation_failed', __( 'Failed to create product variation.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'variation_creation_failed', __( 'Failed to create product variation.', 'storeseeder' ) );
 		}
 
 		// Keep the parent product's stored price range in step with its
@@ -106,13 +106,13 @@ class Product_Variation extends Generator {
 		 * Allows developers to modify the returned product variation data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_product_variation_generation_result
+		 * @hook  storeseeder_product_variation_generation_result
 		 *
 		 * @param array $result          The product variation generation result data.
 		 * @param int   $variation_id    The created product variation ID.
 		 * @param array $variation_data  The original product variation data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_product_variation_generation_result', $result, $variation->id, $variation_data );
+		return apply_filters( 'storeseeder_product_variation_generation_result', $result, $variation->id, $variation_data );
 	}
 
 	/**

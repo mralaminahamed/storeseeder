@@ -2,20 +2,20 @@
 /**
  * Test class for the Tax_Class REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Tax_Class;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Tax_Class;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Tax_Class REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Tax_Class
+ * @covers \StoreSeeder\Controllers\Tax_Class
  */
-class TaxClassRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class TaxClassRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

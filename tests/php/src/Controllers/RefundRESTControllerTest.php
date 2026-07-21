@@ -2,20 +2,20 @@
 /**
  * Test class for the Refund REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Refund;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Refund;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Refund REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Refund
+ * @covers \StoreSeeder\Controllers\Refund
  */
-class RefundRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class RefundRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

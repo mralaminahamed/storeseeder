@@ -2,20 +2,20 @@
 /**
  * Test class for the Shipping_Plan generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Shipping_Plan;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Shipping_Plan;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Shipping_Plan generator.
  *
- * @covers \FluentCartFakerPress\Generators\Shipping_Plan
+ * @covers \StoreSeeder\Generators\Shipping_Plan
  */
-class ShippingPlanGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class ShippingPlanGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

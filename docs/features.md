@@ -1,12 +1,12 @@
 # Features Overview
 
-Fluent Cart FakerPress provides comprehensive test data generation capabilities for Fluent Cart stores. This document outlines all available features and their benefits.
+StoreSeeder provides comprehensive test data generation capabilities for Fluent Cart stores. This document outlines all available features and their benefits.
 
 ## Core Features
 
 ### 🛍️ Smart Generators
 
-Generate realistic data for all major Fluent Cart entities (13 generators total):
+Generate realistic data for all major Fluent Cart entities (17 generators total):
 
 - **Products**: Simple and variable products with pricing, inventory, and attributes
 - **Customers**: Customer profiles with demographics and purchase history
@@ -84,9 +84,9 @@ Generate realistic data for all major Fluent Cart entities (13 generators total)
 ### 🔌 API Integration
 
 #### REST Endpoints
-- `POST /wp-json/fluent-cart-fakerpress/v1/products/generate`
-- `POST /wp-json/fluent-cart-fakerpress/v1/customers/generate`
-- `GET /wp-json/fluent-cart-fakerpress/v1/status`
+- `POST /wp-json/storeseeder/v1/products/generate`
+- `POST /wp-json/storeseeder/v1/customers/generate`
+- `GET /wp-json/storeseeder/v1/status`
 
 #### Webhooks
 - Generation completion notifications
@@ -98,13 +98,13 @@ Generate realistic data for all major Fluent Cart entities (13 generators total)
 #### Filters & Actions
 ```php
 // Modify generated product data
-add_filter( 'fluent_cart_fakerpress_product_data', 'customize_product_data' );
+add_filter( 'storeseeder_product_data', 'customize_product_data' );
 
 // Add custom generation parameters
-add_action( 'fluent_cart_fakerpress_before_generation', 'setup_custom_params' );
+add_action( 'storeseeder_before_generation', 'setup_custom_params' );
 
 // Customize validation rules
-add_filter( 'fluent_cart_fakerpress_validation_rules', 'custom_validation' );
+add_filter( 'storeseeder_validation_rules', 'custom_validation' );
 ```
 
 #### Template System

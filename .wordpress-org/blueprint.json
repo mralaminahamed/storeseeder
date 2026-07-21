@@ -1,9 +1,9 @@
 {
-  "name": "Fluent Cart FakerPress",
-  "slug": "fluent-cart-fakerpress",
+  "name": "StoreSeeder",
+  "slug": "storeseeder",
   "version": "1.0.0",
   "author": "Al Amin Ahamed",
-  "homepage": "https://github.com/mralaminahamed/fluent-cart-fakerpress",
+  "homepage": "https://github.com/mralaminahamed/storeseeder",
   "description": "Generate realistic test data for Fluent Cart stores",
   "assets": {
     "banner": "banner-1544x500.png",

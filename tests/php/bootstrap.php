@@ -1,14 +1,14 @@
 <?php
 /**
- * PHPUnit bootstrap file for Fluent Cart FakerPress
+ * PHPUnit bootstrap file for StoreSeeder
  */
 
 // Define plugin directories..
-define( 'TEST_FLUENT_CART_FAKERPRESS_DIR', dirname( __DIR__, 2 ) );
+define( 'TEST_STORESEEDER_DIR', dirname( __DIR__, 2 ) );
 define( 'TEST_FC_DIR', dirname( __DIR__, 3 ) . '/fluent-cart' );
 
 // Composer autoloader must be loaded before WP_PHPUNIT__DIR will be available.
-require_once TEST_FLUENT_CART_FAKERPRESS_DIR . '/vendor/autoload.php';
+require_once TEST_STORESEEDER_DIR . '/vendor/autoload.php';
 
 // Define WordPress test environment path
 $_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: getenv( 'WP_PHPUNIT__DIR' );
@@ -23,11 +23,11 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 }
 
 /**
- * Truncate Fluent Cart FakerPress tables for clean test runs
+ * Truncate StoreSeeder tables for clean test runs
  */
-function fluent_cart_fakerpress_truncate_table_data(): void {
+function storeseeder_truncate_table_data(): void {
 	$tables = array(
-		'fluent_cart_fakerpress_generated_data',
+		'storeseeder_generated_data',
 		// Add other tables as needed.
 	);
 
@@ -51,7 +51,7 @@ function _manually_load_plugin() {
 	require TEST_FC_DIR . '/fluent-cart.php';
 
 	// Load our plugin.
-	require TEST_FLUENT_CART_FAKERPRESS_DIR . '/fluent-cart-fakerpress.php';
+	require TEST_STORESEEDER_DIR . '/storeseeder.php';
 }
 
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
@@ -81,23 +81,23 @@ function install_fluent_cart() {
 }
 
 /**
- * Install Fluent Cart FakerPress for testing
+ * Install StoreSeeder for testing
  */
-function install_fluent_cart_fakerpress() {
-	echo 'Installing Fluent Cart FakerPress...' . PHP_EOL;
+function install_storeseeder() {
+	echo 'Installing StoreSeeder...' . PHP_EOL;
 
 	// Clean up existing tables.
-	fluent_cart_fakerpress_truncate_table_data();
+	storeseeder_truncate_table_data();
 
 	// Activate the plugin.
-	if ( function_exists( 'fluent_cart_fakerpress' ) ) {
-		fluent_cart_fakerpress()->activate();
+	if ( function_exists( 'storeseeder' ) ) {
+		storeseeder()->activate();
 	}
 }
 
 // Install dependencies and our plugin.
 tests_add_filter( 'setup_theme', 'install_fluent_cart' );
-tests_add_filter( 'setup_theme', 'install_fluent_cart_fakerpress' );
+tests_add_filter( 'setup_theme', 'install_storeseeder' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';

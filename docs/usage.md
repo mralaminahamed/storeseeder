@@ -2,14 +2,14 @@
 
 ## Getting Started
 
-Fluent Cart FakerPress provides an intuitive interface for generating realistic test data for your Fluent Cart store. This guide covers basic usage, advanced features, and best practices.
+StoreSeeder provides an intuitive interface for generating realistic test data for your Fluent Cart store. This guide covers basic usage, advanced features, and best practices.
 
 ## Admin Interface
 
 ### Accessing the Interface
 
 1. Log into your WordPress admin dashboard
-2. Navigate to **FC FakerPress** in the left sidebar
+2. Navigate to **StoreSeeder** in the left sidebar
 3. The main interface will load with tabbed navigation
 
 ### Interface Overview
@@ -75,7 +75,7 @@ Save frequently used configurations:
 All API requests require authentication:
 
 ```javascript
-const response = await fetch('/wp-json/fluent-cart-fakerpress/v1/products/generate', {
+const response = await fetch('/wp-json/storeseeder/v1/products/generate', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const response = await fetch('/wp-json/fluent-cart-fakerpress/v1/products/genera
 
 #### Products
 ```http
-POST /wp-json/fluent-cart-fakerpress/v1/products/generate
+POST /wp-json/storeseeder/v1/products/generate
 ```
 
 Parameters:
@@ -103,7 +103,7 @@ Parameters:
 
 #### Customers
 ```http
-POST /wp-json/fluent-cart-fakerpress/v1/customers/generate
+POST /wp-json/storeseeder/v1/customers/generate
 ```
 
 Parameters:
@@ -172,7 +172,7 @@ Enable debug logging:
 
 ```php
 // Add to wp-config.php
-define( 'FLUENT_CART_FAKERPRESS_DEBUG', true );
+define( 'STORESEEDER_DEBUG', true );
 ```
 
 Check logs in `/wp-content/debug.log` for detailed information.
@@ -207,6 +207,6 @@ await generateOrders({ count: 1000, batch_size: 50 });
 
 ## Support
 
-- **Documentation**: [GitHub Wiki](https://github.com/mralaminahamed/fluent-cart-fakerpress/wiki)
-- **Issues**: [GitHub Issues](https://github.com/mralaminahamed/fluent-cart-fakerpress/issues)
+- **Documentation**: [GitHub Wiki](https://github.com/mralaminahamed/storeseeder/wiki)
+- **Issues**: [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
 - **Forums**: WordPress.org support forums

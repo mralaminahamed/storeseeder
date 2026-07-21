@@ -2,20 +2,20 @@
 /**
  * Test class for the Product_Download generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Product_Download;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Product_Download;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Download generator.
  *
- * @covers \FluentCartFakerPress\Generators\Product_Download
+ * @covers \StoreSeeder\Generators\Product_Download
  */
-class ProductDownloadGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class ProductDownloadGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

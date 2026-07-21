@@ -2,20 +2,20 @@
 /**
  * Test class for the Coupon REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Coupon;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Coupon;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Coupon REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Coupon
+ * @covers \StoreSeeder\Controllers\Coupon
  */
-class CouponRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class CouponRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

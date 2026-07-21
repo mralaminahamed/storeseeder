@@ -1,13 +1,13 @@
 <?php
 /**
- * Order Generator Class for Fluent Cart FakerPress Plugin
+ * Order Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\AppliedCoupon as AppliedCouponModel;
 use FluentCart\App\Models\Coupon as CouponModel;
@@ -15,7 +15,7 @@ use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderAddress as OrderAddressModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -65,7 +65,7 @@ class Order extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$order_data = $this->generate_order_data();
@@ -76,7 +76,7 @@ class Order extends Generator {
 		if ( empty( $order_data['items'] ) ) {
 			return new WP_Error(
 				'no_products',
-				__( 'No published products with variations were found. Generate products before generating orders.', 'fluent-cart-fakerpress' )
+				__( 'No published products with variations were found. Generate products before generating orders.', 'storeseeder' )
 			);
 		}
 
@@ -86,7 +86,7 @@ class Order extends Generator {
 		if ( null === $order_data['customer_id'] ) {
 			return new WP_Error(
 				'no_customers',
-				__( 'No customers were found. Generate customers before generating orders.', 'fluent-cart-fakerpress' )
+				__( 'No customers were found. Generate customers before generating orders.', 'storeseeder' )
 			);
 		}
 
@@ -97,7 +97,7 @@ class Order extends Generator {
 		}
 
 		if ( ! $order_id ) {
-			return new WP_Error( 'order_creation_failed', __( 'Failed to create order.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'order_creation_failed', __( 'Failed to create order.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -117,13 +117,13 @@ class Order extends Generator {
 		 * Allows developers to modify the returned order data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_order_generation_result
+		 * @hook  storeseeder_order_generation_result
 		 *
 		 * @param array $result     The order generation result data.
 		 * @param int   $order_id   The created order ID.
 		 * @param array $order_data The original order data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_order_generation_result', $result, $order_id, $order_data );
+		return apply_filters( 'storeseeder_order_generation_result', $result, $order_id, $order_data );
 	}
 
 	/**
@@ -270,7 +270,7 @@ class Order extends Generator {
 	private function create_order( array $data ) {
 		// Check if Fluent Cart Order model is available.
 		if ( ! class_exists( OrderModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// Prepare order data for Fluent Cart Order model.
@@ -299,7 +299,7 @@ class Order extends Generator {
 		$order = OrderModel::query()->create( $order_data );
 
 		if ( ! $order ) {
-			return new WP_Error( 'order_creation_failed', __( 'Failed to create order using Fluent Cart model.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'order_creation_failed', __( 'Failed to create order using Fluent Cart model.', 'storeseeder' ) );
 		}
 
 		// Create order items if provided.

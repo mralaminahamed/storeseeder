@@ -3,15 +3,15 @@
  * Log (Activity) Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
 use FluentCart\App\Models\Activity;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 /**
@@ -74,10 +74,10 @@ class Log extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'info'    => __( 'Info', 'fluent-cart-fakerpress' ),
-			'warning' => __( 'Warning', 'fluent-cart-fakerpress' ),
-			'error'   => __( 'Error', 'fluent-cart-fakerpress' ),
-			'success' => __( 'Success', 'fluent-cart-fakerpress' ),
+			'info'    => __( 'Info', 'storeseeder' ),
+			'warning' => __( 'Warning', 'storeseeder' ),
+			'error'   => __( 'Error', 'storeseeder' ),
+			'success' => __( 'Success', 'storeseeder' ),
 		);
 	}
 
@@ -93,7 +93,7 @@ class Log extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( Activity::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$module_names = array_keys( self::MODULES );
@@ -122,7 +122,7 @@ class Log extends Generator {
 		);
 
 		if ( ! $activity || ! $activity->id ) {
-			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'storeseeder' ) );
 		}
 
 		return array(

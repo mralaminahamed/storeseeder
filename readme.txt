@@ -1,4 +1,4 @@
-=== Fluent Cart FakerPress ===
+=== StoreSeeder ===
 Contributors: mralaminahamed
 Tags: test data, dummy data, sample data, demo content, faker
 Requires at least: 6.5
@@ -13,7 +13,7 @@ Generate realistic Fluent Cart test data with 17 generators, a modern React admi
 
 == Description ==
 
-Fluent Cart FakerPress generates realistic test data for the Fluent Cart e-commerce platform. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
+StoreSeeder generates realistic test data for the Fluent Cart e-commerce platform. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
 All data is created through native Fluent Cart models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with Fluent Cart updates.
 
@@ -23,7 +23,7 @@ All data is created through native Fluent Cart models, so generated records resp
 * **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
 * **Live preview** — a read-only preview of real faker rows that refreshes as you change settings, without persisting anything.
 * **Schema-driven configuration** — each generator renders its own fields from a parameter schema: nested options, ranges, toggles, and intelligent defaults.
-* **REST API** — every generator is exposed at `fluent-cart-fakerpress/v1/<resource>/generate` for programmatic use.
+* **REST API** — every generator is exposed at `storeseeder/v1/<resource>/generate` for programmatic use.
 * **Optional MCP integration** — expose generators as AI tools via the WordPress Abilities API (see below).
 * **Extensible** — filters and actions cover the full generation lifecycle.
 
@@ -55,18 +55,18 @@ The plugin can optionally expose every generator as an MCP tool so AI clients (e
 
 = Automatic Installation =
 1. Go to **Plugins → Add New** in your WordPress admin.
-2. Search for "Fluent Cart FakerPress".
+2. Search for "StoreSeeder".
 3. Click **Install Now**, then **Activate**.
-4. Open the new **FC FakerPress** menu item.
+4. Open the new **StoreSeeder** menu item.
 
 = Manual Installation =
 1. Download the plugin ZIP.
-2. Upload it to `/wp-content/plugins/fluent-cart-fakerpress/`.
+2. Upload it to `/wp-content/plugins/storeseeder/`.
 3. Activate via the **Plugins** screen.
-4. Open the **FC FakerPress** menu.
+4. Open the **StoreSeeder** menu.
 
 = Development Setup =
-1. Clone: `git clone https://github.com/mralaminahamed/fluent-cart-fakerpress.git`
+1. Clone: `git clone https://github.com/mralaminahamed/storeseeder.git`
 2. Install dependencies: `composer install && yarn install`
 3. Build assets: `yarn build`
 4. Activate the plugin.
@@ -116,7 +116,7 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 * Initial release.
 * 17 generators — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs — all persisting through native Fluent Cart models.
 * Modern single-page React admin (React Router v7, Tailwind CSS v4) with live preview, command palette, and a batch queue.
-* REST API — every generator at `fluent-cart-fakerpress/v1/<resource>/generate`.
+* REST API — every generator at `storeseeder/v1/<resource>/generate`.
 * Optional MCP integration via the WordPress Abilities API + `mcp-adapter`.
 * Filters and actions across the generation lifecycle.
 
@@ -134,7 +134,7 @@ This plugin connects to two external services. Neither is contacted on activatio
 The Settings page offers an optional "Sample Data Sync" action that downloads locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic.
 
 Service: GitHub
-Endpoint: [https://github.com/mralaminahamed/fluent-cart-fakerpress-sample-data/archive/refs/heads/trunk.zip](https://github.com/mralaminahamed/fluent-cart-fakerpress-sample-data/archive/refs/heads/trunk.zip)
+Endpoint: [https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip](https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip)
 When data is sent: Only when an administrator clicks "Sync Sample Data" on the plugin Settings page, or when a generator requires sample data that has not been downloaded yet.
 Data sent: An unauthenticated HTTP GET request. No site, user, or store data is included — only the request itself (and the IP address and user agent inherent to any HTTP request).
 Terms of Service: [https://docs.github.com/en/site-policy/github-terms/github-terms-of-service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)
@@ -155,7 +155,7 @@ Privacy Policy: [https://wordpress.org/about/privacy/](https://wordpress.org/abo
 
 The minified JavaScript and CSS in `build/` is compiled from the TypeScript and CSS sources in `src/`, which are not included in the distributed plugin package. The complete, human-readable source is public:
 
-[github.com/mralaminahamed/fluent-cart-fakerpress](https://github.com/mralaminahamed/fluent-cart-fakerpress)
+[github.com/mralaminahamed/storeseeder](https://github.com/mralaminahamed/storeseeder)
 
 Build steps:
 
@@ -175,4 +175,4 @@ The plugin makes two outbound requests, both administrator-initiated and both ca
 
 **Contributing**
 
-Development happens on [GitHub](https://github.com/mralaminahamed/fluent-cart-fakerpress). Report bugs and request features on the [issue tracker](https://github.com/mralaminahamed/fluent-cart-fakerpress/issues), and read the [development guide](https://github.com/mralaminahamed/fluent-cart-fakerpress/blob/trunk/docs/development.md) before opening a pull request.
+Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Report bugs and request features on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues), and read the [development guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/development.md) before opening a pull request.

@@ -1,18 +1,18 @@
 <?php
 /**
- * Product Generator Class for Fluent Cart FakerPress Plugin
+ * Product Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Product as ProductModel;
 use FluentCart\App\Models\ProductDetail as ProductDetailModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -62,7 +62,7 @@ class Product extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$product_data = $this->generate_product_data();
@@ -73,7 +73,7 @@ class Product extends Generator {
 		}
 
 		if ( ! $product_id ) {
-			return new WP_Error( 'product_creation_failed', __( 'Failed to create product.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'product_creation_failed', __( 'Failed to create product.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -93,13 +93,13 @@ class Product extends Generator {
 		 * Allows developers to modify the returned product data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_product_generation_result
+		 * @hook  storeseeder_product_generation_result
 		 *
 		 * @param array $result       The product generation result data.
 		 * @param int   $product_id   The created product ID.
 		 * @param array $product_data The original product data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_product_generation_result', $result, $product_id, $product_data );
+		return apply_filters( 'storeseeder_product_generation_result', $result, $product_id, $product_data );
 	}
 
 	/**
@@ -160,7 +160,7 @@ class Product extends Generator {
 	private function create_product( array $data ) {
 		// Check if Fluent Cart Product model is available.
 		if ( ! class_exists( ProductModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// post_type is forced to the fluent-products CPT by Product::boot(), but

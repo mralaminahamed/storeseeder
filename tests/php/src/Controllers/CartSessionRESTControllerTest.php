@@ -2,20 +2,20 @@
 /**
  * Test class for the Cart_Session REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Cart_Session;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Cart_Session;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Cart_Session REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Cart_Session
+ * @covers \StoreSeeder\Controllers\Cart_Session
  */
-class CartSessionRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class CartSessionRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

@@ -2,10 +2,10 @@
 /**
  * Helper trait for WordPress REST API requests in tests.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\TestHelpers\Traits;
+namespace StoreSeeder\Tests\TestHelpers\Traits;
 
 use WP_REST_Request;
 

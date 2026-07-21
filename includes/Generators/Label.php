@@ -1,19 +1,19 @@
 <?php
 /**
- * Label Generator Class for Fluent Cart FakerPress Plugin
+ * Label Generator Class for StoreSeeder Plugin
  *
  * @since      2.4.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\Label as LabelModel;
 use FluentCart\App\Models\LabelRelationship as LabelRelationshipModel;
 use FluentCart\App\Models\Order as OrderModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -83,13 +83,13 @@ class Label extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( LabelModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Label model not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Label model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$label = $this->create_label();
 
 		if ( ! $label ) {
-			return new WP_Error( 'label_creation_failed', __( 'Failed to create label.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'label_creation_failed', __( 'Failed to create label.', 'storeseeder' ) );
 		}
 
 		$attached = $this->attach_label( (int) $label->id );
@@ -105,12 +105,12 @@ class Label extends Generator {
 		 * Filters the label generation result data.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_label_generation_result
+		 * @hook  storeseeder_label_generation_result
 		 *
 		 * @param array $result The label generation result data.
 		 * @param int   $id     The created label ID.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_label_generation_result', $result, $label->id );
+		return apply_filters( 'storeseeder_label_generation_result', $result, $label->id );
 	}
 
 	/**

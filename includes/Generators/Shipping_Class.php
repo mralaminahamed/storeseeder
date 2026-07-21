@@ -1,16 +1,16 @@
 <?php
 /**
- * Shipping Class Generator Class for Fluent Cart FakerPress Plugin
+ * Shipping Class Generator Class for StoreSeeder Plugin
  *
  * @since      2.4.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\ShippingClass as ShippingClassModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -78,7 +78,7 @@ class Shipping_Class extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( ShippingClassModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart ShippingClass model not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart ShippingClass model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$data = $this->generate_shipping_class_data();
@@ -86,7 +86,7 @@ class Shipping_Class extends Generator {
 		$shipping_class = $this->create_shipping_class( $data );
 
 		if ( ! $shipping_class ) {
-			return new WP_Error( 'shipping_class_creation_failed', __( 'Failed to create shipping class.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'shipping_class_creation_failed', __( 'Failed to create shipping class.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -103,13 +103,13 @@ class Shipping_Class extends Generator {
 		 * Filters the shipping class generation result data.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_shipping_class_generation_result
+		 * @hook  storeseeder_shipping_class_generation_result
 		 *
 		 * @param array $result The shipping class generation result data.
 		 * @param int   $id     The created shipping class ID.
 		 * @param array $data   The original data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_shipping_class_generation_result', $result, $shipping_class->id, $data );
+		return apply_filters( 'storeseeder_shipping_class_generation_result', $result, $shipping_class->id, $data );
 	}
 
 	/**

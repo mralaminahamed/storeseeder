@@ -2,20 +2,20 @@
 /**
  * Test class for the Subscription generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Subscription;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Subscription;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Subscription generator.
  *
- * @covers \FluentCartFakerPress\Generators\Subscription
+ * @covers \StoreSeeder\Generators\Subscription
  */
-class SubscriptionGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class SubscriptionGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

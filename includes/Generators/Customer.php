@@ -3,14 +3,14 @@
  * Customer Generator.
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Generators
+ * @package StoreSeeder\Generators
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\CustomerAddresses as CustomerAddressModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 use WP_User;
 
@@ -68,7 +68,7 @@ class Customer extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'customers' => __( 'Customer Profiles with Addresses and Metadata', 'fluent-cart-fakerpress' ),
+			'customers' => __( 'Customer Profiles with Addresses and Metadata', 'storeseeder' ),
 		);
 	}
 
@@ -78,7 +78,7 @@ class Customer extends Generator {
 	 * @return string Description
 	 */
 	public function get_description(): string {
-		return __( 'Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems.', 'fluent-cart-fakerpress' );
+		return __( 'Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems.', 'storeseeder' );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Customer extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart is active.
 		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		$first_name = $this->get_faker()->firstName();
@@ -111,7 +111,7 @@ class Customer extends Generator {
 		 * before the customer is created in the database.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_customer_data_before_create
+		 * @hook  storeseeder_customer_data_before_create
 		 *
 		 * @param array $customer_data {
 		 *     Customer data array.
@@ -126,7 +126,7 @@ class Customer extends Generator {
 		 * }
 		 */
 		$customer_data = apply_filters(
-			'fluent_cart_fakerpress_customer_data_before_create',
+			'storeseeder_customer_data_before_create',
 			array(
 				'first_name'       => $first_name,
 				'last_name'        => $last_name,
@@ -149,7 +149,7 @@ class Customer extends Generator {
 
 		// Check if user with this email already exists.
 		if ( email_exists( $email ) ) {
-			return new WP_Error( 'email_exists', __( 'A user with this email address already exists.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'email_exists', __( 'A user with this email address already exists.', 'storeseeder' ) );
 		}
 
 		// Create customer using Fluent Cart's customer creation.
@@ -171,7 +171,7 @@ class Customer extends Generator {
 		}
 
 		if ( ! $customer_id ) {
-			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -196,13 +196,13 @@ class Customer extends Generator {
 		 * Allows developers to modify the returned customer data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_customer_generation_result
+		 * @hook  storeseeder_customer_generation_result
 		 *
 		 * @param array $result        The customer generation result data.
 		 * @param int   $customer_id   The created customer ID.
 		 * @param array $customer_data The original customer data used for creation.
 		 */
-		$result = apply_filters( 'fluent_cart_fakerpress_customer_generation_result', $result, $customer_id, $customer_data );
+		$result = apply_filters( 'storeseeder_customer_generation_result', $result, $customer_id, $customer_data );
 
 		/**
 		 * Fires after a customer has been successfully created.
@@ -211,13 +211,13 @@ class Customer extends Generator {
 		 * such as adding custom metadata, triggering related processes, or logging.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_after_customer_created
+		 * @hook  storeseeder_after_customer_created
 		 *
 		 * @param int   $customer_id   The created customer ID.
 		 * @param array $result        The customer generation result data.
 		 * @param array $customer_data The original customer data used for creation.
 		 */
-		do_action( 'fluent_cart_fakerpress_after_customer_created', $customer_id, $result, $customer_data );
+		do_action( 'storeseeder_after_customer_created', $customer_id, $result, $customer_data );
 
 		return $result;
 	}
@@ -235,7 +235,7 @@ class Customer extends Generator {
 	private function create_fluent_cart_customer( array $user_data, array $billing_addr, array $shipping_addr, array $meta_data ) {
 		// Check if Fluent Cart Customer model is available.
 		if ( ! class_exists( CustomerModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// Prepare customer data for Fluent Cart Customer model.
@@ -258,7 +258,7 @@ class Customer extends Generator {
 		);
 
 		if ( ! $customer ) {
-			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart model.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart model.', 'storeseeder' ) );
 		}
 
 		// Optionally create WordPress user if requested.

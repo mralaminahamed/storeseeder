@@ -7,23 +7,20 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-21T07:55:37+00:00\n"
+"POT-Creation-Date: 2026-07-21T08:51:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.13.0-alpha-3eb2dd7\n"
-"X-Domain: fluent-cart-fakerpress\n"
+"X-Domain: storeseeder\n"
 
-#: class-fluent-cart-fakerpress.php:163
+#: class-storeseeder.php:163
+#: class-storeseeder.php:164
 #: includes/MCP/MCP_Server.php:87
 #: includes/MCP/MCP_Server.php:140
-msgid "Fluent Cart FakerPress"
+msgid "StoreSeeder"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:164
-msgid "FC FakerPress"
-msgstr ""
-
-#: class-fluent-cart-fakerpress.php:596
-msgid "Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active."
+#: class-storeseeder.php:597
+msgid "StoreSeeder requires Fluent Cart plugin to be installed and active."
 msgstr ""
 
 #: includes/Abstracts/Ability.php:85

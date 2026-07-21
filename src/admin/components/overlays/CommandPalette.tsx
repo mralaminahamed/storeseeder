@@ -29,9 +29,9 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   }, []);
 
   const items: CmdItem[] = [
-    { key: "dashboard", name: __("Overview", "fluent-cart-fakerpress"), grp: __("Pages", "fluent-cart-fakerpress"), ic: "dashboard", path: "/" },
-    { key: "settings", name: __("Settings", "fluent-cart-fakerpress"), grp: __("Pages", "fluent-cart-fakerpress"), ic: "settings", path: "/settings" },
-    { key: "plugins", name: __("Our Plugins", "fluent-cart-fakerpress"), grp: __("Pages", "fluent-cart-fakerpress"), ic: "plug", path: "/plugins" },
+    { key: "dashboard", name: __("Overview", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "dashboard", path: "/" },
+    { key: "settings", name: __("Settings", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "settings", path: "/settings" },
+    { key: "plugins", name: __("Our Plugins", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "plug", path: "/plugins" },
     ...generators.map((g) => ({
       key: `gen:${g.route}`,
       name: g.name,
@@ -96,7 +96,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
             className="fp-cmd-input"
             placeholder={__(
               "Search generators and pages…",
-              "fluent-cart-fakerpress",
+              "storeseeder",
             )}
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -106,7 +106,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
         <div className="fp-cmd-results">
           {filtered.length === 0 ? (
             <div className="fp-empty" style={{ padding: 28 }}>
-              {__("No matches", "fluent-cart-fakerpress")}
+              {__("No matches", "storeseeder")}
             </div>
           ) : (
             filtered.map((it, i) => {
@@ -133,11 +133,11 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
         <div className="fp-cmd-foot">
           <span>
             <span className="kbd-key">↑</span> <span className="kbd-key">↓</span>{" "}
-            {__("navigate", "fluent-cart-fakerpress")}
+            {__("navigate", "storeseeder")}
           </span>
           <span>
             <span className="kbd-key">↵</span>{" "}
-            {__("open", "fluent-cart-fakerpress")}
+            {__("open", "storeseeder")}
           </span>
         </div>
       </div>
@@ -147,5 +147,5 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
 
 /** Suffix a generator category with " generator" for the palette group label. */
 function sprintfGroup(category: string): string {
-  return `${category} ${__("generator", "fluent-cart-fakerpress")}`;
+  return `${category} ${__("generator", "storeseeder")}`;
 }

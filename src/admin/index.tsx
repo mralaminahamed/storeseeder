@@ -6,7 +6,7 @@ import './styles.css';
 import '@/admin/components.css';
 
 domReady( () => {
-	const container = document.getElementById( 'fluent-cart-fakerpress-root' )!;
+	const container = document.getElementById( 'storeseeder-root' )!;
 	if ( container ) {
 		const root = createRoot( container );
 		root.render( <App /> );

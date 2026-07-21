@@ -3,13 +3,13 @@
  * Product Download REST Controller
  *
  * @since   2.4.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Product_Download as ProductDownloadGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Product_Download as ProductDownloadGenerator;
 
 /**
  * Product Download REST Controller Class
@@ -36,7 +36,7 @@ class Product_Download extends Controller {
 	 * @return string The translated label for the resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Product Download', 'fluent-cart-fakerpress' );
+		return __( 'Product Download', 'storeseeder' );
 	}
 
 	/**

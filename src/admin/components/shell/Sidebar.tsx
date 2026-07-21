@@ -74,7 +74,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
         </div>
         {!collapsed && (
           <div className="fp-brand-text">
-            <div className="fp-brand-name">FakerPress</div>
+            <div className="fp-brand-name">StoreSeeder</div>
             <div className="fp-brand-sub">Fluent Cart</div>
           </div>
         )}

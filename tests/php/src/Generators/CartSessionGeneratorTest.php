@@ -2,20 +2,20 @@
 /**
  * Test class for the Cart_Session generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Cart_Session;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Cart_Session;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Cart_Session generator.
  *
- * @covers \FluentCartFakerPress\Generators\Cart_Session
+ * @covers \StoreSeeder\Generators\Cart_Session
  */
-class CartSessionGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class CartSessionGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

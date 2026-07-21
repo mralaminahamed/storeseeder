@@ -2,20 +2,20 @@
 /**
  * MCP Ability: Generate Refunds
  *
- * @package FluentCartFakerPress\MCP\Abilities
+ * @package StoreSeeder\MCP\Abilities
  * @since   2.1.0
  */
 
-namespace FluentCartFakerPress\MCP\Abilities;
+namespace StoreSeeder\MCP\Abilities;
 
-use FluentCartFakerPress\Abstracts\Ability;
+use StoreSeeder\Abstracts\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Generate_Refunds
  *
- * Maps to REST endpoint: POST /fluent-cart-fakerpress/v1/refunds/generate
+ * Maps to REST endpoint: POST /storeseeder/v1/refunds/generate
  *
  * @since 1.0.0
  */

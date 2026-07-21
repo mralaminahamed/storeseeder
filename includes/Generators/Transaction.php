@@ -1,17 +1,17 @@
 <?php
 /**
- * Transaction Generator Class for Fluent Cart FakerPress Plugin
+ * Transaction Generator Class for StoreSeeder Plugin
  *
  * @since      1.0.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderTransaction as OrderTransactionModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -61,7 +61,7 @@ class Transaction extends Generator {
 	protected function generate_single_item() {
 		// Check if Fluent Cart OrderTransaction model is available.
 		if ( ! class_exists( OrderTransactionModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_model', __( 'Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
 		// A transaction is a child of an order; without one there is nothing to
@@ -71,7 +71,7 @@ class Transaction extends Generator {
 		if ( null === $order ) {
 			return new WP_Error(
 				'no_orders',
-				__( 'No orders were found. Generate orders before generating transactions.', 'fluent-cart-fakerpress' )
+				__( 'No orders were found. Generate orders before generating transactions.', 'storeseeder' )
 			);
 		}
 
@@ -79,7 +79,7 @@ class Transaction extends Generator {
 		$transaction      = $this->create_transaction( $transaction_data );
 
 		if ( ! $transaction ) {
-			return new WP_Error( 'transaction_creation_failed', __( 'Failed to create transaction.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'transaction_creation_failed', __( 'Failed to create transaction.', 'storeseeder' ) );
 		}
 
 		$result = array(
@@ -98,13 +98,13 @@ class Transaction extends Generator {
 		 * Allows developers to modify the returned transaction data after generation.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_transaction_generation_result
+		 * @hook  storeseeder_transaction_generation_result
 		 *
 		 * @param array $result            The transaction generation result data.
 		 * @param int   $transaction_id    The created transaction ID.
 		 * @param array $transaction_data  The original transaction data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_transaction_generation_result', $result, $transaction->id, $transaction_data );
+		return apply_filters( 'storeseeder_transaction_generation_result', $result, $transaction->id, $transaction_data );
 	}
 
 	/**

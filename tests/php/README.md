@@ -1,6 +1,6 @@
-# Fluent Cart FakerPress Tests
+# StoreSeeder Tests
 
-This directory contains PHPUnit tests for the Fluent Cart FakerPress plugin.
+This directory contains PHPUnit tests for the StoreSeeder plugin.
 
 ## Setup
 
@@ -56,13 +56,13 @@ vendor/bin/phpunit --testsuite unit
 ### Specific Test Class
 ```bash
 # Run specific test class
-vendor/bin/phpunit tests/php/src/FluentCartFakerPressTest.php
+vendor/bin/phpunit tests/php/src/StoreSeederTest.php
 ```
 
 ### Specific Test Method
 ```bash
 # Run specific test method
-vendor/bin/phpunit --filter test_instance tests/php/src/FluentCartFakerPressTest.php
+vendor/bin/phpunit --filter test_instance tests/php/src/StoreSeederTest.php
 ```
 
 ### With Coverage Report
@@ -84,8 +84,8 @@ tests/php/
 ├── bin/
 │   └── install-wp-tests.sh    # WordPress test suite installer
 └── src/
-    ├── FluentCartFakerPressUnitTestCase.php    # Base test case
-    ├── FluentCartFakerPressTest.php            # Main plugin tests
+    ├── StoreSeederUnitTestCase.php    # Base test case
+    ├── StoreSeederTest.php            # Main plugin tests
     ├── Generators/
     │   └── ProductGeneratorTest.php              # Product generator tests
     ├── Admin/
@@ -103,7 +103,7 @@ tests/php/
 
 ### Base Test Case
 
-All tests extend `FluentCartFakerPressUnitTestCase` which provides:
+All tests extend `StoreSeederUnitTestCase` which provides:
 
 - WordPress test environment setup
 - REST API testing utilities
@@ -117,9 +117,9 @@ All tests extend `FluentCartFakerPressUnitTestCase` which provides:
 ```php
 <?php
 
-namespace FluentCartFakerPress\Tests;
+namespace StoreSeeder\Tests;
 
-class MyComponentTest extends FluentCartFakerPressUnitTestCase {
+class MyComponentTest extends StoreSeederUnitTestCase {
 
     private $component;
 

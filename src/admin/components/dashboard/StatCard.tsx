@@ -41,12 +41,12 @@ export function StatCard({ iconName, label, value, empty, delta, spark, accentVa
       <div className="fp-stat-foot">
         {empty ? (
           <span className="fp-stat-empty">
-            {__("Nothing generated yet", "fluent-cart-fakerpress")}
+            {__("Nothing generated yet", "storeseeder")}
           </span>
         ) : (
           <span className={`fp-stat-delta ${delta > 0 ? "up" : "flat"}`}>
             {delta > 0 && <Icon name="chart" size={13} />}
-            {delta > 0 ? `+${delta} this week` : __("steady", "fluent-cart-fakerpress")}
+            {delta > 0 ? `+${delta} this week` : __("steady", "storeseeder")}
           </span>
         )}
         {spark && (

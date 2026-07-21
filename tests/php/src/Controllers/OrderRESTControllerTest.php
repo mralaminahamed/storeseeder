@@ -2,20 +2,20 @@
 /**
  * Test class for the Order REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Order;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Order;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Order
+ * @covers \StoreSeeder\Controllers\Order
  */
-class OrderRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class OrderRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

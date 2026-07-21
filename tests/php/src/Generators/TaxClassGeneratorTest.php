@@ -2,20 +2,20 @@
 /**
  * Test class for the Tax_Class generator.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Generators;
+namespace StoreSeeder\Tests\Generators;
 
-use FluentCartFakerPress\Generators\Tax_Class;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Generators\Tax_Class;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Tax_Class generator.
  *
- * @covers \FluentCartFakerPress\Generators\Tax_Class
+ * @covers \StoreSeeder\Generators\Tax_Class
  */
-class TaxClassGeneratorTest extends FluentCartFakerPressUnitTestCase {
+class TaxClassGeneratorTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * Generator tests need neither the REST server nor a fresh DB fixture.

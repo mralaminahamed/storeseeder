@@ -8,7 +8,7 @@ import type { GlobalRun } from "@/admin/types";
 
 function timeAgo(ts: number): string {
   const d = (Date.now() - ts) / 1000;
-  if (d < 60) return __("just now", "fluent-cart-fakerpress");
+  if (d < 60) return __("just now", "storeseeder");
   if (d < 3600) return Math.floor(d / 60) + "m ago";
   if (d < 86400) return Math.floor(d / 3600) + "h ago";
   return Math.floor(d / 86400) + "d ago";
@@ -26,7 +26,7 @@ export function RecentActivity({ runs }: RecentActivityProps) {
       <div className="fp-card fp-recent">
         <div className="fp-empty">
           <Icon name="history" size={22} />
-          <div>{__("No runs yet — generate something to see it here.", "fluent-cart-fakerpress")}</div>
+          <div>{__("No runs yet — generate something to see it here.", "storeseeder")}</div>
         </div>
       </div>
     );
@@ -41,8 +41,8 @@ export function RecentActivity({ runs }: RecentActivityProps) {
 
         const localePart = run.locale ? run.locale.split(" (")[0] : "";
         const seedPart = run.seed
-          ? `· ${__("seed", "fluent-cart-fakerpress")} ${run.seed}`
-          : `· ${__("random seed", "fluent-cart-fakerpress")}`;
+          ? `· ${__("seed", "storeseeder")} ${run.seed}`
+          : `· ${__("random seed", "storeseeder")}`;
         const meta = [localePart, seedPart].filter(Boolean).join(" ");
 
         return (
@@ -56,11 +56,11 @@ export function RecentActivity({ runs }: RecentActivityProps) {
             </span>
             <div className="fp-recent-main">
               <div className="fp-recent-title">
-                {__("Generated", "fluent-cart-fakerpress")} {run.count} {name.toLowerCase()}
+                {__("Generated", "storeseeder")} {run.count} {name.toLowerCase()}
               </div>
               <div className="fp-recent-meta">{meta}</div>
             </div>
-            <StatusPill>{run.success ? __("Success", "fluent-cart-fakerpress") : __("Error", "fluent-cart-fakerpress")}</StatusPill>
+            <StatusPill>{run.success ? __("Success", "storeseeder") : __("Error", "storeseeder")}</StatusPill>
             <span className="fp-recent-time">{timeAgo(run.timestamp)}</span>
           </div>
         );

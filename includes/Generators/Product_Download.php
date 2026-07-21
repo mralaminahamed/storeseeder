@@ -1,19 +1,19 @@
 <?php
 /**
- * Product Download Generator Class for Fluent Cart FakerPress Plugin
+ * Product Download Generator Class for StoreSeeder Plugin
  *
  * @since      2.4.0
  * @subpackage Generators
- * @package    FluentCartFakerPress
+ * @package    StoreSeeder
  */
 
-namespace FluentCartFakerPress\Generators;
+namespace StoreSeeder\Generators;
 
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderDownloadPermission as OrderDownloadPermissionModel;
 use FluentCart\App\Models\ProductDownload as ProductDownloadModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
-use FluentCartFakerPress\Abstracts\Generator;
+use StoreSeeder\Abstracts\Generator;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -63,7 +63,7 @@ class Product_Download extends Generator {
 	 */
 	protected function generate_single_item() {
 		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( ProductDownloadModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart ProductDownload model not found. Please ensure Fluent Cart is active.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart ProductDownload model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
 		}
 
 		// A download hangs off a product; the variation gives both the parent
@@ -73,7 +73,7 @@ class Product_Download extends Generator {
 		if ( ! $variation ) {
 			return new WP_Error(
 				'no_products',
-				__( 'No product variations were found. Generate products before generating downloads.', 'fluent-cart-fakerpress' )
+				__( 'No product variations were found. Generate products before generating downloads.', 'storeseeder' )
 			);
 		}
 
@@ -81,7 +81,7 @@ class Product_Download extends Generator {
 		$download = $this->create_download( $data );
 
 		if ( ! $download ) {
-			return new WP_Error( 'product_download_creation_failed', __( 'Failed to create product download.', 'fluent-cart-fakerpress' ) );
+			return new WP_Error( 'product_download_creation_failed', __( 'Failed to create product download.', 'storeseeder' ) );
 		}
 
 		$granted = $this->grant_permission( (int) $download->id, (int) $variation->id );
@@ -99,13 +99,13 @@ class Product_Download extends Generator {
 		 * Filters the product download generation result data.
 		 *
 		 * @since 1.0.0
-		 * @hook  fluent_cart_fakerpress_product_download_generation_result
+		 * @hook  storeseeder_product_download_generation_result
 		 *
 		 * @param array $result The generation result data.
 		 * @param int   $id     The created download ID.
 		 * @param array $data   The original data used for creation.
 		 */
-		return apply_filters( 'fluent_cart_fakerpress_product_download_generation_result', $result, $download->id, $data );
+		return apply_filters( 'storeseeder_product_download_generation_result', $result, $download->id, $data );
 	}
 
 	/**

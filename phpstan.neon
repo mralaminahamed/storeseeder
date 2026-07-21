@@ -5,7 +5,7 @@ parameters:
     level: 7
 
     paths:
-        - class-fluent-cart-fakerpress.php
+        - class-storeseeder.php
         - includes/
 
     excludePaths:
@@ -17,7 +17,7 @@ parameters:
 
     # WordPress specific configuration
     bootstrapFiles:
-        - fluent-cart-fakerpress.php
+        - storeseeder.php
 
     # Universal object crates
     universalObjectCratesClasses:
@@ -41,10 +41,10 @@ parameters:
         - WP_DEBUG_DISPLAY
         - SCRIPT_DEBUG
         - WP_CACHE
-        - FLUENT_CART_FAKERPRESS_VERSION
-        - FLUENT_CART_FAKERPRESS_PLUGIN_FILE
-        - FLUENT_CART_FAKERPRESS_PLUGIN_URL
-        - FLUENT_CART_FAKERPRESS_PLUGIN_PATH
+        - STORESEEDER_VERSION
+        - STORESEEDER_PLUGIN_FILE
+        - STORESEEDER_PLUGIN_URL
+        - STORESEEDER_PLUGIN_PATH
     # Ignore errors
     ignoreErrors:
         # WordPress functions that may not be defined during static analysis
@@ -136,7 +136,7 @@ parameters:
         - '#Method .* has invalid return type .*WP_Error\.#'
 
         # Test-specific ignores
-        - '#Instantiated class FluentCartFakerPress\\\\[a-zA-Z_\\\\]+ not found\.#'
+        - '#Instantiated class StoreSeeder\\\\[a-zA-Z_\\\\]+ not found\.#'
         - path: tests/
           message: '#Call to method [a-zA-Z_]+ on an unknown class [a-zA-Z0-9\\_]+\.#'
 

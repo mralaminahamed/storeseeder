@@ -1,11 +1,11 @@
 <?php
 /**
- * Base test case for all Fluent Cart FakerPress tests.
+ * Base test case for all StoreSeeder tests.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests;
+namespace StoreSeeder\Tests;
 
 use Brain\Monkey;
 use WP_REST_Request;
@@ -13,14 +13,14 @@ use WP_REST_Server;
 use WP_UnitTestCase;
 
 /**
- * Base test case for all Fluent Cart FakerPress tests.
+ * Base test case for all StoreSeeder tests.
  *
  * Provides REST helpers, user factories, and hook assertions shared across the
  * generator and controller test suites.
  *
  * @since 1.0.0
  */
-abstract class FluentCartFakerPressUnitTestCase extends WP_UnitTestCase {
+abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 
 	use TestHelpers\Traits\Wp_Rest_Request_Trait;
 
@@ -36,7 +36,7 @@ abstract class FluentCartFakerPressUnitTestCase extends WP_UnitTestCase {
 	 *
 	 * @var string
 	 */
-	protected string $namespace = 'fluent-cart-fakerpress/v1';
+	protected string $namespace = 'storeseeder/v1';
 
 	/**
 	 * Whether the test is a pure unit test that needs neither REST nor a DB.

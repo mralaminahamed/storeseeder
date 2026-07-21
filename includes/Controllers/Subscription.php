@@ -3,13 +3,13 @@
  * Subscription REST Controller
  *
  * @since   2.4.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Subscription as SubscriptionGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Subscription as SubscriptionGenerator;
 
 /**
  * Subscription REST Controller Class
@@ -36,7 +36,7 @@ class Subscription extends Controller {
 	 * @return string The translated label for the resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Subscription', 'fluent-cart-fakerpress' );
+		return __( 'Subscription', 'storeseeder' );
 	}
 
 	/**

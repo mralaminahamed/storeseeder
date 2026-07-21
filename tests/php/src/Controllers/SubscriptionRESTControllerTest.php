@@ -2,20 +2,20 @@
 /**
  * Test class for the Subscription REST controller.
  *
- * @package FluentCartFakerPress\Tests
+ * @package StoreSeeder\Tests
  */
 
-namespace FluentCartFakerPress\Tests\Controllers;
+namespace StoreSeeder\Tests\Controllers;
 
-use FluentCartFakerPress\Controllers\Subscription;
-use FluentCartFakerPress\Tests\FluentCartFakerPressUnitTestCase;
+use StoreSeeder\Controllers\Subscription;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Subscription REST controller.
  *
- * @covers \FluentCartFakerPress\Controllers\Subscription
+ * @covers \StoreSeeder\Controllers\Subscription
  */
-class SubscriptionRESTControllerTest extends FluentCartFakerPressUnitTestCase {
+class SubscriptionRESTControllerTest extends StoreSeederUnitTestCase {
 
 	/**
 	 * The controller under test.

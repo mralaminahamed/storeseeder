@@ -3,13 +3,13 @@
  * Cart Session REST Controller
  *
  * @since   1.0.0
- * @package FluentCartFakerPress\Controllers
+ * @package StoreSeeder\Controllers
  */
 
-namespace FluentCartFakerPress\Controllers;
+namespace StoreSeeder\Controllers;
 
-use FluentCartFakerPress\Abstracts\Controller;
-use FluentCartFakerPress\Generators\Cart_Session as CartSessionGenerator;
+use StoreSeeder\Abstracts\Controller;
+use StoreSeeder\Generators\Cart_Session as CartSessionGenerator;
 
 /**
  * Cart Session REST Controller Class
@@ -40,7 +40,7 @@ class Cart_Session extends Controller {
 	 * @return string The translated label for cart session resource type.
 	 */
 	protected function get_resource_type_label(): string {
-		return __( 'Cart Session', 'fluent-cart-fakerpress' );
+		return __( 'Cart Session', 'storeseeder' );
 	}
 
 	/**
@@ -75,20 +75,20 @@ class Cart_Session extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'customer_type'        => array(
-				'description'       => __( 'Type of customers for cart sessions.', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Type of customers for cart sessions.', 'storeseeder' ),
 				'type'              => 'string',
 				'enum'              => array( 'existing', 'new', 'mixed', 'specific', 'guest_only' ),
 				'default'           => 'mixed',
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'specific_customer_id' => array(
-				'description'       => __( 'Specific customer ID for cart sessions (when customer_type is "specific").', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Specific customer ID for cart sessions (when customer_type is "specific").', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
 			),
 			'guest_cart_ratio'     => array(
-				'description'       => __( 'Percentage of guest carts (0-100) when customer_type is "mixed".', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Percentage of guest carts (0-100) when customer_type is "mixed".', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 0,
 				'maximum'           => 100,
@@ -96,7 +96,7 @@ class Cart_Session extends Controller {
 				'sanitize_callback' => 'absint',
 			),
 			'abandonment_rate'     => array(
-				'description'       => __( 'Cart abandonment rate percentage (0-100).', 'fluent-cart-fakerpress' ),
+				'description'       => __( 'Cart abandonment rate percentage (0-100).', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 0,
 				'maximum'           => 100,
@@ -104,29 +104,29 @@ class Cart_Session extends Controller {
 				'sanitize_callback' => 'absint',
 			),
 			'status_distribution'  => array(
-				'description' => __( 'Custom cart status distribution.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Custom cart status distribution.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'pending'   => array(
-						'description' => __( 'Percentage of pending carts.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Percentage of pending carts.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 					'abandoned' => array(
-						'description' => __( 'Percentage of abandoned carts.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Percentage of abandoned carts.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 					'completed' => array(
-						'description' => __( 'Percentage of completed carts.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Percentage of completed carts.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 					'cancelled' => array(
-						'description' => __( 'Percentage of cancelled carts.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Percentage of cancelled carts.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
@@ -134,17 +134,17 @@ class Cart_Session extends Controller {
 				),
 			),
 			'cart_value_range'     => array(
-				'description' => __( 'Cart value range for generated sessions.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Cart value range for generated sessions.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum cart value.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum cart value.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
 						'default'     => 5,
 					),
 					'max' => array(
-						'description' => __( 'Maximum cart value.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum cart value.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 1,
 						'default'     => 500,
@@ -152,17 +152,17 @@ class Cart_Session extends Controller {
 				),
 			),
 			'items_per_cart'       => array(
-				'description' => __( 'Number of items per cart session.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Number of items per cart session.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
-						'description' => __( 'Minimum items per cart.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Minimum items per cart.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'default'     => 1,
 					),
 					'max' => array(
-						'description' => __( 'Maximum items per cart.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum items per cart.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 1,
 						'maximum'     => 15,
@@ -171,23 +171,23 @@ class Cart_Session extends Controller {
 				),
 			),
 			'abandonment_tracking' => array(
-				'description' => __( 'Abandonment tracking settings.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Abandonment tracking settings.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'generate_reminders' => array(
-						'description' => __( 'Generate abandoned cart reminders.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Generate abandoned cart reminders.', 'storeseeder' ),
 						'type'        => 'boolean',
 						'default'     => true,
 					),
 					'reminder_count'     => array(
-						'description' => __( 'Maximum number of reminders to generate.', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Maximum number of reminders to generate.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 10,
 						'default'     => 3,
 					),
 					'recovery_rate'      => array(
-						'description' => __( 'Cart recovery rate percentage (0-100).', 'fluent-cart-fakerpress' ),
+						'description' => __( 'Cart recovery rate percentage (0-100).', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
@@ -208,7 +208,7 @@ class Cart_Session extends Controller {
 	protected function get_resource_specific_properties(): array {
 		return array(
 			'cart_sessions' => array(
-				'description' => __( 'Generated cart sessions with items and customer data.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generated cart sessions with items and customer data.', 'storeseeder' ),
 				'type'        => 'array',
 				'context'     => array( 'view' ),
 				'readonly'    => true,
