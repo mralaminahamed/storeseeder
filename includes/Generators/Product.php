@@ -10,6 +10,8 @@
 namespace FluentCartFakerPress\Generators;
 
 use FluentCart\App\Models\Product as ProductModel;
+use FluentCart\App\Models\ProductDetail as ProductDetailModel;
+use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use FluentCartFakerPress\Abstracts\Generator;
 use WP_Error;
 
@@ -77,7 +79,9 @@ class Product extends Generator {
 		$result = array(
 			'id'         => $product_id,
 			'title'      => $product_data['title'],
-			'price'      => $product_data['price'],
+			// Stored in cents; reported in major units so the UI shows 45.67
+			// rather than 4567.
+			'price'      => round( $product_data['price'] / 100, 2 ),
 			'status'     => $product_data['status'],
 			'type'       => 'simple',
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
@@ -110,14 +114,38 @@ class Product extends Generator {
 
 		$title = $this->get_faker()->randomElement( $adjectives ) . ' ' . $this->get_faker()->randomElement( $products );
 
+		$fulfillment_type = $this->get_faker()->randomElement( array( 'physical', 'digital' ) );
+
 		return array(
-			'title'       => $title,
-			'description' => $this->get_faker()->paragraphs( 3, true ),
-			'price'       => $this->get_faker()->randomFloat( 2, 9.99, 999.99 ),
-			'status'      => 'published',
-			'sku'         => strtoupper( $this->get_faker()->bothify( '??-#####' ) ),
-			'stock'       => $this->get_faker()->numberBetween( 0, 100 ),
+			'title'            => $title,
+			'description'      => $this->get_faker()->paragraphs( 3, true ),
+			// item_price is integer cents, despite the column being a double —
+			// PricingTableRenderer reads it back through Helper::toDecimal().
+			'price'            => (int) round( $this->get_faker()->randomFloat( 2, 9.99, 999.99 ) * 100 ),
+			// 'publish' is the WordPress post status; 'published' is not one.
+			'status'           => 'publish',
+			'sku'              => $this->unique_sku(),
+			'stock'            => $this->get_faker()->numberBetween( 0, 100 ),
+			'fulfillment_type' => $fulfillment_type,
 		);
+	}
+
+	/**
+	 * Build an SKU that is not already taken.
+	 *
+	 * The fct_product_variations table carries a UNIQUE index on sku, so a
+	 * collision is a database error rather than a silently overwritten row.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string Unused SKU.
+	 */
+	private function unique_sku(): string {
+		do {
+			$sku = strtoupper( $this->get_faker()->bothify( '??-#####' ) );
+		} while ( ProductVariationModel::query()->where( 'sku', $sku )->exists() );
+
+		return $sku;
 	}
 
 	/**
@@ -135,12 +163,14 @@ class Product extends Generator {
 			return new WP_Error( 'missing_model', __( 'Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active.', 'fluent-cart-fakerpress' ) );
 		}
 
-		// Use Fluent Cart Product model with compatible data structure.
+		// post_type is forced to the fluent-products CPT by Product::boot(), but
+		// naming it here keeps the intent readable.
 		$product_data = array(
 			'post_title'   => $data['title'],
+			'post_name'    => sanitize_title( $data['title'] ),
 			'post_content' => $data['description'],
-			'post_status'  => 'publish',
-			'post_type'    => 'fluentcart_product',
+			'post_status'  => $data['status'],
+			'post_type'    => 'fluent-products',
 		);
 
 		$product = ProductModel::query()->create( $product_data );
@@ -149,10 +179,53 @@ class Product extends Generator {
 			return null;
 		}
 
-		// Add product meta data.
-		$product->updateProductMeta( '_price', $data['price'] );
-		$product->updateProductMeta( '_sku', $data['sku'] );
-		$product->updateProductMeta( '_stock', $data['stock'] );
+		$stock_status = $data['stock'] > 0 ? 'in-stock' : 'out-of-stock';
+
+		// A product Fluent Cart can actually sell needs three rows, not one:
+		// the post, a fct_product_details row, and at least one variation.
+		// Price, SKU and stock live on the variation — the _price/_sku/_stock
+		// post meta this generator used to write is read by nothing in Fluent
+		// Cart, so those products had no price and could not be bought.
+		$detail = ProductDetailModel::query()->create(
+			array(
+				'post_id'            => $product->ID,
+				'fulfillment_type'   => $data['fulfillment_type'],
+				'variation_type'     => 'simple',
+				'min_price'          => $data['price'],
+				'max_price'          => $data['price'],
+				'manage_stock'       => 1,
+				'stock_availability' => $stock_status,
+			)
+		);
+
+		$variation = ProductVariationModel::query()->create(
+			array(
+				'post_id'          => $product->ID,
+				'serial_index'     => 1,
+				'variation_title'  => $data['title'],
+				'sku'              => $data['sku'],
+				'item_price'       => $data['price'],
+				'manage_stock'     => 1,
+				'stock_status'     => $stock_status,
+				'total_stock'      => $data['stock'],
+				'available'        => $data['stock'],
+				'payment_type'     => 'onetime',
+				'fulfillment_type' => $data['fulfillment_type'],
+				'item_status'      => 'active',
+				'other_info'       => array(
+					'description'  => '',
+					'payment_type' => 'onetime',
+					'tax_class'    => 'standard',
+					'tax_exempt'   => 'no',
+				),
+			)
+		);
+
+		// The detail row points at the variation customers land on by default.
+		if ( $detail && $variation ) {
+			$detail->default_variation_id = $variation->id;
+			$detail->save();
+		}
 
 		return $product->ID;
 	}
