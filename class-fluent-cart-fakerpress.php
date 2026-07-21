@@ -30,6 +30,7 @@ use FluentCartFakerPress\Controllers\Shipping_Class;
 use FluentCartFakerPress\Controllers\Label;
 use FluentCartFakerPress\Controllers\Order_Tax_Rate;
 use FluentCartFakerPress\Controllers\Product_Download;
+use FluentCartFakerPress\Controllers\Subscription;
 use FluentCartFakerPress\MCP\MCP_Server;
 
 /**
@@ -318,6 +319,7 @@ class FluentCart_FakerPress {
 			new Label(),
 			new Order_Tax_Rate(),
 			new Product_Download(),
+			new Subscription(),
 		);
 
 		foreach ( $controllers as $controller ) {

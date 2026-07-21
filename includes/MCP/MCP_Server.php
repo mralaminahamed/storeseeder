@@ -85,7 +85,7 @@ class MCP_Server {
 			'fluent-cart-fakerpress',
 			array(
 				'label'       => __( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions.', 'fluent-cart-fakerpress' ),
 			)
 		);
 	}
@@ -138,7 +138,7 @@ class MCP_Server {
 			self::REST_NAMESPACE,
 			self::REST_ROUTE,
 			__( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads.', 'fluent-cart-fakerpress' ),
+			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions.', 'fluent-cart-fakerpress' ),
 			FLUENT_CART_FAKERPRESS_VERSION,
 			array(
 				\WP\MCP\Transport\HttpTransport::class,
@@ -663,6 +663,16 @@ class MCP_Server {
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'product_downloads', __( 'Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted.', 'fluent-cart-fakerpress' ) ),
 				'execute_callback'    => array( Abilities\Generate_Product_Downloads::class, 'execute' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+			),
+
+			'fluent-cart-fakerpress/generate-subscriptions' => array(
+				'label'               => __( 'Generate Subscriptions', 'fluent-cart-fakerpress' ),
+				'description'         => __( 'Generate subscription records against existing orders for testing Fluent Cart recurring-billing views. The subscriptions table ships in core, but active billing requires Fluent Cart Pro. Requires existing orders and products.', 'fluent-cart-fakerpress' ),
+				'category'            => 'fluent-cart-fakerpress',
+				'input_schema'        => $this->build_input_schema( array() ),
+				'output_schema'       => $this->build_output_schema( 'subscriptions', __( 'Array of generated subscription objects with id, uuid, customer_id, item_name, billing_interval, status, and recurring_total.', 'fluent-cart-fakerpress' ) ),
+				'execute_callback'    => array( Abilities\Generate_Subscriptions::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
