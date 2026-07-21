@@ -97,7 +97,7 @@
       "@makepot",
       "composer update --no-dev",
       "mkdir -p release/dev",
-      "rsync -av --exclude='.*' --exclude='CLAUDE.md' --exclude='AGENTS.md' --exclude='node_modules' --exclude='release' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.log' . release/dev/storeseeder/",
+      "rsync -av --exclude='.*' --exclude='node_modules' --exclude='release' --exclude='src' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.md' --exclude='*.log' --exclude='package.json' --exclude='package-lock.json' --exclude='yarn.lock' --exclude='composer.lock' --exclude='webpack.config.js' --exclude='tsconfig.json' --exclude='postcss.config.js' --exclude='tailwind.config.js' --exclude='components.json' --exclude='phpcs.xml' --exclude='phpcs.plugin-review.xml' --exclude='phpstan.neon' --exclude='phpunit.xml.dist' --exclude='phpunit.xml' . release/dev/storeseeder/",
       "cd release/dev && zip -r storeseeder.zip storeseeder/",
       "rm -rf release/dev/storeseeder/",
       "composer install",
