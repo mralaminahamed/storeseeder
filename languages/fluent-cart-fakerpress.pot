@@ -7,22 +7,22 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-21T02:53:36+00:00\n"
+"POT-Creation-Date: 2026-07-21T03:48:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.13.0-alpha-3eb2dd7\n"
 "X-Domain: fluent-cart-fakerpress\n"
 
-#: class-fluent-cart-fakerpress.php:158
+#: class-fluent-cart-fakerpress.php:162
 #: includes/MCP/MCP_Server.php:87
 #: includes/MCP/MCP_Server.php:140
 msgid "Fluent Cart FakerPress"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:159
+#: class-fluent-cart-fakerpress.php:163
 msgid "FC FakerPress"
 msgstr ""
 
-#: class-fluent-cart-fakerpress.php:571
+#: class-fluent-cart-fakerpress.php:579
 msgid "Fluent Cart FakerPress requires Fluent Cart plugin to be installed and active."
 msgstr ""
 
@@ -279,6 +279,10 @@ msgstr ""
 msgid "Generated customers data."
 msgstr ""
 
+#: includes/Controllers/Label.php:39
+msgid "Label"
+msgstr ""
+
 #: includes/Controllers/Log.php:35
 msgid "Log"
 msgstr ""
@@ -329,6 +333,10 @@ msgstr ""
 
 #: includes/Controllers/Order.php:178
 msgid "Generated orders data."
+msgstr ""
+
+#: includes/Controllers/Order_Tax_Rate.php:39
+msgid "Order Tax Line"
 msgstr ""
 
 #: includes/Controllers/Product.php:58
@@ -403,6 +411,10 @@ msgstr ""
 msgid "Generated products data."
 msgstr ""
 
+#: includes/Controllers/Product_Download.php:39
+msgid "Product Download"
+msgstr ""
+
 #: includes/Controllers/Product_Variation.php:58
 msgid "Product Variation"
 msgstr ""
@@ -461,6 +473,10 @@ msgstr ""
 
 #: includes/Controllers/Refund.php:35
 msgid "Refund"
+msgstr ""
+
+#: includes/Controllers/Shipping_Class.php:39
+msgid "Shipping Class"
 msgstr ""
 
 #: includes/Controllers/Shipping_Plan.php:43
@@ -591,15 +607,15 @@ msgstr ""
 msgid "Generated transactions with payment details and metadata."
 msgstr ""
 
-#: includes/Generators/Attribute.php:50
+#: includes/Generators/Attribute.php:52
 msgid "Product Attribute Groups with Terms"
 msgstr ""
 
-#: includes/Generators/Attribute.php:65
+#: includes/Generators/Attribute.php:67
 msgid "Fluent Cart attribute models not found. Ensure Fluent Cart is active."
 msgstr ""
 
-#: includes/Generators/Attribute.php:84
+#: includes/Generators/Attribute.php:86
 msgid "Failed to create attribute group."
 msgstr ""
 
@@ -612,11 +628,11 @@ msgid "Failed to create cart session."
 msgstr ""
 
 #: includes/Generators/Coupon.php:63
-#: includes/Generators/Customer.php:93
-#: includes/Generators/Order.php:65
+#: includes/Generators/Customer.php:94
+#: includes/Generators/Order.php:68
 #: includes/Generators/Product.php:65
 #: includes/Generators/Product_Variation.php:64
-#: includes/Generators/Tax_Class.php:63
+#: includes/Generators/Tax_Class.php:64
 msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
 msgstr ""
 
@@ -632,28 +648,36 @@ msgstr ""
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
-#: includes/Generators/Customer.php:70
+#: includes/Generators/Customer.php:71
 msgid "Customer Profiles with Addresses and Metadata"
 msgstr ""
 
-#: includes/Generators/Customer.php:80
+#: includes/Generators/Customer.php:81
 msgid "Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems."
 msgstr ""
 
-#: includes/Generators/Customer.php:151
+#: includes/Generators/Customer.php:152
 msgid "A user with this email address already exists."
 msgstr ""
 
-#: includes/Generators/Customer.php:173
+#: includes/Generators/Customer.php:174
 msgid "Failed to create customer using Fluent Cart."
 msgstr ""
 
-#: includes/Generators/Customer.php:237
+#: includes/Generators/Customer.php:238
 msgid "Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Customer.php:260
+#: includes/Generators/Customer.php:261
 msgid "Failed to create customer using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Label.php:86
+msgid "Fluent Cart Label model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Label.php:92
+msgid "Failed to create label."
 msgstr ""
 
 #: includes/Generators/Log.php:77
@@ -680,24 +704,44 @@ msgstr ""
 msgid "Failed to create activity log entry."
 msgstr ""
 
-#: includes/Generators/Order.php:76
+#: includes/Generators/Order.php:79
 msgid "No published products with variations were found. Generate products before generating orders."
 msgstr ""
 
-#: includes/Generators/Order.php:86
+#: includes/Generators/Order.php:89
 msgid "No customers were found. Generate customers before generating orders."
 msgstr ""
 
-#: includes/Generators/Order.php:97
+#: includes/Generators/Order.php:100
 msgid "Failed to create order."
 msgstr ""
 
-#: includes/Generators/Order.php:257
+#: includes/Generators/Order.php:273
 msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Order.php:286
+#: includes/Generators/Order.php:302
 msgid "Failed to create order using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Order_Tax_Rate.php:65
+msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Order_Tax_Rate.php:73
+msgid "No orders were found. Generate orders before generating order tax lines."
+msgstr ""
+
+#: includes/Generators/Order_Tax_Rate.php:82
+msgid "No tax rates were found. Generate tax classes before generating order tax lines."
+msgstr ""
+
+#: includes/Generators/Order_Tax_Rate.php:96
+msgid "The drawn order already carries this tax rate. Try again."
+msgstr ""
+
+#: includes/Generators/Order_Tax_Rate.php:104
+msgid "Failed to create order tax line."
 msgstr ""
 
 #: includes/Generators/Product.php:76
@@ -706,6 +750,18 @@ msgstr ""
 
 #: includes/Generators/Product.php:163
 msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Product_Download.php:66
+msgid "Fluent Cart ProductDownload model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Product_Download.php:76
+msgid "No product variations were found. Generate products before generating downloads."
+msgstr ""
+
+#: includes/Generators/Product_Download.php:84
+msgid "Failed to create product download."
 msgstr ""
 
 #: includes/Generators/Product_Variation.php:76
@@ -740,6 +796,14 @@ msgstr ""
 msgid "Failed to create refund transaction."
 msgstr ""
 
+#: includes/Generators/Shipping_Class.php:81
+msgid "Fluent Cart ShippingClass model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Generators/Shipping_Class.php:89
+msgid "Failed to create shipping class."
+msgstr ""
+
 #: includes/Generators/Shipping_Plan.php:64
 msgid "Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
@@ -748,15 +812,15 @@ msgstr ""
 msgid "Failed to create shipping method."
 msgstr ""
 
-#: includes/Generators/Tax_Class.php:74
+#: includes/Generators/Tax_Class.php:75
 msgid "Failed to create tax class."
 msgstr ""
 
-#: includes/Generators/Tax_Class.php:126
+#: includes/Generators/Tax_Class.php:195
 msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Generators/Tax_Class.php:150
+#: includes/Generators/Tax_Class.php:219
 msgid "Failed to create tax class using Fluent Cart model."
 msgstr ""
 
@@ -773,11 +837,11 @@ msgid "Failed to create transaction."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:88
-msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, and product attributes."
+msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:141
-msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, and product attributes."
+msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:167
@@ -1136,18 +1200,66 @@ msgstr ""
 msgid "Array of generated log objects with id, object, action, type, note, and is_public."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:645
-msgid "Number of items to generate (1–100). Required."
+#: includes/MCP/MCP_Server.php:630
+msgid "Generate Shipping Classes"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:631
+msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag, for a Fluent Cart store."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:634
+msgid "Array of generated shipping class objects with id, name, cost, and per_item."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:640
+msgid "Generate Labels"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:641
+msgid "Generate labels (tags) and attach them to existing orders and customers for testing Fluent Cart segmentation. Requires existing orders or customers to attach to."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:644
+msgid "Array of generated label objects with id, value, and attached count."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:650
+msgid "Generate Order Tax Lines"
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:651
-msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
+msgid "Generate per-order tax lines linking orders to tax rates with the tax amounts collected. Requires existing orders and tax rates."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:656
-msgid "Optional integer seed for reproducible data generation. Omit for random output."
+#: includes/MCP/MCP_Server.php:654
+msgid "Array of generated order tax line objects with id, order_id, tax_rate_id, and total_tax."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:660
+msgid "Generate Product Downloads"
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:661
+msgid "Generate downloadable files for products and grant download permissions on existing orders, for testing Fluent Cart digital fulfillment. Requires existing products."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:664
+msgid "Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted."
 msgstr ""
 
 #: includes/MCP/MCP_Server.php:685
+msgid "Number of items to generate (1–100). Required."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:691
+msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:696
+msgid "Optional integer seed for reproducible data generation. Omit for random output."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:725
 msgid "Human-readable summary of the generation result."
 msgstr ""

@@ -26,6 +26,10 @@ use FluentCartFakerPress\Controllers\Cart_Session;
 use FluentCartFakerPress\Controllers\Attribute;
 use FluentCartFakerPress\Controllers\Refund;
 use FluentCartFakerPress\Controllers\Log;
+use FluentCartFakerPress\Controllers\Shipping_Class;
+use FluentCartFakerPress\Controllers\Label;
+use FluentCartFakerPress\Controllers\Order_Tax_Rate;
+use FluentCartFakerPress\Controllers\Product_Download;
 use FluentCartFakerPress\MCP\MCP_Server;
 
 /**
@@ -310,6 +314,10 @@ class FluentCart_FakerPress {
 			new Attribute(),
 			new Refund(),
 			new Log(),
+			new Shipping_Class(),
+			new Label(),
+			new Order_Tax_Rate(),
+			new Product_Download(),
 		);
 
 		foreach ( $controllers as $controller ) {
