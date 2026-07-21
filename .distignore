@@ -93,7 +93,9 @@ Thumbs.db
 
 # Claude AI files
 /.claude/
+/.superpowers/
 CLAUDE.md
+.phpunit.result.cache
 
 # WordPress specific files
 /.wordpress-org/

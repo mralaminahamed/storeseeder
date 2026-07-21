@@ -5,6 +5,27 @@ All notable changes to Fluent Cart FakerPress will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-07-21
+
+### Added
+
+- Five new generators — **Shipping Classes**, **Labels**, **Order Tax Lines**, **Product Downloads**, and **Subscriptions** — bringing the total to 17, each with a REST controller and an optional MCP tool.
+- Customer generator now persists billing and shipping addresses; the Order generator adds order addresses and records applied coupons; the Tax Class generator creates real tax-rate rows; the Attribute generator links terms to real product variations.
+
+### Changed
+
+- **Data-integrity overhaul** against Fluent Cart 1.5.0: every generator now writes valid, sellable, correctly-priced records — products create the full post + detail + variation rows, money is stored in the units Fluent Cart expects (integer cents, except the DECIMAL shipping columns), and foreign keys reference real rows.
+- Rewrote the README, refreshed the logo and banners, and restructured the PHPUnit suite to cover every generator and controller.
+- Readied the plugin for WordPress.org: disclosed external services and source code in `readme.txt`, added the `Requires Plugins` header, and guarded debug logging.
+
+### Removed
+
+- The **Location** generator, which had no corresponding Fluent Cart entity.
+
+### Fixed
+
+- Order generation against Fluent Cart 1.5.0 (correct relation name, real customers and variations, valid statuses), coupon values and types, transaction order types, cart stages and foreign keys, and a `TypeError` that could abort a whole customer batch.
+
 ## [2.0.0] - 2025-11-11
 
 ### 🚀 Major Release: Complete Parameter Schema Alignment

@@ -53,7 +53,7 @@ use FluentCartFakerPress\MCP\MCP_Server;
  * - Multi-locale support for international data generation
  *
  * @since 1.0.0
- * @version 2.0.0
+ * @version 2.1.0
  */
 class FluentCart_FakerPress {
 
@@ -493,24 +493,39 @@ class FluentCart_FakerPress {
 	 */
 	private function extract_zip( string $zip_file, string $extract_to ): bool {
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			error_log( 'Fluent Cart FakerPress: ZipArchive class not available' );
+			$this->debug_log( 'Fluent Cart FakerPress: ZipArchive class not available' );
 			return false;
 		}
 
 		$zip = new ZipArchive();
 		if ( $zip->open( $zip_file ) !== true ) {
-			error_log( 'Fluent Cart FakerPress: Failed to open zip file' );
+			$this->debug_log( 'Fluent Cart FakerPress: Failed to open zip file' );
 			return false;
 		}
 
 		if ( ! $zip->extractTo( $extract_to ) ) {
-			error_log( 'Fluent Cart FakerPress: Failed to extract zip file' );
+			$this->debug_log( 'Fluent Cart FakerPress: Failed to extract zip file' );
 			$zip->close();
 			return false;
 		}
 
 		$zip->close();
 		return true;
+	}
+
+	/**
+	 * Write a message to the PHP error log, but only when debugging is enabled.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $message Message to log.
+	 *
+	 * @return void
+	 */
+	private function debug_log( string $message ): void {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		}
 	}
 
 	/**
