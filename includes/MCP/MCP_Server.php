@@ -85,7 +85,7 @@ class MCP_Server {
 			'fluent-cart-fakerpress',
 			array(
 				'label'       => __( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, and product attributes.', 'fluent-cart-fakerpress' ),
+				'description' => __( 'Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads.', 'fluent-cart-fakerpress' ),
 			)
 		);
 	}
@@ -138,7 +138,7 @@ class MCP_Server {
 			self::REST_NAMESPACE,
 			self::REST_ROUTE,
 			__( 'Fluent Cart FakerPress', 'fluent-cart-fakerpress' ),
-			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, and product attributes.', 'fluent-cart-fakerpress' ),
+			__( 'Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, and product downloads.', 'fluent-cart-fakerpress' ),
 			FLUENT_CART_FAKERPRESS_VERSION,
 			array(
 				\WP\MCP\Transport\HttpTransport::class,
@@ -623,6 +623,46 @@ class MCP_Server {
 				),
 				'output_schema'       => $this->build_output_schema( 'logs', __( 'Array of generated log objects with id, object, action, type, note, and is_public.', 'fluent-cart-fakerpress' ) ),
 				'execute_callback'    => array( Abilities\Generate_Logs::class, 'execute' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+			),
+
+			'fluent-cart-fakerpress/generate-shipping-classes' => array(
+				'label'               => __( 'Generate Shipping Classes', 'fluent-cart-fakerpress' ),
+				'description'         => __( 'Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag, for a Fluent Cart store.', 'fluent-cart-fakerpress' ),
+				'category'            => 'fluent-cart-fakerpress',
+				'input_schema'        => $this->build_input_schema( array() ),
+				'output_schema'       => $this->build_output_schema( 'shipping_classes', __( 'Array of generated shipping class objects with id, name, cost, and per_item.', 'fluent-cart-fakerpress' ) ),
+				'execute_callback'    => array( Abilities\Generate_Shipping_Classes::class, 'execute' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+			),
+
+			'fluent-cart-fakerpress/generate-labels'      => array(
+				'label'               => __( 'Generate Labels', 'fluent-cart-fakerpress' ),
+				'description'         => __( 'Generate labels (tags) and attach them to existing orders and customers for testing Fluent Cart segmentation. Requires existing orders or customers to attach to.', 'fluent-cart-fakerpress' ),
+				'category'            => 'fluent-cart-fakerpress',
+				'input_schema'        => $this->build_input_schema( array() ),
+				'output_schema'       => $this->build_output_schema( 'labels', __( 'Array of generated label objects with id, value, and attached count.', 'fluent-cart-fakerpress' ) ),
+				'execute_callback'    => array( Abilities\Generate_Labels::class, 'execute' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+			),
+
+			'fluent-cart-fakerpress/generate-order-tax-rates' => array(
+				'label'               => __( 'Generate Order Tax Lines', 'fluent-cart-fakerpress' ),
+				'description'         => __( 'Generate per-order tax lines linking orders to tax rates with the tax amounts collected. Requires existing orders and tax rates.', 'fluent-cart-fakerpress' ),
+				'category'            => 'fluent-cart-fakerpress',
+				'input_schema'        => $this->build_input_schema( array() ),
+				'output_schema'       => $this->build_output_schema( 'order_tax_rates', __( 'Array of generated order tax line objects with id, order_id, tax_rate_id, and total_tax.', 'fluent-cart-fakerpress' ) ),
+				'execute_callback'    => array( Abilities\Generate_Order_Tax_Rates::class, 'execute' ),
+				'permission_callback' => array( $this, 'permission_callback' ),
+			),
+
+			'fluent-cart-fakerpress/generate-product-downloads' => array(
+				'label'               => __( 'Generate Product Downloads', 'fluent-cart-fakerpress' ),
+				'description'         => __( 'Generate downloadable files for products and grant download permissions on existing orders, for testing Fluent Cart digital fulfillment. Requires existing products.', 'fluent-cart-fakerpress' ),
+				'category'            => 'fluent-cart-fakerpress',
+				'input_schema'        => $this->build_input_schema( array() ),
+				'output_schema'       => $this->build_output_schema( 'product_downloads', __( 'Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted.', 'fluent-cart-fakerpress' ) ),
+				'execute_callback'    => array( Abilities\Generate_Product_Downloads::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 

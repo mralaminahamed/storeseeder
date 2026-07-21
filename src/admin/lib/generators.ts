@@ -12,6 +12,10 @@ import {
   Layers,
   ReceiptText,
   ScrollText,
+  Boxes,
+  Tags,
+  Percent,
+  Download,
 } from "lucide-react";
 
 import { __ } from "@wordpress/i18n";
@@ -726,6 +730,62 @@ export const generators: Generator[] = [
         default: ["order", "product", "customer", "coupon", "refund", "cart", "transaction", "system"],
       },
     },
+  },
+  {
+    name: __("Shipping Classes", "fluent-cart-fakerpress"),
+    category: __("Advanced", "fluent-cart-fakerpress"),
+    order: 9,
+    icon: Boxes,
+    iconName: "boxes",
+    description: __(
+      "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag.",
+      "fluent-cart-fakerpress",
+    ),
+    useCase: __("Store owners configuring shipping rate groups", "fluent-cart-fakerpress"),
+    route: "shipping_classes",
+    parameterConfig: {},
+  },
+  {
+    name: __("Labels", "fluent-cart-fakerpress"),
+    category: __("Advanced", "fluent-cart-fakerpress"),
+    order: 10,
+    icon: Tags,
+    iconName: "tags",
+    description: __(
+      "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to.",
+      "fluent-cart-fakerpress",
+    ),
+    useCase: __("Teams segmenting orders and customers with tags", "fluent-cart-fakerpress"),
+    route: "labels",
+    parameterConfig: {},
+  },
+  {
+    name: __("Order Tax Lines", "fluent-cart-fakerpress"),
+    category: __("Advanced", "fluent-cart-fakerpress"),
+    order: 11,
+    icon: Percent,
+    iconName: "percent",
+    description: __(
+      "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates.",
+      "fluent-cart-fakerpress",
+    ),
+    useCase: __("Developers testing tax reports and collected-tax views", "fluent-cart-fakerpress"),
+    route: "order_tax_rates",
+    parameterConfig: {},
+  },
+  {
+    name: __("Product Downloads", "fluent-cart-fakerpress"),
+    category: __("Advanced", "fluent-cart-fakerpress"),
+    order: 12,
+    icon: Download,
+    iconName: "download",
+    description: __(
+      "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products.",
+      "fluent-cart-fakerpress",
+    ),
+    useCase: __("Developers testing digital-product fulfillment", "fluent-cart-fakerpress"),
+    route: "product_downloads",
+    parameterConfig: {},
   },
 ];
 
