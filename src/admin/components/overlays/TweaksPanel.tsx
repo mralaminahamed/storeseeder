@@ -241,7 +241,7 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
             }}
           >
             {__(
-              "These controls preview how the FakerPress admin would adapt to store-owner theme preferences.",
+              "These controls preview how the StoreSeeder admin would adapt to store-owner theme preferences.",
               "storeseeder",
             )}
           </p>

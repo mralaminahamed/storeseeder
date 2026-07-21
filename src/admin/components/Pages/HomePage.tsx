@@ -17,7 +17,7 @@ export default function HomePage() {
       {/* Page header */}
       <div className="fp-page-head">
         <div>
-          <h1 className="fp-h1">{__("FakerPress", "storeseeder")}</h1>
+          <h1 className="fp-h1">{__("StoreSeeder", "storeseeder")}</h1>
           <p className="fp-sub">
             {__("Generate realistic test data for your Fluent Cart store.", "storeseeder")}
           </p>

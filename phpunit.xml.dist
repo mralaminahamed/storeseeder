@@ -28,14 +28,14 @@
     <coverage>
         <include>
             <directory suffix=".php">./includes</directory>
-            <file>./class-fluent-cart-fakerpress.php</file>
+            <file>./class-storeseeder.php</file>
         </include>
         <exclude>
             <directory>./vendor</directory>
             <directory>./node_modules</directory>
             <directory>./build</directory>
             <directory>./tests</directory>
-            <file>./fluent-cart-fakerpress.php</file>
+            <file>./storeseeder.php</file>
         </exclude>
     </coverage>
     <logging>

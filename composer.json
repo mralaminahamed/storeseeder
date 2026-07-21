@@ -78,7 +78,7 @@
     "phpstan": "phpstan analyse --memory-limit 2G",
     "test": "phpunit",
     "test:coverage": "phpunit --coverage-html=tests/coverage/html",
-    "makepot": "wp i18n make-pot . languages/storeseeder.pot --exclude=node_modules,vendor,drafts,docs,build,release,tests",
+    "makepot": "wp i18n make-pot . languages/storeseeder.pot --domain=storeseeder --exclude=node_modules,vendor,drafts,docs,build,release,tests",
     "release": [
       "@lint",
       "@analyse",

@@ -1,6 +1,6 @@
 # 🛠️ Development Guide
 
-Welcome to the StoreSeeder v2.0.0 development guide! This comprehensive resource will help you contribute effectively to the project, now featuring complete TypeScript support and parameter schema alignment.
+Welcome to the StoreSeeder v1.0.0 development guide! This comprehensive resource will help you contribute effectively to the project, now featuring complete TypeScript support and parameter schema alignment.
 
 ## 🚀 Quick Development Setup
 
@@ -22,7 +22,7 @@ cd storeseeder
 composer install && npm install && npm run build
 ```
 
-### v2.0.0: TypeScript Migration
+### v1.0.0: TypeScript Migration
 
 **All React components have been migrated to TypeScript (.tsx) for better type safety and developer experience.**
 

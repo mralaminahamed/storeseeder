@@ -40,7 +40,7 @@ export function Topbar({
           onClick={() => navigate("/")}
           style={{ padding: "0 8px", marginLeft: -6 }}
         >
-          FakerPress
+          StoreSeeder
         </button>
         <Icon name="chevright" size={14} style={{ color: "var(--text-faint)" }} />
         <span className="fp-crumb-cur">{crumb}</span>

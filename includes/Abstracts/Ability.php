@@ -1,8 +1,8 @@
 <?php
 /**
- * Abstract base class for all FakerPress MCP Ability execute callbacks.
+ * Abstract base class for all StoreSeeder MCP Ability execute callbacks.
  *
- * Each concrete Ability class maps one ability ID to one FakerPress REST
+ * Each concrete Ability class maps one ability ID to one StoreSeeder REST
  * endpoint. The shared generate() method handles building the payload,
  * dispatching a WP_REST_Request internally (no HTTP round-trip), and
  * returning the response array to the Abilities API.
@@ -38,7 +38,7 @@ abstract class Ability {
 	const REST_BASE = '';
 
 	/**
-	 * REST namespace shared by all FakerPress endpoints.
+	 * REST namespace shared by all StoreSeeder endpoints.
 	 *
 	 * @since 1.0.0
 	 */

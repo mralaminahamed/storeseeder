@@ -6,7 +6,7 @@ Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 
 | # | Checklist item | Status | Notes |
 |---|----------------|--------|-------|
-| 1 | **Plugin name / slug — trademark** | ⚠️ | See "Remaining blocker" below. The name leads with the third-party "Fluent Cart" trademark. |
+| 1 | **Plugin name / slug — trademark** | 🔧 | Renamed to **StoreSeeder** (slug `storeseeder`) — distinctive, trademark-free. See the resolved note below. |
 | 2 | Main file name matches slug (`storeseeder.php`) | ✅ | |
 | 3 | Plugin header complete + valid | 🔧 | Fixed `License` → `GPLv2 or later`, `License URI` → `https://www.gnu.org/licenses/gpl-2.0.html`, `Requires at least` → `6.5` (the `Requires Plugins` header needs WP 6.5+), `Version` → `1.0.0`. `Requires Plugins: fluent-cart`, `Text Domain`, `Domain Path` all present. |
 | 4 | `readme.txt` header fields | 🔧 | Added `Requires Plugins`, bumped `Requires at least` to 6.5, `Stable tag` → 1.0.0, `License` → `GPLv2 or later`; retuned tags away from generic terms. |
@@ -32,14 +32,11 @@ Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 | 24 | Screenshots | ⚠️ (minor) | `readme.txt` lists three screenshot captions but no `screenshot-N.png` files exist in `.wordpress-org/` yet. Not a blocker; add before publishing for a complete listing. Icon + banners are present (redesigned in 1.0.0). |
 | 25 | `readme.txt` passes the official validator | ⬜ | Run https://wordpress.org/plugins/developers/readme-validator/ on the final file (structure verified locally; validator run is the last manual step). |
 
-## Remaining blocker — plugin name / slug (Guideline 17)
+## Naming / slug (Guideline 17) — RESOLVED
 
-**"Fluent Cart" is a third-party commercial product/trademark (WPManageNinja).** WordPress.org's naming rule requires a third-party name to appear only *after* a connector (`for`, `with`), never leading the name. "**Fluent Cart** FakerPress" and the slug `storeseeder` both lead with the trademark, which is a common rejection reason.
+The original name "Fluent Cart FakerPress" led with the third-party "Fluent Cart" trademark (WPManageNinja), which WordPress.org allows only after a connector (`for`, `with`) or when submitted by the trademark owner — a common rejection reason.
 
-- This differs from **easycommerce-fakerpress**, where "EasyCommerce" is the *author's own* plugin — allowed.
-- Compliant forms would be e.g. **"Test Data Generator for Fluent Cart"** (slug `test-data-generator-for-fluent-cart`). Note "FakerPress" is itself an existing WordPress.org plugin name, so reusing it is also risky.
-
-**This was not auto-fixed** because renaming cascades through the slug, text domain, function/class prefixes, constants, and the main file name — a product/branding decision, not a mechanical edit. Decide on the final name before submitting; everything else on this list is ready.
+The plugin was renamed to **StoreSeeder** (slug `storeseeder`) — a distinctive, trademark-free name whose slug is available. The rename cascaded through the slug, text domain, PHP namespace, class/function/constant/hook prefixes, and the main file name; the GitHub repo was renamed to match. "Fluent Cart" now appears only in the description as the host platform (allowed). No naming blocker remains.
 
 ## What to run before hitting "Submit"
 
@@ -47,4 +44,4 @@ Legend: ✅ pass · 🔧 fixed in this pass · ⚠️ action needed
 2. `composer zip:dev` or `composer release` and confirm the zip contains `build/`, `vendor/`, `includes/`, `languages/`, `readme.txt`, `storeseeder.php` — and **not** `src/`, `tests/`, `node_modules/`, `.wordpress-org/`.
 3. Validate `readme.txt` in the official validator.
 4. Add `screenshot-1..3.png` to `.wordpress-org/` (optional but recommended).
-5. Resolve the naming decision (item above).
+5. Run the official Plugin Check plugin on the built zip (done — 0 real issues; the two `wp_register_ability*` findings are `function_exists()`-guarded false positives).

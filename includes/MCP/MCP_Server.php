@@ -3,7 +3,7 @@
  * StoreSeeder MCP Server Registration
  *
  * Registers the MCP server via the WordPress mcp-adapter, exposing all
- * FakerPress data-generation abilities as MCP tools so AI clients such as
+ * StoreSeeder data-generation abilities as MCP tools so AI clients such as
  * Claude Desktop and VS Code Copilot can invoke them with natural language.
  *
  * Dependencies (must be installed on the WordPress site):
@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
  * MCP_Server
  *
  * Hooks into `mcp_adapter_init` and creates one MCP server that exposes
- * every registered FakerPress ability as an MCP tool.
+ * every registered StoreSeeder ability as an MCP tool.
  *
  * @since 1.0.0
  */
@@ -71,7 +71,7 @@ class MCP_Server {
 	}
 
 	/**
-	 * Register the ability category that groups all FakerPress abilities.
+	 * Register the ability category that groups all StoreSeeder abilities.
 	 *
 	 * @since 1.0.0
 	 * @return void
@@ -91,7 +91,7 @@ class MCP_Server {
 	}
 
 	/**
-	 * Register all FakerPress abilities with the Abilities API.
+	 * Register all StoreSeeder abilities with the Abilities API.
 	 *
 	 * Each ability maps 1-to-1 with an existing REST controller / generator pair.
 	 *
@@ -103,7 +103,7 @@ class MCP_Server {
 			return;
 		}
 
-		// Guard: FakerPress must be active and Fluent Cart present.
+		// Guard: StoreSeeder must be active and Fluent Cart present.
 		if ( ! $this->dependencies_met() ) {
 			return;
 		}
@@ -120,7 +120,7 @@ class MCP_Server {
 	}
 
 	/**
-	 * Create the MCP server and expose all FakerPress abilities as tools.
+	 * Create the MCP server and expose all StoreSeeder abilities as tools.
 	 *
 	 * @since 1.0.0
 	 * @param mixed $adapter The MCP adapter instance provided by the hook.
@@ -152,7 +152,7 @@ class MCP_Server {
 	}
 
 	/**
-	 * Return the full map of ability-id → $args for every FakerPress generator.
+	 * Return the full map of ability-id → $args for every StoreSeeder generator.
 	 *
 	 * Keeping all definitions in one place makes it trivial to add or remove
 	 * abilities without touching any other files.
@@ -744,10 +744,10 @@ class MCP_Server {
 	}
 
 	/**
-	 * Shared permission callback for all FakerPress abilities.
+	 * Shared permission callback for all StoreSeeder abilities.
 	 *
 	 * Only users with the manage_options capability (administrators) may execute
-	 * FakerPress abilities. This mirrors the existing REST API permission check
+	 * StoreSeeder abilities. This mirrors the existing REST API permission check
 	 * already enforced in Controller::generate_items_permissions_check().
 	 *
 	 * @since 1.0.0

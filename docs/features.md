@@ -6,7 +6,7 @@ StoreSeeder provides comprehensive test data generation capabilities for Fluent 
 
 ### 🛍️ Smart Generators
 
-Generate realistic data for all major Fluent Cart entities (13 generators total):
+Generate realistic data for all major Fluent Cart entities (17 generators total):
 
 - **Products**: Simple and variable products with pricing, inventory, and attributes
 - **Customers**: Customer profiles with demographics and purchase history
