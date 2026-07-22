@@ -668,6 +668,22 @@ class StoreSeeder {
 			return false;
 		}
 
+		// Guard against zip-slip: reject any entry that escapes the target dir.
+		for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive built-in property.
+			$entry_name = $zip->getNameIndex( $i );
+			if (
+				false === $entry_name
+				|| '' === $entry_name
+				|| 0 === strpos( $entry_name, '/' )
+				|| 0 === strpos( $entry_name, '\\' )
+				|| 1 === preg_match( '#(?:^|[/\\\\])\.\.(?:[/\\\\]|$)#', $entry_name )
+			) {
+				$this->debug_log( 'StoreSeeder: Unsafe path in zip archive: ' . ( false === $entry_name ? '(invalid)' : $entry_name ) );
+				$zip->close();
+				return false;
+			}
+		}
+
 		if ( ! $zip->extractTo( $extract_to ) ) {
 			$this->debug_log( 'StoreSeeder: Failed to extract zip file' );
 			$zip->close();

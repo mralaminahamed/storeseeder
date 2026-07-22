@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** the plugin no longer downloads sample data automatically when the admin page loads; the download is now consent-gated and REST-driven.
 
+### Security
+
+- The sample-data importer now validates every archive entry before extraction, rejecting absolute paths and `..` traversal segments so a crafted ZIP cannot write outside the sample-data directory (zip-slip / path traversal).
+
 ## [1.0.0] - 2026-07-21
 
 Initial release.
