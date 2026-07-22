@@ -448,7 +448,7 @@ class StoreSeeder {
 	/**
 	 * Get the sample-data consent decision (site-wide).
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return string 'granted', 'declined', or '' when undecided.
 	 */
@@ -461,7 +461,7 @@ class StoreSeeder {
 	/**
 	 * Record the sample-data consent decision.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param string $value Either 'granted' or 'declined'; other values are ignored.
 	 *
@@ -478,7 +478,7 @@ class StoreSeeder {
 	/**
 	 * REST callback: record the sample-data consent decision.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param WP_REST_Request $request The REST request; `granted` selects the decision.
 	 * @return WP_REST_Response Consent result payload.
@@ -500,7 +500,7 @@ class StoreSeeder {
 	/**
 	 * REST permission check.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return bool True when the current user may manage the plugin.
 	 */
@@ -511,7 +511,7 @@ class StoreSeeder {
 	/**
 	 * REST callback: report sample-data status.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @return WP_REST_Response Status payload.
 	 */
@@ -534,7 +534,7 @@ class StoreSeeder {
 	/**
 	 * REST callback: download / re-sync sample data.
 	 *
-	 * @since 2.1.0
+	 * @since 1.0.0
 	 *
 	 * @param WP_REST_Request $request The REST request; `force` re-downloads.
 	 * @return WP_REST_Response|WP_Error Sync result payload.

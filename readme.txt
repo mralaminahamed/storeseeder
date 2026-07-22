@@ -17,6 +17,8 @@ StoreSeeder generates realistic test data for the Fluent Cart e-commerce platfor
 
 All data is created through native Fluent Cart models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with Fluent Cart updates.
 
+**Sample data is optional and consent-based.** StoreSeeder can download locale-specific reference data (product names, addresses, customer tags) from GitHub to make generated content more realistic. This never happens automatically — it runs only after you accept a one-time consent prompt on the plugin's admin page, transmits no data about your site, and can be declined without losing any functionality (generators fall back to built-in defaults). You can change the decision at any time from Settings.
+
 **Highlights**
 
 * **17 generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs.
@@ -118,6 +120,8 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 * Modern single-page React admin (React Router v7, Tailwind CSS v4) with live preview, command palette, and a batch queue.
 * REST API — every generator at `storeseeder/v1/<resource>/generate`.
 * Optional MCP integration via the WordPress Abilities API + `mcp-adapter`.
+* Consent-gated sample data — locale reference data downloads from GitHub only after an administrator accepts a one-time consent prompt; no site data is sent and declining uses built-in defaults.
+* Security — sample-data archives are validated before extraction to prevent path traversal (zip-slip).
 * Filters and actions across the generation lifecycle.
 
 == Upgrade Notice ==
