@@ -88,3 +88,7 @@ release/
 # Local submission helper docs (untracked; excluded from the zip via .distignore)
 /plugin-submission-review.md
 /submission-form.md
+
+# Superpowers SDD scratch + local plans (untracked)
+.superpowers/
+docs/superpowers/

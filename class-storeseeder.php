@@ -176,16 +176,12 @@ class StoreSeeder {
 	 * Outputs the HTML container element where the React admin interface will be mounted.
 	 * This method serves as the callback for the WordPress add_menu_page() function,
 	 * providing the entry point for the React Router v7 application.
-	 * Also ensures sample data is downloaded when the page is first visited.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return void
 	 */
 	public function render_admin_page(): void {
-		// Ensure sample data is available when admin page is visited.
-		$this->ensure_sample_data();
-
 		echo '<div id="storeseeder-root"></div>';
 	}
 
@@ -325,13 +321,53 @@ class StoreSeeder {
 		foreach ( $controllers as $controller ) {
 			$controller->register_routes();
 		}
+
+		// Register the sample-data download endpoint.
+		register_rest_route(
+			'storeseeder/v1',
+			'/download-sample',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_sample_data_status' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_download_sample_data' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					),
+				),
+			)
+		);
+
+		// Register the sample-data consent endpoint.
+		register_rest_route(
+			'storeseeder/v1',
+			'/download-sample/consent',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'rest_set_sample_data_consent' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'granted' => array(
+						'type'     => 'boolean',
+						'required' => true,
+					),
+				),
+			)
+		);
 	}
 
 	/**
 	 * Plugin activation hook
 	 *
 	 * Handles plugin activation tasks including flushing rewrite rules.
-	 * Sample data is downloaded when the admin page is first visited.
 	 *
 	 * @since 1.0.0
 	 * @hooked register_activation_hook
@@ -410,6 +446,134 @@ class StoreSeeder {
 	}
 
 	/**
+	 * Get the sample-data consent decision (site-wide).
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return string 'granted', 'declined', or '' when undecided.
+	 */
+	public function get_sample_data_consent(): string {
+		$value = get_option( 'storeseeder_sample_data_consent', '' );
+
+		return in_array( $value, array( 'granted', 'declined' ), true ) ? $value : '';
+	}
+
+	/**
+	 * Record the sample-data consent decision.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $value Either 'granted' or 'declined'; other values are ignored.
+	 *
+	 * @return void
+	 */
+	public function set_sample_data_consent( string $value ): void {
+		if ( ! in_array( $value, array( 'granted', 'declined' ), true ) ) {
+			return;
+		}
+
+		update_option( 'storeseeder_sample_data_consent', $value, false );
+	}
+
+	/**
+	 * REST callback: record the sample-data consent decision.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `granted` selects the decision.
+	 * @return WP_REST_Response Consent result payload.
+	 */
+	public function rest_set_sample_data_consent( WP_REST_Request $request ): WP_REST_Response {
+		$granted = (bool) $request->get_param( 'granted' );
+		$this->set_sample_data_consent( $granted ? 'granted' : 'declined' );
+
+		$consent = $this->get_sample_data_consent();
+
+		return new WP_REST_Response(
+			array(
+				'consent' => '' === $consent ? null : $consent,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST permission check.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return bool True when the current user may manage the plugin.
+	 */
+	public function rest_permission_check(): bool {
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * REST callback: report sample-data status.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return WP_REST_Response Status payload.
+	 */
+	public function rest_sample_data_status(): WP_REST_Response {
+		$exists  = $this->sample_data_exists();
+		$dir     = $this->get_sample_data_directory();
+		$consent = $this->get_sample_data_consent();
+
+		return new WP_REST_Response(
+			array(
+				'exists'      => $exists,
+				'last_synced' => $exists && is_dir( $dir ) ? gmdate( 'c', (int) filemtime( $dir ) ) : null,
+				'repo_url'    => 'https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart',
+				'consent'     => '' === $consent ? null : $consent,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback: download / re-sync sample data.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `force` re-downloads.
+	 * @return WP_REST_Response|WP_Error Sync result payload.
+	 */
+	public function rest_download_sample_data( WP_REST_Request $request ) {
+		$force = (bool) $request->get_param( 'force' );
+
+		if ( $force ) {
+			$dir = $this->get_sample_data_directory();
+			global $wp_filesystem;
+			if ( ! $wp_filesystem ) {
+				require_once ABSPATH . '/wp-admin/includes/file.php';
+				WP_Filesystem();
+			}
+			if ( $wp_filesystem ) {
+				foreach ( array( 'products', 'customers' ) as $subdir ) {
+					$wp_filesystem->delete( $dir . '/' . $subdir, true );
+				}
+			}
+		}
+
+		$result = $this->ensure_sample_data();
+		if ( ! $result ) {
+			return new WP_Error( 'download_failed', 'Failed to download sample data', array( 'status' => 500 ) );
+		}
+
+		// A successful download implies the administrator consented.
+		$this->set_sample_data_consent( 'granted' );
+
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => 'Sample data synced successfully.',
+			),
+			200
+		);
+	}
+
+	/**
 	 * Download sample data from remote repository
 	 *
 	 * Downloads the sample data archive from GitHub and extracts it to the local directory.
@@ -454,7 +618,7 @@ class StoreSeeder {
 			return false;
 		}
 
-		// Save zip file temporarily
+		// Save zip file temporarily.
 		if ( ! $wp_filesystem->put_contents( $temp_zip_file, $zip_content ) ) {
 			return false;
 		}
@@ -504,6 +668,22 @@ class StoreSeeder {
 			return false;
 		}
 
+		// Guard against zip-slip: reject any entry that escapes the target dir.
+		for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive built-in property.
+			$entry_name = $zip->getNameIndex( $i );
+			if (
+				false === $entry_name
+				|| '' === $entry_name
+				|| 0 === strpos( $entry_name, '/' )
+				|| 0 === strpos( $entry_name, '\\' )
+				|| 1 === preg_match( '#(?:^|[/\\\\])\.\.(?:[/\\\\]|$)#', $entry_name )
+			) {
+				$this->debug_log( 'StoreSeeder: Unsafe path in zip archive: ' . ( false === $entry_name ? '(invalid)' : $entry_name ) );
+				$zip->close();
+				return false;
+			}
+		}
+
 		if ( ! $zip->extractTo( $extract_to ) ) {
 			$this->debug_log( 'StoreSeeder: Failed to extract zip file' );
 			$zip->close();
@@ -550,13 +730,13 @@ class StoreSeeder {
 			$dest_path   = $dest_dir . '/' . $item['name'];
 
 			if ( 'd' === $item['type'] ) {
-				// Directory
+				// Directory.
 				if ( ! $wp_filesystem->exists( $dest_path ) ) {
 					$wp_filesystem->mkdir( $dest_path );
 				}
 				$this->move_directory_contents( $source_path, $dest_path );
 			} else {
-				// File
+				// File.
 				$wp_filesystem->move( $source_path, $dest_path );
 			}
 		}
