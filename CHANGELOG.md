@@ -21,7 +21,7 @@ Initial release.
 - Modern single-page React admin (React Router v7, Tailwind CSS v4) with a live preview, command palette, and batch queue.
 - REST API — every generator at `storeseeder/v1/<resource>/generate`.
 - Optional Model Context Protocol (MCP) integration via the WordPress Abilities API + `mcp-adapter`.
-- Consent-gated sample data: locale-specific reference data downloads from GitHub only after an administrator accepts a one-time consent prompt (or clicks Sync in Settings); no site data is sent, and declining leaves generators working from built-in defaults. The decision is site-wide and changeable from Settings, where **Show consent prompt** reopens the original prompt on demand — it otherwise appears only on a site that has not decided yet.
+- Consent-gated sample data: locale-specific reference data downloads from GitHub only after an administrator accepts a one-time consent prompt (or clicks Sync in Settings); no site data is sent, and declining leaves generators working from built-in defaults. The decision is site-wide and changeable from Settings: **Revoke** withdraws permission, and while permission is not granted, **Sync now** reopens the consent prompt instead of downloading — so the question is always attached to the download it governs.
 - Filters and actions across the generation lifecycle.
 
 ### Security

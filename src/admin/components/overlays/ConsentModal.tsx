@@ -4,7 +4,10 @@ import { __ } from "@wordpress/i18n";
 
 import { Button } from "@/admin/components/ui/button";
 import { Icon } from "@/admin/lib/icons";
-import { SHOW_CONSENT_EVENT } from "@/admin/lib/consent";
+import {
+  SHOW_CONSENT_EVENT,
+  notifyConsentChanged,
+} from "@/admin/lib/consent";
 import { useToast } from "@/admin/providers/ToastProvider";
 
 const REPO_URL =
@@ -101,6 +104,7 @@ export function ConsentModal() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`);
       toast(__("Sample data downloaded", "storeseeder"));
+      notifyConsentChanged();
       setOpen(false);
     } catch {
       toast(
@@ -121,6 +125,7 @@ export function ConsentModal() {
     } catch {
       /* Best effort — declining is a local preference. */
     }
+    notifyConsentChanged();
     setOpen(false);
   }, [restUrl, nonce]);
 

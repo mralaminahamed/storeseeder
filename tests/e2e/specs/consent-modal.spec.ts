@@ -54,11 +54,47 @@ test.describe('Sample-data consent modal', () => {
     expect(declined).toBe(true);
   });
 
-  test('Settings can reopen the prompt after a decision is recorded', async ({
+  test('Sync now reopens the prompt instead of downloading when consent is revoked', async ({
     page,
   }) => {
-    // Consent granted and data already present: both load-time gates closed, so
-    // the modal must not auto-open. Anything visible after this is the trigger.
+    // Revoked, and data already present, so neither load-time gate opens the
+    // modal. Any POST here would be a download that bypassed the prompt.
+    let downloaded = false;
+    await page.route('**/download-sample', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            exists: true,
+            last_synced: '2026-01-01T00:00:00+00:00',
+            repo_url: '',
+            consent: 'declined',
+          }),
+        });
+        return;
+      }
+      downloaded = true;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, message: 'synced' }),
+      });
+    });
+
+    await page.goto(`${PLUGIN_URL}#/settings`);
+    await expect(page.getByTestId('consent-modal')).toBeHidden();
+
+    await page.getByRole('button', { name: 'Sync now' }).click();
+
+    await expect(page.getByTestId('consent-modal')).toBeVisible();
+    expect(downloaded).toBe(false);
+  });
+
+  test('Sync now downloads directly once consent is granted', async ({
+    page,
+  }) => {
+    let downloaded = false;
     await page.route('**/download-sample', async (route) => {
       if (route.request().method() === 'GET') {
         await route.fulfill({
@@ -71,15 +107,20 @@ test.describe('Sample-data consent modal', () => {
             consent: 'granted',
           }),
         });
-      } else {
-        await route.continue();
+        return;
       }
+      downloaded = true;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, message: 'synced' }),
+      });
     });
 
     await page.goto(`${PLUGIN_URL}#/settings`);
-    await expect(page.getByTestId('consent-modal')).toBeHidden();
+    await page.getByRole('button', { name: 'Sync now' }).click();
 
-    await page.getByTestId('consent-reshow').click();
-    await expect(page.getByTestId('consent-modal')).toBeVisible();
+    await expect.poll(() => downloaded).toBe(true);
+    await expect(page.getByTestId('consent-modal')).toBeHidden();
   });
 });
