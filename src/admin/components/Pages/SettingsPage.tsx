@@ -146,7 +146,7 @@ export default function SettingsPage() {
   const syncSummary = (): JSX.Element => {
     if (statusLoading) {
       return (
-        <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
           {__("Checking status…", "storeseeder")}
         </div>
       );
@@ -155,7 +155,7 @@ export default function SettingsPage() {
     if (syncStatus?.exists) {
       return (
         <>
-          <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 500 }}>
             {__("Sample data is synced", "storeseeder")}
           </div>
           {syncStatus.last_synced && (
@@ -173,7 +173,7 @@ export default function SettingsPage() {
 
     return (
       <>
-        <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
           {__("Sample data not found", "storeseeder")}
         </div>
         <div style={{ fontSize: 12, color: "var(--text-3)" }}>

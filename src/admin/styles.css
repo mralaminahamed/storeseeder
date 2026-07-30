@@ -310,13 +310,13 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
 .fp-root :where(h1, h2, h3, h4, h5, h6) {
   color: var(--text);
   font-family: inherit;
-  font-weight: 640;
+  font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.25;
   margin: 0 0 8px;
   padding: 0;
 }
-.fp-root :where(h1) { font-size: var(--fs-h1); font-weight: 680; letter-spacing: -0.02em; }
+.fp-root :where(h1) { font-size: var(--fs-h1); font-weight: 700; letter-spacing: -0.02em; }
 .fp-root :where(h2) { font-size: var(--fs-h2); }
 .fp-root :where(h3) { font-size: 15px; }
 .fp-root :where(h4) { font-size: 13.5px; }

@@ -278,7 +278,7 @@ export default function GeneratorPage() {
               {generating && (
                 <div className="fp-gen-progress">
                   <div className="fp-spinner" />
-                  <div style={{ fontWeight: 550, fontSize: 14 }}>
+                  <div style={{ fontWeight: 500, fontSize: 14 }}>
                     {sprintf(
                       /* translators: %1$s: count, %2$s: generator name */
                       __("Generating %1$s %2$s…", "storeseeder"),

@@ -77,7 +77,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
                     <Icon name={g?.iconName ?? "box"} size={17} />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 500 }}>
                       {g?.name ?? b.route}
                     </div>
                     <div style={{ fontSize: 12, color: "var(--text-3)" }}>
