@@ -75,7 +75,7 @@ storeseeder/
 ### 📁 Directory Structure Explanation
 
 - **`includes/`**: Contains all PHP backend logic with clear separation between generators and controllers
-- **`src/admin/`**: Modern React frontend with component-based architecture
+- **`src/`**: Modern React frontend with component-based architecture
 - **`build/`**: Production-ready compiled assets
 - **`docs/`**: Complete documentation for users and developers
 
@@ -251,7 +251,7 @@ const router = createHashRouter([
 
 ### 🧩 Component Architecture
 
-#### Page Components (`src/admin/components/Pages/`)
+#### Page Components (`src/components/Pages/`)
 
 Route-focused components that handle specific URLs and layouts:
 
@@ -259,7 +259,7 @@ Route-focused components that handle specific URLs and layouts:
 - **`HomePage.jsx`**: Dashboard with generator selection grid and quick actions
 - **`GeneratorPage.jsx`**: Individual generator interfaces with parameter controls
 
-#### Generator Components (`src/admin/components/Generators/`)
+#### Generator Components (`src/components/generator/`)
 
 Data generation components extending the base generator:
 

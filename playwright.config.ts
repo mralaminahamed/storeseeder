@@ -40,6 +40,14 @@ export default defineConfig({
         storageState: 'tests/e2e/.auth/admin.json',
       },
       dependencies: ['setup'],
+      /*
+       * screenshots.spec.ts and banners.spec.ts write into .wordpress-org/ — they
+       * produce the listing assets rather than assert anything, and they have their
+       * own config and npm scripts. Matched here they ran on every `playwright test`
+       * and silently overwrote the shipped PNGs with whatever Faker had generated
+       * that minute.
+       */
+      testIgnore: ['specs/screenshots.spec.ts', 'specs/banners.spec.ts'],
       testMatch: 'specs/**/*.spec.ts',
     },
   ],

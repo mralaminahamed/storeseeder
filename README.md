@@ -121,7 +121,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 
 ```mermaid
 flowchart LR
-    A["React admin<br/>src/admin"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
+    A["React admin<br/>src"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
     B -->|"JSON Schema validation"| C["Generator<br/>generate()"]
     C -->|FakerPHP| D["Fluent Cart models"]
     D --> E["WordPress database"]
@@ -142,7 +142,7 @@ includes/
 ```
 
 The admin app is React 18, React Router v7, Radix UI, and Tailwind CSS v4, entered at
-`src/admin/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
+`src/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
 readable source lives in this repository.
 
 ## Development
@@ -161,7 +161,7 @@ composer lint                # WordPress coding standards (phpcs)
 composer format              # Auto-fix coding standards (phpcbf)
 composer analyse             # Static analysis (PHPStan, level 7)
 composer phpcs:plugin-review # WordPress.org plugin review ruleset
-composer makepot             # Regenerate the translation template
+composer makepot             # Regenerate the translation template (needs build/, so yarn build first)
 composer release             # Lint + analyse + build + makepot + zip
 composer zip:dev             # Development zip at release/dev/storeseeder.zip
 ```

@@ -19,16 +19,16 @@ defaults:
 # ---------------------------------------------------------------------------
 # Pipeline DAG (StoreSeeder — no Freemius):
 #
-#   meta ──┬── lint ─────┐
-#          ├── phpstan ───┤
-#          ├── assets ────┼── package ── deploy
-#          └── i18n ──────┘
+#   meta ──┬── lint ────────────────┐
+#          ├── phpstan ──────────────┤
+#          └── assets ──┬── i18n ────┼── package ── deploy
+#                       └────────────┘
 #
 #   meta     : resolve slug, validate tag == header version, prerelease flag
 #   lint     : PHP syntax + sensitive scan + PHPCS (WPCS)  — gate, parallel
 #   phpstan  : PHPStan (level 7)                           — gate, parallel
 #   assets   : wp-scripts build -> build/                  — producer, parallel
-#   i18n     : wp i18n make-pot -> languages/              — producer, parallel
+#   i18n     : wp i18n make-pot -> languages/              — producer, after assets
 #   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip
 #   deploy   : 10up SVN deploy (BUILD_DIR) + .wordpress-org assets + GH release
 # ---------------------------------------------------------------------------
@@ -173,12 +173,17 @@ jobs:
           retention-days: 1
 
   # -------------------------------------------------------------------------
-  # JOB 5 — i18n: generate the translation template. (parallel) -> languages/
+  # JOB 5 — i18n: generate the translation template. -> languages/
+  #
+  # Needs the compiled bundle, so it runs after assets rather than beside it:
+  # `wp i18n make-pot` does not read .tsx sources, so the admin UI strings are
+  # extracted from build/admin-app.js. Without the artifact the POT would still be
+  # produced, just silently missing every string in the interface.
   # -------------------------------------------------------------------------
   i18n:
     name: "i18n: translations"
     runs-on: ubuntu-latest
-    needs: meta
+    needs: [meta, assets]
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
@@ -186,6 +191,11 @@ jobs:
           php-version: "7.4"
           coverage: none
           tools: composer:v2, wp-cli
+      - name: Download compiled assets
+        uses: actions/download-artifact@v8
+        with:
+          name: build-${{ needs.meta.outputs.version }}
+          path: build
       - name: Generate POT
         run: |
           mkdir -p languages

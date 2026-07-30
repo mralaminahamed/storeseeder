@@ -32,6 +32,8 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# npm lockfile: yarn.lock is the tracked one (CI runs yarn install --immutable)
+package-lock.json
 
 # Coverage and testing
 coverage/
@@ -79,6 +81,7 @@ storeseeder-sample-data-fluent-cart/
 
 # Claude AI
 .claude/
+/.remember/
 
 # Temporary files
 *.tmp

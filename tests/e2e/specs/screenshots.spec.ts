@@ -1,13 +1,12 @@
 import { test } from '@playwright/test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { BRAND, glassField } from '../brand';
 
 const PLUGIN_URL = '/wp-admin/admin.php?page=storeseeder';
 const ASSET_DIR = join(__dirname, '..', '..', '..', '.wordpress-org');
 
-/** Brand gradient, taken from .wordpress-org/icon.svg. */
-const BRAND_FROM = '#4f46e5';
-const BRAND_TO = '#7c3aed';
+/** Palette shared with the icon and the banners. See tests/e2e/brand.ts. */
 
 /** Final canvas. The plugin directory renders screenshots in a fixed carousel. */
 const CANVAS = { width: 1200, height: 900 };
@@ -45,10 +44,10 @@ async function hideWpChrome(page: import('@playwright/test').Page) {
          shots would otherwise decide the listing's colour. Pin the accent to the
          brand indigo so the images match the icon and banner. */
       .fp-root {
-        --wp-admin-primary: ${BRAND_FROM} !important;
-        --wp-admin-secondary: #4338ca !important;
-        --wp-admin-highlight: #6366f1 !important;
-        --wp-admin-accent: ${BRAND_TO} !important;
+        --wp-admin-primary: ${BRAND.mid} !important;
+        --wp-admin-secondary: ${BRAND.deep} !important;
+        --wp-admin-highlight: ${BRAND.top} !important;
+        --wp-admin-accent: ${BRAND.tint} !important;
       }
     `,
   });
@@ -58,18 +57,19 @@ async function hideWpChrome(page: import('@playwright/test').Page) {
 /**
  * Compose one listing image: the real capture inset in a branded frame.
  *
- * Gradient field, icon and wordmark, a kicker plus title, the product shot on a
+ * Glass field, icon and wordmark, a kicker plus title, the product shot on a
  * white card, and a footer line — the same treatment as the author's other
  * plugin listings, so the directory pages read as one family rather than five
- * raw admin screenshots.
+ * raw admin screenshots. The field is `glassField()`, the same lighting the icon
+ * bakes into its gradient stops, tilted closer to vertical for a 4:3 canvas.
  */
 function frame(options: {
   shotBase64: string;
-  iconBase64: string;
+  iconSvg: string;
   kicker: string;
   title: string;
 }): string {
-  const { shotBase64, iconBase64, kicker, title } = options;
+  const { shotBase64, iconSvg, kicker, title } = options;
 
   return `<!doctype html>
 <html>
@@ -85,8 +85,14 @@ function frame(options: {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
       Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
-    background: linear-gradient(135deg, ${BRAND_FROM} 0%, ${BRAND_TO} 100%);
+    background: ${glassField(172)};
     position: relative;
+  }
+
+  /* Rim light along the top edge, as on the icon and the banners. */
+  body::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    border-top: 1px solid rgba(255, 255, 255, .3);
   }
 
   /* Dot texture, mirrored top-right and bottom-left. */
@@ -102,11 +108,17 @@ function frame(options: {
     position: absolute; top: 44px; left: 52px;
     display: flex; align-items: center; gap: 16px;
   }
-  /* No plate behind the icon — it sits straight on the gradient. A drop shadow
-     keeps it from melting into a background of the same two stops. */
-  .brand img {
-    width: 58px; height: 58px; border-radius: 24%; display: block;
-    filter: drop-shadow(0 6px 14px rgba(23, 16, 60, .38));
+  /* No plate behind the icon — it sits straight on the field. A drop shadow
+     keeps it from melting into a background of its own hue.
+
+     The mark is icon.svg inlined verbatim, not a scaled-down icon-256x256.png:
+     the raster lost the 1.6px rim on the way down to 58px, and the CSS radius
+     this rule used to carry re-clipped corners the artwork had already rounded,
+     shaving the rim at all four of them. No radius here — the squircle, and the
+     shadow's shape, come from the artwork's own alpha. */
+  .brand svg {
+    width: 58px; height: 58px; display: block;
+    filter: drop-shadow(0 6px 14px rgba(${BRAND.shadow}, .38));
   }
   .brand span { color: #fff; font-size: 27px; font-weight: 700; letter-spacing: -.01em; }
 
@@ -123,7 +135,7 @@ function frame(options: {
   .card {
     position: absolute; left: 46px; right: 46px; top: 244px; height: 604px;
     background: #fff; border-radius: 22px; padding: 12px;
-    box-shadow: 0 30px 70px -20px rgba(23, 16, 60, .45), 0 10px 24px -12px rgba(23, 16, 60, .3);
+    box-shadow: 0 30px 70px -20px rgba(${BRAND.shadow}, .45), 0 10px 24px -12px rgba(${BRAND.shadow}, .3);
     overflow: hidden;
   }
   .card img {
@@ -143,7 +155,7 @@ function frame(options: {
   <div class="dots bl"></div>
 
   <div class="brand">
-    <img src="data:image/png;base64,${iconBase64}" alt="">
+    ${iconSvg}
     <span>StoreSeeder</span>
   </div>
 
@@ -213,7 +225,8 @@ const SHOTS = [
 ] as const;
 
 test.describe('Screenshots', () => {
-  const iconBase64 = readFileSync(join(ASSET_DIR, 'icon-256x256.png')).toString('base64');
+  // The listing icon itself, so the frames cannot show a stale copy of the mark.
+  const iconSvg = readFileSync(join(ASSET_DIR, 'icon.svg'), 'utf-8');
 
   for (const [index, shot] of SHOTS.entries()) {
     test(`${index + 1}. ${shot.file}`, async ({ page }) => {
@@ -230,7 +243,7 @@ test.describe('Screenshots', () => {
       // from wp-admin.
       await page.setViewportSize(CANVAS);
       await page.setContent(
-        frame({ shotBase64, iconBase64, kicker: shot.kicker, title: shot.title }),
+        frame({ shotBase64, iconSvg, kicker: shot.kicker, title: shot.title }),
       );
       await page.waitForTimeout(300);
 

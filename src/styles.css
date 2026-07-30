@@ -1,0 +1,532 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities) important;
+
+@theme {
+  /* Match the WP core admin font stacks — no bundled webfonts. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-mono: Menlo, Consolas, monaco, monospace;
+
+  --color-wp-admin-primary: var(--wp-admin-primary, #2271b1);
+  --color-wp-admin-secondary: var(--wp-admin-secondary, #135e96);
+  --color-wp-admin-highlight: var(--wp-admin-highlight, #043f54);
+  --color-wp-admin-accent: var(--wp-admin-accent, #0a4b78);
+
+  --color-wp-blue: #0073aa;
+  --color-wp-blue-dark: #005177;
+  --color-wp-gray: #f1f1f1;
+  --color-wp-gray-dark: #ddd;
+  --color-wp-text: #333;
+  --color-wp-text-secondary: #666;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: var(--wp-admin-primary, #3b82f6);
+  --color-blue-600: var(--wp-admin-secondary, #2563eb);
+  --color-blue-700: var(--wp-admin-highlight, #1d4ed8);
+  --color-blue-800: var(--wp-admin-accent, #1e40af);
+  --color-blue-900: #1e3a8a;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  /* Use WP font stack */
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* ============================================================
+   StoreSeeder — design tokens scoped to .fp-root
+   ============================================================ */
+
+.fp-root {
+  /* type */
+  font-family: var(--font-sans);
+
+  /* Height of the fixed WP admin bar (32px desktop, 46px ≤782px, 0 if hidden).
+     Used to offset the app height and any fixed overlay panels. */
+  --fp-admin-bar: 32px;
+
+  /* radii */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 18px;
+  --r-full: 999px;
+
+  /* ---- density scale ----
+     Driven by Tweaks → Density. Components read these instead of hardcoding
+     px, so switching to compact tightens every page, panel, and control
+     rather than the handful of surfaces that used to carry an override.
+     The values here are the comfortable defaults. */
+
+  /* page + shell */
+  --pad-page-y: 28px;
+  --pad-page-x: 34px;
+  --pad-page-b: 120px;
+  --nav-w: 252px;
+  --nav-w-collapsed: 68px;
+  --pad-nav-item-y: 7px;
+  --pad-brand-y: 16px;
+  --topbar-h: 54px;
+  --pad-topbar-x: 22px;
+
+  /* containers */
+  --pad-card: 18px;
+  --pad-card-lg-y: 22px;
+  --pad-card-lg-x: 24px;
+  --pad-col-y: 26px;
+  --pad-col-x: 30px;
+  --pad-col-b: 40px;
+  --pad-panel-y: 16px;
+  --pad-panel-x: 18px;
+  --pad-row-y: 11px;
+  --pad-row-x: 14px;
+  --pad-cell-y: 11px;
+  --pad-cell-x: 16px;
+
+  /* rhythm */
+  --mb-section: 28px;
+  --mb-head: 24px;
+  --mb-field: 16px;
+  --pad-field-sec-y: 20px;
+  --gap-grid: 16px;
+
+  /* control heights */
+  --ctl-h: 38px;
+  --ctl-h-sm: 31px;
+  --ctl-h-lg: 44px;
+  --ctl-h-icon: 34px;
+
+  /* icon tiles */
+  --tile: 38px;
+  --tile-sm: 30px;
+  --tile-lg: 44px;
+
+  /* density-sensitive type */
+  --fs-h1: 25px;
+  --fs-h2: 16px;
+  --fs-title: 20px;
+  --fs-stat: 30px;
+  --card-min-h: 158px;
+
+  /* accent — default indigo (overridable via [data-accent]) */
+  --accent: oklch(0.55 0.205 277);
+  --accent-contrast: #ffffff;
+
+  /* ---- LIGHT THEME ---- */
+  --bg: oklch(0.985 0.003 270);
+  --bg-2: oklch(0.965 0.004 270);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.985 0.003 270);
+  --surface-inset: oklch(0.972 0.004 270);
+  --border: oklch(0.916 0.005 270);
+  --border-strong: oklch(0.86 0.006 270);
+  --text: oklch(0.245 0.012 274);
+  --text-2: oklch(0.46 0.012 274);
+  --text-3: oklch(0.62 0.011 274);
+  --text-faint: oklch(0.72 0.009 274);
+
+  --shadow-color: 274 30% 30%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06), 0 1px 1px hsl(var(--shadow-color) / 0.04);
+  --shadow-md: 0 4px 12px -2px hsl(var(--shadow-color) / 0.10), 0 2px 4px -2px hsl(var(--shadow-color) / 0.06);
+  --shadow-lg: 0 16px 40px -8px hsl(var(--shadow-color) / 0.16), 0 6px 14px -6px hsl(var(--shadow-color) / 0.10);
+  --shadow-pop: 0 24px 60px -12px hsl(var(--shadow-color) / 0.28), 0 8px 20px -8px hsl(var(--shadow-color) / 0.16);
+
+  /* semantic */
+  --green: oklch(0.62 0.16 152);
+  --amber: oklch(0.74 0.15 75);
+  --red: oklch(0.60 0.21 22);
+  --sky: oklch(0.62 0.14 232);
+  --violet: oklch(0.58 0.20 300);
+
+  /* derived accent helpers.
+     Mixed in oklab, not oklch: oklch carries a hue channel, and mixing a
+     chromatic colour with an achromatic one (white, black, a near-grey
+     surface) drags that hue toward 0 — which turned every indigo tint pink.
+     oklab has no hue channel, so a tint stays on the accent's own hue. */
+  --accent-hover: color-mix(in oklab, var(--accent), black 12%);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  --accent-soft-2: color-mix(in oklab, var(--accent) 20%, var(--surface));
+  --accent-line: color-mix(in oklab, var(--accent) 32%, var(--border));
+  --ring: color-mix(in oklab, var(--accent) 36%, transparent);
+
+  /* base app styles */
+  background: var(--bg-2);
+  color: var(--text);
+  /* Fill the viewport minus the fixed WP admin bar so the sticky run bar
+     never sits behind it / off-screen. WP pushes content down 32px (≥783px)
+     or 46px (≤782px) via html.wp-toolbar padding-top. */
+  height: 100vh; /* fallback */
+  height: calc(100vh - var(--fp-admin-bar));
+  -webkit-font-smoothing: antialiased;
+  /* Clip to the fixed height and lay children out as a flex column so the
+     height chain reaches .fp-scroll — otherwise the whole document scrolls
+     and the sticky topbar rides up with the page. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Admin bar grows to 46px on small screens. */
+@media screen and (max-width: 782px) {
+  .fp-root { --fp-admin-bar: 46px; }
+}
+
+/* When the admin bar is hidden (e.g. fullscreen block editor contexts), the
+   content area starts at the very top. */
+body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
+
+.fp-root *, .fp-root *::before, .fp-root *::after { box-sizing: border-box; }
+
+.fp-root[data-theme="dark"] {
+  --bg: oklch(0.165 0.011 270);
+  --bg-2: oklch(0.145 0.011 270);
+  --surface: oklch(0.205 0.013 270);
+  --surface-2: oklch(0.232 0.014 270);
+  --surface-inset: oklch(0.185 0.012 270);
+  --border: oklch(0.292 0.014 270);
+  --border-strong: oklch(0.36 0.016 270);
+  --text: oklch(0.965 0.004 270);
+  --text-2: oklch(0.74 0.012 270);
+  --text-3: oklch(0.60 0.013 270);
+  --text-faint: oklch(0.50 0.013 270);
+
+  --shadow-color: 270 50% 2%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.30);
+  --shadow-md: 0 4px 14px -2px hsl(var(--shadow-color) / 0.45), 0 2px 4px -2px hsl(var(--shadow-color) / 0.35);
+  --shadow-lg: 0 18px 44px -8px hsl(var(--shadow-color) / 0.55), 0 6px 14px -6px hsl(var(--shadow-color) / 0.4);
+  --shadow-pop: 0 28px 70px -12px hsl(var(--shadow-color) / 0.7), 0 10px 24px -8px hsl(var(--shadow-color) / 0.5);
+
+  --green: oklch(0.72 0.17 152);
+  --amber: oklch(0.80 0.15 80);
+  --red: oklch(0.68 0.19 22);
+  --sky: oklch(0.70 0.14 232);
+  --violet: oklch(0.70 0.18 300);
+
+  --accent-soft: color-mix(in oklab, var(--accent) 22%, var(--surface));
+  --accent-soft-2: color-mix(in oklab, var(--accent) 34%, var(--surface));
+  --accent-hover: color-mix(in oklab, var(--accent), white 10%);
+}
+
+/* ---- accent palettes ---- */
+.fp-root[data-accent="indigo"]  { --accent: oklch(0.55 0.205 277); --accent-contrast: #fff; }
+.fp-root[data-accent="blue"]    { --accent: oklch(0.55 0.205 256); --accent-contrast: #fff; }
+.fp-root[data-accent="violet"]  { --accent: oklch(0.56 0.225 300); --accent-contrast: #fff; }
+.fp-root[data-accent="emerald"] { --accent: oklch(0.60 0.145 162); --accent-contrast: #fff; }
+.fp-root[data-accent="amber"]   { --accent: oklch(0.72 0.155 66);  --accent-contrast: oklch(0.28 0.04 70); }
+.fp-root[data-theme="dark"][data-accent="amber"] { --accent: oklch(0.78 0.155 72); }
+
+/* ---- density: compact ----
+   One override block for the whole app: every component consumes the tokens
+   above, so nothing needs a per-component compact rule. */
+.fp-root[data-density="compact"] {
+  --pad-page-y: 18px;
+  --pad-page-x: 24px;
+  --pad-page-b: 84px;
+  --nav-w: 226px;
+  --nav-w-collapsed: 60px;
+  --pad-nav-item-y: 5px;
+  --pad-brand-y: 12px;
+  --topbar-h: 46px;
+  --pad-topbar-x: 16px;
+
+  --pad-card: 14px;
+  --pad-card-lg-y: 18px;
+  --pad-card-lg-x: 20px;
+  --pad-col-y: 18px;
+  --pad-col-x: 22px;
+  --pad-col-b: 26px;
+  --pad-panel-y: 12px;
+  --pad-panel-x: 14px;
+  --pad-row-y: 8px;
+  --pad-row-x: 11px;
+  --pad-cell-y: 7px;
+  --pad-cell-x: 12px;
+
+  --mb-section: 20px;
+  --mb-head: 16px;
+  --mb-field: 12px;
+  --pad-field-sec-y: 14px;
+  --gap-grid: 12px;
+
+  --ctl-h: 34px;
+  --ctl-h-sm: 28px;
+  --ctl-h-lg: 39px;
+  --ctl-h-icon: 30px;
+
+  --tile: 32px;
+  --tile-sm: 26px;
+  --tile-lg: 38px;
+
+  --fs-h1: 22px;
+  --fs-h2: 15px;
+  --fs-title: 18px;
+  --fs-stat: 26px;
+  --card-min-h: 0px;
+}
+
+/* ---- scrollbars ---- */
+.fp-root * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.fp-root *::-webkit-scrollbar { width: 10px; height: 10px; }
+.fp-root *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
+.fp-root *::-webkit-scrollbar-thumb:hover { background: var(--text-faint); background-clip: content-box; }
+
+/* ============================================================
+   base elements
+   WordPress admin paints h1–h6, a, p, lists, code and form controls with its
+   own light-theme colours (#1d2327 text, #2271b1 links). Those rules apply
+   inside our container too, so any element not wearing an fp-* class stayed
+   light-on-dark when the theme flipped. Restating them against the tokens
+   fixes dark mode for all of it.
+
+   Element selectors sit inside :where() so they contribute no specificity:
+   they still beat WordPress's bare `h1`/`a` rules through .fp-root, while any
+   component class keeps winning over them.
+   ============================================================ */
+
+.fp-root :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 0 0 8px;
+  padding: 0;
+}
+.fp-root :where(h1) { font-size: var(--fs-h1); font-weight: 700; letter-spacing: -0.02em; }
+.fp-root :where(h2) { font-size: var(--fs-h2); }
+.fp-root :where(h3) { font-size: 15px; }
+.fp-root :where(h4) { font-size: 13.5px; }
+.fp-root :where(h5) { font-size: 12.5px; }
+.fp-root :where(h6) {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.fp-root :where(h1, h2, h3, h4, h5, h6):last-child { margin-bottom: 0; }
+
+.fp-root :where(p) { color: var(--text-2); font-size: 13.5px; line-height: 1.6; margin: 0 0 12px; }
+.fp-root :where(p):last-child { margin-bottom: 0; }
+.fp-root :where(small) { font-size: 12px; color: var(--text-3); }
+.fp-root :where(strong, b) { color: var(--text); font-weight: 600; }
+.fp-root :where(em, i) { color: inherit; }
+.fp-root :where(mark) { background: color-mix(in oklab, var(--amber) 30%, transparent); color: var(--text); }
+.fp-root :where(abbr[title]) { border-bottom: 1px dotted var(--border-strong); text-decoration: none; cursor: help; }
+
+/* Links resolve to the accent so they read on both themes. :hover/:focus are
+   left outside :where() because WordPress's own a:hover carries a pseudo-class
+   and would otherwise win. */
+.fp-root :where(a) { color: var(--accent); text-decoration: none; transition: color .12s; }
+.fp-root :where(a):hover,
+.fp-root :where(a):active { color: var(--accent-hover); text-decoration: underline; }
+.fp-root :where(a):visited { color: var(--accent); }
+/* WordPress puts a blue box-shadow on :focus for every admin link; keep focus
+   feedback on the token ring instead, and only for keyboard focus. */
+.fp-root :where(a):focus { box-shadow: none; color: var(--accent-hover); }
+.fp-root :where(a):focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); border-radius: var(--r-xs); }
+.fp-root :where(a.fp-btn, a.fp-nav-item, a.fp-cmd-item):hover { text-decoration: none; }
+
+.fp-root :where(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+  background: var(--surface-inset);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+}
+.fp-root :where(code, kbd, samp) { font-size: 12px; padding: 1px 5px; }
+.fp-root :where(pre) { padding: 12px; margin: 0 0 12px; overflow: auto; font-size: 12.5px; line-height: 1.55; }
+.fp-root :where(pre code) { background: none; border: none; padding: 0; }
+
+.fp-root :where(ul, ol) { color: var(--text-2); font-size: 13.5px; line-height: 1.6; margin: 0 0 12px; padding-left: 1.3em; }
+.fp-root :where(ul) { list-style: disc; }
+.fp-root :where(ol) { list-style: decimal; }
+.fp-root :where(li) { margin: 0 0 4px; }
+.fp-root :where(dl) { margin: 0 0 12px; }
+.fp-root :where(dt) { color: var(--text); font-weight: 600; }
+.fp-root :where(dd) { color: var(--text-2); margin: 0 0 8px; }
+.fp-root :where(blockquote) {
+  margin: 0 0 12px; padding-left: 12px;
+  border-left: 2px solid var(--accent-line); color: var(--text-2);
+}
+.fp-root :where(hr) { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.fp-root :where(label) { color: var(--text); font-size: 13px; }
+.fp-root :where(figure) { margin: 0 0 12px; }
+.fp-root :where(figcaption) { font-size: 12px; color: var(--text-3); }
+.fp-root :where(img, svg, video) { max-width: 100%; }
+.fp-root :where(fieldset) { border: 1px solid var(--border); border-radius: var(--r-md); padding: 12px; margin: 0 0 12px; }
+.fp-root :where(legend) { color: var(--text); font-size: 12.5px; font-weight: 600; padding: 0 4px; }
+.fp-root :where(table) { color: var(--text-2); border-color: var(--border); }
+.fp-root :where(th) { color: var(--text); }
+.fp-root :where(caption) { color: var(--text-3); font-size: 12px; text-align: left; }
+
+/* Raw form controls. WordPress styles these with attribute selectors, which
+   outrank a :where() rule, so these need the specificity — and an escape
+   hatch so the fp-* controls keep their own look. */
+.fp-root input[type="text"]:not([class*="fp-"]),
+.fp-root input[type="search"]:not([class*="fp-"]),
+.fp-root input[type="number"]:not([class*="fp-"]),
+.fp-root input[type="email"]:not([class*="fp-"]),
+.fp-root input[type="url"]:not([class*="fp-"]),
+.fp-root input[type="tel"]:not([class*="fp-"]),
+.fp-root input[type="password"]:not([class*="fp-"]),
+.fp-root textarea:not([class*="fp-"]),
+.fp-root select:not([class*="fp-"]) {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13.5px;
+  box-shadow: none;
+  padding: 0 12px;
+  min-height: var(--ctl-h);
+}
+.fp-root textarea:not([class*="fp-"]) {
+  min-height: calc(var(--ctl-h) * 2);
+  padding: 8px 12px;
+  line-height: 1.55;
+}
+.fp-root input:not([class*="fp-"]):focus,
+.fp-root textarea:not([class*="fp-"]):focus,
+.fp-root select:not([class*="fp-"]):focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+  outline: none;
+}
+.fp-root input:not([class*="fp-"])::placeholder,
+.fp-root textarea:not([class*="fp-"])::placeholder { color: var(--text-faint); }
+.fp-root input[type="checkbox"]:not([class*="fp-"]),
+.fp-root input[type="radio"]:not([class*="fp-"]) {
+  accent-color: var(--accent);
+  background: var(--surface);
+  border-color: var(--border-strong);
+}
+.fp-root input:disabled, .fp-root textarea:disabled, .fp-root select:disabled { opacity: .55; }
+
+/* ---- typography helpers ---- */
+.fp-root .mono { font-family: var(--font-mono); font-feature-settings: "tnum"; }
+.fp-root .tnum { font-variant-numeric: tabular-nums; }
+
+/* ---- focus ring ---- */
+.fp-root .fp-focusable:focus-visible,
+.fp-root input:focus-visible,
+.fp-root button:focus-visible,
+.fp-root select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* ---- selection ---- */
+.fp-root ::selection { background: color-mix(in oklab, var(--accent) 28%, transparent); }
+
+/* ---- keyframes (global — fine for @keyframes) ---- */
+@keyframes fp-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fp-fade-down { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes fp-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fp-pop { 0% { opacity: 0; transform: scale(.96) translateY(6px); } 100% { opacity: 1; transform: none; } }
+@keyframes fp-spin { to { transform: rotate(360deg); } }
+@keyframes fp-shimmer { 100% { background-position: 200% 0; } }
+@keyframes fp-bar { from { width: 0; } }
+/* entrance/row animations are transform-only so content stays visible even
+   if the animation is throttled/paused (e.g. backgrounded iframe). */
+@keyframes fp-rise { from { transform: translateY(10px); } to { transform: none; } }
+@keyframes fp-row-in { from { transform: translateY(5px); } to { transform: none; } }
+
+.fp-root .fp-enter { animation: fp-rise .42s cubic-bezier(.2,.7,.2,1); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; }
+}
+
+/* ============================================================ */
+
+@utility animate-collapsible-down {
+  animation: collapsible-down 0.2s ease-out;
+}
+
+@utility animate-collapsible-up {
+  animation: collapsible-up 0.2s ease-out;
+}
+
+@keyframes collapsible-down {
+
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes collapsible-up {
+
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-progress-shimmer {
+  background: linear-gradient(90deg, transparent 0%, #2563eb 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: progress-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+
+  from {
+    background-position: -200% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}
+
+
+body:has(#storeseeder-root) #wpcontent {
+  padding-left: 0;
+
+  /* Remove WP admin default focus styles from links */
+  a:focus {
+    box-shadow: none;
+  }
+}
+
+/* The plugin app is a full-height takeover of the content area, so the
+   WordPress admin footer ("Thank you for creating with WordPress…") would
+   overlap the sticky run bar. Hide it on our screen only. */
+body:has(#storeseeder-root) #wpfooter {
+  display: none;
+}
+
+/* Reset WP core's reserved footer space so the app fills the content area. */
+body:has(#storeseeder-root) #wpbody-content {
+  padding-bottom: 0;
+}

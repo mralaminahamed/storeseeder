@@ -1,6 +1,6 @@
 {
   "name": "mralaminahamed/storeseeder",
-  "description": "Comprehensive Fluent Cart test data generator with 10 specialized generators, real-time validation, advanced parameter configuration, WordPress admin color integration, and modern React Router v7 interface.",
+  "description": "Comprehensive Fluent Cart test data generator with 17 generators, live preview, schema-driven parameter configuration, WordPress admin colour integration, and a modern React Router v7 interface.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "authors": [
@@ -78,7 +78,10 @@
     "phpstan": "phpstan analyse --memory-limit 2G",
     "test": "phpunit",
     "test:coverage": "phpunit --coverage-html=tests/coverage/html",
-    "makepot": "wp i18n make-pot . languages/storeseeder.pot --domain=storeseeder --exclude=node_modules,vendor,drafts,docs,build,release,tests",
+    "makepot": [
+      "@php -r \"if (! file_exists('build/admin-app.js')) { fwrite(STDERR, 'build/admin-app.js is missing. Run yarn build first: the admin UI strings are extracted from the compiled bundle, because wp i18n make-pot does not read .tsx sources.' . PHP_EOL); exit(1); }\"",
+      "wp i18n make-pot . languages/storeseeder.pot --domain=storeseeder --exclude=node_modules,vendor,drafts,docs,release,tests"
+    ],
     "release": [
       "@lint",
       "@analyse",
@@ -97,7 +100,7 @@
       "@makepot",
       "composer update --no-dev",
       "mkdir -p release/dev",
-      "rsync -av --exclude='.*' --exclude='node_modules' --exclude='release' --exclude='src' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.md' --exclude='*.log' --exclude='package.json' --exclude='package-lock.json' --exclude='yarn.lock' --exclude='composer.lock' --exclude='webpack.config.js' --exclude='tsconfig.json' --exclude='postcss.config.js' --exclude='tailwind.config.js' --exclude='components.json' --exclude='phpcs.xml' --exclude='phpcs.plugin-review.xml' --exclude='phpstan.neon' --exclude='phpunit.xml.dist' --exclude='phpunit.xml' . release/dev/storeseeder/",
+      "rsync -av --exclude='.*' --exclude='node_modules' --exclude='release' --exclude='src' --exclude='docs' --exclude='drafts' --exclude='tests' --exclude='*.md' --exclude='*.log' --exclude='package.json' --exclude='package-lock.json' --exclude='yarn.lock' --exclude='composer.lock' --exclude='webpack.config.js' --exclude='eslint.config.mjs' --exclude='tsconfig.json' --exclude='postcss.config.js' --exclude='tailwind.config.js' --exclude='components.json' --exclude='phpcs.xml' --exclude='phpcs.plugin-review.xml' --exclude='phpstan.neon' --exclude='phpunit.xml.dist' --exclude='phpunit.xml' . release/dev/storeseeder/",
       "cd release/dev && zip -r storeseeder.zip storeseeder/",
       "rm -rf release/dev/storeseeder/",
       "composer install",

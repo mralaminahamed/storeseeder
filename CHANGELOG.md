@@ -9,7 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- The plugin screen clears other plugins' admin notices — setup wizards, review nags, upgrade
+  prompts — so the interface starts at the top of the page instead of below a stack of messages
+  about the rest of the site. Only this screen is affected, and
+  `storeseeder_hide_foreign_admin_notices` turns it off.
+
+### Changed
+
+- New brand mark: the icon is a single indigo lit like glass rather than a two-colour gradient
+  ramp, and the WordPress.org banners and screenshots now share that palette from one source.
+- Every clickable row, overlay and field caption is reachable by keyboard. Rows that navigate are
+  buttons, the command palette and locale picker are dialogs that close on Escape, the custom
+  select announces itself as a combobox, and field captions are bound to the controls they name.
+- Font weights use the standard 400/500/600/700 scale, which a non-variable system font can render
+  as drawn.
+
+### Fixed
+
+- **The admin interface is translatable.** None of it was, for two independent reasons.
+  `wp i18n make-pot` does not read `.tsx` sources, so every string in the React admin — "New
+  generation", "Add to batch", the generator descriptions, the settings labels — was absent
+  from the translation template; they are now extracted from the compiled bundle, taking it
+  from 347 entries to 632. And the bundle was named `admin.js`, which WP-CLI mistakes for a
+  minified file: it rewrote the reference to `build/a.js`, so translations would have been
+  filed under a name WordPress never looks for. The bundle is `admin-app.js` now.
+- The dependency notes on each generator page were passed to the translation function as a
+  variable, so they were never extracted and could not be translated.
+- Settings stored in the browser are validated field by field when read, so a value left by an
+  older version can no longer reach the UI as the wrong type.
 
 ## [1.0.0] - 2026-07-22
 

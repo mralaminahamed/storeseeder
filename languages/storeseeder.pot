@@ -9,17 +9,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-22T01:13:55+00:00\n"
+"POT-Creation-Date: 2026-07-30T16:41:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:163
-#: class-storeseeder.php:164
+#: class-storeseeder.php:187
+#: class-storeseeder.php:188
 #: includes/MCP/MCP_Server.php:87
 #: includes/MCP/MCP_Server.php:140
+#: build/admin-app.js:10
 msgid "StoreSeeder"
 msgstr ""
 
@@ -43,20 +44,55 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:777
+#: class-storeseeder.php:215
+msgid "Generate Data"
+msgstr ""
+
+#: class-storeseeder.php:220
+#: build/admin-app.js:11
+#: build/admin-app.js:14
+msgid "Settings"
+msgstr ""
+
+#: class-storeseeder.php:246
+#: build/admin-app.js:16
+msgid "Documentation"
+msgstr ""
+
+#: class-storeseeder.php:251
+#: build/admin-app.js:16
+msgid "Support"
+msgstr ""
+
+#: class-storeseeder.php:256
+#: build/admin-app.js:16
+msgid "GitHub"
+msgstr ""
+
+#: class-storeseeder.php:1101
 msgid "StoreSeeder requires Fluent Cart plugin to be installed and active."
+msgstr ""
+
+#. translators: 1: opening anchor tag, 2: closing anchor tag
+#: class-storeseeder.php:1118
+#, php-format
+msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
+msgstr ""
+
+#: class-storeseeder.php:1196
+msgid "You are not allowed to do that."
 msgstr ""
 
 #: includes/Abstracts/Ability.php:85
 msgid "Unknown REST error."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:178
+#: includes/Abstracts/Controller.php:229
 msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Abstracts/Controller.php:226
+#: includes/Abstracts/Controller.php:277
 #, php-format
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
@@ -64,84 +100,84 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of items that could not be created.
-#: includes/Abstracts/Controller.php:233
+#: includes/Abstracts/Controller.php:284
 #, php-format
 msgid "%s could not be created."
 msgid_plural "%s could not be created."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Abstracts/Controller.php:294
+#: includes/Abstracts/Controller.php:345
 msgid "Sorry, you are not allowed to generate fake data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:317
+#: includes/Abstracts/Controller.php:368
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:326
+#: includes/Abstracts/Controller.php:377
 msgid "Locale for generated data (e.g., en_US, fr_FR, de_DE)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:333
+#: includes/Abstracts/Controller.php:384
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:339
+#: includes/Abstracts/Controller.php:390
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:345
+#: includes/Abstracts/Controller.php:396
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:349
+#: includes/Abstracts/Controller.php:400
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:356
+#: includes/Abstracts/Controller.php:407
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:365
+#: includes/Abstracts/Controller.php:416
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:369
+#: includes/Abstracts/Controller.php:420
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:374
+#: includes/Abstracts/Controller.php:425
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:381
+#: includes/Abstracts/Controller.php:432
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:385
+#: includes/Abstracts/Controller.php:436
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:390
+#: includes/Abstracts/Controller.php:441
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:425
+#: includes/Abstracts/Controller.php:476
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:451
+#: includes/Abstracts/Controller.php:502
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Abstracts/Controller.php:473
+#: includes/Abstracts/Controller.php:524
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Abstracts/Controller.php:477
+#: includes/Abstracts/Controller.php:528
 msgid "Number of items generated."
 msgstr ""
 
@@ -151,12 +187,20 @@ msgstr ""
 msgid "Generation failed: %s"
 msgstr ""
 
-#: includes/Abstracts/Generator.php:426
+#: includes/Abstracts/Generator.php:455
+msgid "ID"
+msgstr ""
+
+#: includes/Abstracts/Generator.php:459
+msgid "Value"
+msgstr ""
+
+#: includes/Abstracts/Generator.php:504
 msgid "Count must be a positive number."
 msgstr ""
 
 #. translators: %d: Maximum batch size
-#: includes/Abstracts/Generator.php:435
+#: includes/Abstracts/Generator.php:513
 #, php-format
 msgid "Count cannot exceed %d items per batch."
 msgstr ""
@@ -254,22 +298,27 @@ msgid "Coupon"
 msgstr ""
 
 #: includes/Controllers/Coupon.php:78
+#: build/admin-app.js:3
 msgid "Types of discount coupons to generate"
 msgstr ""
 
 #: includes/Controllers/Coupon.php:88
+#: build/admin-app.js:3
 msgid "Discount value range"
 msgstr ""
 
 #: includes/Controllers/Coupon.php:116
+#: build/admin-app.js:3
 msgid "Usage limitation settings"
 msgstr ""
 
 #: includes/Controllers/Coupon.php:138
+#: build/admin-app.js:3
 msgid "Coupon validity period configuration"
 msgstr ""
 
 #: includes/Controllers/Coupon.php:156
+#: build/admin-app.js:3
 msgid "Coupon usage restrictions"
 msgstr ""
 
@@ -278,6 +327,7 @@ msgid "Generated coupons data."
 msgstr ""
 
 #: includes/Controllers/Customer.php:58
+#: includes/Generators/Order.php:483
 msgid "Customer"
 msgstr ""
 
@@ -318,6 +368,7 @@ msgid "Severity types to generate."
 msgstr ""
 
 #: includes/Controllers/Order.php:58
+#: includes/Generators/Order.php:479
 msgid "Order"
 msgstr ""
 
@@ -678,6 +729,28 @@ msgstr ""
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
+#: includes/Generators/Coupon.php:199
+msgid "Code"
+msgstr ""
+
+#: includes/Generators/Coupon.php:203
+msgid "Type"
+msgstr ""
+
+#: includes/Generators/Coupon.php:207
+msgid "Amount"
+msgstr ""
+
+#: includes/Generators/Coupon.php:211
+msgid "Usage limit"
+msgstr ""
+
+#: includes/Generators/Coupon.php:215
+#: includes/Generators/Order.php:495
+#: includes/Generators/Product.php:260
+msgid "Status"
+msgstr ""
+
 #: includes/Generators/Customer.php:71
 msgid "Customer Profiles with Addresses and Metadata"
 msgstr ""
@@ -702,6 +775,29 @@ msgstr ""
 msgid "Failed to create customer using Fluent Cart model."
 msgstr ""
 
+#: includes/Generators/Customer.php:854
+#: includes/Generators/Product.php:244
+msgid "Name"
+msgstr ""
+
+#: includes/Generators/Customer.php:858
+msgid "Email"
+msgstr ""
+
+#: includes/Generators/Customer.php:862
+msgid "City"
+msgstr ""
+
+#: includes/Generators/Customer.php:866
+msgid "Country"
+msgstr ""
+
+#: includes/Generators/Customer.php:870
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Orders"
+msgstr ""
+
 #: includes/Generators/Label.php:86
 msgid "Fluent Cart Label model not found. Please ensure Fluent Cart is active."
 msgstr ""
@@ -715,14 +811,18 @@ msgid "Info"
 msgstr ""
 
 #: includes/Generators/Log.php:78
+#: build/admin-app.js:11
 msgid "Warning"
 msgstr ""
 
 #: includes/Generators/Log.php:79
+#: build/admin-app.js:10
 msgid "Error"
 msgstr ""
 
 #: includes/Generators/Log.php:80
+#: build/admin-app.js:10
+#: build/admin-app.js:11
 msgid "Success"
 msgstr ""
 
@@ -754,6 +854,15 @@ msgstr ""
 msgid "Failed to create order using Fluent Cart model."
 msgstr ""
 
+#: includes/Generators/Order.php:487
+msgid "Items"
+msgstr ""
+
+#: includes/Generators/Order.php:491
+#: build/admin-app.js:12
+msgid "Total"
+msgstr ""
+
 #: includes/Generators/Order_Tax_Rate.php:65
 msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active."
 msgstr ""
@@ -780,6 +889,18 @@ msgstr ""
 
 #: includes/Generators/Product.php:163
 msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Product.php:248
+msgid "SKU"
+msgstr ""
+
+#: includes/Generators/Product.php:252
+msgid "Price"
+msgstr ""
+
+#: includes/Generators/Product.php:256
+msgid "Stock"
 msgstr ""
 
 #: includes/Generators/Product_Download.php:66
@@ -1320,4 +1441,1181 @@ msgstr ""
 
 #: includes/MCP/MCP_Server.php:735
 msgid "Human-readable summary of the generation result."
+msgstr ""
+
+#: build/admin-app.js:1
+#: build/admin-app.js:9
+msgid "An error occurred."
+msgstr ""
+
+#. translators: %1$s: total items, %2$s: number of generators
+#: build/admin-app.js:2
+#, js-format
+msgid "Batch complete · %1$s items"
+msgstr ""
+
+#. translators: %s: number of generators run
+#: build/admin-app.js:3
+#, js-format
+msgid "%s generator run"
+msgid_plural "%s generators run"
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin-app.js:3
+msgid "Batch failed"
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Products"
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Core"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create realistic products with prices, categories, inventory, and variations. Perfect for testing your store catalog and product pages."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, theme developers, plugin testers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Type of products to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Price range for generated products"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product categories configuration"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create new categories if needed"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum categories per product"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product attributes configuration"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include product attributes"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Number of variations for variable products"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Inventory settings for generated products"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Enable stock management"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Stock quantity range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product content generation options"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Length of product descriptions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include placeholder images"
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Customers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate customer profiles with addresses, purchase history, and loyalty data. Essential for testing user accounts and customer management."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, CRM developers, membership site testers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Types of customers to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Demographic distribution"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Age group distribution"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Address generation preferences"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include billing addresses"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include shipping addresses"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Percentage with different billing/shipping (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Purchase history simulation"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate purchase history metadata"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include loyalty tier assignments"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Contact and communication preferences"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include phone numbers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Percentage opted in for marketing (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create complete order histories with payments, shipping, and tax calculations. Test your checkout flow and order management system."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, payment gateway developers, shipping testers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Order status distribution"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Type of customers for orders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Specific customer ID (when customer_type is 'specific')"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Customer type distribution for mixed mode"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Percentage of existing customers (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Percentage of new customers (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Number of items per order"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum items"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum items"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Payment methods to use"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Geographic distribution of orders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Countries to generate orders from"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Coupons"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate discount codes with various rules and restrictions. Perfect for testing promotional campaigns and discount logic."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, marketing teams, discount plugin developers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product Variations"
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Advanced"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create complex product variations with size, color, and material options. Essential for testing variable product functionality."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "E-commerce developers, product catalog managers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Specific product ID to generate variations for"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product types to consider for variation generation"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Price variance settings for variations"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum variance %"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum variance %"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Stock management settings for variations"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Attribute generation settings"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create missing attributes if needed"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum attributes per variation"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Shipping Plans"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, shipping plugin developers, logistics teams"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Types of shipping methods to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Shipping cost range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum cost"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum cost"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Geographic coverage areas"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Shipping calculation methods"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Delivery time ranges"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum delivery days"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum delivery days"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Tax Classes"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners, accountants, tax plugin developers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Types of tax classes to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Tax jurisdictions to generate rates for"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Tax rate ranges by type"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Standard tax rate range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Reduced tax rate range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Geographic coverage for tax rates"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Countries to generate tax rates for"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Include compound tax rates"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Transactions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Payment gateway developers, accountants, financial analysts"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Type of customers for transactions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Filter orders by status"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Types of transactions to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Payment gateways to use for transactions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Transaction amount range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Transaction status distribution"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Cart Sessions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Marketing teams, cart recovery plugin developers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Type of customers for cart sessions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Percentage of guest carts (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Cart abandonment rate percentage (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Cart value range"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum cart value"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum cart value"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Number of items per cart session"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Minimum items per cart"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum items per cart"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Abandonment tracking settings"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate abandoned cart reminders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Maximum number of reminders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Cart recovery rate percentage (0–100)"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Attributes"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate product attributes such as Text, Color, and Image types. Attributes can be used to define product variations and filtering options."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Types of attributes to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Refunds"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners testing refund workflows, payment gateway developers"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Order statuses eligible for refund generation"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Payment gateways for transaction IDs"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Logs"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Developers testing audit logs, admin panel log views"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Log severity types to generate"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Object types to generate log entries for"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Shipping Classes"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Store owners configuring shipping rate groups"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Labels"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Teams segmenting orders and customers with tags"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Order Tax Lines"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Developers testing tax reports and collected-tax views"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Product Downloads"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Developers testing digital-product fulfillment"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Subscriptions"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generate subscription records against existing orders. The table ships in core; active billing requires Fluent Cart Pro. Requires existing orders and products."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Developers testing recurring-billing views and reports"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Targets existing completed / processing orders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Applied to existing variable products"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Generated against existing orders"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Uses your existing products & customers"
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:10
+msgid "Popular"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "No extra options — just set a count and generate."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Could not load preview."
+msgstr ""
+
+#: build/admin-app.js:3
+#: build/admin-app.js:7
+msgid "Metadata"
+msgstr ""
+
+#. translators: %s: seed value
+#: build/admin-app.js:4
+#, js-format
+msgid "seed: %s"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "seed: random"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Loading preview…"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "No preview available."
+msgstr ""
+
+#. translators: %1$s: visible row count, %2$s: total count
+#: build/admin-app.js:5
+#, js-format
+msgid "Live preview · showing %1$s of %2$s"
+msgstr ""
+
+#. translators: %s: formatted number
+#: build/admin-app.js:6
+#, js-format
+msgid "Generate %s item"
+msgstr ""
+
+#. translators: %s: formatted number
+#: build/admin-app.js:7
+#, js-format
+msgid "Generate %s items"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Count"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Seed"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Add to batch"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Live preview"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Shuffle"
+msgstr ""
+
+#: build/admin-app.js:7
+msgid "Sample of what this run will create — updates as you change the settings."
+msgstr ""
+
+#. translators: %1$s: count, %2$s: generator name
+#: build/admin-app.js:8
+#, js-format
+msgid "Generating %1$s %2$s…"
+msgstr ""
+
+#. translators: %1$s: count, %2$s: generator name
+#: build/admin-app.js:9
+#, js-format
+msgid "Generated %1$s %2$s"
+msgstr ""
+
+#: build/admin-app.js:9
+msgid "Added to your Fluent Cart store"
+msgstr ""
+
+#: build/admin-app.js:9
+msgid "Generation failed"
+msgstr ""
+
+#. translators: %1$s: count, %2$s: generator name
+#: build/admin-app.js:10
+#, js-format
+msgid "Added %1$s %2$s to batch"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Nothing generated yet"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "steady"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "just now"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "No runs yet — generate something to see it here."
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "seed"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "random seed"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Generated"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Enhanced"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "generators"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "generated"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Not run yet"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Generate realistic test data for your Fluent Cart store."
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "New generation"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Total Generated"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Recent activity"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Could not load plugins. Check your internet connection."
+msgstr ""
+
+#: build/admin-app.js:10
+#: build/admin-app.js:11
+msgid "Our Plugins"
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "Other plugins by the same author on WordPress.org."
+msgstr ""
+
+#: build/admin-app.js:10
+msgid "No plugins found."
+msgstr ""
+
+#. translators: %s: formatted install count
+#: build/admin-app.js:11
+#, js-format
+msgid "%s+ active"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "View on WordPress.org"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Dismiss"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Sample data downloaded"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Download failed — you can retry from Settings."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Could not save your choice — please try again."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Download sample data?"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "StoreSeeder can download locale-specific reference data (product names, addresses and customer tags for 75+ locales) from GitHub to make generated content more realistic. No data about your site is sent."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "You can decline and still generate data using built-in defaults, or change this later in Settings."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "View the sample data repository"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Not now"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Downloading…"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Allow & download"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Overview"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Pages"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "generator"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Command palette"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Search generators and pages…"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "No matches"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "navigate"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "open"
+msgstr ""
+
+#: build/admin-app.js:11
+#: build/admin-app.js:14
+msgid "Default locale"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Accent"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Background"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Surface"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Text"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Border"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Danger"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Tweaks"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Close"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Appearance"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Light"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Dark"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Accent color"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Density"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Comfortable"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Compact"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Custom colors"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Reset"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Revert"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "These controls preview how the StoreSeeder admin would adapt to store-owner theme preferences."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Batch queue"
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Queue is empty."
+msgstr ""
+
+#: build/admin-app.js:11
+msgid "Add generators with “Add to batch” to run them together."
+msgstr ""
+
+#. translators: %s: item count
+#. translators: %s: total item count
+#: build/admin-app.js:12
+#: build/admin-app.js:13
+#, js-format
+msgid "%s items"
+msgstr ""
+
+#: build/admin-app.js:12
+msgid "Remove"
+msgstr ""
+
+#: build/admin-app.js:13
+msgid "Generating…"
+msgstr ""
+
+#. translators: %s: number of queued generators
+#: build/admin-app.js:14
+#, js-format
+msgid "Run batch (%s)"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Sample data synced."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Sync failed."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Automatic download allowed."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Automatic download declined."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Update failed."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Configure default behaviour for data generation."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Generation defaults"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Pre-fill values on every generator page."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Default count"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Number of items pre-filled on every generator page."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Faker locale used when generating data."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Default seed"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Fixed seed for reproducible runs. Leave blank for random output."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "random (leave blank)"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Include metadata by default"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Pre-check the Include Metadata toggle on every generator."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Saved!"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Save settings"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Run history"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Control how much history is retained."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Max runs per generator"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "How many recent runs to store in history per generator type."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Sample data"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Locale-specific reference data used by generators to produce realistic output."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Checking status…"
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Sample data is synced"
+msgstr ""
+
+#. translators: %s: date string
+#: build/admin-app.js:15
+#, js-format
+msgid "Last updated: %s"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Sample data not found"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Sync to download locale-specific reference data."
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Automatic download is allowed. Revoke to stop downloading on visit."
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Automatic download is declined. Sync now reopens the consent prompt so you can allow it."
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Nothing has been downloaded yet. Sync now asks for your permission first."
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Syncing…"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Sync now"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Force re-sync"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Revoke"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "View sample data repository"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "About"
+msgstr ""
+
+#. translators: %s: version number
+#: build/admin-app.js:16
+#, js-format
+msgid "StoreSeeder · Version %s"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Danger zone"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "These actions cannot be undone."
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Run history cleared"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Clear run history & stats"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Removes locally stored generation stats and run history. Does not delete data in your database."
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Settings reset to defaults"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Reset settings to defaults"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Resets all settings to their default values."
 msgstr ""
