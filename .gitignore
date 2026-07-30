@@ -40,7 +40,10 @@ coverage/
 test-results/
 
 # Composer
-composer.lock
+# composer.lock IS tracked: this is a distributed application, not a library, so the
+# dependency resolution has to be reproducible. The release workflow refuses to deploy
+# without it (.github/workflows/svn-deploy.yml, "meta" job). It is excluded from the
+# shipped package via .distignore, since the zip carries a built vendor/ directory.
 
 # WordPress
 wp-config.php

@@ -11,7 +11,7 @@ StoreSeeder is maintained by one developer, so a little triage on your side goes
 | What can each generator produce? | [docs/features.md](docs/features.md) |
 | How is the plugin put together? | [docs/architecture.md](docs/architecture.md) |
 | How do I build from source or add a generator? | [docs/development.md](docs/development.md) |
-| What changed in this version? | [docs/changelog.md](docs/changelog.md) |
+| What changed in this version? | [CHANGELOG.md](CHANGELOG.md) |
 
 ## Bugs and Feature Requests
 

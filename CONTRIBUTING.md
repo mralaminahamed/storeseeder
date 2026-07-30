@@ -163,9 +163,11 @@ tests under `tests/php/`.
 - Fill in the pull request template — what changed, why, and how you verified it.
 - Keep the diff scoped; unrelated cleanups belong in their own pull request.
 - Update the docs you touched: [`docs/`](docs/), [`README.md`](README.md), and
-  [`docs/changelog.md`](docs/changelog.md) for user-visible changes.
-- Note any new outbound HTTP request in the External Services table in `README.md` and `readme.txt` —
-  WordPress.org review depends on that table being complete.
+  [`CHANGELOG.md`](CHANGELOG.md) for user-visible changes. `CHANGELOG.md` is the full history;
+  `readme.txt` carries only the four most recent releases.
+- Note any new outbound HTTP request in [`docs/external-services.md`](docs/external-services.md), and
+  in the External Services summaries in `README.md` and `readme.txt` — WordPress.org review depends on
+  that disclosure being complete.
 - Say plainly what you did not test.
 
 Maintainer review happens on GitHub. Once approved, the maintainer merges — there is no need to

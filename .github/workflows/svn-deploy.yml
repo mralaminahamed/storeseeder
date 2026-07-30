@@ -26,7 +26,7 @@ defaults:
 #
 #   meta     : resolve slug, validate tag == header version, prerelease flag
 #   lint     : PHP syntax + sensitive scan + PHPCS (WPCS)  — gate, parallel
-#   phpstan  : PHPStan (level max)                         — gate, parallel
+#   phpstan  : PHPStan (level 7)                           — gate, parallel
 #   assets   : wp-scripts build -> build/                  — producer, parallel
 #   i18n     : wp i18n make-pot -> languages/              — producer, parallel
 #   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip
@@ -317,7 +317,7 @@ jobs:
           files: dist/${{ needs.meta.outputs.plugin_slug }}-${{ needs.meta.outputs.version }}.zip
           body: |
             ## ${{ needs.meta.outputs.plugin_slug }} — v${{ needs.meta.outputs.version }}
-            See the `== Changelog ==` section of [readme.txt](https://github.com/${{ github.repository }}/blob/trunk/readme.txt) for full details.
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/trunk/CHANGELOG.md) for the full history.
             - Deployed to https://wordpress.org/plugins/${{ needs.meta.outputs.plugin_slug }}/
           draft: false
         env:

@@ -116,6 +116,10 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 
 == Changelog ==
 
+Only the four most recent releases are listed here. The complete history, in Keep a Changelog format, is maintained in the repository:
+
+[CHANGELOG.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
+
 = 1.0.0 =
 * Initial release.
 * 17 generators — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs — all persisting through native Fluent Cart models.
@@ -133,29 +137,19 @@ Initial release.
 
 == External services ==
 
-This plugin connects to two external services. Neither is contacted on activation, and no personal or store data is ever transmitted.
+StoreSeeder connects to two external services. Neither is contacted on activation, both are administrator-initiated, and no personal or store data is ever transmitted to either one.
 
 **1. GitHub — sample data repository**
 
-Sample data (locale-specific reference data — product names, addresses, customer tags — used to make generated content more realistic) is downloaded only after an administrator grants consent: either by accepting the one-time consent prompt shown on the plugin admin page, or by clicking "Sync now" on the Settings page. No data about the site is ever transmitted, and declining the prompt still leaves every generator working from built-in defaults. The decision is site-wide and can be changed from Settings at any time.
-
-Service: GitHub
-Endpoint: [https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip](https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip)
-When data is sent: Only after an administrator grants consent — either by accepting the consent prompt shown on the plugin admin page, or by clicking "Sync now" on the Settings page.
-Data sent: An unauthenticated HTTP GET request. No site, user, or store data is included — only the request itself (and the IP address and user agent inherent to any HTTP request).
-Terms of Service: [https://docs.github.com/en/site-policy/github-terms/github-terms-of-service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service)
-Privacy Policy: [https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator grants consent — either by accepting the one-time consent prompt on the plugin admin page, or by clicking "Sync now" on the Settings page. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
 
 **2. WordPress.org — plugin directory API**
 
-The "Our Plugins" admin page lists the plugin author's other WordPress.org plugins with live ratings and install counts.
+The "Our Plugins" admin page lists the plugin author's other WordPress.org plugins with live ratings and install counts. Requested by the browser, only when an administrator opens that page.
 
-Service: WordPress.org Plugin Directory API
-Endpoint: [https://api.wordpress.org/plugins/info/1.2/](https://api.wordpress.org/plugins/info/1.2/)
-When data is sent: Only when an administrator opens the "Our Plugins" page in the plugin admin. The request is made by the browser.
-Data sent: A query for plugins by the author "mralaminahamed". No site, user, or store data is included — only the request itself (and the IP address and user agent inherent to any HTTP request).
-Terms of Service: [https://wordpress.org/about/](https://wordpress.org/about/)
-Privacy Policy: [https://wordpress.org/about/privacy/](https://wordpress.org/about/privacy/)
+The full disclosure for each service — endpoint, exactly when the request is made, what is sent and received, and the provider's terms of service and privacy policy — is documented here:
+
+[docs/external-services.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md)
 
 == Source code ==
 
@@ -163,13 +157,9 @@ The minified JavaScript and CSS in `build/` is compiled from the TypeScript and 
 
 [github.com/mralaminahamed/storeseeder](https://github.com/mralaminahamed/storeseeder)
 
-Build steps:
+Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS, configured by `webpack.config.js`, `tsconfig.json`, and `postcss.config.js` in the repository root. The build steps are listed under "Development Setup" above; local setup, the full toolchain, and the quality gates are documented in the contributing guide:
 
-`composer install`
-`yarn install`
-`yarn build`
-
-Build tooling: webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS. Configuration files (`webpack.config.js`, `tsconfig.json`, `postcss.config.js`) are in the repository root.
+[CONTRIBUTING.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
 
 == Other Notes ==
 
@@ -177,8 +167,10 @@ Build tooling: webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS. C
 
 All generated data is stored in your own WordPress database and is never transmitted anywhere. Generated content is fictional and does not represent real individuals or transactions. The plugin does not collect analytics and does not phone home.
 
-The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section for the full disclosure.
+The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [docs/external-services.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md) for the full disclosure.
 
 **Contributing**
 
-Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Report bugs and request features on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues), and read the [development guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/development.md) before opening a pull request.
+Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Bug reports, feature requests, and pull requests are all welcome — the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) is the place to start. Branching, commit conventions, quality gates, and pull request expectations are all documented in the contributing guide:
+
+[CONTRIBUTING.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
