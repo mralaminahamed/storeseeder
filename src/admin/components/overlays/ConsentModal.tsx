@@ -179,7 +179,7 @@ export function ConsentModal() {
         <div className="fp-consent-actions">
           <Button
             variant="outline"
-            onClick={decline}
+            onClick={() => void decline()}
             disabled={busy}
             data-testid="consent-decline"
           >
@@ -188,7 +188,7 @@ export function ConsentModal() {
           <Button
             variant="primary"
             icon="download"
-            onClick={allow}
+            onClick={() => void allow()}
             disabled={busy}
             data-testid="consent-allow"
           >

@@ -1,5 +1,4 @@
 import {
-  type LucideIcon,
   Package,
   Users,
   ShoppingCart,

@@ -49,7 +49,7 @@ export function RecentActivity({ runs }: RecentActivityProps) {
           <div
             key={i}
             className="fp-recent-row"
-            onClick={() => navigate(`/generator/${run.route}`)}
+            onClick={() => void navigate(`/generator/${run.route}`)}
           >
             <span className="fp-recent-ic">
               <Icon name={iconName} size={16} />

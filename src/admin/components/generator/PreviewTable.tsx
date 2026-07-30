@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useRef } from "@wordpress/element";
+import { useState, useEffect } from "@wordpress/element";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { fetchPreview } from "@/admin/lib/preview";

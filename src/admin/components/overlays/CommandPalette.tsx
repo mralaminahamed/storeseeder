@@ -56,7 +56,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   const choose = (i: number) => {
     const item = filtered[i];
     if (item) {
-      navigate(item.path);
+      void navigate(item.path);
       onClose();
     }
   };

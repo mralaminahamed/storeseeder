@@ -127,7 +127,7 @@ export default function SettingsPage() {
 
   // Fetch sync status on mount
   useEffect(() => {
-    refreshSyncStatus().finally(() => setStatusLoading(false));
+    void refreshSyncStatus().finally(() => setStatusLoading(false));
   }, [refreshSyncStatus]);
 
   // The consent modal writes the decision itself, so pick up its result rather
@@ -491,7 +491,7 @@ export default function SettingsPage() {
               <Button
                 variant="primary"
                 icon="refresh"
-                onClick={() => handleSync(false)}
+                onClick={() => void handleSync(false)}
                 disabled={syncing}
               >
                 {syncing
@@ -501,7 +501,7 @@ export default function SettingsPage() {
               <Button
                 variant="outline"
                 icon="refresh"
-                onClick={() => handleSync(true)}
+                onClick={() => void handleSync(true)}
                 disabled={syncing}
               >
                 {__("Force re-sync", "storeseeder")}
@@ -510,7 +510,7 @@ export default function SettingsPage() {
                 <Button
                   variant="outline"
                   icon="x"
-                  onClick={() => handleSetConsent(false)}
+                  onClick={() => void handleSetConsent(false)}
                   disabled={syncing}
                 >
                   {__("Revoke", "storeseeder")}

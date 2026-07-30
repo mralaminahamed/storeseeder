@@ -15,9 +15,8 @@ import { ConfigColumn } from "@/admin/components/generator/ConfigColumn";
 import { PreviewTable } from "@/admin/components/generator/PreviewTable";
 import { RunBar } from "@/admin/components/generator/RunBar";
 import { Button } from "@/admin/components/ui/button";
-import { Icon } from "@/admin/lib/icons";
 
-import type { GeneratorPageParams, GeneratorResult } from "@/admin/types";
+import type { GeneratorPageParams } from "@/admin/types";
 
 // ---------------------------------------------------------------------------
 // Build default params from a generator's parameterConfig schema
@@ -106,7 +105,7 @@ export default function GeneratorPage() {
 
   // Redirect if generator not found
   if (!generator) {
-    navigate("/");
+    void navigate("/");
     return null;
   }
 
@@ -137,8 +136,9 @@ export default function GeneratorPage() {
 
     raf = requestAnimationFrame(tick);
 
-    // setTimeout guarantees completion even if rAF is throttled in a background tab
-    const timer = setTimeout(async () => {
+    // Named rather than inlined into setTimeout: an async callback there returns a
+    // promise nothing can await, so the timer would swallow a rejection.
+    const finish = async () => {
       cancelAnimationFrame(raf);
       setProgress(1);
 
@@ -184,7 +184,10 @@ export default function GeneratorPage() {
       } finally {
         setGenerating(false);
       }
-    }, dur);
+    };
+
+    // setTimeout guarantees completion even if rAF is throttled in a background tab
+    const timer = setTimeout(() => void finish(), dur);
 
     // Cleanup if component unmounts mid-flight (React StrictMode / navigation)
     return () => {

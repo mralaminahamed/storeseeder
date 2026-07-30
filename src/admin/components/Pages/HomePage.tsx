@@ -25,7 +25,7 @@ export default function HomePage() {
         <Button
           variant="primary"
           icon="sparkles"
-          onClick={() => navigate("/generator/products")}
+          onClick={() => void navigate("/generator/products")}
         >
           {__("New generation", "storeseeder")}
         </Button>

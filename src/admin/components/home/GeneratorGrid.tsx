@@ -42,7 +42,7 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
                 <button
                   key={g.route}
                   className="fp-gen-card"
-                  onClick={() => navigate(`/generator/${g.route}`)}
+                  onClick={() => void navigate(`/generator/${g.route}`)}
                   data-testid={`gen-card-${g.route}`}
                 >
                   <div className="fp-gen-card-top">

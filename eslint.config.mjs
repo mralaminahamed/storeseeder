@@ -11,8 +11,8 @@ import globals from 'globals';
  * is all tsconfig.json includes — pointing them at tests/ would fail with
  * "file not found in project".
  *
- * @wordpress/eslint-plugin 25's package root exports flat configs as arrays to
- * spread; its `./eslintrc` subpath still carries the legacy versions. Its
+ * The WordPress plugin's package root (version 25) exports flat configs as arrays
+ * to spread; its `./eslintrc` subpath still carries the legacy versions. Its
  * `recommended` already pulls in esnext, jsdoc, jsx-a11y and react, so only i18n
  * is added on top of it here.
  */
@@ -26,6 +26,9 @@ export default [
       'tests/e2e/report/**',
       'test-results/**',
       '**/*.min.js',
+      // Local, gitignored scratch directories that happen to contain .ts files.
+      '.remember/**',
+      '.claude/**',
     ],
   },
 

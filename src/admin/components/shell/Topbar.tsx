@@ -37,7 +37,7 @@ export function Topbar({
       <div className="fp-crumbs">
         <button
           className="fp-btn fp-btn-ghost fp-btn-sm"
-          onClick={() => navigate("/")}
+          onClick={() => void navigate("/")}
           style={{ padding: "0 8px", marginLeft: -6 }}
         >
           StoreSeeder

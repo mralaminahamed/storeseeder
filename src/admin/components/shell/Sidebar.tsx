@@ -46,7 +46,7 @@ function NavItem({ to, label, ic, count, active, collapsed, testId }: NavItemPro
   return (
     <button
       className={`fp-nav-item${active ? " active" : ""}`}
-      onClick={() => navigate(to)}
+      onClick={() => void navigate(to)}
       title={collapsed ? label : undefined}
       data-testid={testId}
     >

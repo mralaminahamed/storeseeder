@@ -7,7 +7,6 @@ import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
 import { getSettings } from "@/admin/lib/settings";
 
-import type { GeneratorResult } from "@/admin/types";
 
 export interface BatchItem {
   route: string;
