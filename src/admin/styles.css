@@ -1,11 +1,12 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities) important;
-@import "../../assets/fonts/fonts.css";
 
 @theme {
-  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Match the WP core admin font stacks — no bundled webfonts. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-mono: Menlo, Consolas, monaco, monospace;
 
   --color-wp-admin-primary: var(--wp-admin-primary, #2271b1);
   --color-wp-admin-secondary: var(--wp-admin-secondary, #135e96);
@@ -51,9 +52,7 @@
 
   /* Use WP font stack */
   body {
-    font-family:
-      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans,
-      Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-family: var(--font-sans);
   }
 }
 
