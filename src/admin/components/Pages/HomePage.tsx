@@ -24,7 +24,7 @@ export default function HomePage() {
         </div>
         <Button
           variant="primary"
-          icon="sparkles"
+          icon="plus"
           onClick={() => void navigate("/generator/products")}
         >
           {__("New generation", "storeseeder")}

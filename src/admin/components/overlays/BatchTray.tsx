@@ -136,7 +136,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
           <Button
             variant="primary"
             size="lg"
-            icon="sparkles"
+            icon="play"
             className="full-w"
             onClick={() => void run()}
             disabled={running || batch.length === 0}

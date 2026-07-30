@@ -90,7 +90,7 @@ export function RunBar({
       <Button
         variant="primary"
         size="lg"
-        icon="sparkles"
+        icon="play"
         onClick={onGenerate}
         disabled={generating}
         type="button"
