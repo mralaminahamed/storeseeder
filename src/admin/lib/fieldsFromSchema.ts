@@ -68,9 +68,9 @@ function isMinMaxRange(
  * Derive a single FieldDescriptor (or an array of them when the schema node
  * is an object that must be recursed) for one `key → config` entry.
  *
- * @param key       - The dot-path key for this field (already includes parent prefix)
- * @param config    - The ParameterConfig node
- * @param section   - The section name this field belongs to
+ * @param key     - The dot-path key for this field (already includes parent prefix)
+ * @param config  - The ParameterConfig node
+ * @param section - The section name this field belongs to
  */
 function descriptorFromNode(
   key: string,

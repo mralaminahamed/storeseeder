@@ -45,7 +45,7 @@ function NavItem({ to, label, ic, count, active, collapsed, testId }: NavItemPro
 
   return (
     <button
-      className={"fp-nav-item" + (active ? " active" : "")}
+      className={`fp-nav-item${active ? " active" : ""}`}
       onClick={() => navigate(to)}
       title={collapsed ? label : undefined}
       data-testid={testId}
@@ -67,7 +67,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
   const { pathname } = useLocation();
 
   return (
-    <nav className={"fp-nav" + (collapsed ? " collapsed" : "")} data-testid="sidebar">
+    <nav className={`fp-nav${collapsed ? " collapsed" : ""}`} data-testid="sidebar">
       {/* Brand */}
       <div className="fp-brand">
         <BrandIcon className="fp-brand-mark" size={30} />

@@ -73,7 +73,7 @@ export function PreviewTable({
 
   // Serialise the inputs that affect the preview so the effect only refires
   // when something meaningful changes.
-  const token = JSON.stringify(params) + "|" + seed + "|" + meta + "|" + shuffleN;
+  const token = `${JSON.stringify(params)}|${seed}|${meta}|${shuffleN}`;
 
   useEffect(() => {
     let cancelled = false;

@@ -158,7 +158,7 @@ export default function GeneratorPage() {
           path: `/storeseeder/v1/${generator.route}/generate`,
           method: "POST",
           data: body,
-        })) as GeneratorResult;
+        }));
 
         recordRun(generator.route, count, true, data.message ?? "", {
           locale,

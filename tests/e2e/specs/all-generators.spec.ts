@@ -30,7 +30,7 @@ for (const { route, name } of GENERATORS) {
     });
 
     test('page loads without error boundary', async ({ page }) => {
-      await expect(page.getByText('Something went wrong')).not.toBeVisible();
+      await expect(page.getByText('Something went wrong')).toBeHidden();
     });
 
     test('topbar shows generator name', async ({ page }) => {

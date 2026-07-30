@@ -79,7 +79,7 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
             path: `/storeseeder/v1/${item.route}/generate`,
             method: "POST",
             data: { count: item.count, locale, include_meta: false },
-          })) as GeneratorResult;
+          }));
           recordRun(item.route, item.count, true, data.message ?? "", { locale });
           ok += 1;
           total += item.count;

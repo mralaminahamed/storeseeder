@@ -75,19 +75,19 @@ export function RangeField({
       <div className="fp-track" ref={trackRef}>
         <div
           className="fp-track-fill"
-          style={{ left: pct(lo) + "%", right: 100 - pct(hi) + "%" }}
+          style={{ left: `${pct(lo)}%`, right: `${100 - pct(hi)}%` }}
         />
         <button
           type="button"
           className="fp-thumb fp-focusable"
-          style={{ left: pct(lo) + "%" }}
+          style={{ left: `${pct(lo)}%` }}
           onPointerDown={drag("lo")}
           aria-label="min"
         />
         <button
           type="button"
           className="fp-thumb fp-focusable"
-          style={{ left: pct(hi) + "%" }}
+          style={{ left: `${pct(hi)}%` }}
           onPointerDown={drag("hi")}
           aria-label="max"
         />

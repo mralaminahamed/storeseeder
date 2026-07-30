@@ -27,5 +27,5 @@ export function fetchPreview(
     path: `/storeseeder/v1/${route}/preview`,
     method: "POST",
     data: params,
-  }) as Promise<PreviewData>;
+  });
 }

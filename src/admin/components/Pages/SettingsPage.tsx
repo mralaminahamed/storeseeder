@@ -107,7 +107,7 @@ export default function SettingsPage() {
   const codeToLabel = (code: string) => allLocales[code] ?? code;
   const labelToCode = (label: string) =>
     Object.keys(allLocales).find((c) => allLocales[c] === label) ?? label;
-  const localeLabels = Object.values(allLocales).filter(Boolean) as string[];
+  const localeLabels = Object.values(allLocales).filter(Boolean);
 
   const set = <K extends keyof typeof settings>(
     key: K,

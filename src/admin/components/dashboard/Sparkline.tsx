@@ -20,7 +20,7 @@ export function Sparkline({ data, w = 84, h = 28, color = "var(--accent)" }: Spa
     .join(" ");
 
   const area = `0,${h} ${pts} ${w},${h}`;
-  const id = "sg" + Math.round(data[0] * 1000) + data.length;
+  const id = `sg${Math.round(data[0] * 1000)}${data.length}`;
 
   return (
     <svg

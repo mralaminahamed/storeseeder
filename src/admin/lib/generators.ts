@@ -175,7 +175,7 @@ export const generators: Generator[] = [
             default: true,
           },
           different_addresses_ratio: {
-            description: __("Percentage with different billing/shipping (0-100)", "storeseeder"),
+            description: __("Percentage with different billing/shipping (0–100)", "storeseeder"),
             type: "integer",
             minimum: 0,
             maximum: 100,
@@ -209,7 +209,7 @@ export const generators: Generator[] = [
             default: true,
           },
           marketing_opt_in_ratio: {
-            description: __("Percentage opted in for marketing (0-100)", "storeseeder"),
+            description: __("Percentage opted in for marketing (0–100)", "storeseeder"),
             type: "integer",
             minimum: 0,
             maximum: 100,
@@ -256,14 +256,14 @@ export const generators: Generator[] = [
         type: "object",
         properties: {
           existing_ratio: {
-            description: __("Percentage of existing customers (0-100)", "storeseeder"),
+            description: __("Percentage of existing customers (0–100)", "storeseeder"),
             type: "integer",
             minimum: 0,
             maximum: 100,
             default: 70,
           },
           new_ratio: {
-            description: __("Percentage of new customers (0-100)", "storeseeder"),
+            description: __("Percentage of new customers (0–100)", "storeseeder"),
             type: "integer",
             minimum: 0,
             maximum: 100,
@@ -617,14 +617,14 @@ export const generators: Generator[] = [
         dependsOn: { customer_type: "specific" },
       },
       guest_cart_ratio: {
-        description: __("Percentage of guest carts (0-100)", "storeseeder"),
+        description: __("Percentage of guest carts (0–100)", "storeseeder"),
         type: "integer",
         minimum: 0,
         maximum: 100,
         default: 40,
       },
       abandonment_rate: {
-        description: __("Cart abandonment rate percentage (0-100)", "storeseeder"),
+        description: __("Cart abandonment rate percentage (0–100)", "storeseeder"),
         type: "integer",
         minimum: 0,
         maximum: 100,
@@ -652,7 +652,7 @@ export const generators: Generator[] = [
         properties: {
           generate_reminders: { description: __("Generate abandoned cart reminders", "storeseeder"), type: "boolean", default: true },
           reminder_count: { description: __("Maximum number of reminders", "storeseeder"), type: "integer", minimum: 0, maximum: 10, default: 3 },
-          recovery_rate: { description: __("Cart recovery rate percentage (0-100)", "storeseeder"), type: "integer", minimum: 0, maximum: 100, default: 15 },
+          recovery_rate: { description: __("Cart recovery rate percentage (0–100)", "storeseeder"), type: "integer", minimum: 0, maximum: 100, default: 15 },
         },
       },
     },

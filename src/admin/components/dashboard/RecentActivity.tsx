@@ -9,9 +9,9 @@ import type { GlobalRun } from "@/admin/types";
 function timeAgo(ts: number): string {
   const d = (Date.now() - ts) / 1000;
   if (d < 60) return __("just now", "storeseeder");
-  if (d < 3600) return Math.floor(d / 60) + "m ago";
-  if (d < 86400) return Math.floor(d / 3600) + "h ago";
-  return Math.floor(d / 86400) + "d ago";
+  if (d < 3600) return `${Math.floor(d / 60)}m ago`;
+  if (d < 86400) return `${Math.floor(d / 3600)}h ago`;
+  return `${Math.floor(d / 86400)}d ago`;
 }
 
 interface RecentActivityProps {
@@ -49,7 +49,7 @@ export function RecentActivity({ runs }: RecentActivityProps) {
           <div
             key={i}
             className="fp-recent-row"
-            onClick={() => navigate("/generator/" + run.route)}
+            onClick={() => navigate(`/generator/${run.route}`)}
           >
             <span className="fp-recent-ic">
               <Icon name={iconName} size={16} />

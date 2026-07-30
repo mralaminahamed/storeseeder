@@ -35,7 +35,7 @@ test.describe('Overlays', () => {
       await page.getByTestId('cmd-button').click();
       await page.getByTestId('command-palette').waitFor();
       await page.keyboard.press('Escape');
-      await expect(page.getByTestId('command-palette')).not.toBeVisible();
+      await expect(page.getByTestId('command-palette')).toBeHidden();
     });
   });
 
@@ -57,7 +57,7 @@ test.describe('Overlays', () => {
       await page.getByTestId('tweaks-button').click();
       await page.getByTestId('tweaks-panel').waitFor();
       await page.getByTestId('tweaks-panel').getByRole('button', { name: /Close/i }).click();
-      await expect(page.getByTestId('tweaks-panel')).not.toBeVisible();
+      await expect(page.getByTestId('tweaks-panel')).toBeHidden();
     });
   });
 
