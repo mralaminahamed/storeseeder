@@ -68,15 +68,22 @@ function install_fluent_cart() {
 
 	echo 'Installing Fluent Cart...' . PHP_EOL;
 
-	// Install Fluent Cart if it has an installation method. Current releases no
-	// longer expose this function, and calling it unconditionally takes the whole
-	// suite down with a fatal before a single test runs.
-	if ( ! function_exists( '\FluentCart\fluent_cart_install' ) ) {
-		echo 'Warning: FluentCart\fluent_cart_install() not available; skipping Fluent Cart install.' . PHP_EOL;
+	/*
+	 * Create Fluent Cart's tables. This has to happen on setup_theme, before
+	 * Fluent Cart's own modules query them on init — its Tax module reads
+	 * fct_meta there and takes the whole suite down if the schema is missing.
+	 *
+	 * DBMigrator is the current entry point. fluent_cart_install() was the old
+	 * one and no longer exists in shipping releases, so it is only a fallback.
+	 */
+	if ( class_exists( '\FluentCart\Database\DBMigrator' ) ) {
+		\FluentCart\Database\DBMigrator::migrateUp();
+	} elseif ( function_exists( '\FluentCart\fluent_cart_install' ) ) {
+		\FluentCart\fluent_cart_install();
+	} else {
+		echo 'Warning: no Fluent Cart installer found; tests touching Fluent Cart tables will fail.' . PHP_EOL;
 		return;
 	}
-
-	\FluentCart\fluent_cart_install();
 
 	// Reload capabilities after install.
 	if ( version_compare( $GLOBALS['wp_version'], '4.7', '<' ) ) {

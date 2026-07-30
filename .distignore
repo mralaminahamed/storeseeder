@@ -124,3 +124,5 @@ components.json
 # Logs
 /logs/
 /*.log
+# Local GitHub Actions runner (act)
+.actrc

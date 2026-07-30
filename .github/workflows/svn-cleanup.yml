@@ -1,0 +1,96 @@
+name: SVN Cleanup
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "SVN target — 'trunk' or a tag e.g. 'tags/2.1.0'"
+        required: true
+        default: "trunk"
+      paths:
+        description: "Space-separated paths to delete (e.g. src docs README.md)"
+        required: true
+        default: "src docs"
+      dry_run:
+        description: "Dry run — preview deletions without committing"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cleanup:
+    name: "Remove paths from SVN ${{ github.event.inputs.target }}"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Subversion
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y subversion
+
+      - name: Checkout SVN target (immediates only)
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          TARGET:       ${{ github.event.inputs.target }}
+        run: |
+          PLUGIN_SLUG="storeseeder"
+          SVN_URL="https://plugins.svn.wordpress.org/${PLUGIN_SLUG}/${TARGET}"
+          echo "Checking out: ${SVN_URL}"
+          svn checkout "$SVN_URL" svn-target \
+            --username "$SVN_USERNAME" \
+            --password "$SVN_PASSWORD" \
+            --depth immediates \
+            --non-interactive --quiet
+
+      - name: Delete specified paths
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          PATHS:        ${{ github.event.inputs.paths }}
+          TARGET:       ${{ github.event.inputs.target }}
+          DRY_RUN:      ${{ github.event.inputs.dry_run }}
+        run: |
+          DELETED=()
+          MISSING=()
+
+          for path in $PATHS; do
+            ENTRY="svn-target/${path}"
+            if [ -e "$ENTRY" ]; then
+              echo "Found: ${path} — scheduling for deletion"
+              svn delete "$ENTRY" --force
+              DELETED+=("$path")
+            else
+              echo "Not found in ${TARGET}: ${path} — skipping"
+              MISSING+=("$path")
+            fi
+          done
+
+          echo ""
+          echo "── Summary ─────────────────────────────────────"
+          echo "Target    : ${TARGET}"
+          echo "Deleted   : ${DELETED[*]:-none}"
+          echo "Not found : ${MISSING[*]:-none}"
+          echo "Dry run   : ${DRY_RUN}"
+
+          if [ ${#DELETED[@]} -eq 0 ]; then
+            echo "Nothing to delete — exiting cleanly."
+            exit 0
+          fi
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo ""
+            echo "DRY RUN — changes NOT committed to SVN."
+          else
+            svn commit svn-target \
+              -m "chore: remove dev-only files (${DELETED[*]}) from SVN ${TARGET}" \
+              --username "$SVN_USERNAME" \
+              --password "$SVN_PASSWORD" \
+              --non-interactive
+            echo "Committed. Removed from ${TARGET}: ${DELETED[*]}"
+          fi

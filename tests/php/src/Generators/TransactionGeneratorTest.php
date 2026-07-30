@@ -90,7 +90,7 @@ class TransactionGeneratorTest extends StoreSeederUnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_generate_zero_count_is_empty(): void {
+	public function test_generate_zero_count_is_rejected(): void {
 		$this->require_fluent_cart();
 
 		$this->generator->set_locale( 'en_US' );
@@ -99,7 +99,9 @@ class TransactionGeneratorTest extends StoreSeederUnitTestCase {
 
 		$result = $this->generator->generate( 0 );
 
-		$this->assertIsArray( $result );
-		$this->assertCount( 0, $result );
+		// validate_count() rejects anything <= 0 rather than returning an empty
+		// batch, so callers can tell "nothing asked for" from "nothing created".
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertSame( 'invalid_count', $result->get_error_code() );
 	}
 }

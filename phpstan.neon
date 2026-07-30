@@ -9,9 +9,13 @@ parameters:
         - includes/
 
     excludePaths:
-        - vendor/
-        - node_modules/
-        - build/
+        # (?) marks a path as optional. node_modules/ and build/ only exist
+        # after an install and a build, and PHPStan hard-errors on an excluded
+        # path that is missing — which failed the analysis job on a fresh
+        # checkout that only installs Composer dependencies.
+        - vendor/ (?)
+        - node_modules/ (?)
+        - build/ (?)
         - tests/
         - languages/
 
