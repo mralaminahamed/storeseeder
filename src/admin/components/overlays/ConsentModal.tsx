@@ -4,7 +4,10 @@ import { __ } from "@wordpress/i18n";
 
 import { Button } from "@/admin/components/ui/button";
 import { Icon } from "@/admin/lib/icons";
-import { SHOW_CONSENT_EVENT } from "@/admin/lib/consent";
+import {
+  SHOW_CONSENT_EVENT,
+  notifyConsentChanged,
+} from "@/admin/lib/consent";
 import { useToast } from "@/admin/providers/ToastProvider";
 
 const REPO_URL =
@@ -101,6 +104,7 @@ export function ConsentModal() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`);
       toast(__("Sample data downloaded", "storeseeder"));
+      notifyConsentChanged();
       setOpen(false);
     } catch {
       toast(
@@ -113,16 +117,23 @@ export function ConsentModal() {
   const decline = useCallback(async () => {
     setBusy(true);
     try {
-      await fetch(`${restUrl}download-sample/consent`, {
+      const res = await fetch(`${restUrl}download-sample/consent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-WP-Nonce": nonce },
         body: JSON.stringify({ granted: false }),
       });
+      // Closing has to mean the decision was stored, otherwise the prompt
+      // silently returns on the next visit as though nothing was chosen.
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      notifyConsentChanged();
+      setOpen(false);
     } catch {
-      /* Best effort — declining is a local preference. */
+      toast(
+        __("Could not save your choice — please try again.", "storeseeder"),
+      );
+      setBusy(false);
     }
-    setOpen(false);
-  }, [restUrl, nonce]);
+  }, [restUrl, nonce, toast]);
 
   if (!open) return null;
 

@@ -8,7 +8,10 @@ import { NumberField } from "@/admin/components/generator/fields/NumberField";
 import { TextField } from "@/admin/components/generator/fields/TextField";
 import { FieldSelect } from "@/admin/components/generator/fields/FieldSelect";
 import { Icon } from "@/admin/lib/icons";
-import { requestConsentPrompt } from "@/admin/lib/consent";
+import {
+  CONSENT_CHANGED_EVENT,
+  requestConsentPrompt,
+} from "@/admin/lib/consent";
 import { getSettings, saveSettings } from "@/admin/lib/settings";
 import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
@@ -111,16 +114,30 @@ export default function SettingsPage() {
     value: (typeof settings)[K],
   ) => setSettings((s) => ({ ...s, [key]: value }));
 
+  const refreshSyncStatus = useCallback(
+    () =>
+      fetch(`${restUrl}download-sample`, {
+        headers: { "X-WP-Nonce": nonce },
+      })
+        .then((r) => r.json())
+        .then((data: SyncStatus) => setSyncStatus(data))
+        .catch(() => setSyncStatus(null)),
+    [restUrl, nonce],
+  );
+
   // Fetch sync status on mount
   useEffect(() => {
-    fetch(`${restUrl}download-sample`, {
-      headers: { "X-WP-Nonce": nonce },
-    })
-      .then((r) => r.json())
-      .then((data: SyncStatus) => setSyncStatus(data))
-      .catch(() => setSyncStatus(null))
-      .finally(() => setStatusLoading(false));
-  }, [restUrl, nonce]);
+    refreshSyncStatus().finally(() => setStatusLoading(false));
+  }, [refreshSyncStatus]);
+
+  // The consent modal writes the decision itself, so pick up its result rather
+  // than leaving this card showing the pre-prompt state.
+  useEffect(() => {
+    const onChanged = () => void refreshSyncStatus();
+
+    window.addEventListener(CONSENT_CHANGED_EVENT, onChanged);
+    return () => window.removeEventListener(CONSENT_CHANGED_EVENT, onChanged);
+  }, [refreshSyncStatus]);
 
   const handleSave = () => {
     saveSettings(settings);
@@ -130,6 +147,14 @@ export default function SettingsPage() {
 
   const handleSync = useCallback(
     async (force = false) => {
+      // Downloading is the act that needs permission, so ask here rather than
+      // from a separate control. The modal performs the download on approval.
+      if (syncStatus?.consent !== "granted") {
+        setSyncResult(null);
+        requestConsentPrompt();
+        return;
+      }
+
       setSyncing(true);
       setSyncResult(null);
       try {
@@ -160,7 +185,7 @@ export default function SettingsPage() {
         setSyncing(false);
       }
     },
-    [restUrl, nonce],
+    [restUrl, nonce, syncStatus?.consent],
   );
 
   const handleSetConsent = useCallback(
@@ -453,11 +478,11 @@ export default function SettingsPage() {
                   )
                 : syncStatus?.consent === "declined"
                   ? __(
-                      "Automatic download is declined. Sync now to allow it.",
+                      "Automatic download is declined. Sync now reopens the consent prompt so you can allow it.",
                       "storeseeder",
                     )
                   : __(
-                      "You will be asked to allow automatic download on your next visit.",
+                      "Nothing has been downloaded yet. Sync now asks for your permission first.",
                       "storeseeder",
                     )}
             </p>
@@ -491,23 +516,7 @@ export default function SettingsPage() {
                   {__("Revoke", "storeseeder")}
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                icon="database"
-                onClick={requestConsentPrompt}
-                disabled={syncing}
-                data-testid="consent-reshow"
-              >
-                {__("Show consent prompt", "storeseeder")}
-              </Button>
             </div>
-
-            <p className="fp-set-hint" style={{ marginTop: 10 }}>
-              {__(
-                "“Show consent prompt” reopens the original prompt so you can review it. It normally appears only once, on a site that has not decided yet.",
-                "storeseeder",
-              )}
-            </p>
 
             <div style={{ marginTop: 14 }}>
               <a
