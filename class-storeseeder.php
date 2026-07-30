@@ -165,9 +165,35 @@ class StoreSeeder {
 			'manage_options',
 			'storeseeder',
 			array( $this, 'render_admin_page' ),
-			'dashicons-randomize',
+			$this->get_menu_icon(),
 			30
 		);
+	}
+
+	/**
+	 * Build the admin menu icon
+	 *
+	 * Returns the StoreSeeder mark — a shopping cart with a sprout, matching the
+	 * plugin icon — as a base64 data URI. WordPress recognises that prefix and
+	 * renders the SVG as the menu icon background, dimming and brightening it with
+	 * the rest of the menu, so the mark is drawn in the default admin icon grey
+	 * rather than a brand colour.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return string Data URI suitable for the add_menu_page() $icon_url argument.
+	 */
+	private function get_menu_icon(): string {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a7aaad" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'
+			. '<path d="M3.2 9.4h17.6"/>'
+			. '<path d="M5.3 9.4l1.4 7.4a2 2 0 0 0 2 1.6h6.6a2 2 0 0 0 2-1.6l1.4-7.4"/>'
+			. '<path d="M12 9.2V3.9"/>'
+			. '<path d="M11.9 7.1c-1.1-1.4-3-1.3-3.6.2 1.4 1.2 3.1 1.1 3.6-.2Z" fill="#a7aaad" stroke="none"/>'
+			. '<path d="M12.1 5.6c.7-1.5 2.6-1.7 3.3-.7-.7 1.5-2.6 1.8-3.3.7Z" fill="#a7aaad" stroke="none"/>'
+			. '</svg>';
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- WordPress requires the menu icon SVG as a base64 data URI.
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
 	}
 
 	/**
