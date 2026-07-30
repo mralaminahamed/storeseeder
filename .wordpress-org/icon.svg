@@ -1,12 +1,51 @@
 <svg width="256" height="256" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="StoreSeeder">
+  <!--
+    The tile is one hue lit like glass, not a blend of two brand colours.
+
+    It used to run indigo #4f46e5 into violet #7c3aed corner to corner, which
+    reads as a colour ramp rather than a material. Every stop below is a tint or
+    shade of a single indigo (#5856d6, Apple's systemIndigo), so the panel reads
+    as one piece of glass catching light from above: body tone, a specular sweep
+    down the top half, light pooling in the lower right, and a rim that is bright
+    on the top edge and only bounces faintly along the bottom.
+
+    Baked rather than live: macOS renders this lighting itself from a layered
+    Icon Composer file, but a WordPress.org listing shows a flat PNG, so the
+    light has to be in the artwork. No SVG filters — gradients alone, so the
+    rasterisers behind the directory's own thumbnails cannot drop the effect.
+  -->
   <defs>
-    <linearGradient id="ssIcon" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4f46e5"/>
-      <stop offset="1" stop-color="#7c3aed"/>
+    <linearGradient id="ssBody" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6b68e8"/>
+      <stop offset="0.45" stop-color="#5250cf"/>
+      <stop offset="1" stop-color="#3b38a8"/>
+    </linearGradient>
+
+    <!-- Specular sweep. Held to 18% and spent by the top third: the cart runs
+         almost the full height, and any brighter washes the white glyph out. -->
+    <linearGradient id="ssSpec" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="0.34" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Light pooling where a thick pane would refract it, low and to the right. -->
+    <radialGradient id="ssPool" cx="88" cy="106" r="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a9a6ff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#a9a6ff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Edge: lit top, dark sides, a faint bounce along the bottom. -->
+    <linearGradient id="ssRim" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.68"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.22"/>
     </linearGradient>
   </defs>
 
-  <rect width="120" height="120" rx="29" fill="url(#ssIcon)"/>
+  <rect width="120" height="120" rx="29" fill="url(#ssBody)"/>
+  <rect width="120" height="120" rx="29" fill="url(#ssPool)"/>
+  <rect width="120" height="120" rx="29" fill="url(#ssSpec)"/>
+  <rect x="0.8" y="0.8" width="118.4" height="118.4" rx="28.2" fill="none" stroke="url(#ssRim)" stroke-width="1.6"/>
 
   <!-- Shopping cart: the store -->
   <g transform="translate(11,26) scale(3.7)" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">

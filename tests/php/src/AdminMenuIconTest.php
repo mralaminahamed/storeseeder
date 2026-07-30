@@ -102,11 +102,13 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 	}
 
 	public function test_no_variant_carries_the_gradient(): void {
-		// A gradient panel muddies to a single tone at 20px, so neither variant
-		// ships one.
+		// The listing icon's glass lighting muddies to a single tone at 20px, so
+		// neither menu variant ships any of it.
 		$this->assertStringNotContainsString( 'linearGradient', $this->svg );
-		$this->assertStringNotContainsString( '#4f46e5', $this->svg );
-		$this->assertStringNotContainsString( '#7c3aed', $this->svg );
+		$this->assertStringNotContainsString( 'radialGradient', $this->svg );
+		$this->assertStringNotContainsString( '#6b68e8', $this->svg );
+		$this->assertStringNotContainsString( '#5250cf', $this->svg );
+		$this->assertStringNotContainsString( '#3b38a8', $this->svg );
 	}
 
 	public function test_monochrome_variant_drops_the_tile_for_admin_grey(): void {

@@ -12,8 +12,8 @@
 }
 .fp-root .fp-brand { display:flex; align-items:center; gap:10px; padding:var(--pad-brand-y) var(--pad-panel-x) calc(var(--pad-brand-y) - 4px); }
 /* The brand mark is <BrandIcon>, a port of .wordpress-org/icon.svg, so the
-   artwork — gradient tile included — comes from the SVG itself. This only sizes
-   it and lifts it off the surface. The radius matches the SVG's own rx (29 of a
+   artwork — glass tile included — comes from the SVG itself. This only sizes it
+   and lifts it off the surface. The radius matches the SVG's own rx (29 of a
    120 viewBox = 24%) so the shadow traces the same corners as the artwork. */
 .fp-root .fp-brand-mark {
   width:var(--tile-sm); height:var(--tile-sm); flex-shrink:0;

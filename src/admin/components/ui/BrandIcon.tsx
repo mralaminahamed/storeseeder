@@ -15,19 +15,23 @@ export interface BrandIconProps {
 /**
  * The StoreSeeder brand mark.
  *
- * A direct port of `.wordpress-org/icon.svg` — the rounded indigo-to-violet
- * tile, the shopping cart, and the sprout — so the admin shows the same mark
- * that WordPress.org and the plugin's own listing do. Keep the two in step: if
- * the artwork changes, change it in both places.
+ * A direct port of `.wordpress-org/icon.svg` — the rounded indigo glass tile,
+ * the shopping cart, and the sprout — so the admin shows the same mark that
+ * WordPress.org and the plugin's own listing do. Keep the two in step: if the
+ * artwork changes, change it in both places, stop values included.
  *
  * Distinct from the `storeseeder` entry in `lib/icons.tsx`, which is the flat
  * monochrome variant that inherits `currentColor` for the WordPress admin menu.
  * This one carries the brand colours and its own background.
  */
 export function BrandIcon({ size = 30, className = "", style = {}, title }: BrandIconProps) {
-  // The gradient needs a document-unique id: two mounted instances sharing one
+  // Each gradient needs a document-unique id: two mounted instances sharing one
   // would collide, and the second would reference the first's definition.
-  const gradientId = `ss-brand-${useId().replace(/:/g, "")}`;
+  const uid = `ss-brand-${useId().replace(/:/g, "")}`;
+  const body = `${uid}-body`;
+  const pool = `${uid}-pool`;
+  const spec = `${uid}-spec`;
+  const rim = `${uid}-rim`;
   const decorative = undefined === title;
 
   return (
@@ -44,14 +48,47 @@ export function BrandIcon({ size = 30, className = "", style = {}, title }: Bran
     >
       {!decorative && <title>{title}</title>}
 
+      {/* One hue lit like glass, not a blend of two brand colours: body tone, a
+          specular sweep down the top third, light pooling low and to the right,
+          and a rim that is bright on the top edge and bounces faintly along the
+          bottom. See the source SVG for why the lighting is baked in. */}
       <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#4f46e5" />
-          <stop offset="1" stopColor="#7c3aed" />
+        <linearGradient id={body} x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#6b68e8" />
+          <stop offset="0.45" stopColor="#5250cf" />
+          <stop offset="1" stopColor="#3b38a8" />
+        </linearGradient>
+
+        <linearGradient id={spec} x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.18" />
+          <stop offset="0.34" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+
+        <radialGradient id={pool} cx="88" cy="106" r="48" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#a9a6ff" stopOpacity="0.22" />
+          <stop offset="1" stopColor="#a9a6ff" stopOpacity="0" />
+        </radialGradient>
+
+        <linearGradient id={rim} x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.68" />
+          <stop offset="0.4" stopColor="#ffffff" stopOpacity="0.04" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0.22" />
         </linearGradient>
       </defs>
 
-      <rect width="120" height="120" rx="29" fill={`url(#${gradientId})`} />
+      <rect width="120" height="120" rx="29" fill={`url(#${body})`} />
+      <rect width="120" height="120" rx="29" fill={`url(#${pool})`} />
+      <rect width="120" height="120" rx="29" fill={`url(#${spec})`} />
+      <rect
+        x="0.8"
+        y="0.8"
+        width="118.4"
+        height="118.4"
+        rx="28.2"
+        fill="none"
+        stroke={`url(#${rim})`}
+        strokeWidth="1.6"
+      />
 
       {/* Shopping cart: the store */}
       <g
