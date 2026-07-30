@@ -393,7 +393,8 @@ class StoreSeeder {
 	/**
 	 * Plugin activation hook
 	 *
-	 * Handles plugin activation tasks including flushing rewrite rules.
+	 * Handles plugin activation tasks: switching a site that is still on plain
+	 * permalinks over to post-name permalinks, then flushing rewrite rules.
 	 *
 	 * @since 1.0.0
 	 * @hooked register_activation_hook
@@ -401,8 +402,65 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function activate_plugin(): void {
+		// Runs before the flush below, since changing the structure is what
+		// makes the rules stale in the first place.
+		$this->maybe_set_postname_permalinks();
+
 		// Flush rewrite rules.
 		$this->flush_rewrite_rules();
+	}
+
+	/**
+	 * Switch to post-name permalinks when the site has none set
+	 *
+	 * Generated products and orders are only reachable at readable URLs once the
+	 * site is off plain permalinks, so a fresh install that never picked a
+	 * structure gets `/%postname%/` here.
+	 *
+	 * Only an empty structure is treated as "not set". Plain permalinks store an
+	 * empty `permalink_structure`, so any non-empty value means the site owner
+	 * already chose day-and-name, a custom pattern, or anything else — those are
+	 * left untouched.
+	 *
+	 * Filter `storeseeder_set_postname_permalinks` to false to opt out entirely,
+	 * for sites that deliberately run on plain permalinks.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return bool True when the structure was written, false when it was left alone.
+	 */
+	private function maybe_set_postname_permalinks(): bool {
+		// Non-empty means the site already has a structure — never overwrite it.
+		if ( '' !== (string) get_option( 'permalink_structure', '' ) ) {
+			return false;
+		}
+
+		/**
+		 * Filters whether activation may set post-name permalinks.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param bool $enable Whether to set `/%postname%/` when no structure is set.
+		 */
+		if ( ! apply_filters( 'storeseeder_set_postname_permalinks', true ) ) {
+			return false;
+		}
+
+		global $wp_rewrite;
+
+		if ( $wp_rewrite instanceof WP_Rewrite ) {
+			// Saves the option, rebuilds the rules, and updates .htaccess when
+			// the file is writable.
+			$wp_rewrite->set_permalink_structure( '/%postname%/' );
+
+			return true;
+		}
+
+		// No $wp_rewrite yet: store the structure so the flush that follows —
+		// and the next page load — pick it up.
+		update_option( 'permalink_structure', '/%postname%/' );
+
+		return true;
 	}
 
 	/**

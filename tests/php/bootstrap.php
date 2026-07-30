@@ -68,7 +68,14 @@ function install_fluent_cart() {
 
 	echo 'Installing Fluent Cart...' . PHP_EOL;
 
-	// Install Fluent Cart if it has an installation method.
+	// Install Fluent Cart if it has an installation method. Current releases no
+	// longer expose this function, and calling it unconditionally takes the whole
+	// suite down with a fatal before a single test runs.
+	if ( ! function_exists( '\FluentCart\fluent_cart_install' ) ) {
+		echo 'Warning: FluentCart\fluent_cart_install() not available; skipping Fluent Cart install.' . PHP_EOL;
+		return;
+	}
+
 	\FluentCart\fluent_cart_install();
 
 	// Reload capabilities after install.
@@ -89,9 +96,10 @@ function install_storeseeder() {
 	// Clean up existing tables.
 	storeseeder_truncate_table_data();
 
-	// Activate the plugin.
-	if ( function_exists( 'storeseeder' ) ) {
-		storeseeder()->activate();
+	// Activate the plugin. The method is activate_plugin(); the old activate()
+	// call fataled here before any test could run.
+	if ( function_exists( 'storeseeder' ) && method_exists( storeseeder(), 'activate_plugin' ) ) {
+		storeseeder()->activate_plugin();
 	}
 }
 
