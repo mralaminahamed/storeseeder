@@ -82,9 +82,9 @@ interface Platform {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param string $resource One of the Resource constants.
+	 * @param string $resource_type One of the Resource constants.
 	 *
 	 * @return Writer|null Null when this platform cannot write that resource.
 	 */
-	public function writer( string $resource ): ?Writer;
+	public function writer( string $resource_type ): ?Writer;
 }

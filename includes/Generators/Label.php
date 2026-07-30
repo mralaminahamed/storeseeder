@@ -9,20 +9,17 @@
 
 namespace StoreSeeder\Generators;
 
-use FluentCart\App\Models\Customer as CustomerModel;
-use FluentCart\App\Models\Label as LabelModel;
-use FluentCart\App\Models\LabelRelationship as LabelRelationshipModel;
-use FluentCart\App\Models\Order as OrderModel;
 use StoreSeeder\Abstracts\Generator;
-use WP_Error;
+use StoreSeeder\Platform\Resource;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Label Generator Class
  *
- * Generates labels (tags) and attaches them to existing orders and customers for
- * testing Fluent Cart's tagging and segmentation features.
+ * Shapes labels (tags) and decides how many orders and customers each should be
+ * attached to. Finding those rows, and knowing how the platform records the
+ * association, is the writer's job.
  */
 class Label extends Generator {
 
@@ -63,7 +60,7 @@ class Label extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'labels' => 'Fluent Cart Labels',
+			'labels' => __( 'Labels', 'storeseeder' ),
 		);
 	}
 
@@ -73,137 +70,27 @@ class Label extends Generator {
 	 * @return string Description
 	 */
 	public function get_description(): string {
-		return 'Generates labels and attaches them to existing orders and customers for testing Fluent Cart tagging and segmentation.';
+		return 'Generates labels and attaches them to existing orders and customers for testing tagging and segmentation.';
 	}
 
 	/**
-	 * Generate a single label
+	 * Build a canonical label
 	 *
-	 * @return WP_Error|array Single label data, error, or false on failure.
+	 * `attach` is keyed by canonical resource rather than by model class, so the same
+	 * entity means the same thing on a platform that stores labels as a taxonomy as on
+	 * one that stores them in a polymorphic table.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>
 	 */
-	protected function generate_single_item() {
-		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( LabelModel::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Label model not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
-		}
-
-		$label = $this->create_label();
-
-		if ( ! $label ) {
-			return new WP_Error( 'label_creation_failed', __( 'Failed to create label.', 'storeseeder' ) );
-		}
-
-		$attached = $this->attach_label( (int) $label->id );
-
-		$result = array(
-			'id'         => $label->id,
-			'value'      => $label->value,
-			'attached'   => $attached,
-			'created_at' => current_time( 'Y-m-d H:i:s' ),
+	protected function build_entity() {
+		return array(
+			'value'  => $this->get_faker()->randomElement( self::LABELS ),
+			'attach' => array(
+				Resource::ORDER    => $this->get_faker()->numberBetween( 0, 3 ),
+				Resource::CUSTOMER => $this->get_faker()->numberBetween( 0, 3 ),
+			),
 		);
-
-		/**
-		 * Filters the label generation result data.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_label_generation_result
-		 *
-		 * @param array $result The label generation result data.
-		 * @param int   $id     The created label ID.
-		 */
-		return apply_filters( 'storeseeder_label_generation_result', $result, $label->id );
-	}
-
-	/**
-	 * Create a label with a value not already taken.
-	 *
-	 * The fct_label.value column carries a UNIQUE index, so a collision is a
-	 * database error.
-	 *
-	 * @return LabelModel|null Created label, or null on failure.
-	 */
-	private function create_label(): ?LabelModel {
-		$base  = $this->get_faker()->randomElement( self::LABELS );
-		$value = $base;
-
-		while ( LabelModel::query()->where( 'value', $value )->exists() ) {
-			$value = $base . ' ' . strtoupper( $this->get_faker()->bothify( '??#' ) );
-		}
-
-		try {
-			return LabelModel::query()->create( array( 'value' => $value ) );
-		} catch ( \Exception $e ) {
-			return null;
-		}
-	}
-
-	/**
-	 * Attach the label to a few random orders and customers.
-	 *
-	 * The fct_label_relationships table is polymorphic: labelable_type is the
-	 * target model class and labelable_id its row id. Labels attach to nothing
-	 * until this runs.
-	 *
-	 * @param int $label_id Label ID.
-	 *
-	 * @return int Number of relationships created.
-	 */
-	private function attach_label( int $label_id ): int {
-		if ( ! class_exists( LabelRelationshipModel::class ) ) {
-			return 0;
-		}
-
-		$targets = array();
-
-		foreach ( $this->random_rows( OrderModel::class ) as $id ) {
-			$targets[] = array(
-				'id'   => $id,
-				'type' => OrderModel::class,
-			);
-		}
-
-		foreach ( $this->random_rows( CustomerModel::class ) as $id ) {
-			$targets[] = array(
-				'id'   => $id,
-				'type' => CustomerModel::class,
-			);
-		}
-
-		$created = 0;
-
-		foreach ( $targets as $target ) {
-			LabelRelationshipModel::query()->create(
-				array(
-					'label_id'       => $label_id,
-					'labelable_id'   => $target['id'],
-					'labelable_type' => $target['type'],
-				)
-			);
-
-			++$created;
-		}
-
-		return $created;
-	}
-
-	/**
-	 * Draw a handful of random row IDs for a model.
-	 *
-	 * @param class-string $model Model class.
-	 *
-	 * @return array<int, int> Row IDs, possibly empty.
-	 */
-	private function random_rows( string $model ): array {
-		$rows = $model::query()
-			->inRandomOrder()
-			->limit( $this->get_faker()->numberBetween( 0, 3 ) )
-			->get();
-
-		$ids = array();
-
-		foreach ( $rows as $row ) {
-			$ids[] = (int) $row->id;
-		}
-
-		return $ids;
 	}
 }

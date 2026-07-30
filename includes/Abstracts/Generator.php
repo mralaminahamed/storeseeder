@@ -372,7 +372,7 @@ abstract class Generator {
 	 *
 	 * @return array<string, mixed>|WP_Error Generated item data array or error object.
 	 */
-	protected function generate_single_item() {
+	final protected function generate_single_item() {
 		$entity = $this->build_entity();
 
 		if ( is_wp_error( $entity ) ) {
@@ -450,16 +450,7 @@ abstract class Generator {
 	 *
 	 * @return array<string, mixed>|WP_Error The canonical entity, or why one could not be built.
 	 */
-	protected function build_entity() {
-		return new WP_Error(
-			'storeseeder_not_implemented',
-			sprintf(
-				/* translators: %s: generator class name. */
-				__( '%s does not implement build_entity().', 'storeseeder' ),
-				static::class
-			)
-		);
-	}
+	abstract protected function build_entity();
 
 	/**
 	 * The writer for this generator's resource on the target platform

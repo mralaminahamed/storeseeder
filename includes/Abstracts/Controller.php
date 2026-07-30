@@ -368,9 +368,9 @@ abstract class Controller extends WP_REST_Controller {
 			return $platform;
 		}
 
-		$resource     = $this->get_resource_type();
-		$capabilities = $platform->supports();
-		$capability   = $capabilities[ $resource ] ?? null;
+		$resource_type = $this->get_resource_type();
+		$capabilities  = $platform->supports();
+		$capability    = $capabilities[ $resource_type ] ?? null;
 
 		if ( null === $capability || ! $capability->is_supported() ) {
 			$reason = null === $capability
@@ -389,7 +389,7 @@ abstract class Controller extends WP_REST_Controller {
 				array(
 					'status'    => 400,
 					'platform'  => $platform->id(),
-					'resource'  => $resource,
+					'resource'  => $resource_type,
 					'extension' => null !== $capability ? $capability->get_extension() : '',
 				)
 			);

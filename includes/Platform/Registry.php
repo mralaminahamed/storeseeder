@@ -91,7 +91,11 @@ final class Registry {
 		 *
 		 * @since 1.1.0
 		 *
-		 * @param array<int, Platform> $platforms Drivers, in preference order.
+		 * @param array<int, mixed> $platforms Drivers, in preference order. Each entry
+		 *                                     is expected to implement Platform;
+		 *                                     anything else is discarded rather than
+		 *                                     trusted, since a filter can return
+		 *                                     whatever it likes.
 		 */
 		$platforms = apply_filters( 'storeseeder_platforms', array( new Fluent_Cart() ) );
 

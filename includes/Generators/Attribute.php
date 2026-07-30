@@ -10,15 +10,10 @@ namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
-use FluentCart\App\Models\AttributeGroup;
-use FluentCart\App\Models\AttributeRelation;
-use FluentCart\App\Models\AttributeTerm;
-use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use StoreSeeder\Abstracts\Generator;
-use WP_Error;
 
 /**
- * Generates Fluent Cart product attribute groups with terms.
+ * Shapes product attribute groups with their terms.
  *
  * @since 1.0.0
  */
@@ -56,122 +51,34 @@ class Attribute extends Generator {
 	 * {@inheritDoc}
 	 */
 	public function get_description(): string {
-		return 'Generates Fluent Cart attribute groups (Color, Size, Material, etc.) each with a set of terms for testing product variation functionality.';
+		return 'Generates attribute groups (Color, Size, Material, etc.) each with a set of terms for testing product variation functionality.';
 	}
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * `link_count` is how many product variations the group should be bound to. The
+	 * number is generated data; finding the variations is not, so the writer does that
+	 * part.
 	 */
-	protected function generate_single_item() {
-		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( AttributeGroup::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart attribute models not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
-		}
-
+	protected function build_entity() {
 		$set_names = array_keys( self::ATTRIBUTE_SETS );
 		$base_name = $this->get_faker()->randomElement( $set_names );
 		$title     = $base_name . ' ' . $this->get_faker()->numerify( '###' );
-		$slug      = sanitize_title( $title );
-
-		$group = AttributeGroup::create(
-			array(
-				'title'       => $title,
-				'slug'        => $slug,
-				'description' => $this->get_faker()->sentence( 8 ),
-				'settings'    => array(),
-				'serial'      => $this->get_faker()->numberBetween( 1, 999 ),
-			)
-		);
-
-		if ( ! $group || ! $group->id ) {
-			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'storeseeder' ) );
-		}
 
 		$all_terms = self::ATTRIBUTE_SETS[ $base_name ];
-		$count     = $this->get_faker()->numberBetween( 3, count( $all_terms ) );
-		$selected  = $this->get_faker()->randomElements( $all_terms, $count, false );
-		$values    = array();
-
-		foreach ( $selected as $i => $label ) {
-			$term = AttributeTerm::create(
-				array(
-					'group_id'    => $group->id,
-					'serial'      => $i + 1,
-					'title'       => $label,
-					'slug'        => sanitize_title( $title . '-' . $label ),
-					'description' => '',
-					'settings'    => array(),
-				)
-			);
-			if ( $term && $term->id ) {
-				$values[] = array(
-					'id'    => (int) $term->id,
-					'label' => $label,
-				);
-			}
-		}
-
-		// Bind the terms to real product variations. Without this the attribute
-		// group and its terms exist but attach to nothing — fct_atts_relations
-		// stays empty, no product is genuinely variable, and the attribute is
-		// invisible on every product page.
-		$linked = $this->link_terms_to_variations( (int) $group->id, array_column( $values, 'id' ) );
 
 		return array(
-			'id'     => (int) $group->id,
-			'name'   => $title,
-			'slug'   => $slug,
-			'values' => $values,
-			'linked' => $linked,
+			'title'       => $title,
+			'slug'        => sanitize_title( $title ),
+			'description' => $this->get_faker()->sentence( 8 ),
+			'serial'      => $this->get_faker()->numberBetween( 1, 999 ),
+			'terms'       => $this->get_faker()->randomElements(
+				$all_terms,
+				$this->get_faker()->numberBetween( 3, count( $all_terms ) ),
+				false
+			),
+			'link_count'  => $this->get_faker()->numberBetween( 2, 6 ),
 		);
-	}
-
-	/**
-	 * Attach this attribute group's terms to real product variations.
-	 *
-	 * The fct_atts_relations table binds a variation (object_id) to one term of a group.
-	 * A variation carries at most one term per group — it is one size, one
-	 * colour — so a variation that already has a term for this group is skipped.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int   $group_id Attribute group ID.
-	 * @param int[] $term_ids IDs of the group's terms.
-	 *
-	 * @return int Number of variations linked.
-	 */
-	private function link_terms_to_variations( int $group_id, array $term_ids ): int {
-		if ( empty( $term_ids ) || ! class_exists( AttributeRelation::class ) ) {
-			return 0;
-		}
-
-		$variations = ProductVariationModel::query()
-			->inRandomOrder()
-			->limit( $this->get_faker()->numberBetween( 2, 6 ) )
-			->get();
-
-		$linked = 0;
-
-		foreach ( $variations as $variation ) {
-			$already = AttributeRelation::query()
-				->where( 'object_id', $variation->id )
-				->where( 'group_id', $group_id )
-				->exists();
-
-			if ( $already ) {
-				continue;
-			}
-
-			AttributeRelation::query()->create(
-				array(
-					'object_id' => (int) $variation->id,
-					'group_id'  => $group_id,
-					'term_id'   => (int) $this->get_faker()->randomElement( $term_ids ),
-				)
-			);
-
-			++$linked;
-		}
-
-		return $linked;
 	}
 }

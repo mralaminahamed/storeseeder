@@ -75,11 +75,11 @@ final class Resource {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param string $resource Candidate resource name.
+	 * @param string $resource_type Candidate resource name.
 	 *
 	 * @return bool
 	 */
-	public static function exists( string $resource ): bool {
-		return in_array( $resource, self::all(), true );
+	public static function exists( string $resource_type ): bool {
+		return in_array( $resource_type, self::all(), true );
 	}
 }

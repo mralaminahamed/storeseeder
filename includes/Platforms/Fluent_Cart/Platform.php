@@ -93,8 +93,8 @@ final class Platform extends Platform_Driver {
 	protected function capabilities(): array {
 		$matrix = array();
 
-		foreach ( Resource::all() as $resource ) {
-			$matrix[ $resource ] = true;
+		foreach ( Resource::all() as $resource_type ) {
+			$matrix[ $resource_type ] = true;
 		}
 
 		return $matrix;

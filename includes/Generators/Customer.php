@@ -8,18 +8,20 @@
 
 namespace StoreSeeder\Generators;
 
-use FluentCart\App\Models\Customer as CustomerModel;
-use FluentCart\App\Models\CustomerAddresses as CustomerAddressModel;
 use StoreSeeder\Abstracts\Generator;
-use WP_Error;
-use WP_User;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Customer Generator Class
  *
- * Generates realistic fake customer data for Fluent Cart
+ * Shapes realistic customer profiles: names, localised addresses, preferences and
+ * purchase history. Persisting them, and reconciling with any existing WordPress user,
+ * is a platform writer's job.
+ *
+ * This is the generator where the split pays off most: of its nine hundred lines, only
+ * a handful ever touched a platform, and the locale-aware address, phone and postcode
+ * logic below now serves every platform unchanged.
  *
  * @since 1.0.0
  */
@@ -78,22 +80,17 @@ class Customer extends Generator {
 	 * @return string Description
 	 */
 	public function get_description(): string {
-		return __( 'Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems.', 'storeseeder' );
+		return __( 'Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing customer management systems.', 'storeseeder' );
 	}
 
 	/**
-	 * Generate a single customer
+	 * Build a canonical customer
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 *
-	 * @return array|WP_Error Single customer data, error, or false on failure.
+	 * @return array<string, mixed> Canonical customer entity.
 	 */
-	protected function generate_single_item() {
-		// Check if Fluent Cart is active.
-		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart plugin not found. Please ensure Fluent Cart is active.', 'storeseeder' ) );
-		}
-
+	protected function build_entity() {
 		$first_name = $this->get_faker()->firstName();
 		$last_name  = $this->get_faker()->lastName();
 		$email      = $this->get_faker()->unique()->safeEmail();
@@ -147,242 +144,22 @@ class Customer extends Generator {
 		$shipping_address = $customer_data['shipping_address'];
 		$customer_meta    = $customer_data['customer_meta'];
 
-		// Check if user with this email already exists.
-		if ( email_exists( $email ) ) {
-			return new WP_Error( 'email_exists', __( 'A user with this email address already exists.', 'storeseeder' ) );
-		}
-
-		// Create customer using Fluent Cart's customer creation.
-		$customer_id = $this->create_fluent_cart_customer(
-			array(
-				'email'      => $email,
-				'first_name' => $first_name,
-				'last_name'  => $last_name,
-				'username'   => $this->generate_unique_username( $first_name, $last_name ),
-				'password'   => wp_generate_password( 16, true, true ),
-			),
-			$billing_address,
-			$shipping_address,
-			$customer_meta
-		);
-
-		if ( is_wp_error( $customer_id ) ) {
-			return $customer_id;
-		}
-
-		if ( ! $customer_id ) {
-			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart.', 'storeseeder' ) );
-		}
-
-		$result = array(
-			'id'              => $customer_id,
-			'name'            => $full_name,
-			'email'           => $email,
-			'username'        => $this->generate_unique_username( $first_name, $last_name ),
-			'phone'           => $billing_address['phone'],
-			'billing_city'    => $billing_address['city'],
-			'billing_country' => $billing_address['country'],
-			'shipping_city'   => ! empty( $shipping_address ) ? $shipping_address['city'] : $billing_address['city'],
-			'customer_since'  => $customer_meta['customer_since'],
-			'loyalty_tier'    => $customer_meta['loyalty_tier'],
-			'total_orders'    => $customer_meta['total_orders'],
-			'total_spent'     => '$' . number_format( $customer_meta['total_spent'], 2 ),
-			'last_login'      => $customer_meta['last_login'],
-		);
-
-		/**
-		 * Filters the customer generation result data.
-		 *
-		 * Allows developers to modify the returned customer data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_customer_generation_result
-		 *
-		 * @param array $result        The customer generation result data.
-		 * @param int   $customer_id   The created customer ID.
-		 * @param array $customer_data The original customer data used for creation.
-		 */
-		$result = apply_filters( 'storeseeder_customer_generation_result', $result, $customer_id, $customer_data );
-
-		/**
-		 * Fires after a customer has been successfully created.
-		 *
-		 * Allows developers to perform additional operations after customer creation,
-		 * such as adding custom metadata, triggering related processes, or logging.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_after_customer_created
-		 *
-		 * @param int   $customer_id   The created customer ID.
-		 * @param array $result        The customer generation result data.
-		 * @param array $customer_data The original customer data used for creation.
-		 */
-		do_action( 'storeseeder_after_customer_created', $customer_id, $result, $customer_data );
-
-		return $result;
-	}
-
-	/**
-	 * Create customer using Fluent Cart
-	 *
-	 * @param array $user_data     User data.
-	 * @param array $billing_addr  Billing address.
-	 * @param array $shipping_addr Shipping address.
-	 * @param array $meta_data     Meta data.
-	 *
-	 * @return int|WP_Error|null Customer ID or error
-	 */
-	private function create_fluent_cart_customer( array $user_data, array $billing_addr, array $shipping_addr, array $meta_data ) {
-		// Check if Fluent Cart Customer model is available.
-		if ( ! class_exists( CustomerModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
-		}
-
-		// Prepare customer data for Fluent Cart Customer model.
-		$customer_data = array(
-			'email'          => $user_data['email'],
-			'first_name'     => $user_data['first_name'],
-			'last_name'      => $user_data['last_name'],
-			'status'         => 'active',
-			'purchase_value' => $meta_data['total_spent'],
-			'purchase_count' => $meta_data['total_orders'],
-			'ltv'            => $meta_data['total_spent'],
-			'aov'            => $meta_data['total_orders'] > 0 ? $meta_data['total_spent'] / $meta_data['total_orders'] : 0,
-			'notes'          => $this->get_faker()->sentence( 3, true ),
-		);
-
-		// Create customer using Fluent Cart Customer model.
-		$customer = CustomerModel::query()->firstOrCreate(
-			array( 'email' => $user_data['email'] ),
-			$customer_data
-		);
-
-		if ( ! $customer ) {
-			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart model.', 'storeseeder' ) );
-		}
-
-		// Optionally create WordPress user if requested.
-		if ( $this->get_faker()->boolean( 30 ) ) { // 30% chance of creating WP user
-			$user_id = wp_insert_user(
-				array(
-					'user_login' => $user_data['username'],
-					'user_email' => $user_data['email'],
-					'first_name' => $user_data['first_name'],
-					'last_name'  => $user_data['last_name'],
-					'user_pass'  => $user_data['password'],
-					'role'       => 'customer',
-				)
-			);
-
-			if ( ! is_wp_error( $user_id ) ) {
-				$customer->update( array( 'user_id' => $user_id ) );
-			}
-		}
-
-		// Persist the generated addresses to fct_customer_addresses. They were
-		// built and then discarded, leaving the customer with an empty address
-		// book that pre-filled nothing at checkout and showed no address in the
-		// admin profile.
-		$this->create_customer_addresses( (int) $customer->id, $billing_addr, $shipping_addr );
-
-		return $customer->id;
-	}
-
-	/**
-	 * Persist a customer's billing and shipping addresses.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int   $customer_id Customer row ID.
-	 * @param array $billing     Billing address fields.
-	 * @param array $shipping    Shipping address fields, empty when it matches
-	 *                           billing.
-	 *
-	 * @return void
-	 */
-	private function create_customer_addresses( int $customer_id, array $billing, array $shipping ): void {
-		if ( ! class_exists( CustomerAddressModel::class ) || empty( $billing ) ) {
-			return;
-		}
-
-		CustomerAddressModel::query()->create(
-			$this->map_customer_address( $customer_id, $billing, 'billing' )
-		);
-
-		// generate_shipping_address() returns an empty array when the customer
-		// ships to their billing address, so only store a distinct one.
-		if ( ! empty( $shipping ) ) {
-			CustomerAddressModel::query()->create(
-				$this->map_customer_address( $customer_id, $shipping, 'shipping' )
-			);
-		}
-	}
-
-	/**
-	 * Shape a generated address array for the CustomerAddresses model.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int    $customer_id Customer row ID.
-	 * @param array  $addr        Generated address fields.
-	 * @param string $type        'billing' or 'shipping'.
-	 *
-	 * @return array Column map for CustomerAddresses::create().
-	 */
-	private function map_customer_address( int $customer_id, array $addr, string $type ): array {
-		$name = trim( ( $addr['first_name'] ?? '' ) . ' ' . ( $addr['last_name'] ?? '' ) );
-
 		return array(
-			'customer_id' => $customer_id,
-			// Each type carries its own primary; Fluent Cart resolves the default
-			// billing and default shipping address separately.
-			'is_primary'  => 1,
-			'type'        => $type,
-			'status'      => 'active',
-			'label'       => ucfirst( $type ),
-			'name'        => $name,
-			'address_1'   => $addr['address_1'] ?? '',
-			'address_2'   => $addr['address_2'] ?? '',
-			'city'        => $addr['city'] ?? '',
-			'state'       => $addr['state'] ?? '',
-			'postcode'    => $addr['postcode'] ?? '',
-			'country'     => $addr['country'] ?? '',
-			'phone'       => $addr['phone'] ?? '',
-			'email'       => $addr['email'] ?? '',
-			// company_name is not fillable; it lives under meta.other_data.
-			'meta'        => array(
-				'other_data' => array(
-					'company_name' => $addr['company'] ?? '',
-				),
-			),
+			'first_name'       => $first_name,
+			'last_name'        => $last_name,
+			'full_name'        => $full_name,
+			'email'            => $email,
+			'billing_address'  => $billing_address,
+			'shipping_address' => $shipping_address,
+			'meta'             => $customer_meta,
+			'notes'            => $this->get_faker()->sentence( 3, true ),
+			// Only some customers hold an account. The writer reconciles that with
+			// whatever user records the platform already has.
+			'with_account'     => $this->get_faker()->boolean( 30 ),
+			// A base for the account name; the writer disambiguates it, since only
+			// the site knows which usernames are taken.
+			'username_base'    => strtolower( $first_name . '.' . $last_name ),
 		);
-	}
-
-	/**
-	 * Generate unique username
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $first_name First name.
-	 * @param string $last_name  Last name.
-	 *
-	 * @return string Unique username.
-	 */
-	private function generate_unique_username( string $first_name, string $last_name ): string {
-		$base_username = strtolower( $first_name . '.' . $last_name );
-		$username      = sanitize_user( $base_username, true );
-		$attempts      = 0;
-
-		while ( username_exists( $username ) && $attempts < 10 ) {
-			$username = sanitize_user( $base_username . $this->get_faker()->numberBetween( 1, 999 ), true );
-			++$attempts;
-		}
-
-		if ( username_exists( $username ) ) {
-			$username = sanitize_user( $base_username . time(), true );
-		}
-
-		return $username;
 	}
 
 	/**

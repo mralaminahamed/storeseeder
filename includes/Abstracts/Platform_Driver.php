@@ -34,10 +34,13 @@ abstract class Platform_Driver implements Platform {
 	private array $writers = array();
 
 	/**
-	 * Resolved writer class map, or null before the filter has run.
+	 * Resolved writer map, or null before the filter has run.
+	 *
+	 * Holds class names as authored, but the filter may substitute already-built Writer
+	 * instances, so both forms are legal here.
 	 *
 	 * @since 1.1.0
-	 * @var array<string, string>|null
+	 * @var array<string, string|Writer>|null
 	 */
 	private $writer_map = null;
 
@@ -74,8 +77,8 @@ abstract class Platform_Driver implements Platform {
 	public function supports(): array {
 		$matrix = array();
 
-		foreach ( $this->capabilities() as $resource => $value ) {
-			$matrix[ $resource ] = Capability::from( $value );
+		foreach ( $this->capabilities() as $resource_type => $value ) {
+			$matrix[ $resource_type ] = Capability::from( $value );
 		}
 
 		/**
@@ -98,22 +101,22 @@ abstract class Platform_Driver implements Platform {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param string $resource Canonical resource name.
+	 * @param string $resource_type Canonical resource name.
 	 *
 	 * @return Writer|null
 	 */
-	public function writer( string $resource ): ?Writer {
-		if ( isset( $this->writers[ $resource ] ) ) {
-			return $this->writers[ $resource ];
+	public function writer( string $resource_type ): ?Writer {
+		if ( isset( $this->writers[ $resource_type ] ) ) {
+			return $this->writers[ $resource_type ];
 		}
 
 		$map = $this->resolved_writer_map();
 
-		if ( ! isset( $map[ $resource ] ) ) {
+		if ( ! isset( $map[ $resource_type ] ) ) {
 			return null;
 		}
 
-		$writer = $map[ $resource ];
+		$writer = $map[ $resource_type ];
 
 		if ( is_string( $writer ) ) {
 			if ( ! class_exists( $writer ) ) {
@@ -127,7 +130,7 @@ abstract class Platform_Driver implements Platform {
 			return null;
 		}
 
-		$this->writers[ $resource ] = $writer;
+		$this->writers[ $resource_type ] = $writer;
 
 		return $writer;
 	}
