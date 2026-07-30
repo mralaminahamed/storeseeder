@@ -132,6 +132,7 @@ class StoreSeeder {
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+		add_action( 'in_admin_header', array( $this, 'hide_foreign_admin_notices' ), PHP_INT_MAX );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_filter( 'admin_body_class', array( $this, 'filter_admin_body_class' ) );
@@ -283,6 +284,58 @@ class StoreSeeder {
 		}
 
 		return trim( $classes . ' storeseeder-admin-page' );
+	}
+
+	/**
+	 * Clear other plugins' notices from the StoreSeeder screen
+	 *
+	 * The plugin renders a single-page app that owns the whole content area, and
+	 * every unrelated notice on the site lands on top of it — setup wizards,
+	 * review nags, upgrade prompts. They describe the site, not this screen, and
+	 * they push the interface down the page.
+	 *
+	 * Only this screen is affected: every notice still shows everywhere else, so
+	 * nothing is hidden from an administrator who has not navigated here. The
+	 * plugin's own hint is re-registered afterwards, since it is about this screen
+	 * and is dismissible.
+	 *
+	 * `in_admin_header` is the last hook that fires before WordPress prints the
+	 * notice queue, so removing the callbacks here catches everything registered up
+	 * to that point.
+	 *
+	 * @since 1.0.1
+	 * @hooked in_admin_header
+	 *
+	 * @return void
+	 */
+	public function hide_foreign_admin_notices(): void {
+		$screen = get_current_screen();
+
+		if ( null === $screen || 'toplevel_page_storeseeder' !== $screen->id ) {
+			return;
+		}
+
+		/**
+		 * Filters whether unrelated admin notices are cleared on the plugin screen.
+		 *
+		 * Return false to let every notice through, e.g. while debugging another
+		 * plugin's warning that only appears here.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param bool $hide Whether to clear notices. Default true.
+		 */
+		if ( ! apply_filters( 'storeseeder_hide_foreign_admin_notices', true ) ) {
+			return;
+		}
+
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+		remove_all_actions( 'user_admin_notices' );
+		remove_all_actions( 'network_admin_notices' );
+
+		// The MCP hint belongs to this screen and is dismissible, so it stays.
+		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 	}
 
 	/**
