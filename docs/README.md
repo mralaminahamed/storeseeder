@@ -27,6 +27,7 @@ for the overview; these pages go deeper.
 | [Code of Conduct](../CODE_OF_CONDUCT.md) | Contributor Covenant 2.1 |
 | [Support](../SUPPORT.md) | Where to ask, what to include, what is out of scope |
 | [Security](../SECURITY.md) | Private vulnerability reporting and the plugin's security measures |
+| [External Services](external-services.md) | The two outbound requests the plugin can make, what they send, and how to opt out |
 
 ## Reference
 

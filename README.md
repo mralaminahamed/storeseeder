@@ -157,6 +157,8 @@ Two outbound requests, both administrator-initiated. Neither sends any site, use
 
 GitHub [terms](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service) and [privacy policy](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement). WordPress.org [about](https://wordpress.org/about/) and [privacy policy](https://wordpress.org/about/privacy/).
 
+Full disclosure — when each request fires, what it sends and receives, and what the plugin deliberately does not do — in [docs/external-services.md](docs/external-services.md).
+
 ## Security
 
 - All REST endpoints require the `manage_options` capability
