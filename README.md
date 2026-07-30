@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src=".wordpress-org/icon-256x256.png" alt="StoreSeeder icon" width="128" height="128">
+
 # StoreSeeder
 
 [![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
@@ -168,9 +170,13 @@ Report vulnerabilities privately — see the [security policy](SECURITY.md).
 
 The version history lives in [docs/changelog.md](docs/changelog.md). [`readme.txt`](readme.txt) carries the most recent releases in the WordPress plugin format.
 
+## Documentation
+
+The full documentation set lives in [`docs/`](docs/README.md) — installation, usage, features, architecture, and the development guide.
+
 ## Contributing
 
-Bug reports, feature requests, and pull requests are welcome. Read the [development guide](docs/development.md) before opening a pull request, and file issues on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues).
+Bug reports, feature requests, and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the checks a pull request needs to pass, and the [development guide](docs/development.md) for architecture detail. File issues on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues); for help using the plugin, see [SUPPORT.md](SUPPORT.md). Participation is covered by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Maintainer
 
