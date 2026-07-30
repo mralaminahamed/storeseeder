@@ -15,8 +15,46 @@ declare global {
         wordpress?: string;
         allLocales?: Record<string, string>;
       };
+      /**
+       * Inlined by the server so the topbar knows its target on first paint.
+       * Absent on an older build, in which case the provider fetches instead.
+       */
+      platforms?: PlatformState;
     };
   }
+}
+
+/**
+ * Whether one platform can generate one resource, and why not when it cannot.
+ *
+ * A bare boolean would be enough to dim a tile but not to explain it — and
+ * "install WooCommerce Subscriptions" is actionable in a way that a greyed-out
+ * card is not.
+ */
+export interface Capability {
+  supported: boolean;
+  reason: string;
+  /** Plugin slug that would enable this, or '' when none applies. */
+  extension: string;
+}
+
+export interface PlatformInfo {
+  id: string;
+  label: string;
+  active: boolean;
+  version: string | null;
+  /** Keyed by the canonical resource name, not by REST base. */
+  supports: Record<string, Capability>;
+}
+
+export interface PlatformState {
+  platforms: PlatformInfo[];
+  /** The site-wide target, or '' for auto. */
+  stored: string;
+  /** What auto resolves to right now, or null when it cannot be decided. */
+  resolved: string | null;
+  /** True when more than one platform is active and none has been chosen. */
+  ambiguous: boolean;
 }
 
 /**
@@ -66,7 +104,14 @@ export interface Generator {
   iconName: IconName;
   description: string;
   useCase?: string;
+  /** REST base, e.g. `cart-sessions`. */
   route: string;
+  /**
+   * Canonical resource name, e.g. `cart_session`. Keys into the capability matrix.
+   * Held separately rather than derived from `route` because the two key spaces
+   * genuinely differ, and no singularisation rule survives `shipping_classes`.
+   */
+  resource: string;
   popular?: boolean;
   parameterConfig?: Record<string, ParameterConfig>;
 }

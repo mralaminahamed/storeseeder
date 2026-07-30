@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/theme/ThemeProvider';
 import { StatsProvider } from '@/providers/StatsProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
 import { BatchProvider } from '@/providers/BatchProvider';
+import { PlatformProvider } from '@/providers/PlatformProvider';
 import GeneratorPage from '@/components/Pages/GeneratorPage';
 import HomePage from '@/components/Pages/HomePage';
 import PluginsPage from '@/components/Pages/PluginsPage';
@@ -29,9 +30,12 @@ export default function App() {
     <ThemeProvider>
       <ToastProvider>
         <StatsProvider>
-          <BatchProvider>
-            <RouterProvider router={router} />
-          </BatchProvider>
+          {/* Outside BatchProvider: queued runs read the target when they run. */}
+          <PlatformProvider>
+            <BatchProvider>
+              <RouterProvider router={router} />
+            </BatchProvider>
+          </PlatformProvider>
         </StatsProvider>
       </ToastProvider>
     </ThemeProvider>

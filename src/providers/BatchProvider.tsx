@@ -5,6 +5,8 @@ import apiFetch from "@wordpress/api-fetch";
 
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
+import { usePlatform } from "@/providers/PlatformProvider";
+import { AUTO } from "@/lib/platform";
 import { getSettings } from "@/lib/settings";
 import type { GeneratorResult } from "@/types";
 
@@ -34,6 +36,7 @@ export function useBatch(): BatchState {
 export function BatchProvider({ children }: { children: React.ReactNode }) {
   const [batch, setBatch] = useState<BatchItem[]>([]);
   const { recordRun } = useStats();
+  const { target } = usePlatform();
   const { toast } = useToast();
 
   const add = useCallback((route: string, count: number) => {
@@ -78,7 +81,9 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
           const data = await apiFetch<GeneratorResult>({
             path: `/storeseeder/v1/${item.route}/generate`,
             method: "POST",
-            data: { count: item.count, locale, include_meta: false },
+            // Explicit, like the single-run path. A queued run must land in the store
+            // the topbar names, not wherever the server would guess.
+            data: { count: item.count, locale, include_meta: false, platform: target ?? AUTO },
           });
           recordRun(item.route, item.count, true, data.message ?? "", { locale });
           ok += 1;
@@ -117,7 +122,10 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
 
       setBatch([]);
     },
-    [batch, recordRun, toast],
+    // `target` genuinely belongs here: without it the callback keeps whichever
+    // platform was selected when it was created, and a queue run after switching
+    // targets would write to the previous store.
+    [batch, recordRun, toast, target],
   );
 
   return (

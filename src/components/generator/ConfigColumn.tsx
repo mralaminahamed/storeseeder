@@ -6,7 +6,7 @@ import { fieldsFromSchema, asParamValue } from "@/lib/fieldsFromSchema";
 import { getPath } from "@/lib/paths";
 import type { ParamBag } from "@/lib/paths";
 import { Field } from "@/components/generator/FieldSection";
-import type { Generator, ParamValue } from "@/types";
+import type { Capability, Generator, ParamValue, PlatformInfo } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Dependency notes keyed by generator route
@@ -17,7 +17,7 @@ const DEP: Record<string, () => string> = {
     __("Targets existing completed / processing orders", "storeseeder"),
   "product-variations": () =>
     __("Applied to existing variable products", "storeseeder"),
-  transaction: () => __("Generated against existing orders", "storeseeder"),
+  transactions: () => __("Generated against existing orders", "storeseeder"),
   "cart-sessions": () =>
     __("Uses your existing products & customers", "storeseeder"),
 };
@@ -30,6 +30,13 @@ interface ConfigColumnProps {
   generator: Generator;
   params: ParamBag;
   setField: (key: string, value: ParamValue) => void;
+  /** True when several platforms are active and none has been chosen yet. */
+  needsTarget?: boolean;
+  /** The platforms that could be chosen. */
+  platforms?: PlatformInfo[];
+  onPickTarget?: (id: string) => void;
+  /** Set when the chosen platform cannot represent this resource. */
+  unsupported?: Capability | null;
 }
 
 /**
@@ -40,6 +47,10 @@ export function ConfigColumn({
   generator,
   params,
   setField,
+  needsTarget = false,
+  platforms = [],
+  onPickTarget,
+  unsupported = null,
 }: ConfigColumnProps): JSX.Element {
   const depNote = DEP[generator.route]?.();
   const sections = fieldsFromSchema(generator.parameterConfig ?? {});
@@ -68,6 +79,54 @@ export function ConfigColumn({
 
       {/* Description */}
       <p className="fp-config-desc">{generator.description}</p>
+
+      {/* Target platform prompt — the run is blocked until this is answered, so it
+          sits above the fields rather than beside the Generate button. */}
+      {needsTarget && (
+        <div className="fp-dep fp-dep-warn" data-testid="target-prompt">
+          <Icon name="boxes" size={15} />
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {__("Choose where to write", "storeseeder")}
+            </div>
+            <p style={{ margin: "4px 0 8px", color: "var(--text-faint)", fontSize: 13 }}>
+              {__(
+                "More than one e-commerce platform is active, so there is no safe default.",
+                "storeseeder",
+              )}
+            </p>
+            <div className="fp-target-choices">
+              {platforms.map((platform) => (
+                <button
+                  key={platform.id}
+                  type="button"
+                  className="fp-btn fp-btn-outline fp-btn-sm"
+                  onClick={() => onPickTarget?.(platform.id)}
+                  data-testid={`target-choice-${platform.id}`}
+                >
+                  {platform.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unsupported on the chosen platform. Says which plugin would enable it when
+          one would, because a dimmed control that explains nothing is a dead end. */}
+      {unsupported && (
+        <div className="fp-dep fp-dep-warn" data-testid="unsupported-notice">
+          <Icon name="info" size={15} />
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {__("Not available here", "storeseeder")}
+            </div>
+            <p style={{ margin: "4px 0 0", color: "var(--text-faint)", fontSize: 13 }}>
+              {unsupported.reason}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Dependency note */}
       {depNote && (

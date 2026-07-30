@@ -17,6 +17,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, theme developers, plugin testers", "storeseeder"),
     route: "products",
+    resource: "product",
     popular: true,
     parameterConfig: {
       product_type: {
@@ -118,6 +119,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, CRM developers, membership site testers", "storeseeder"),
     route: "customers",
+    resource: "customer",
     popular: true,
     parameterConfig: {
       customer_types: {
@@ -208,6 +210,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, payment gateway developers, shipping testers", "storeseeder"),
     route: "orders",
+    resource: "order",
     popular: true,
     parameterConfig: {
       order_status: {
@@ -287,6 +290,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, marketing teams, discount plugin developers", "storeseeder"),
     route: "coupons",
+    resource: "coupon",
     parameterConfig: {
       discount_types: {
         description: __("Types of discount coupons to generate", "storeseeder"),
@@ -344,6 +348,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("E-commerce developers, product catalog managers", "storeseeder"),
     route: "product-variations",
+    resource: "product_variation",
     parameterConfig: {
       specific_product_id: {
         description: __("Specific product ID to generate variations for", "storeseeder"),
@@ -400,6 +405,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, shipping plugin developers, logistics teams", "storeseeder"),
     route: "shipping-plans",
+    resource: "shipping_plan",
     parameterConfig: {
       shipping_types: {
         description: __("Types of shipping methods to generate", "storeseeder"),
@@ -448,6 +454,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners, accountants, tax plugin developers", "storeseeder"),
     route: "tax_classes",
+    resource: "tax_class",
     parameterConfig: {
       tax_types: {
         description: __("Types of tax classes to generate", "storeseeder"),
@@ -513,6 +520,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Payment gateway developers, accountants, financial analysts", "storeseeder"),
     route: "transactions",
+    resource: "transaction",
     parameterConfig: {
       customer_type: {
         description: __("Type of customers for transactions", "storeseeder"),
@@ -574,6 +582,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Marketing teams, cart recovery plugin developers", "storeseeder"),
     route: "cart-sessions",
+    resource: "cart_session",
     parameterConfig: {
       customer_type: {
         description: __("Type of customers for cart sessions", "storeseeder"),
@@ -639,6 +648,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("E-commerce developers, product catalog managers", "storeseeder"),
     route: "attributes",
+    resource: "attribute",
     parameterConfig: {
       attribute_types: {
         description: __("Types of attributes to generate", "storeseeder"),
@@ -659,6 +669,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners testing refund workflows, payment gateway developers", "storeseeder"),
     route: "refunds",
+    resource: "refund",
     parameterConfig: {
       order_statuses: {
         description: __("Order statuses eligible for refund generation", "storeseeder"),
@@ -685,6 +696,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Developers testing audit logs, admin panel log views", "storeseeder"),
     route: "logs",
+    resource: "log",
     parameterConfig: {
       log_types: {
         description: __("Log severity types to generate", "storeseeder"),
@@ -711,6 +723,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Store owners configuring shipping rate groups", "storeseeder"),
     route: "shipping_classes",
+    resource: "shipping_class",
     parameterConfig: {},
   },
   {
@@ -724,6 +737,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Teams segmenting orders and customers with tags", "storeseeder"),
     route: "labels",
+    resource: "label",
     parameterConfig: {},
   },
   {
@@ -737,6 +751,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Developers testing tax reports and collected-tax views", "storeseeder"),
     route: "order_tax_rates",
+    resource: "order_tax_rate",
     parameterConfig: {},
   },
   {
@@ -750,6 +765,7 @@ export const generators: Generator[] = [
     ),
     useCase: __("Developers testing digital-product fulfillment", "storeseeder"),
     route: "product_downloads",
+    resource: "product_download",
     parameterConfig: {},
   },
   {
@@ -758,11 +774,12 @@ export const generators: Generator[] = [
     order: 13,
     iconName: "repeat",
     description: __(
-      "Generate subscription records against existing orders. The table ships in core; active billing requires Fluent Cart Pro. Requires existing orders and products.",
+      "Generate subscription records against existing orders. Records seed as fixtures; charging them is your platform's job and may need a paid add-on. Requires existing orders and products.",
       "storeseeder",
     ),
     useCase: __("Developers testing recurring-billing views and reports", "storeseeder"),
     route: "subscriptions",
+    resource: "subscription",
     parameterConfig: {},
   },
 ];

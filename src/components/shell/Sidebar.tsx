@@ -1,10 +1,12 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { __ } from "@wordpress/i18n";
 
 import { Icon } from "@/lib/icons";
 import type { IconName } from "@/lib/icons";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 import { generators } from "@/lib/generators";
+import { usePlatform } from "@/providers/PlatformProvider";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,17 +41,24 @@ interface NavItemProps {
   active: boolean;
   collapsed: boolean;
   testId?: string;
+  /**
+   * Why this generator is unavailable on the current target, or undefined when it
+   * is available. Still navigable: the generator page states the reason in full,
+   * and a nav item that refuses to respond reads as broken.
+   */
+  unavailable?: string;
 }
 
-function NavItem({ to, label, ic, count, active, collapsed, testId }: NavItemProps) {
+function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable }: NavItemProps) {
   const navigate = useNavigate();
 
   return (
     <button
-      className={`fp-nav-item${active ? " active" : ""}`}
+      className={`fp-nav-item${active ? " active" : ""}${unavailable ? " unavailable" : ""}`}
       onClick={() => void navigate(to)}
-      title={collapsed ? label : undefined}
+      title={unavailable ?? (collapsed ? label : undefined)}
       data-testid={testId}
+      data-unavailable={unavailable ? "true" : undefined}
     >
       <Icon name={ic} size={17} className="fp-nav-ic" stroke={1.7} />
       <span className="fp-nav-text">{label}</span>
@@ -66,6 +75,19 @@ function NavItem({ to, label, ic, count, active, collapsed, testId }: NavItemPro
 
 export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarProps) {
   const { pathname } = useLocation();
+  const { state, target, capability } = usePlatform();
+
+  // Names the store being seeded rather than a fixed platform. Falls back to a
+  // generic word when nothing is resolved, which is the case on a site with several
+  // platforms active and no choice made yet.
+  const platformLabel =
+    state.platforms.find((p) => p.id === target)?.label ??
+    __("Multi-platform", "storeseeder");
+
+  const unavailableReason = (resource: string): string | undefined => {
+    const cap = capability(resource);
+    return cap && !cap.supported ? cap.reason : undefined;
+  };
 
   return (
     <nav className={`fp-nav${collapsed ? " collapsed" : ""}`} data-testid="sidebar">
@@ -75,7 +97,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
         {!collapsed && (
           <div className="fp-brand-text">
             <div className="fp-brand-name">StoreSeeder</div>
-            <div className="fp-brand-sub">Fluent Cart</div>
+            <div className="fp-brand-sub">{platformLabel}</div>
           </div>
         )}
         <button
@@ -142,6 +164,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
                   active={pathname === `/generator/${g.route}`}
                   collapsed={collapsed}
                   testId={`nav-${g.route}`}
+                  unavailable={unavailableReason(g.resource)}
                 />
               ))}
             </div>

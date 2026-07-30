@@ -12,6 +12,8 @@ import { getSettings } from "@/lib/settings";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { useBatch } from "@/providers/BatchProvider";
+import { usePlatform } from "@/providers/PlatformProvider";
+import { AUTO } from "@/lib/platform";
 import { ConfigColumn } from "@/components/generator/ConfigColumn";
 import { PreviewTable } from "@/components/generator/PreviewTable";
 import { RunBar } from "@/components/generator/RunBar";
@@ -71,6 +73,7 @@ export default function GeneratorPage() {
   const { recordRun } = useStats();
   const { toast } = useToast();
   const { add: addToBatch } = useBatch();
+  const { target, ambiguous, capability, active, setTarget } = usePlatform();
 
   const generator = generators.find((g) => g.route === type);
 
@@ -152,6 +155,9 @@ export default function GeneratorPage() {
         count,
         locale,
         include_meta: meta,
+        // Always explicit. Letting the server fall back to auto would mean the row
+        // could land somewhere other than the store named in the topbar.
+        platform: target ?? AUTO,
         ...params,
       };
 
@@ -177,7 +183,7 @@ export default function GeneratorPage() {
             count.toLocaleString(),
             generatorLabel,
           ),
-          __("Added to your Fluent Cart store", "storeseeder"),
+          targetLabel,
         );
       } catch (err) {
         const errMsg =
@@ -216,6 +222,23 @@ export default function GeneratorPage() {
 
   const generatorLabel = generator.name.toLowerCase();
 
+  // Which store this run lands in, named in the success toast. On a single-platform
+  // site this is the only place the platform is mentioned at all.
+  const targetPlatform = active.find((p) => p.id === target);
+  const targetLabel = targetPlatform
+    ? sprintf(
+        /* translators: %s: e-commerce platform name. */
+        __("Added to your %s store", "storeseeder"),
+        targetPlatform.label,
+      )
+    : __("Added to your store", "storeseeder");
+
+  // Two separate reasons a run cannot proceed, and they need different words: no
+  // target chosen yet, versus a target that cannot represent this resource.
+  const cap = capability(generator.resource);
+  const unsupported = null !== cap && !cap.supported;
+  const blocked = ambiguous || unsupported;
+
   return (
     <div className="fp-gen-main fp-enter">
       <div className="fp-gen-body">
@@ -225,6 +248,10 @@ export default function GeneratorPage() {
             generator={generator}
             params={params}
             setField={setField}
+            needsTarget={ambiguous}
+            platforms={active}
+            onPickTarget={(id) => void setTarget(id)}
+            unsupported={unsupported ? cap : null}
           />
 
           {/* ---- Right: preview column ---- */}
@@ -310,6 +337,7 @@ export default function GeneratorPage() {
         onGenerate={doGenerate}
         onAddBatch={onAddBatch}
         generating={generating}
+        disabled={blocked}
       />
     </div>
   );

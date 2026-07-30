@@ -1,16 +1,20 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { GeneratorGrid } from "@/components/home/GeneratorGrid";
 import { useStats } from "@/providers/StatsProvider";
+import { usePlatform } from "@/providers/PlatformProvider";
 
 export default function HomePage() {
   const navigate = useNavigate();
   const { counts, totalGenerated, recentRuns } = useStats();
+  const { state, target } = usePlatform();
+
+  const targetName = state.platforms.find((p) => p.id === target)?.label;
 
   return (
     <div className="fp-page wide fp-enter">
@@ -19,7 +23,13 @@ export default function HomePage() {
         <div>
           <h1 className="fp-h1">{__("StoreSeeder", "storeseeder")}</h1>
           <p className="fp-sub">
-            {__("Generate realistic test data for your Fluent Cart store.", "storeseeder")}
+            {targetName
+              ? sprintf(
+                  /* translators: %s: e-commerce platform name. */
+                  __("Generate realistic test data for your %s store.", "storeseeder"),
+                  targetName,
+                )
+              : __("Generate realistic test data for your store.", "storeseeder")}
           </p>
         </div>
         <Button

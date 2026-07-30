@@ -81,6 +81,20 @@
 .fp-root .fp-top-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
 .fp-root .fp-locale-pill { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-2); padding:6px 10px; border:1px solid var(--border); border-radius:var(--r-full); cursor:pointer; }
 .fp-root .fp-locale-pill:hover { border-color:var(--border-strong); }
+
+/* ---------------------------------------------------------------------------
+   Platform select — sits left of the locale pill and answers the more
+   consequential of the two questions: not what the data looks like, but which
+   store it lands in. Styled as a pill to match, since they are peers.
+   --------------------------------------------------------------------------- */
+.fp-root .fp-platform-select { display:flex; align-items:center; gap:6px; padding:5px 8px 5px 10px; border:1px solid var(--border); border-radius:var(--r-full); color:var(--text-2); }
+.fp-root .fp-platform-select:hover { border-color:var(--border-strong); }
+.fp-root .fp-platform-select-control { border:0; background:transparent; color:inherit; font-size:12.5px; font-family:inherit; padding:0 2px; cursor:pointer; max-width:22ch; }
+.fp-root .fp-platform-select-control:focus { outline:none; }
+
+/* No target chosen yet: this control is the only thing between the user and a
+   run, so it asks for attention rather than blending in. */
+.fp-root .fp-platform-select:has(> [data-needs-choice]) { border-color:var(--accent-line); background:var(--accent-soft); color:var(--accent); }
 .fp-root .fp-icon-btn { width:var(--ctl-h-icon); height:var(--ctl-h-icon); display:grid; place-items:center; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); color:var(--text-2); cursor:pointer; }
 .fp-root .fp-icon-btn:hover { border-color:var(--border-strong); color:var(--text); }
 
@@ -246,6 +260,11 @@
 .fp-root .fp-config-title { font-size:var(--fs-title); font-weight:600; letter-spacing:-.02em; color:var(--text); }
 .fp-root .fp-config-desc { font-size:13.5px; line-height:1.55; color:var(--text-3); margin:14px 0 4px; }
 .fp-root .fp-dep { display:flex; align-items:center; gap:8px; margin-top:14px; padding:9px 12px; background:var(--accent-soft); border:1px solid var(--accent-line); border-radius:var(--r-md); font-size:12.5px; color:var(--accent); }
+/* A blocking note carries more than one line, so it aligns to the top rather than
+   centring an icon against a paragraph. */
+.fp-root .fp-dep-warn { align-items:flex-start; }
+.fp-root .fp-dep-warn > svg { margin-top:2px; flex-shrink:0; }
+.fp-root .fp-target-choices { display:flex; flex-wrap:wrap; gap:6px; }
 
 .fp-root .fp-field-section { padding:var(--pad-field-sec-y) 0; border-top:1px solid var(--border); }
 .fp-root .fp-field-section:first-of-type { border-top:none; }
@@ -423,3 +442,13 @@
 .fp-root .fp-consent-link { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--accent); text-decoration:none; margin-bottom:20px; }
 .fp-root .fp-consent-link:hover { text-decoration:underline; }
 .fp-root .fp-consent-actions { display:flex; justify-content:flex-end; gap:8px; }
+
+
+/* ---------------------------------------------------------------------------
+   Unavailable on the current target. Dimmed, not disabled: the generator page
+   states the reason and offers another target, so the card has to stay clickable.
+   --------------------------------------------------------------------------- */
+.fp-root .fp-gen-card.unavailable,
+.fp-root .fp-nav-item.unavailable { opacity:.5; }
+.fp-root .fp-gen-card.unavailable:hover,
+.fp-root .fp-nav-item.unavailable:hover { opacity:.75; }

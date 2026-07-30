@@ -4,6 +4,7 @@ import { __ } from "@wordpress/i18n";
 import { Icon } from "@/lib/icons";
 import { SectionLabel } from "@/components/ui/section-label";
 import { generators } from "@/lib/generators";
+import { usePlatform } from "@/providers/PlatformProvider";
 
 interface GeneratorGridProps {
   counts: Record<string, number>;
@@ -17,6 +18,7 @@ const CATEGORY_ORDER = [
 
 export function GeneratorGrid({ counts }: GeneratorGridProps) {
   const navigate = useNavigate();
+  const { capability } = usePlatform();
 
   const categories = CATEGORY_ORDER.filter((cat) =>
     generators.some((g) => g.category === cat),
@@ -38,12 +40,29 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
               <div className="fp-group-line" />
             </div>
             <div className="fp-gen-grid">
-              {group.map((g) => (
+              {group.map((g) => {
+                const cap = capability(g.resource);
+                const unavailable = cap && !cap.supported ? cap.reason : undefined;
+                const runCount = counts[g.route];
+
+                const runNote = runCount
+                  ? `${runCount} ${__("generated", "storeseeder")}`
+                  : __("Not run yet", "storeseeder");
+                const footNote = unavailable
+                  ? __("Unavailable here", "storeseeder")
+                  : runNote;
+
+                return (
                 <button
                   key={g.route}
-                  className="fp-gen-card"
+                  className={`fp-gen-card${unavailable ? " unavailable" : ""}`}
                   onClick={() => void navigate(`/generator/${g.route}`)}
                   data-testid={`gen-card-${g.route}`}
+                  data-unavailable={unavailable ? "true" : undefined}
+                  // Still navigable. The generator page explains the reason in full
+                  // and offers the choice of another target; a card that swallows
+                  // clicks reads as a bug.
+                  title={unavailable}
                 >
                   <div className="fp-gen-card-top">
                     <span className="fp-gen-ic">
@@ -59,14 +78,13 @@ export function GeneratorGrid({ counts }: GeneratorGridProps) {
                   <div className="fp-gen-desc">{g.description}</div>
                   <div className="fp-gen-foot">
                     <span className="fp-gen-gen">
-                      {counts[g.route]
-                        ? `${counts[g.route]} ${__("generated", "storeseeder")}`
-                        : __("Not run yet", "storeseeder")}
+                      {footNote}
                     </span>
                     <Icon name="chevright" size={16} className="fp-gen-arrow" />
                   </div>
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
