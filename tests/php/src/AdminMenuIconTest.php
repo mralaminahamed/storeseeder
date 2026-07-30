@@ -88,14 +88,71 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 		$this->assertStringContainsString( 'viewBox="0 0 120 120"', $this->svg, 'The menu icon must use the source grid.' );
 	}
 
-	public function test_icon_is_monochrome_admin_grey(): void {
-		// WordPress paints this as a background image, which cannot inherit a
-		// colour — so it has to ship in the admin icon grey and carry no gradient
-		// or brand fill, or it will not sit right in the menu.
-		$this->assertStringContainsString( '#a7aaad', $this->svg );
+	public function test_default_variant_is_a_dark_mark_on_a_white_tile(): void {
+		$this->assertStringContainsString( 'rx="29" fill="#ffffff"', $this->svg, 'The tile keeps the source corner radius.' );
+		$this->assertStringContainsString( 'stroke="#1d2327"', $this->svg );
+		$this->assertStringContainsString( 'fill="#1d2327"', $this->svg, 'The sprout leaves are filled, not stroked.' );
+	}
+
+	public function test_no_variant_carries_the_gradient(): void {
+		// A gradient panel muddies to a single tone at 20px, so neither variant
+		// ships one.
 		$this->assertStringNotContainsString( 'linearGradient', $this->svg );
 		$this->assertStringNotContainsString( '#4f46e5', $this->svg );
 		$this->assertStringNotContainsString( '#7c3aed', $this->svg );
-		$this->assertStringNotContainsString( '#ffffff', $this->svg );
+	}
+
+	public function test_monochrome_variant_drops_the_tile_for_admin_grey(): void {
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_monochrome_variant' ) );
+		$svg = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_monochrome_variant' ) );
+
+		$this->assertStringContainsString( '#a7aaad', $svg );
+		$this->assertStringNotContainsString( '<rect', $svg, 'The monochrome variant draws no tile.' );
+		$this->assertStringNotContainsString( '#ffffff', $svg );
+		$this->assertStringContainsString( 'translate(11,26) scale(3.7)', $svg, 'Both variants share the artwork.' );
+	}
+
+	public function test_unknown_variant_falls_back_to_the_default(): void {
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_unknown_variant' ) );
+		$svg = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_unknown_variant' ) );
+
+		$this->assertStringContainsString( 'fill="#ffffff"', $svg, 'Anything unrecognised should render the default.' );
+	}
+
+	/**
+	 * Filter callback: select the monochrome variant.
+	 *
+	 * @return string
+	 */
+	public function force_monochrome_variant(): string {
+		return 'monochrome';
+	}
+
+	/**
+	 * Filter callback: return a variant name the plugin does not know.
+	 *
+	 * @return string
+	 */
+	public function force_unknown_variant(): string {
+		return 'chartreuse-hexagon';
+	}
+
+	/**
+	 * Invoke the private builder and decode its payload.
+	 *
+	 * @return string SVG markup.
+	 */
+	private function decode_menu_icon(): string {
+		$method = new ReflectionMethod( StoreSeeder::class, 'get_menu_icon' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$uri = (string) $method->invoke( storeseeder() );
+
+		return (string) base64_decode( substr( $uri, strlen( 'data:image/svg+xml;base64,' ) ), true );
 	}
 }
