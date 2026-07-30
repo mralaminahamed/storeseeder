@@ -17,6 +17,7 @@ use Exception;
 use Faker\Factory;
 use Faker\Generator as Faker_Generator;
 use Faker\Provider\DateTime;
+use StoreSeeder\Platform\Platform;
 use WP_Error;
 use wpdb;
 
@@ -108,6 +109,18 @@ abstract class Generator {
 	 * @var array<int, string>
 	 */
 	protected array $generation_errors = array();
+
+	/**
+	 * The platform this run writes to
+	 *
+	 * Injected by the controller once the target has been resolved, because the
+	 * decision belongs to the request, not to the generator. Null only in the preview
+	 * path, which never persists anything and so needs no platform at all.
+	 *
+	 * @since 1.1.0
+	 * @var Platform|null
+	 */
+	protected $platform = null;
 
 	/**
 	 * Get the failures collected during the last generate() call.
@@ -359,7 +372,157 @@ abstract class Generator {
 	 *
 	 * @return array<string, mixed>|WP_Error Generated item data array or error object.
 	 */
-	abstract protected function generate_single_item();
+	protected function generate_single_item() {
+		$entity = $this->build_entity();
+
+		if ( is_wp_error( $entity ) ) {
+			return $entity;
+		}
+
+		/**
+		 * Filters the canonical entity before it is handed to a platform writer.
+		 *
+		 * The entity is platform-neutral at this point: money is an integer in the
+		 * currency's minor unit and statuses use the StoreSeeder\Platform\Status
+		 * vocabulary. A filter here therefore applies to every platform equally,
+		 * which is what makes it the right place to change generated data.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array<string, mixed> $entity    The canonical entity.
+		 * @param Generator            $generator The generator that built it.
+		 */
+		$entity = apply_filters(
+			"storeseeder_canonical_{$this->get_resource_type()}",
+			$entity,
+			$this
+		);
+
+		$writer = $this->get_writer();
+
+		if ( is_wp_error( $writer ) ) {
+			return $writer;
+		}
+
+		$resource = $this->get_resource_type();
+		$platform = $this->platform->id();
+
+		/**
+		 * Fires before one entity is written to a platform.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array<string, mixed> $entity The canonical entity about to be written.
+		 */
+		do_action( "storeseeder_before_write_{$platform}_{$resource}", $entity );
+
+		$result = $writer->write( $entity );
+
+		/**
+		 * Fires after one entity has been written to a platform.
+		 *
+		 * Runs for failures too — $result is a WP_Error then — so a listener can
+		 * observe the whole batch rather than only its successful half.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array<string, mixed>|WP_Error $result The persisted item, or the failure.
+		 * @param array<string, mixed>          $entity The canonical entity.
+		 */
+		do_action( "storeseeder_after_write_{$platform}_{$resource}", $result, $entity );
+
+		return $result;
+	}
+
+	/**
+	 * Build one platform-neutral entity
+	 *
+	 * Concrete generators implement this with FakerPHP and loaded sample data only. It
+	 * must name no platform: no models, no table names, no platform-specific status
+	 * strings, and no database reads. That restriction is what lets one generator feed
+	 * every platform, and lets a fixed seed produce the same data on all of them.
+	 *
+	 * Resolving foreign keys is deliberately *not* part of this — an order's line items
+	 * need real product variations, and each platform stores and randomises those
+	 * differently. That work belongs to the writer. See StoreSeeder\Abstracts\Writer.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>|WP_Error The canonical entity, or why one could not be built.
+	 */
+	protected function build_entity() {
+		return new WP_Error(
+			'storeseeder_not_implemented',
+			sprintf(
+				/* translators: %s: generator class name. */
+				__( '%s does not implement build_entity().', 'storeseeder' ),
+				static::class
+			)
+		);
+	}
+
+	/**
+	 * The writer for this generator's resource on the target platform
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return \StoreSeeder\Abstracts\Writer|WP_Error
+	 */
+	protected function get_writer() {
+		$resource = $this->get_resource_type();
+
+		if ( null === $this->platform ) {
+			return new WP_Error(
+				'storeseeder_no_platform',
+				__( 'No target platform was set for this run.', 'storeseeder' )
+			);
+		}
+
+		$writer = $this->platform->writer( $resource );
+
+		if ( null === $writer ) {
+			return new WP_Error(
+				'storeseeder_unsupported_resource',
+				sprintf(
+					/* translators: 1: resource name, 2: platform display name. */
+					__( '%1$s cannot be generated for %2$s.', 'storeseeder' ),
+					$resource,
+					$this->platform->label()
+				)
+			);
+		}
+
+		// Handed over per run rather than at construction: the faker is created after
+		// the generator, and re-seeded per request.
+		$writer->set_faker( $this->get_faker() );
+		$writer->set_params( $this->generation_params );
+
+		return $writer;
+	}
+
+	/**
+	 * Set the platform this run writes to
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param Platform $platform Resolved target platform.
+	 *
+	 * @return void
+	 */
+	public function set_platform( Platform $platform ): void {
+		$this->platform = $platform;
+	}
+
+	/**
+	 * The platform this run writes to
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return Platform|null
+	 */
+	public function get_platform(): ?Platform {
+		return $this->platform;
+	}
 
 	/**
 	 * Get the resource type name

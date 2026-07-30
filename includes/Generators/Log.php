@@ -10,28 +10,31 @@ namespace StoreSeeder\Generators;
 
 defined( 'ABSPATH' ) || exit;
 
-use FluentCart\App\Models\Activity;
 use StoreSeeder\Abstracts\Generator;
-use WP_Error;
+use StoreSeeder\Platform\Resource;
 
 /**
- * Generates Fluent Cart activity log entries.
+ * Shapes activity log entries.
  *
  * @since 1.0.0
  */
 class Log extends Generator {
 
 	/**
-	 * Module noun => model FQCN.
+	 * Resources an entry can be about.
 	 *
-	 * @var array<string, string>
+	 * Canonical resource names, not model class names. The platform's own type token —
+	 * Fluent Cart stores a model FQCN in this column, WooCommerce would not — is the
+	 * writer's business.
+	 *
+	 * @var string[]
 	 */
 	private const MODULES = array(
-		'order'        => 'FluentCart\\App\\Models\\Order',
-		'product'      => 'FluentCart\\App\\Models\\Product',
-		'coupon'       => 'FluentCart\\App\\Models\\Coupon',
-		'subscription' => 'FluentCart\\App\\Models\\Subscription',
-		'customer'     => 'FluentCart\\App\\Models\\Customer',
+		Resource::ORDER,
+		Resource::PRODUCT,
+		Resource::COUPON,
+		Resource::SUBSCRIPTION,
+		Resource::CUSTOMER,
 	);
 
 	/**
@@ -85,53 +88,29 @@ class Log extends Generator {
 	 * {@inheritDoc}
 	 */
 	public function get_description(): string {
-		return 'Generates Fluent Cart activity log entries across orders, products, customers, coupons, and subscriptions with realistic severities and module references.';
+		return 'Generates activity log entries across orders, products, customers, coupons, and subscriptions with realistic severities and module references.';
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	protected function generate_single_item() {
-		if ( ! defined( 'FLUENTCART_VERSION' ) || ! class_exists( Activity::class ) ) {
-			return new WP_Error( 'missing_fluent_cart', __( 'Fluent Cart Activity model not found. Ensure Fluent Cart is active.', 'storeseeder' ) );
-		}
-
-		$module_names = array_keys( self::MODULES );
-		$module_name  = $this->get_faker()->randomElement( $module_names );
-		$module_type  = self::MODULES[ $module_name ];
-		$severity     = $this->get_faker()->randomElement(
+	protected function build_entity() {
+		$module   = $this->get_faker()->randomElement( self::MODULES );
+		$severity = $this->get_faker()->randomElement(
 			$this->generation_params['log_types'] ?? self::SEVERITIES
 		);
-		$log_type     = $this->get_faker()->randomElement( self::LOG_TYPES );
-		$title        = sprintf( $this->get_faker()->randomElement( self::TITLES ), ucfirst( $module_name ) );
-		$user_id      = max( 1, get_current_user_id() );
-
-		$activity = Activity::query()->create(
-			array(
-				'status'      => $severity,
-				'log_type'    => $log_type,
-				'module_id'   => $this->get_faker()->numberBetween( 1, 9999 ),
-				'module_type' => $module_type,
-				'module_name' => $module_name,
-				'title'       => $title,
-				'content'     => $this->get_faker()->sentence( 10 ),
-				'user_id'     => $user_id,
-				'read_status' => $this->get_faker()->boolean( 40 ) ? 'read' : 'unread',
-				'created_by'  => 'FCT-BOT',
-			)
-		);
-
-		if ( ! $activity || ! $activity->id ) {
-			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'storeseeder' ) );
-		}
+		$log_type = $this->get_faker()->randomElement( self::LOG_TYPES );
+		$title    = sprintf( $this->get_faker()->randomElement( self::TITLES ), ucfirst( $module ) );
 
 		return array(
-			'id'          => (int) $activity->id,
-			'module_name' => $module_name,
-			'module_type' => $module_type,
-			'status'      => $severity,
-			'log_type'    => $log_type,
-			'title'       => $title,
+			'module'    => $module,
+			'severity'  => $severity,
+			'log_type'  => $log_type,
+			'title'     => $title,
+			'module_id' => $this->get_faker()->numberBetween( 1, 9999 ),
+			'content'   => $this->get_faker()->sentence( 10 ),
+			'read'      => $this->get_faker()->boolean( 40 ),
+			'user_id'   => max( 1, get_current_user_id() ),
 		);
 	}
 }

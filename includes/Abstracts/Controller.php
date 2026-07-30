@@ -12,6 +12,8 @@
 
 namespace StoreSeeder\Abstracts;
 
+use StoreSeeder\Platform\Platform;
+use StoreSeeder\Platform\Resolver;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -236,6 +238,18 @@ abstract class Controller extends WP_REST_Controller {
 		$generator         = $this->get_generator_instance();
 		$supported_locales = array( 'en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'pt_BR' ); // Basic locales for now.
 
+		// Which store the rows land in is a property of the request, not of the
+		// generator, so it is resolved here and injected. Resolution can legitimately
+		// fail — with more than one platform active there is no safe default, and
+		// guessing would write rows into the wrong store silently.
+		$platform = $this->resolve_platform( $params );
+
+		if ( is_wp_error( $platform ) ) {
+			return $platform;
+		}
+
+		$generator->set_platform( $platform );
+
 		// Set faker and locale.
 		$locale = $params['locale'] ?? 'en_US';
 		if ( ! in_array( $locale, $supported_locales, true ) ) {
@@ -332,6 +346,59 @@ abstract class Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Resolve the target platform and confirm it can generate this resource
+	 *
+	 * Two failures are possible and they mean different things. An unresolvable target
+	 * is a request problem — nothing was chosen and more than one platform is active.
+	 * An unsupported resource is a capability problem, and it is answered rather than
+	 * ignored: writing nothing and reporting success would leave the caller believing
+	 * rows exist.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $params Request parameters.
+	 *
+	 * @return Platform|WP_Error
+	 */
+	protected function resolve_platform( array $params ) {
+		$requested = isset( $params['platform'] ) ? (string) $params['platform'] : null;
+		$platform  = ( new Resolver() )->resolve( $requested );
+
+		if ( is_wp_error( $platform ) ) {
+			return $platform;
+		}
+
+		$resource     = $this->get_resource_type();
+		$capabilities = $platform->supports();
+		$capability   = $capabilities[ $resource ] ?? null;
+
+		if ( null === $capability || ! $capability->is_supported() ) {
+			$reason = null === $capability
+				? __( 'Not supported by this platform.', 'storeseeder' )
+				: $capability->get_reason();
+
+			return new WP_Error(
+				'storeseeder_unsupported_resource',
+				sprintf(
+					/* translators: 1: resource label, 2: platform display name, 3: reason. */
+					__( '%1$s cannot be generated for %2$s. %3$s', 'storeseeder' ),
+					$this->get_resource_type_label(),
+					$platform->label(),
+					$reason
+				),
+				array(
+					'status'    => 400,
+					'platform'  => $platform->id(),
+					'resource'  => $resource,
+					'extension' => null !== $capability ? $capability->get_extension() : '',
+				)
+			);
+		}
+
+		return $platform;
+	}
+
+	/**
 	 * Check if user has permission to generate items
 	 *
 	 * @param  WP_REST_Request $request Full data about the request.
@@ -385,6 +452,16 @@ abstract class Controller extends WP_REST_Controller {
 				'type'              => 'integer',
 				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
+			),
+			'platform'      => array(
+				// Not enumerated: the set of drivers is extensible through the
+				// storeseeder_platforms filter, so an enum here would reject a valid
+				// third-party platform. Resolver validates it instead, and says which
+				// ones exist when it rejects.
+				'description'       => __( 'Target e-commerce platform to seed. Defaults to the site setting, or the only active platform.', 'storeseeder' ),
+				'type'              => 'string',
+				'default'           => Resolver::AUTO,
+				'sanitize_callback' => 'sanitize_key',
 			),
 			'status'        => array(
 				'description'       => __( 'Status filter for generated items.', 'storeseeder' ),

@@ -9,20 +9,28 @@
 
 namespace StoreSeeder\Generators;
 
-use FluentCart\App\Models\ShippingMethod as ShippingMethodModel;
-use FluentCart\App\Models\ShippingZone as ShippingZoneModel;
 use StoreSeeder\Abstracts\Generator;
-use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Shipping Plan Generator Class
  *
- * Generates realistic fake shipping plan data for Fluent Cart testing and development.
+ * Shapes shipping methods with rates and coverage. Attaching them to a zone is the
+ * platform writer's job.
  */
 class Shipping_Plan extends Generator {
 
+
+	/**
+	 * Shipping method types, in canonical spelling.
+	 *
+	 * Both are near-universal concepts. Each platform names them its own way — Fluent
+	 * Cart calls flat rate 'fixed' — so its writer translates.
+	 *
+	 * @var string[]
+	 */
+	private const TYPES = array( 'flat_rate', 'free_shipping' );
 
 	/**
 	 * Get the resource type name
@@ -40,7 +48,7 @@ class Shipping_Plan extends Generator {
 	 */
 	public function get_supported_types(): array {
 		return array(
-			'shipping_plans' => 'Fluent Cart Shipping Plans',
+			'shipping_plans' => __( 'Shipping Plans', 'storeseeder' ),
 		);
 	}
 
@@ -50,128 +58,34 @@ class Shipping_Plan extends Generator {
 	 * @return string Description
 	 */
 	public function get_description(): string {
-		return 'Generates shipping plans with different methods, rates, and coverage areas for testing Fluent Cart shipping functionality.';
+		return 'Generates shipping plans with different methods, rates, and coverage areas for testing shipping functionality.';
 	}
 
 	/**
-	 * Generate a single shipping plan
+	 * Build a canonical shipping plan
 	 *
-	 * @return WP_Error|array Single shipping plan data, error, or false on failure.
-	 */
-	protected function generate_single_item() {
-		// Check if Fluent Cart ShippingMethod model is available.
-		if ( ! class_exists( ShippingMethodModel::class ) ) {
-			return new WP_Error( 'missing_model', __( 'Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
-		}
-
-		$plan_data       = $this->generate_shipping_plan_data();
-		$shipping_method = $this->create_shipping_method( $plan_data );
-
-		if ( ! $shipping_method ) {
-			return new WP_Error( 'shipping_method_creation_failed', __( 'Failed to create shipping method.', 'storeseeder' ) );
-		}
-
-		$result = array(
-			'id'         => $shipping_method->id,
-			'title'      => $shipping_method->title,
-			'type'       => $shipping_method->type,
-			'amount'     => $shipping_method->amount,
-			'is_enabled' => $shipping_method->is_enabled,
-			'zone_id'    => $shipping_method->zone_id,
-			'created_at' => $shipping_method->created_at,
-		);
-
-		/**
-		 * Filters the shipping method generation result data.
-		 *
-		 * Allows developers to modify the returned shipping method data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_shipping_method_generation_result
-		 *
-		 * @param array $result          The shipping method generation result data.
-		 * @param int   $method_id       The created shipping method ID.
-		 * @param array $plan_data       The original shipping method data used for creation.
-		 */
-		return apply_filters( 'storeseeder_shipping_method_generation_result', $result, $shipping_method->id, $plan_data );
-	}
-
-	/**
-	 * Generate shipping method data
+	 * @since 1.1.0
 	 *
-	 * @return array Shipping method data
+	 * @return array<string, mixed>
 	 */
-	private function generate_shipping_plan_data(): array {
-		// Fluent Cart recognises 'fixed' (charged by the stored amount) and
-		// 'free_shipping'. 'flat_rate' and 'local_pickup' are not method types it
-		// reads — CartHelper only special-cases 'free_shipping' and charges every
-		// other method by its amount, so those strings produced methods the admin
-		// UI could not edit.
-		$types = array( 'fixed', 'free_shipping' );
-		$type  = $this->get_faker()->randomElement( $types );
+	protected function build_entity() {
+		$type = $this->get_faker()->randomElement( self::TYPES );
 
-		// amount is a DECIMAL(10,2) of major currency units — Fluent Cart scales
-		// it to cents at calculation time — so dollars go in here, not cents.
+		// Integer minor units. Free shipping costs nothing, and drawing an amount for
+		// it would both be meaningless and shift every later value in the sequence.
 		$amount = 0;
 		if ( 'free_shipping' !== $type ) {
-			$amount = $this->get_faker()->randomFloat( 2, 5, 50 );
+			$amount = (int) round( $this->get_faker()->randomFloat( 2, 5, 50 ) * 100 );
 		}
-
-		$zone_id = $this->get_or_create_shipping_zone();
 
 		return array(
-			'zone_id'    => $zone_id,
-			'title'      => implode( ' ', (array) $this->get_faker()->words( 3, true ) ) . ' Shipping',
-			'type'       => $type,
-			'amount'     => $amount,
-			'settings'   => array(
-				'description' => $this->get_faker()->sentence( 6 ),
-			),
-			'is_enabled' => $this->get_faker()->boolean( 85 ), // 85% chance of being enabled.
-			'states'     => array(), // Empty array means all states in the zone.
+			'title'       => implode( ' ', (array) $this->get_faker()->words( 3, true ) ) . ' Shipping',
+			'type'        => $type,
+			'amount'      => $amount,
+			'description' => $this->get_faker()->sentence( 6 ),
+			'enabled'     => $this->get_faker()->boolean( 85 ), // 85% chance of being enabled.
+			// Empty means every region the zone covers.
+			'regions'     => array(),
 		);
-	}
-
-	/**
-	 * Get or create a shipping zone for the shipping method
-	 *
-	 * @return int Shipping zone ID
-	 */
-	private function get_or_create_shipping_zone(): int {
-		// Check if ShippingZone model is available.
-		if ( ! class_exists( ShippingZoneModel::class ) ) {
-			return 1; // Fallback to zone ID 1 if model not available.
-		}
-
-		// Try to find an existing zone, or create a default one.
-		$zone = ShippingZoneModel::query()->where( 'region', 'all' )->first();
-
-		if ( ! $zone ) {
-			$zone = ShippingZoneModel::query()->create(
-				array(
-					'name'   => 'Worldwide Shipping',
-					'region' => 'all',
-					'order'  => 0,
-				)
-			);
-		}
-
-		return $zone->id;
-	}
-
-	/**
-	 * Create shipping method in Fluent Cart
-	 *
-	 * @param array $data Shipping method data.
-	 *
-	 * @return ShippingMethodModel|null Created shipping method instance
-	 */
-	private function create_shipping_method( array $data ): ?ShippingMethodModel {
-		try {
-			$shipping_method = ShippingMethodModel::query()->create( $data );
-			return $shipping_method;
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 }
