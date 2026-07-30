@@ -13,7 +13,7 @@ const BRAND_TO = '#7c3aed';
 const CANVAS = { width: 1200, height: 900 };
 
 /** Wider viewport for the capture itself, so the real UI is not cramped. */
-const CAPTURE_VIEWPORT = { width: 1560, height: 1000 };
+const CAPTURE_VIEWPORT = { width: 1720, height: 1010 };
 
 /**
  * Hide WordPress admin chrome so only the plugin's own UI is captured.
@@ -102,14 +102,12 @@ function frame(options: {
     position: absolute; top: 44px; left: 52px;
     display: flex; align-items: center; gap: 16px;
   }
-  /* The icon carries the same indigo-to-violet gradient as this background, so
-     on its own it dissolves into the field. A white chip gives it an edge. */
-  .brand .chip {
-    width: 60px; height: 60px; border-radius: 17px; background: #fff;
-    display: grid; place-items: center;
-    box-shadow: 0 8px 20px -8px rgba(23, 16, 60, .45);
+  /* No plate behind the icon — it sits straight on the gradient. A drop shadow
+     keeps it from melting into a background of the same two stops. */
+  .brand img {
+    width: 58px; height: 58px; border-radius: 24%; display: block;
+    filter: drop-shadow(0 6px 14px rgba(23, 16, 60, .38));
   }
-  .brand .chip img { width: 44px; height: 44px; border-radius: 24%; display: block; }
   .brand span { color: #fff; font-size: 27px; font-weight: 700; letter-spacing: -.01em; }
 
   .head { position: absolute; top: 126px; left: 0; right: 0; text-align: center; }
@@ -123,8 +121,8 @@ function frame(options: {
   }
 
   .card {
-    position: absolute; left: 90px; right: 90px; top: 250px; height: 588px;
-    background: #fff; border-radius: 24px; padding: 18px;
+    position: absolute; left: 46px; right: 46px; top: 244px; height: 604px;
+    background: #fff; border-radius: 22px; padding: 12px;
     box-shadow: 0 30px 70px -20px rgba(23, 16, 60, .45), 0 10px 24px -12px rgba(23, 16, 60, .3);
     overflow: hidden;
   }
@@ -145,7 +143,7 @@ function frame(options: {
   <div class="dots bl"></div>
 
   <div class="brand">
-    <div class="chip"><img src="data:image/png;base64,${iconBase64}" alt=""></div>
+    <img src="data:image/png;base64,${iconBase64}" alt="">
     <span>StoreSeeder</span>
   </div>
 
@@ -210,7 +208,7 @@ const SHOTS = [
     title: 'Settings',
     // The settings column is capped at 680px, so a wide capture leaves a dead
     // band beside it. A narrower viewport lets the column fill the frame.
-    viewport: { width: 1200, height: 1040 },
+    viewport: { width: 1320, height: 1050 },
   },
 ] as const;
 
