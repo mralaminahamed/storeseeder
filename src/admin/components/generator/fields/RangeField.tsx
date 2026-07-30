@@ -1,4 +1,5 @@
 import React, { useRef } from "@wordpress/element";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { NumberField } from "./NumberField";
 
 interface RangeValue {
@@ -30,7 +31,7 @@ export function RangeField({
 
   const drag =
     (which: "lo" | "hi") =>
-    (e: React.PointerEvent<HTMLButtonElement>) => {
+    (e: ReactPointerEvent<HTMLButtonElement>) => {
       e.preventDefault();
 
       const move = (ev: PointerEvent) => {

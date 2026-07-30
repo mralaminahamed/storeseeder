@@ -1,4 +1,4 @@
-import type { ParameterConfig } from "@/admin/types";
+import type { ParameterConfig, ParamValue } from "@/admin/types";
 
 export type FieldType =
   | "toggle"
@@ -22,6 +22,8 @@ export interface FieldDescriptor {
   max?: number;
   prefix?: string;
   suffix?: string;
+  /** Placeholder for text fields. */
+  ph?: string;
   default?: unknown;
   /** If present the render layer should hide this field unless the condition is met */
   dependsOn?: Record<string, unknown>;
@@ -46,6 +48,47 @@ export function humanize(key: string): string {
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+/**
+ * A schema `default` is untyped JSON, so a numeric bound has to be checked before
+ * it can be used as one. Returns undefined for anything that is not a real number.
+ */
+function asNumber(value: unknown): number | undefined {
+  return "number" === typeof value && Number.isFinite(value) ? value : undefined;
+}
+
+/**
+ * Narrow a value read out of the params bag to something a field control accepts.
+ *
+ * The bag is a tree of unknowns — it is built from schema defaults and then
+ * written to by whichever control the user touched — so this is the one place
+ * that decides what a control may receive. Anything unrecognised becomes
+ * undefined, which every control renders as its empty state.
+ */
+export function asParamValue(value: unknown): ParamValue {
+  if (null === value || undefined === value) {
+    return undefined;
+  }
+
+  if (
+    "string" === typeof value ||
+    "number" === typeof value ||
+    "boolean" === typeof value
+  ) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter((entry): entry is string => "string" === typeof entry);
+  }
+
+  const pair = value as Record<string, unknown>;
+  if ("number" === typeof pair.lo && "number" === typeof pair.hi) {
+    return { lo: pair.lo, hi: pair.hi };
+  }
+
+  return undefined;
 }
 
 /**
@@ -116,8 +159,8 @@ function descriptorFromNode(
         type: "range",
         label,
         section,
-        min: minProp.default ?? minProp.minimum,
-        max: maxProp.default ?? maxProp.maximum,
+        min: asNumber(minProp.default) ?? minProp.minimum,
+        max: asNumber(maxProp.default) ?? maxProp.maximum,
         default: config.default,
         ...(config.dependsOn ? { dependsOn: config.dependsOn } : {}),
       };

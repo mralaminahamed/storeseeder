@@ -7,6 +7,7 @@ import apiFetch from "@wordpress/api-fetch";
 import { generators } from "@/admin/lib/generators";
 import { fieldsFromSchema } from "@/admin/lib/fieldsFromSchema";
 import { setPath } from "@/admin/lib/paths";
+import type { ParamBag } from "@/admin/lib/paths";
 import { getSettings } from "@/admin/lib/settings";
 import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
@@ -16,17 +17,22 @@ import { PreviewTable } from "@/admin/components/generator/PreviewTable";
 import { RunBar } from "@/admin/components/generator/RunBar";
 import { Button } from "@/admin/components/ui/button";
 
-import type { GeneratorPageParams } from "@/admin/types";
+import type {
+  GeneratorPageParams,
+  GeneratorResult,
+  ParameterConfig,
+  ParamValue,
+} from "@/admin/types";
 
 // ---------------------------------------------------------------------------
 // Build default params from a generator's parameterConfig schema
 // ---------------------------------------------------------------------------
 
 function buildDefaultParams(
-  parameterConfig: Record<string, any>,
-): Record<string, any> {
+  parameterConfig: Record<string, ParameterConfig>,
+): ParamBag {
   const sections = fieldsFromSchema(parameterConfig);
-  let acc: Record<string, any> = {};
+  let acc: ParamBag = {};
 
   for (const section of sections) {
     for (const f of section.fields) {
@@ -79,7 +85,7 @@ export default function GeneratorPage() {
     "en_US";
 
   // Generator-specific params — re-initialise on route change
-  const [params, setParams] = useState<Record<string, any>>(() =>
+  const [params, setParams] = useState<ParamBag>(() =>
     buildDefaultParams(generator?.parameterConfig ?? {}),
   );
 
@@ -110,7 +116,7 @@ export default function GeneratorPage() {
   }
 
   // setField — immutable path update
-  const setField = (key: string, value: any) => {
+  const setField = (key: string, value: ParamValue) => {
     setParams((prev) => setPath(prev, key, value));
   };
 
@@ -142,7 +148,7 @@ export default function GeneratorPage() {
       cancelAnimationFrame(raf);
       setProgress(1);
 
-      const body: Record<string, any> = {
+      const body: Record<string, unknown> = {
         count,
         locale,
         include_meta: meta,
@@ -154,11 +160,11 @@ export default function GeneratorPage() {
       }
 
       try {
-        const data = (await apiFetch({
+        const data = await apiFetch<GeneratorResult>({
           path: `/storeseeder/v1/${generator.route}/generate`,
           method: "POST",
           data: body,
-        }));
+        });
 
         recordRun(generator.route, count, true, data.message ?? "", {
           locale,

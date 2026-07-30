@@ -6,6 +6,7 @@ import apiFetch from "@wordpress/api-fetch";
 import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
 import { getSettings } from "@/admin/lib/settings";
+import type { GeneratorResult } from "@/admin/types";
 
 
 export interface BatchItem {
@@ -74,11 +75,11 @@ export function BatchProvider({ children }: { children: React.ReactNode }) {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         try {
-          const data = (await apiFetch({
+          const data = await apiFetch<GeneratorResult>({
             path: `/storeseeder/v1/${item.route}/generate`,
             method: "POST",
             data: { count: item.count, locale, include_meta: false },
-          }));
+          });
           recordRun(item.route, item.count, true, data.message ?? "", { locale });
           ok += 1;
           total += item.count;

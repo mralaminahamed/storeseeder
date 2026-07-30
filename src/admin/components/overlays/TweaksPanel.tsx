@@ -65,8 +65,8 @@ function resolveTokenHex(token: string, theme: string, accent: string): string {
   ctx.fillStyle = "#000000";
   ctx.fillStyle = raw;
   ctx.fillRect(0, 0, 1, 1);
-  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-  return `#${HEX(r)}${HEX(g)}${HEX(b)}`;
+  const px = ctx.getImageData(0, 0, 1, 1).data;
+  return `#${HEX(px[0])}${HEX(px[1])}${HEX(px[2])}`;
 }
 
 interface SegOption<T> {

@@ -437,7 +437,7 @@ export default function SettingsPage() {
                         {sprintf(
                           /* translators: %s: date string */
                           __("Last updated: %s", "storeseeder"),
-                          formatDate(syncStatus.last_synced),
+                          formatDate(syncStatus.last_synced) ?? "",
                         )}
                       </div>
                     )}

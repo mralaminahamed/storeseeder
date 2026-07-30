@@ -2,20 +2,24 @@ import React from "react";
 import { __ } from "@wordpress/i18n";
 import { Icon } from "@/admin/lib/icons";
 import { SectionLabel } from "@/admin/components/ui/section-label";
-import { fieldsFromSchema } from "@/admin/lib/fieldsFromSchema";
+import { fieldsFromSchema, asParamValue } from "@/admin/lib/fieldsFromSchema";
 import { getPath } from "@/admin/lib/paths";
+import type { ParamBag } from "@/admin/lib/paths";
 import { Field } from "@/admin/components/generator/FieldSection";
-import type { Generator } from "@/admin/types";
+import type { Generator, ParamValue } from "@/admin/types";
 
 // ---------------------------------------------------------------------------
 // Dependency notes keyed by generator route
 // ---------------------------------------------------------------------------
 
-const DEP: Record<string, string> = {
-  refunds: "Targets existing completed / processing orders",
-  "product-variations": "Applied to existing variable products",
-  transaction: "Generated against existing orders",
-  "cart-sessions": "Uses your existing products & customers",
+const DEP: Record<string, () => string> = {
+  refunds: () =>
+    __("Targets existing completed / processing orders", "storeseeder"),
+  "product-variations": () =>
+    __("Applied to existing variable products", "storeseeder"),
+  transaction: () => __("Generated against existing orders", "storeseeder"),
+  "cart-sessions": () =>
+    __("Uses your existing products & customers", "storeseeder"),
 };
 
 // ---------------------------------------------------------------------------
@@ -24,8 +28,8 @@ const DEP: Record<string, string> = {
 
 interface ConfigColumnProps {
   generator: Generator;
-  params: Record<string, any>;
-  setField: (key: string, value: any) => void;
+  params: ParamBag;
+  setField: (key: string, value: ParamValue) => void;
 }
 
 /**
@@ -37,7 +41,7 @@ export function ConfigColumn({
   params,
   setField,
 }: ConfigColumnProps): JSX.Element {
-  const depNote = DEP[generator.route];
+  const depNote = DEP[generator.route]?.();
   const sections = fieldsFromSchema(generator.parameterConfig ?? {});
   const hasFields =
     sections.length > 0 && sections.some((s) => s.fields.length > 0);
@@ -69,7 +73,7 @@ export function ConfigColumn({
       {depNote && (
         <div className="fp-dep">
           <Icon name="info" size={15} />
-          {__(depNote, "storeseeder")}
+          {depNote}
         </div>
       )}
 
@@ -105,7 +109,7 @@ export function ConfigColumn({
                     <Field
                       key={f.key}
                       f={f}
-                      value={getPath(params, f.key)}
+                      value={asParamValue(getPath(params, f.key))}
                       onChange={(v) => setField(f.key, v)}
                     />
                   ))}
@@ -115,7 +119,7 @@ export function ConfigColumn({
                   <Field
                     key={f.key}
                     f={f}
-                    value={getPath(params, f.key)}
+                    value={asParamValue(getPath(params, f.key))}
                     onChange={(v) => setField(f.key, v)}
                     hideLabel={dup}
                   />

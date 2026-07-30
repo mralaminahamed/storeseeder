@@ -19,11 +19,32 @@ declare global {
   }
 }
 
+/**
+ * A value one schema-driven field can hold.
+ *
+ * The set is closed by what `fieldsFromSchema` can produce: toggles give a
+ * boolean, chips an array, ranges a `{ lo, hi }` pair, and the rest a string or a
+ * number. Anything wider would put the burden of narrowing back on every control.
+ */
+export type ParamValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | { lo: number; hi: number }
+  | null
+  | undefined;
+
 export interface ParameterConfig {
   type: string;
   title?: string;
   description?: string;
-  default?: any;
+  /**
+   * Whatever the PHP schema declared. Unknown rather than any: it arrives as
+   * JSON, so a caller wanting a number has to check it is one — see `asNumber`
+   * in lib/fieldsFromSchema.ts.
+   */
+  default?: unknown;
   enum?: string[];
   minimum?: number;
   maximum?: number;
@@ -33,7 +54,7 @@ export interface ParameterConfig {
     default?: string[];
   };
   properties?: Record<string, ParameterConfig>;
-  dependsOn?: Record<string, any>;
+  dependsOn?: Record<string, unknown>;
   format?: string;
 }
 
@@ -53,7 +74,8 @@ export interface Generator {
 export interface GeneratorResult {
   message: string;
   generated?: number;
-  [key: string]: any;
+  /** Generators are free to return extra fields; readers must narrow them. */
+  [key: string]: unknown;
 }
 
 export interface StoredRun {

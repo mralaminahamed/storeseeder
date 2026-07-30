@@ -83,6 +83,7 @@
     "@wordpress/api-fetch": "^7.34.0",
     "@wordpress/dom-ready": "^4.34.0",
     "@wordpress/element": "^6.34.0",
+    "@wordpress/html-entities": "^4.34.0",
     "@wordpress/i18n": "^6.7.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

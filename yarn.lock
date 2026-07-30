@@ -3686,6 +3686,7 @@ __metadata:
     "@wordpress/dom-ready": "npm:^4.34.0"
     "@wordpress/element": "npm:^6.34.0"
     "@wordpress/eslint-plugin": "npm:^25.8.0"
+    "@wordpress/html-entities": "npm:^4.34.0"
     "@wordpress/i18n": "npm:^6.7.0"
     "@wordpress/scripts": "npm:^30.27.0"
     "@wordpress/stylelint-config": "npm:^23.26.0"
@@ -7213,6 +7214,13 @@ __metadata:
   version: 4.52.0
   resolution: "@wordpress/hooks@npm:4.52.0"
   checksum: 10c0/7a6b7738e9e96e6c7785b12d4c50d78b997b86f61819d5467f7c57c35c8433d5564ef65fca9ffc98067c1ab1c682e1203fca5c74f375d707b2dd27c7ba4f401a
+  languageName: node
+  linkType: hard
+
+"@wordpress/html-entities@npm:^4.34.0":
+  version: 4.52.0
+  resolution: "@wordpress/html-entities@npm:4.52.0"
+  checksum: 10c0/c45b8cf58b1fc109a545c5938e63a42f54c423a60f0f602f0da2750b377d5a714d3fa491cf961e283002e5757822caf73894ef0fecf6a4e13ee5e260cc94ead4
   languageName: node
   linkType: hard
 
