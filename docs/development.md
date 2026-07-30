@@ -19,7 +19,7 @@ Welcome to the StoreSeeder v1.0.0 development guide! This comprehensive resource
 # Clone and setup in one go
 git clone https://github.com/mralaminahamed/storeseeder.git
 cd storeseeder
-composer install && npm install && npm run build
+composer install && yarn install && yarn build
 ```
 
 ### v1.0.0: TypeScript Migration
@@ -37,13 +37,13 @@ composer install && npm install && npm run build
 
 ```bash
 # Start development server with hot reload
-npm run start
+yarn start
 
 # Production build (optimized for deployment)
-npm run build
+yarn build
 
 # Update packages
-npm run packages-update
+yarn packages-update
 ```
 
 ### Code Quality Assurance
@@ -57,7 +57,7 @@ composer run analyse      # PHP static analysis (level 8)
 composer run format       # Auto-fix PHP code style
 
 # Build and package management
-npm run packages-update   # Update WordPress packages
+yarn packages-update   # Update WordPress packages
 ```
 
 ### Testing Commands
@@ -371,7 +371,7 @@ npm version patch  # or minor, major
 composer update --lock
 
 # Build production assets
-npm run build
+yarn build
 
 # Create release archive
 composer run release
@@ -403,8 +403,8 @@ The project includes automated deployment workflows:
 
 ```bash
 # Clear node_modules and rebuild
-rm -rf node_modules package-lock.json
-npm install
+rm -rf node_modules
+yarn install
 
 # Clear composer cache
 composer clear-cache
