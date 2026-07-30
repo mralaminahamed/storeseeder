@@ -117,6 +117,12 @@ class StoreSeeder {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		add_filter( 'admin_body_class', array( $this, 'filter_admin_body_class' ) );
+		add_filter(
+			'plugin_action_links_' . plugin_basename( STORESEEDER_PLUGIN_FILE ),
+			array( $this, 'add_plugin_action_links' )
+		);
+		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
 
 		$this->init_mcp();
 	}
@@ -168,6 +174,112 @@ class StoreSeeder {
 			$this->get_menu_icon(),
 			30
 		);
+	}
+
+	/**
+	 * Add action links to the plugin's row on the Plugins screen
+	 *
+	 * Puts the two things people open the plugin for — the generators and the
+	 * settings — one click from the Plugins list.
+	 *
+	 * @since 1.0.1
+	 * @hooked plugin_action_links_{basename}
+	 *
+	 * @param array $links Existing action links.
+	 *
+	 * @return array Links with the plugin's own entries first.
+	 */
+	public function add_plugin_action_links( array $links ): array {
+		$own = array(
+			'generate' => sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( admin_url( 'admin.php?page=storeseeder' ) ),
+				esc_html__( 'Generate Data', 'storeseeder' )
+			),
+			'settings' => sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( admin_url( 'admin.php?page=storeseeder#/settings' ) ),
+				esc_html__( 'Settings', 'storeseeder' )
+			),
+		);
+
+		return array_merge( $own, $links );
+	}
+
+	/**
+	 * Add row meta links to the plugin's row on the Plugins screen
+	 *
+	 * @since 1.0.1
+	 * @hooked plugin_row_meta
+	 *
+	 * @param array  $links Existing row meta links.
+	 * @param string $file  Plugin file the row belongs to.
+	 *
+	 * @return array Row meta, extended for this plugin only.
+	 */
+	public function add_plugin_row_meta( array $links, string $file ): array {
+		if ( plugin_basename( STORESEEDER_PLUGIN_FILE ) !== $file ) {
+			return $links;
+		}
+
+		$links[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+			esc_url( 'https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/README.md' ),
+			esc_html__( 'Documentation', 'storeseeder' )
+		);
+		$links[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+			esc_url( 'https://github.com/mralaminahamed/storeseeder/blob/trunk/SUPPORT.md' ),
+			esc_html__( 'Support', 'storeseeder' )
+		);
+		$links[] = sprintf(
+			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+			esc_url( 'https://github.com/mralaminahamed/storeseeder' ),
+			esc_html__( 'GitHub', 'storeseeder' )
+		);
+
+		return $links;
+	}
+
+	/**
+	 * Add a screen-scoped class to the admin body on the plugin's page
+	 *
+	 * Gives stylesheets something to hang off when they need to reach outside
+	 * `.fp-root` — the WordPress footer or notice area, for instance.
+	 *
+	 * Unlike the reference implementation this does not strip the `folded`
+	 * class: that is the user's own admin-menu preference, the app's layout does
+	 * not depend on the menu width, and quietly overriding it would be rude.
+	 *
+	 * @since 1.0.1
+	 * @hooked admin_body_class
+	 *
+	 * @param string $classes Space-separated list of admin body classes.
+	 *
+	 * @return string Body classes, with the plugin's own class on its screen.
+	 */
+	public function filter_admin_body_class( string $classes ): string {
+		$screen = get_current_screen();
+
+		if ( null === $screen || 'toplevel_page_storeseeder' !== $screen->id ) {
+			return $classes;
+		}
+
+		return trim( $classes . ' storeseeder-admin-page' );
+	}
+
+	/**
+	 * Whether the mcp-adapter plugin is available
+	 *
+	 * The MCP integration registers abilities regardless, but they are only
+	 * reachable by an AI client once mcp-adapter exposes its transport.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return bool True when mcp-adapter is loaded.
+	 */
+	public function is_mcp_adapter_active(): bool {
+		return class_exists( '\WP\MCP\Transport\HttpTransport' );
 	}
 
 	/**
@@ -859,6 +971,26 @@ class StoreSeeder {
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
 				esc_html__( 'StoreSeeder requires Fluent Cart plugin to be installed and active.', 'storeseeder' )
+			);
+		}
+
+		$screen = get_current_screen();
+
+		/*
+		 * The MCP hint is confined to the plugin's own screen. mcp-adapter is
+		 * optional, so nagging about it on every admin page would be noise —
+		 * but without any hint at all, MCP silently does nothing and there is
+		 * no way to find out why.
+		 */
+		if ( null !== $screen && 'toplevel_page_storeseeder' === $screen->id && ! $this->is_mcp_adapter_active() ) {
+			printf(
+				'<div class="notice notice-info is-dismissible"><p>%s</p></div>',
+				sprintf(
+					/* translators: 1: opening anchor tag, 2: closing anchor tag */
+					esc_html__( 'StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators.', 'storeseeder' ),
+					'<a href="https://github.com/WordPress/mcp-adapter/releases" target="_blank" rel="noopener noreferrer">',
+					'</a>'
+				)
 			);
 		}
 	}
