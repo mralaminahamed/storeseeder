@@ -29,6 +29,13 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 	 */
 	private string $uri = '';
 
+	/**
+	 * Variant the current test wants the filter to return.
+	 *
+	 * @var string
+	 */
+	private string $variant = 'inverse';
+
 	public function setUp(): void {
 		parent::setUp();
 
@@ -119,6 +126,78 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_unknown_variant' ) );
 
 		$this->assertStringContainsString( 'fill="#ffffff"', $svg, 'Anything unrecognised should render the default.' );
+	}
+
+	/**
+	 * The shipped SVG files carry the same drawing as the inlined markup.
+	 *
+	 * The PHP inlines its own copy rather than reading these files on every admin
+	 * page load, so this is what stops the two from drifting apart.
+	 *
+	 * @dataProvider variant_file_provider
+	 *
+	 * @param string $variant  Variant name passed through the filter.
+	 * @param string $filename File under .wordpress-org/ that should match it.
+	 *
+	 * @return void
+	 */
+	public function test_shipped_svg_file_matches_the_inlined_markup( string $variant, string $filename ): void {
+		$path = STORESEEDER_PLUGIN_PATH . '.wordpress-org/' . $filename;
+
+		if ( ! file_exists( $path ) ) {
+			$this->fail( $filename . ' is missing; it is the reference drawing for the ' . $variant . ' variant.' );
+		}
+
+		$this->variant = $variant;
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_selected_variant' ) );
+		$inlined = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_selected_variant' ) );
+
+		$this->assertSame(
+			$this->normalise_svg( (string) file_get_contents( $path ) ),
+			$this->normalise_svg( $inlined ),
+			$filename . ' and build_menu_icon_svg() have drifted apart.'
+		);
+	}
+
+	/**
+	 * Variants and the file that should match each.
+	 *
+	 * @return array<string, array{0: string, 1: string}>
+	 */
+	public function variant_file_provider(): array {
+		return array(
+			'inverse'    => array( 'inverse', 'icon-menu-inverse.svg' ),
+			'monochrome' => array( 'monochrome', 'icon-menu-monochrome.svg' ),
+		);
+	}
+
+	/**
+	 * Reduce SVG markup to a comparable form.
+	 *
+	 * Drops comments, the documentation-only role/aria-label attributes, and all
+	 * whitespace between tags, so the file can stay readable while the inlined
+	 * copy stays compact.
+	 *
+	 * @param string $svg SVG markup.
+	 *
+	 * @return string
+	 */
+	private function normalise_svg( string $svg ): string {
+		$svg = (string) preg_replace( '/<!--.*?-->/s', '', $svg );
+		$svg = (string) preg_replace( '/\s+role="img"|\s+aria-label="[^"]*"/', '', $svg );
+		$svg = (string) preg_replace( '/>\s+</', '><', $svg );
+
+		return trim( (string) preg_replace( '/\s+/', ' ', $svg ) );
+	}
+
+	/**
+	 * Filter callback: select the variant under test.
+	 *
+	 * @return string
+	 */
+	public function force_selected_variant(): string {
+		return $this->variant;
 	}
 
 	/**
