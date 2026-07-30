@@ -116,6 +116,10 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 
 == Changelog ==
 
+Only the four most recent releases are listed here. The complete history, in Keep a Changelog format, is maintained in the repository:
+
+[CHANGELOG.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
+
 = 1.0.0 =
 * Initial release.
 * 17 generators — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs — all persisting through native Fluent Cart models.

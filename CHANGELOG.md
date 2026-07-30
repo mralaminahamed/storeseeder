@@ -1,9 +1,15 @@
 # 📋 Changelog
 
-All notable changes to StoreSeeder will be documented in this file.
+All notable changes to StoreSeeder are documented in this file. **This is the complete history and
+the canonical record** — [`readme.txt`](readme.txt) carries only the four most recent releases, in
+the WordPress plugin directory format, and links back here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+Nothing yet.
 
 ## [1.0.0] - 2026-07-22
 

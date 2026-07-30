@@ -33,9 +33,9 @@ Manual check:
 - [ ] `yarn build` compiles
 - [ ] New PHP has PHPDoc; REST routes validate input against JSON Schema and require `manage_options`
 - [ ] New user-facing strings are translatable; `composer makepot` re-run if strings changed
-- [ ] Docs updated where relevant (`README.md`, `docs/`, `docs/changelog.md`)
-- [ ] Any new outbound HTTP request is documented in the External Services table in `README.md` and
-      `readme.txt`
+- [ ] Docs updated where relevant (`README.md`, `docs/`, `CHANGELOG.md`)
+- [ ] Any new outbound HTTP request is documented in `docs/external-services.md`, and summarised in
+      `README.md` and `readme.txt`
 - [ ] No `console.log` or debug output left behind
 
 ## Not Tested / Known Gaps

@@ -22,7 +22,7 @@ for the overview; these pages go deeper.
 
 | Page | What it covers |
 |------|----------------|
-| [Changelog](changelog.md) | Version history in Keep a Changelog format — the canonical record |
+| [Changelog](../CHANGELOG.md) | Full version history in Keep a Changelog format — the canonical record |
 | [Contributing](../CONTRIBUTING.md) | Branching, conventional commits, quality gates, pull request expectations |
 | [Code of Conduct](../CODE_OF_CONDUCT.md) | Contributor Covenant 2.1 |
 | [Support](../SUPPORT.md) | Where to ask, what to include, what is out of scope |
