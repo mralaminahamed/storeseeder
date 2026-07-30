@@ -29,6 +29,13 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 	 */
 	private string $uri = '';
 
+	/**
+	 * Variant the current test wants the filter to return.
+	 *
+	 * @var string
+	 */
+	private string $variant = 'inverse';
+
 	public function setUp(): void {
 		parent::setUp();
 
@@ -88,14 +95,143 @@ class AdminMenuIconTest extends StoreSeederUnitTestCase {
 		$this->assertStringContainsString( 'viewBox="0 0 120 120"', $this->svg, 'The menu icon must use the source grid.' );
 	}
 
-	public function test_icon_is_monochrome_admin_grey(): void {
-		// WordPress paints this as a background image, which cannot inherit a
-		// colour — so it has to ship in the admin icon grey and carry no gradient
-		// or brand fill, or it will not sit right in the menu.
-		$this->assertStringContainsString( '#a7aaad', $this->svg );
+	public function test_default_variant_is_a_dark_mark_on_a_white_tile(): void {
+		$this->assertStringContainsString( 'rx="29" fill="#ffffff"', $this->svg, 'The tile keeps the source corner radius.' );
+		$this->assertStringContainsString( 'stroke="#1d2327"', $this->svg );
+		$this->assertStringContainsString( 'fill="#1d2327"', $this->svg, 'The sprout leaves are filled, not stroked.' );
+	}
+
+	public function test_no_variant_carries_the_gradient(): void {
+		// A gradient panel muddies to a single tone at 20px, so neither variant
+		// ships one.
 		$this->assertStringNotContainsString( 'linearGradient', $this->svg );
 		$this->assertStringNotContainsString( '#4f46e5', $this->svg );
 		$this->assertStringNotContainsString( '#7c3aed', $this->svg );
-		$this->assertStringNotContainsString( '#ffffff', $this->svg );
+	}
+
+	public function test_monochrome_variant_drops_the_tile_for_admin_grey(): void {
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_monochrome_variant' ) );
+		$svg = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_monochrome_variant' ) );
+
+		$this->assertStringContainsString( '#a7aaad', $svg );
+		$this->assertStringNotContainsString( '<rect', $svg, 'The monochrome variant draws no tile.' );
+		$this->assertStringNotContainsString( '#ffffff', $svg );
+		$this->assertStringContainsString( 'translate(11,26) scale(3.7)', $svg, 'Both variants share the artwork.' );
+	}
+
+	public function test_unknown_variant_falls_back_to_the_default(): void {
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_unknown_variant' ) );
+		$svg = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_unknown_variant' ) );
+
+		$this->assertStringContainsString( 'fill="#ffffff"', $svg, 'Anything unrecognised should render the default.' );
+	}
+
+	/**
+	 * The shipped SVG files carry the same drawing as the inlined markup.
+	 *
+	 * The PHP inlines its own copy rather than reading these files on every admin
+	 * page load, so this is what stops the two from drifting apart.
+	 *
+	 * @dataProvider variant_file_provider
+	 *
+	 * @param string $variant  Variant name passed through the filter.
+	 * @param string $filename File under .wordpress-org/ that should match it.
+	 *
+	 * @return void
+	 */
+	public function test_shipped_svg_file_matches_the_inlined_markup( string $variant, string $filename ): void {
+		$path = STORESEEDER_PLUGIN_PATH . '.wordpress-org/' . $filename;
+
+		if ( ! file_exists( $path ) ) {
+			$this->fail( $filename . ' is missing; it is the reference drawing for the ' . $variant . ' variant.' );
+		}
+
+		$this->variant = $variant;
+		add_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_selected_variant' ) );
+		$inlined = $this->decode_menu_icon();
+		remove_filter( 'storeseeder_menu_icon_variant', array( $this, 'force_selected_variant' ) );
+
+		$this->assertSame(
+			$this->normalise_svg( (string) file_get_contents( $path ) ),
+			$this->normalise_svg( $inlined ),
+			$filename . ' and build_menu_icon_svg() have drifted apart.'
+		);
+	}
+
+	/**
+	 * Variants and the file that should match each.
+	 *
+	 * @return array<string, array{0: string, 1: string}>
+	 */
+	public function variant_file_provider(): array {
+		return array(
+			'inverse'    => array( 'inverse', 'icon-menu-inverse.svg' ),
+			'monochrome' => array( 'monochrome', 'icon-menu-monochrome.svg' ),
+		);
+	}
+
+	/**
+	 * Reduce SVG markup to a comparable form.
+	 *
+	 * Drops comments, the documentation-only role/aria-label attributes, and all
+	 * whitespace between tags, so the file can stay readable while the inlined
+	 * copy stays compact.
+	 *
+	 * @param string $svg SVG markup.
+	 *
+	 * @return string
+	 */
+	private function normalise_svg( string $svg ): string {
+		$svg = (string) preg_replace( '/<!--.*?-->/s', '', $svg );
+		$svg = (string) preg_replace( '/\s+role="img"|\s+aria-label="[^"]*"/', '', $svg );
+		$svg = (string) preg_replace( '/>\s+</', '><', $svg );
+
+		return trim( (string) preg_replace( '/\s+/', ' ', $svg ) );
+	}
+
+	/**
+	 * Filter callback: select the variant under test.
+	 *
+	 * @return string
+	 */
+	public function force_selected_variant(): string {
+		return $this->variant;
+	}
+
+	/**
+	 * Filter callback: select the monochrome variant.
+	 *
+	 * @return string
+	 */
+	public function force_monochrome_variant(): string {
+		return 'monochrome';
+	}
+
+	/**
+	 * Filter callback: return a variant name the plugin does not know.
+	 *
+	 * @return string
+	 */
+	public function force_unknown_variant(): string {
+		return 'chartreuse-hexagon';
+	}
+
+	/**
+	 * Invoke the private builder and decode its payload.
+	 *
+	 * @return string SVG markup.
+	 */
+	private function decode_menu_icon(): string {
+		$method = new ReflectionMethod( StoreSeeder::class, 'get_menu_icon' );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$uri = (string) $method->invoke( storeseeder() );
+
+		return (string) base64_decode( substr( $uri, strlen( 'data:image/svg+xml;base64,' ) ), true );
 	}
 }

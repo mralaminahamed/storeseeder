@@ -290,12 +290,18 @@ class StoreSeeder {
 	 * WordPress recognises that prefix and paints the SVG as the menu item's
 	 * background image.
 	 *
-	 * Two departures from the source artwork, both forced by how WordPress renders
-	 * this: the gradient tile is dropped, since a coloured panel behind a 20px
-	 * menu icon fights the admin menu and washes out at the 60% opacity WordPress
-	 * applies to inactive items; and the strokes are the default admin icon grey
-	 * (#a7aaad) instead of white, because a background image cannot inherit a
-	 * colour and so cannot follow the admin colour scheme.
+	 * Two variants, because a background image cannot inherit a colour and so
+	 * cannot follow the admin colour scheme:
+	 *
+	 * - `inverse` (default): the mark in near-black on a white rounded tile, the
+	 *   same corner radius as the source artwork. Reads as a distinct chip in the
+	 *   dark admin menu and keeps its contrast at the 60% opacity WordPress
+	 *   applies to inactive items.
+	 * - `monochrome`: flat strokes in the default admin icon grey (#a7aaad), no
+	 *   tile — the understated look core's own icons use.
+	 *
+	 * The gradient from the source artwork is dropped either way: at 20px a
+	 * gradient panel muddies into a single tone.
 	 *
 	 * Keep the geometry in step with `.wordpress-org/icon.svg` and with
 	 * `BrandIcon.tsx`, which carries the full-colour version for the admin UI.
@@ -305,21 +311,58 @@ class StoreSeeder {
 	 * @return string Data URI suitable for the add_menu_page() $icon_url argument.
 	 */
 	private function get_menu_icon(): string {
-		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">'
-			// Shopping cart: the store.
-			. '<g transform="translate(11,26) scale(3.7)" fill="none" stroke="#a7aaad" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'
-			. '<circle cx="8" cy="21" r="1.4"/>'
-			. '<circle cx="19" cy="21" r="1.4"/>'
-			. '<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>'
-			. '</g>'
-			// Sprout: the seed being planted.
-			. '<line x1="92" y1="40" x2="92" y2="20" stroke="#a7aaad" stroke-width="2.6" stroke-linecap="round"/>'
-			. '<path d="M92,27 C86.5,21 78.5,21.5 76,27 C81.5,32 89.5,31.5 92,27 Z" fill="#a7aaad"/>'
-			. '<path d="M92,22 C96,14.5 104,13.5 108.5,18.5 C104.5,25 96.5,26 92,22 Z" fill="#a7aaad"/>'
-			. '</svg>';
+		/**
+		 * Filters which admin menu icon variant is used.
+		 *
+		 * @since 1.0.1
+		 *
+		 * @param string $variant Either 'inverse' (near-black mark on a white tile)
+		 *                        or 'monochrome' (flat admin grey, no tile).
+		 */
+		$variant = apply_filters( 'storeseeder_menu_icon_variant', 'inverse' );
+
+		$svg = 'monochrome' === $variant
+			? $this->build_menu_icon_svg( '#a7aaad', null )
+			: $this->build_menu_icon_svg( '#1d2327', '#ffffff' );
 
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- WordPress requires the menu icon SVG as a base64 data URI.
 		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+	}
+
+	/**
+	 * Draw the menu icon artwork
+	 *
+	 * The cart transform and both sprout leaves are copied verbatim from
+	 * `.wordpress-org/icon.svg`; only the colours differ between variants.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param string      $mark       Colour for the cart strokes and sprout.
+	 * @param string|null $background Tile fill, or null to draw no tile.
+	 *
+	 * @return string SVG markup.
+	 */
+	private function build_menu_icon_svg( string $mark, ?string $background ): string {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">';
+
+		if ( null !== $background ) {
+			// rx matches the source artwork, so the tile keeps the brand silhouette.
+			$svg .= '<rect width="120" height="120" rx="29" fill="' . $background . '"/>';
+		}
+
+		// Shopping cart: the store.
+		$svg .= '<g transform="translate(11,26) scale(3.7)" fill="none" stroke="' . $mark . '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'
+			. '<circle cx="8" cy="21" r="1.4"/>'
+			. '<circle cx="19" cy="21" r="1.4"/>'
+			. '<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>'
+			. '</g>';
+
+		// Sprout: the seed being planted.
+		$svg .= '<line x1="92" y1="40" x2="92" y2="20" stroke="' . $mark . '" stroke-width="2.6" stroke-linecap="round"/>'
+			. '<path d="M92,27 C86.5,21 78.5,21.5 76,27 C81.5,32 89.5,31.5 92,27 Z" fill="' . $mark . '"/>'
+			. '<path d="M92,22 C96,14.5 104,13.5 108.5,18.5 C104.5,25 96.5,26 92,22 Z" fill="' . $mark . '"/>';
+
+		return $svg . '</svg>';
 	}
 
 	/**

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="StoreSeeder">
+  <!--
+    Admin menu icon — monochrome variant: flat strokes, no tile.
+
+    The understated treatment WordPress core uses for its own menu icons, drawn
+    in the default admin icon grey. Opt in with:
+
+      add_filter( 'storeseeder_menu_icon_variant', fn() => 'monochrome' );
+
+    Mirrored by StoreSeeder::build_menu_icon_svg() and compared against it in the
+    test suite.
+  -->
+
+  <!-- Shopping cart: the store -->
+  <g transform="translate(11,26) scale(3.7)" fill="none" stroke="#a7aaad" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="21" r="1.4"/>
+    <circle cx="19" cy="21" r="1.4"/>
+    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+  </g>
+
+  <!-- Sprout: the seed being planted -->
+  <line x1="92" y1="40" x2="92" y2="20" stroke="#a7aaad" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M92,27 C86.5,21 78.5,21.5 76,27 C81.5,32 89.5,31.5 92,27 Z" fill="#a7aaad"/>
+  <path d="M92,22 C96,14.5 104,13.5 108.5,18.5 C104.5,25 96.5,26 92,22 Z" fill="#a7aaad"/>
+</svg>
