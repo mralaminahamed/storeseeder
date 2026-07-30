@@ -1,7 +1,7 @@
 {
   "name": "@mralaminahamed/storeseeder",
   "version": "1.0.0",
-  "description": "Comprehensive Fluent Cart test data generator with 10 specialized generators, real-time validation, advanced parameter configuration, WordPress admin color integration, and modern React Router v7 interface.",
+  "description": "Comprehensive Fluent Cart test data generator with 17 generators, live preview, schema-driven parameter configuration, WordPress admin colour integration, and a modern React Router v7 interface.",
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
