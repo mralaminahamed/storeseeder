@@ -92,3 +92,9 @@ release/
 # Superpowers SDD scratch + local plans (untracked)
 .superpowers/
 docs/superpowers/
+
+# Playwright
+tests/e2e/.auth/
+tests/e2e/report/
+tests/e2e/.env.test
+test-results/
