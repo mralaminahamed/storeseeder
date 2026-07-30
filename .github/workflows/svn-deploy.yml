@@ -256,7 +256,8 @@ jobs:
               -o -name ".yarn"         -o -name ".claude"       -o -name ".playwright-mcp" -o -name ".remember" \
               -o -name ".idea"         -o -name ".vscode" \
               -o -name "phpcs*.xml"    -o -name "phpstan.neon"  -o -name "phpunit.xml*" \
-              -o -name "composer.json" -o -name "composer.lock" -o -name "package.json" \
+              -o \( \( -name "composer.json" -o -name "composer.lock" -o -name "package.json" \) \
+                    -a ! -path "*/vendor/*" \) \
               -o -name "*.zip"         -o -name "*.map"         -o -name ".DS_Store" -o -name "Thumbs.db" \
             \) -print)
 

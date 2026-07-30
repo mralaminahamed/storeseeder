@@ -12,8 +12,11 @@ postcss.config.js
 tailwind.config.js
 
 # Composer development files
-# composer.json - Needed for production dependencies
-# composer.lock - Needed for production dependencies
+# Neither manifest is needed at runtime — the compiled autoloader in
+# vendor/composer/ is self-contained — and the release workflow's "Verify
+# distributable is clean" gate rejects both. The vendor/*/composer.json files
+# that ship inside dependencies are part of those packages and stay put.
+composer.json
 
 # Development tools and configuration
 /.yarn/

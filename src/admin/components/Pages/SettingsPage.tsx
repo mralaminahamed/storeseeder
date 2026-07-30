@@ -8,11 +8,14 @@ import { NumberField } from "@/admin/components/generator/fields/NumberField";
 import { TextField } from "@/admin/components/generator/fields/TextField";
 import { FieldSelect } from "@/admin/components/generator/fields/FieldSelect";
 import { Icon } from "@/admin/lib/icons";
+import { requestConsentPrompt } from "@/admin/lib/consent";
 import { getSettings, saveSettings } from "@/admin/lib/settings";
 import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
 
-const PLUGIN_VERSION = "2.0.0";
+// Localized from STORESEEDER_VERSION; the fallback only shows if the script
+// data is missing, which would mean the admin app failed to enqueue properly.
+const PLUGIN_VERSION = window.storeseederApi?.version || "—";
 const GITHUB_URL = "https://github.com/mralaminahamed/storeseeder";
 const SAMPLE_DATA_REPO_URL =
   "https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart";
@@ -488,7 +491,23 @@ export default function SettingsPage() {
                   {__("Revoke", "storeseeder")}
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                icon="database"
+                onClick={requestConsentPrompt}
+                disabled={syncing}
+                data-testid="consent-reshow"
+              >
+                {__("Show consent prompt", "storeseeder")}
+              </Button>
             </div>
+
+            <p className="fp-set-hint" style={{ marginTop: 10 }}>
+              {__(
+                "“Show consent prompt” reopens the original prompt so you can review it. It normally appears only once, on a site that has not decided yet.",
+                "storeseeder",
+              )}
+            </p>
 
             <div style={{ marginTop: 14 }}>
               <a
