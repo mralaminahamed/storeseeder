@@ -162,12 +162,16 @@
   --sky: oklch(0.62 0.14 232);
   --violet: oklch(0.58 0.20 300);
 
-  /* derived accent helpers */
-  --accent-hover: color-mix(in oklch, var(--accent), black 12%);
-  --accent-soft: color-mix(in oklch, var(--accent) 12%, var(--surface));
-  --accent-soft-2: color-mix(in oklch, var(--accent) 20%, var(--surface));
-  --accent-line: color-mix(in oklch, var(--accent) 32%, var(--border));
-  --ring: color-mix(in oklch, var(--accent) 36%, transparent);
+  /* derived accent helpers.
+     Mixed in oklab, not oklch: oklch carries a hue channel, and mixing a
+     chromatic colour with an achromatic one (white, black, a near-grey
+     surface) drags that hue toward 0 — which turned every indigo tint pink.
+     oklab has no hue channel, so a tint stays on the accent's own hue. */
+  --accent-hover: color-mix(in oklab, var(--accent), black 12%);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  --accent-soft-2: color-mix(in oklab, var(--accent) 20%, var(--surface));
+  --accent-line: color-mix(in oklab, var(--accent) 32%, var(--border));
+  --ring: color-mix(in oklab, var(--accent) 36%, transparent);
 
   /* base app styles */
   background: var(--bg-2);
@@ -222,9 +226,9 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
   --sky: oklch(0.70 0.14 232);
   --violet: oklch(0.70 0.18 300);
 
-  --accent-soft: color-mix(in oklch, var(--accent) 22%, var(--surface));
-  --accent-soft-2: color-mix(in oklch, var(--accent) 34%, var(--surface));
-  --accent-hover: color-mix(in oklch, var(--accent), white 10%);
+  --accent-soft: color-mix(in oklab, var(--accent) 22%, var(--surface));
+  --accent-soft-2: color-mix(in oklab, var(--accent) 34%, var(--surface));
+  --accent-hover: color-mix(in oklab, var(--accent), white 10%);
 }
 
 /* ---- accent palettes ---- */
@@ -328,7 +332,7 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
 .fp-root :where(small) { font-size: 12px; color: var(--text-3); }
 .fp-root :where(strong, b) { color: var(--text); font-weight: 600; }
 .fp-root :where(em, i) { color: inherit; }
-.fp-root :where(mark) { background: color-mix(in oklch, var(--amber) 30%, transparent); color: var(--text); }
+.fp-root :where(mark) { background: color-mix(in oklab, var(--amber) 30%, transparent); color: var(--text); }
 .fp-root :where(abbr[title]) { border-bottom: 1px dotted var(--border-strong); text-decoration: none; cursor: help; }
 
 /* Links resolve to the accent so they read on both themes. :hover/:focus are
@@ -435,7 +439,7 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
 }
 
 /* ---- selection ---- */
-.fp-root ::selection { background: color-mix(in oklch, var(--accent) 28%, transparent); }
+.fp-root ::selection { background: color-mix(in oklab, var(--accent) 28%, transparent); }
 
 /* ---- keyframes (global — fine for @keyframes) ---- */
 @keyframes fp-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

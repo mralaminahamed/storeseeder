@@ -108,9 +108,11 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 
 == Screenshots ==
 
-1. Modern React admin with a generator grid and WordPress color-scheme integration.
-2. Schema-driven generator page with live configuration and preview.
-3. Customer generator with demographics and address options.
+1. Dashboard — run totals, recent activity, and all 17 generators grouped by category.
+2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
+3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
+4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.
+5. Settings — generation defaults, locale, reproducible seed, and run-history retention.
 
 == Changelog ==
 
