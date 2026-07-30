@@ -172,10 +172,12 @@ jobs:
 
   # ---------------------------------------------------------------------------
   # JOB 4 — build
-  # Compile frontend assets to verify the build is not broken.
+  # ESLint over the TypeScript sources, then compile the frontend assets to verify
+  # the build is not broken. Lint runs first: it is the faster of the two and
+  # reports the kind of mistake that also breaks the build.
   # ---------------------------------------------------------------------------
   build:
-    name: "Frontend Build"
+    name: "Frontend Lint & Build"
     runs-on: ubuntu-latest
 
     steps:
@@ -211,8 +213,15 @@ jobs:
           restore-keys: |
             yarn-${{ runner.os }}-
 
-      - name: Install Node dependencies & build assets
+      - name: Install Node dependencies
         run: |
           corepack enable yarn
           yarn install --immutable
-          yarn build
+
+      - name: Run ESLint
+        # Fails the job on errors only. The remaining warnings live in the
+        # Playwright specs, where a fixed settle wait is deliberate.
+        run: yarn lint:js
+
+      - name: Build assets
+        run: yarn build
