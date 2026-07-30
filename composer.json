@@ -78,7 +78,10 @@
     "phpstan": "phpstan analyse --memory-limit 2G",
     "test": "phpunit",
     "test:coverage": "phpunit --coverage-html=tests/coverage/html",
-    "makepot": "wp i18n make-pot . languages/storeseeder.pot --domain=storeseeder --exclude=node_modules,vendor,drafts,docs,build,release,tests",
+    "makepot": [
+      "@php -r \"if (! file_exists('build/admin-app.js')) { fwrite(STDERR, 'build/admin-app.js is missing. Run yarn build first: the admin UI strings are extracted from the compiled bundle, because wp i18n make-pot does not read .tsx sources.' . PHP_EOL); exit(1); }\"",
+      "wp i18n make-pot . languages/storeseeder.pot --domain=storeseeder --exclude=node_modules,vendor,drafts,docs,release,tests"
+    ],
     "release": [
       "@lint",
       "@analyse",

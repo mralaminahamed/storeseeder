@@ -161,7 +161,7 @@ composer lint                # WordPress coding standards (phpcs)
 composer format              # Auto-fix coding standards (phpcbf)
 composer analyse             # Static analysis (PHPStan, level 7)
 composer phpcs:plugin-review # WordPress.org plugin review ruleset
-composer makepot             # Regenerate the translation template
+composer makepot             # Regenerate the translation template (needs build/, so yarn build first)
 composer release             # Lint + analyse + build + makepot + zip
 composer zip:dev             # Development zip at release/dev/storeseeder.zip
 ```

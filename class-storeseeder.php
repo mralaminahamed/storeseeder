@@ -472,7 +472,7 @@ class StoreSeeder {
 			return;
 		}
 
-		$asset_file = STORESEEDER_PLUGIN_PATH . 'build/admin.asset.php';
+		$asset_file = STORESEEDER_PLUGIN_PATH . 'build/admin-app.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
@@ -494,7 +494,7 @@ class StoreSeeder {
 
 		wp_enqueue_script(
 			'storeseeder-admin',
-			STORESEEDER_PLUGIN_URL . 'build/admin.js',
+			STORESEEDER_PLUGIN_URL . 'build/admin-app.js',
 			$deps,
 			$version,
 			true
@@ -502,7 +502,7 @@ class StoreSeeder {
 
 		wp_enqueue_style(
 			'storeseeder-admin',
-			STORESEEDER_PLUGIN_URL . 'build/admin.css',
+			STORESEEDER_PLUGIN_URL . 'build/admin-app.css',
 			array(),
 			$version
 		);

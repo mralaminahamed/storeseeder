@@ -69,7 +69,7 @@ Useful extras:
 ```bash
 composer test:coverage          # HTML coverage report in tests/coverage/html
 composer phpcs:plugin-review    # Stricter ruleset used for directory review
-composer makepot                # Regenerate languages/storeseeder.pot after string changes
+composer makepot                # Regenerate languages/storeseeder.pot (run yarn build first)
 phpunit --filter ClassName::testMethod
 ```
 

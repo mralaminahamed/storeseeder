@@ -28,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The admin interface is translatable.** None of it was, for two independent reasons.
+  `wp i18n make-pot` does not read `.tsx` sources, so every string in the React admin — "New
+  generation", "Add to batch", the generator descriptions, the settings labels — was absent
+  from the translation template; they are now extracted from the compiled bundle, taking it
+  from 347 entries to 632. And the bundle was named `admin.js`, which WP-CLI mistakes for a
+  minified file: it rewrote the reference to `build/a.js`, so translations would have been
+  filed under a name WordPress never looks for. The bundle is `admin-app.js` now.
 - The dependency notes on each generator page were passed to the translation function as a
   variable, so they were never extracted and could not be translated.
 - Settings stored in the browser are validated field by field when read, so a value left by an
