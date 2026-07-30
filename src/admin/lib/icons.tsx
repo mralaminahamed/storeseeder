@@ -54,11 +54,6 @@ const ICONS: Record<string, string> = {
   refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/>',
   globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
   rocket: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
-  // Brand mark: a store basket with a sprout growing out of it — the same two motifs as
-  // .wordpress-org/icon.svg, composed to stay legible at 18-20px. Kept in sync with
-  // StoreSeeder::get_menu_icon(), which draws this mark for the WordPress admin menu.
-  storeseeder:
-    '<path d="M3.2 9.4h17.6"/><path d="M5.3 9.4l1.4 7.4a2 2 0 0 0 2 1.6h6.6a2 2 0 0 0 2-1.6l1.4-7.4"/><path d="M12 9.2V3.9"/><path d="M11.9 7.1c-1.1-1.4-3-1.3-3.6.2 1.4 1.2 3.1 1.1 3.6-.2Z" fill="currentColor" stroke="none"/><path d="M12.1 5.6c.7-1.5 2.6-1.7 3.3-.7-.7 1.5-2.6 1.8-3.3.7Z" fill="currentColor" stroke="none"/>',
 };
 
 export function Icon({ name, size = 18, stroke = 1.75, fill = "none", className = "", style = {} }:

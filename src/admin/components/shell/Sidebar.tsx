@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Icon } from "@/admin/lib/icons";
+import { BrandIcon } from "@/admin/components/ui/BrandIcon";
 import { generators } from "@/admin/lib/generators";
 
 // ---------------------------------------------------------------------------
@@ -69,9 +70,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
     <nav className={"fp-nav" + (collapsed ? " collapsed" : "")} data-testid="sidebar">
       {/* Brand */}
       <div className="fp-brand">
-        <div className="fp-brand-mark">
-          <Icon name="storeseeder" size={18} />
-        </div>
+        <BrandIcon className="fp-brand-mark" size={30} />
         {!collapsed && (
           <div className="fp-brand-text">
             <div className="fp-brand-name">StoreSeeder</div>
