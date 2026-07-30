@@ -79,6 +79,7 @@ storeseeder-sample-data-fluent-cart/
 
 # Claude AI
 .claude/
+/.remember/
 
 # Temporary files
 *.tmp
