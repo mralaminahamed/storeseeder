@@ -60,6 +60,14 @@ export default [
       // on its own when it runs at all.
       'prettier/prettier': 'off',
 
+      // WordPress's preset asks for braces everywhere. This codebase is written
+      // with single-line early returns and guards — `if (!open) return null;` —
+      // and with no Prettier pass wired in behind --fix, "all" rewrites those to
+      // `if (!open) {return null;}` and leaves them that way. `multi-line` keeps
+      // the existing style legal and still requires braces the moment a body
+      // spans lines, which is the case the rule exists for.
+      curly: ['error', 'multi-line'],
+
       '@wordpress/no-unused-vars-before-return': 'error',
       '@wordpress/valid-sprintf': 'error',
       '@wordpress/i18n-text-domain': ['error', { allowedTextDomain: 'storeseeder' }],
@@ -88,15 +96,24 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
 
-      // The signature is the types, not a comment above them. On a component
-      // taking destructured props these ask for @param root0, root0.size,
-      // root0.className — names that appear nowhere in the source and document
-      // nothing. Prose JSDoc is still expected; only the tag audit is off.
+  // The signature is the types, not a comment above them. On a component taking
+  // destructured props these ask for @param root0, root0.size, root0.className —
+  // names that appear nowhere in the source. Worse, --fix writes them in: it put
+  // a bare `@param angle` above every helper in tests/e2e/. Prose JSDoc is still
+  // expected; only the tag audit is off, and for every TypeScript file, not just
+  // the ones under src/.
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
       'jsdoc/require-param': 'off',
       'jsdoc/require-param-type': 'off',
+      'jsdoc/require-param-description': 'off',
       'jsdoc/require-returns': 'off',
       'jsdoc/require-returns-type': 'off',
+      'jsdoc/require-returns-description': 'off',
     },
   },
 
