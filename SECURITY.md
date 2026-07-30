@@ -18,7 +18,7 @@ We take security vulnerabilities seriously. If you discover a security vulnerabi
 
 Instead, please report security vulnerabilities by emailing:
 
-- **Email**: me@alaminahamed.com
+- **Email**: alamin.ahamed.dev@gmail.com
 - **Subject**: [SECURITY] StoreSeeder - Brief Description
 
 ### What to Include
@@ -300,7 +300,7 @@ Security researchers who responsibly disclose vulnerabilities will be:
 
 ### Security Team
 
-- **Primary Email**: me@alaminahamed.com
+- **Primary Email**: alamin.ahamed.dev@gmail.com
 - **Website**: https://github.com/mralaminahamed/storeseeder/security
 - **Response Time**: Within 48 hours
 
