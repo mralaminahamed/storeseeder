@@ -91,5 +91,5 @@
   "browserslist": [
     "extends @wordpress/browserslist-config"
   ],
-  "packageManager": "yarn@4.11.0"
+  "packageManager": "yarn@4.18.0"
 }
