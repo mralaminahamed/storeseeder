@@ -58,6 +58,22 @@ use StoreSeeder\MCP\MCP_Server;
 class StoreSeeder {
 
 	/**
+	 * User meta key recording that the MCP hint was dismissed
+	 *
+	 * @since 1.0.1
+	 * @var string
+	 */
+	const MCP_NOTICE_DISMISSED_META = 'storeseeder_mcp_notice_dismissed';
+
+	/**
+	 * AJAX action, and nonce action, for dismissing the MCP hint
+	 *
+	 * @since 1.0.1
+	 * @var string
+	 */
+	const MCP_NOTICE_DISMISS_ACTION = 'storeseeder_dismiss_mcp_notice';
+
+	/**
 	 * Single instance of the plugin class
 	 *
 	 * Implements the singleton pattern to ensure only one instance of the plugin
@@ -114,6 +130,7 @@ class StoreSeeder {
 		register_deactivation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
 
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
+		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
@@ -1039,9 +1056,9 @@ class StoreSeeder {
 		 * but without any hint at all, MCP silently does nothing and there is
 		 * no way to find out why.
 		 */
-		if ( null !== $screen && 'toplevel_page_storeseeder' === $screen->id && ! $this->is_mcp_adapter_active() ) {
+		if ( null !== $screen && 'toplevel_page_storeseeder' === $screen->id && ! $this->is_mcp_adapter_active() && ! $this->is_mcp_notice_dismissed() ) {
 			printf(
-				'<div class="notice notice-info is-dismissible"><p>%s</p></div>',
+				'<div class="notice notice-info is-dismissible storeseeder-mcp-notice"><p>%s</p></div>',
 				sprintf(
 					/* translators: 1: opening anchor tag, 2: closing anchor tag */
 					esc_html__( 'StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators.', 'storeseeder' ),
@@ -1049,7 +1066,87 @@ class StoreSeeder {
 					'</a>'
 				)
 			);
+
+			$this->print_mcp_notice_dismiss_script();
 		}
+	}
+
+	/**
+	 * Whether the current user has dismissed the MCP hint
+	 *
+	 * Stored per user rather than per site: one administrator closing a hint is
+	 * not a decision for their colleagues.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return bool True when this user has dismissed it.
+	 */
+	private function is_mcp_notice_dismissed(): bool {
+		$user_id = get_current_user_id();
+
+		if ( 0 === $user_id ) {
+			return false;
+		}
+
+		return (bool) get_user_meta( $user_id, self::MCP_NOTICE_DISMISSED_META, true );
+	}
+
+	/**
+	 * Print the script that remembers a dismissal
+	 *
+	 * WordPress adds the notice's close button on DOM ready and then only hides
+	 * the notice client-side, so without this the hint returns on the next page
+	 * load. The listener is delegated from the document because the button does
+	 * not exist yet when this runs.
+	 *
+	 * Inlined rather than enqueued so that dismissal keeps working even if the
+	 * admin bundle is missing — the notice is most useful exactly when something
+	 * about the install is off.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return void
+	 */
+	private function print_mcp_notice_dismiss_script(): void {
+		$script = sprintf(
+			'document.addEventListener( "click", function ( event ) {
+	if ( ! event.target.classList.contains( "notice-dismiss" ) ) {
+		return;
+	}
+	if ( ! event.target.closest( ".storeseeder-mcp-notice" ) ) {
+		return;
+	}
+	var body = new FormData();
+	body.append( "action", %s );
+	body.append( "nonce", %s );
+	fetch( %s, { method: "POST", credentials: "same-origin", body: body } );
+} );',
+			wp_json_encode( self::MCP_NOTICE_DISMISS_ACTION ),
+			wp_json_encode( wp_create_nonce( self::MCP_NOTICE_DISMISS_ACTION ) ),
+			wp_json_encode( admin_url( 'admin-ajax.php' ) )
+		);
+
+		wp_print_inline_script_tag( $script );
+	}
+
+	/**
+	 * Record that the current user dismissed the MCP hint
+	 *
+	 * @since 1.0.1
+	 * @hooked wp_ajax_storeseeder_dismiss_mcp_notice
+	 *
+	 * @return void
+	 */
+	public function ajax_dismiss_mcp_notice(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'storeseeder' ) ), 403 );
+		}
+
+		check_ajax_referer( self::MCP_NOTICE_DISMISS_ACTION, 'nonce' );
+
+		update_user_meta( get_current_user_id(), self::MCP_NOTICE_DISMISSED_META, 1 );
+
+		wp_send_json_success( array( 'dismissed' => true ) );
 	}
 
 	/**
