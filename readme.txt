@@ -161,7 +161,6 @@ Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS,
 
 [Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
 
-== Other Notes ==
 
 **Privacy**
 
