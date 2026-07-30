@@ -3,6 +3,7 @@ import { __ } from "@wordpress/i18n";
 
 import { useTheme, type Accent, type Theme, type Density } from "@/admin/theme/useTheme";
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 
 interface TweaksPanelProps {
   onClose: () => void;
@@ -72,7 +73,7 @@ function resolveTokenHex(token: string, theme: string, accent: string): string {
 interface SegOption<T> {
   v: T;
   label: string;
-  ic?: string;
+  ic?: IconName;
 }
 
 function Seg<T extends string>({

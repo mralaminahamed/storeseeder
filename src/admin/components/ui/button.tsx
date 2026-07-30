@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 import { cn } from "@/admin/lib/utils";
 
 // ── variant / size maps ─────────────────────────────────────────────────────
@@ -65,9 +66,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	/** FP icon name to render before children */
-	icon?: string;
+	icon?: IconName;
 	/** FP icon name to render after children */
-	iconRight?: string;
+	iconRight?: IconName;
 	/** Radix asChild back-compat (no-op — renders a plain button) */
 	asChild?: boolean;
 }

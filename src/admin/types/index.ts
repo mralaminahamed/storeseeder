@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { IconName } from "@/admin/lib/icons";
 
 declare global {
   interface Window {
@@ -62,8 +62,8 @@ export interface Generator {
   name: string;
   category: string;
   order: number;
-  icon: LucideIcon;
-  iconName: string;
+  /** Key into the ICONS registry in lib/icons.tsx. */
+  iconName: IconName;
   description: string;
   useCase?: string;
   route: string;

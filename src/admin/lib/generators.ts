@@ -1,22 +1,3 @@
-import {
-  Package,
-  Users,
-  ShoppingCart,
-  Tag,
-  Settings,
-  Truck,
-  DollarSign,
-  CreditCard,
-  ShoppingBag,
-  Layers,
-  ReceiptText,
-  ScrollText,
-  Boxes,
-  Tags,
-  Percent,
-  Download,
-  Repeat,
-} from "lucide-react";
 
 import { __ } from "@wordpress/i18n";
 
@@ -29,7 +10,6 @@ export const generators: Generator[] = [
     name: __("Products", "storeseeder"),
     category: __("Core", "storeseeder"),
     order: 1,
-    icon: Package,
     iconName: "box",
     description: __(
       "Create realistic products with prices, categories, inventory, and variations. Perfect for testing your store catalog and product pages.",
@@ -131,7 +111,6 @@ export const generators: Generator[] = [
     name: __("Customers", "storeseeder"),
     category: __("Core", "storeseeder"),
     order: 2,
-    icon: Users,
     iconName: "users",
     description: __(
       "Generate customer profiles with addresses, purchase history, and loyalty data. Essential for testing user accounts and customer management.",
@@ -222,7 +201,6 @@ export const generators: Generator[] = [
     name: __("Orders", "storeseeder"),
     category: __("Core", "storeseeder"),
     order: 3,
-    icon: ShoppingCart,
     iconName: "cart",
     description: __(
       "Create complete order histories with payments, shipping, and tax calculations. Test your checkout flow and order management system.",
@@ -302,8 +280,7 @@ export const generators: Generator[] = [
     name: __("Coupons", "storeseeder"),
     category: __("Core", "storeseeder"),
     order: 4,
-    icon: Tag,
-    iconName: "tag",
+    iconName: "ticket",
     description: __(
       "Generate discount codes with various rules and restrictions. Perfect for testing promotional campaigns and discount logic.",
       "storeseeder",
@@ -360,8 +337,7 @@ export const generators: Generator[] = [
     name: __("Product Variations", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 1,
-    icon: Settings,
-    iconName: "sliders",
+    iconName: "branch",
     description: __(
       "Create complex product variations with size, color, and material options. Essential for testing variable product functionality.",
       "storeseeder",
@@ -417,7 +393,6 @@ export const generators: Generator[] = [
     name: __("Shipping Plans", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 2,
-    icon: Truck,
     iconName: "truck",
     description: __(
       "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows.",
@@ -466,8 +441,7 @@ export const generators: Generator[] = [
     name: __("Tax Classes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 3,
-    icon: DollarSign,
-    iconName: "dollar",
+    iconName: "landmark",
     description: __(
       "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance.",
       "storeseeder",
@@ -532,7 +506,6 @@ export const generators: Generator[] = [
     name: __("Transactions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 4,
-    icon: CreditCard,
     iconName: "card",
     description: __(
       "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation.",
@@ -594,7 +567,6 @@ export const generators: Generator[] = [
     name: __("Cart Sessions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 5,
-    icon: ShoppingBag,
     iconName: "bag",
     description: __(
       "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics.",
@@ -660,8 +632,7 @@ export const generators: Generator[] = [
     name: __("Attributes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 6,
-    icon: Layers,
-    iconName: "layers",
+    iconName: "listtree",
     description: __(
       "Generate product attributes such as Text, Color, and Image types. Attributes can be used to define product variations and filtering options.",
       "storeseeder",
@@ -681,8 +652,7 @@ export const generators: Generator[] = [
     name: __("Refunds", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 7,
-    icon: ReceiptText,
-    iconName: "receipt",
+    iconName: "coins",
     description: __(
       "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs.",
       "storeseeder",
@@ -708,7 +678,6 @@ export const generators: Generator[] = [
     name: __("Logs", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 8,
-    icon: ScrollText,
     iconName: "scroll",
     description: __(
       "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails.",
@@ -735,7 +704,6 @@ export const generators: Generator[] = [
     name: __("Shipping Classes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 9,
-    icon: Boxes,
     iconName: "boxes",
     description: __(
       "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag.",
@@ -749,7 +717,6 @@ export const generators: Generator[] = [
     name: __("Labels", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 10,
-    icon: Tags,
     iconName: "tags",
     description: __(
       "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to.",
@@ -763,7 +730,6 @@ export const generators: Generator[] = [
     name: __("Order Tax Lines", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 11,
-    icon: Percent,
     iconName: "percent",
     description: __(
       "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates.",
@@ -777,7 +743,6 @@ export const generators: Generator[] = [
     name: __("Product Downloads", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 12,
-    icon: Download,
     iconName: "download",
     description: __(
       "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products.",
@@ -791,7 +756,6 @@ export const generators: Generator[] = [
     name: __("Subscriptions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
     order: 13,
-    icon: Repeat,
     iconName: "repeat",
     description: __(
       "Generate subscription records against existing orders. The table ships in core; active billing requires Fluent Cart Pro. Requires existing orders and products.",

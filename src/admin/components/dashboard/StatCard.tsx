@@ -1,10 +1,11 @@
 import React from "react";
 import { __ } from "@wordpress/i18n";
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 import { Sparkline } from "./Sparkline";
 
 interface StatCardProps {
-  iconName: string;
+  iconName: IconName;
   label: string;
   value: number;
   empty: boolean;

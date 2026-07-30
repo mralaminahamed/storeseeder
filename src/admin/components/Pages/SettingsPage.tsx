@@ -8,6 +8,7 @@ import { NumberField } from "@/admin/components/generator/fields/NumberField";
 import { TextField } from "@/admin/components/generator/fields/TextField";
 import { FieldSelect } from "@/admin/components/generator/fields/FieldSelect";
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 import {
   CONSENT_CHANGED_EVENT,
   requestConsentPrompt,
@@ -42,7 +43,7 @@ function SetCard({
   danger,
   children,
 }: {
-  icon: string;
+  icon: IconName;
   title: string;
   desc: string;
   danger?: boolean;
@@ -138,7 +139,7 @@ export default function SettingsPage() {
 
   // Three small helpers rather than ternary chains in the markup: each of these
   // picks between three states, which reads as a branch per state.
-  const syncIcon = (): string => {
+  const syncIcon = (): IconName => {
     if (statusLoading) return "refresh";
     return syncStatus?.exists ? "check2" : "alert";
   };

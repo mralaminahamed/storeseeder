@@ -5,6 +5,7 @@ import { __ } from "@wordpress/i18n";
 
 import { generators } from "@/admin/lib/generators";
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 
 interface CommandPaletteProps {
   onClose: () => void;
@@ -14,7 +15,7 @@ interface CmdItem {
   key: string;
   name: string;
   grp: string;
-  ic: string;
+  ic: IconName;
   path: string;
 }
 

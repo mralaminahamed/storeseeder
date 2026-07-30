@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Icon } from "@/admin/lib/icons";
+import type { IconName } from "@/admin/lib/icons";
 import { BrandIcon } from "@/admin/components/ui/BrandIcon";
 import { generators } from "@/admin/lib/generators";
 
@@ -33,7 +34,7 @@ const GROUPS: Array<{ id: string; label: string }> = [
 interface NavItemProps {
   to: string;
   label: string;
-  ic: string;
+  ic: IconName;
   count?: number;
   active: boolean;
   collapsed: boolean;
