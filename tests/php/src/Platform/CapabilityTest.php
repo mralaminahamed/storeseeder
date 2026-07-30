@@ -110,6 +110,42 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 		$this->assertTrue( $platform->supports()[ Resource::SUBSCRIPTION ]->is_supported() );
 	}
 
+	/**
+	 * A driver that claims a resource but ships no writer for it is a driver bug.
+	 * Saying so plainly beats letting the run fail once per requested item and
+	 * report a generic "generation failed" that names neither half.
+	 */
+	public function test_declared_support_without_a_writer_is_reported(): void {
+		add_filter(
+			'storeseeder_platforms',
+			static function ( array $platforms ): array {
+				// Claims every resource, provides no writers at all.
+				$platforms[] = new StubPlatform( 'stub-cart', true );
+				return $platforms;
+			}
+		);
+		Registry::reset();
+
+		$platform = Registry::instance()->get( 'stub-cart' );
+
+		$this->assertTrue( $platform->supports()[ Resource::PRODUCT ]->is_supported() );
+		$this->assertNull( $platform->writer( Resource::PRODUCT ) );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		do_action( 'rest_api_init' );
+
+		$request = new \WP_REST_Request( 'POST', '/storeseeder/v1/products/generate' );
+		$request->set_param( 'count', 1 );
+		$request->set_param( 'platform', 'stub-cart' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( 'storeseeder_missing_writer', $data['code'] );
+		$this->assertStringContainsString( 'no writer', $data['message'] );
+	}
+
 	public function test_resource_names_are_stable(): void {
 		$this->assertCount( 17, Resource::all() );
 		$this->assertTrue( Resource::exists( 'product' ) );

@@ -5,7 +5,65 @@
 
 // Define plugin directories..
 define( 'TEST_STORESEEDER_DIR', dirname( __DIR__, 2 ) );
-define( 'TEST_FC_DIR', dirname( __DIR__, 3 ) . '/fluent-cart' );
+define( 'TEST_PLUGINS_DIR', dirname( __DIR__, 3 ) );
+define( 'TEST_FC_DIR', TEST_PLUGINS_DIR . '/fluent-cart' );
+
+/**
+ * Platforms the suite knows how to load.
+ *
+ * Keyed by platform id so a driver test can ask for one by the same name the registry
+ * uses. Each entry names the plugin directory (its main file is assumed to share the
+ * name) and the driver namespace segment under StoreSeeder\Platforms.
+ *
+ * A platform is only loaded when StoreSeeder actually ships a driver for it. That is
+ * not caution for its own sake: booting a plugin from a test bootstrap means meeting
+ * whatever its main file expects, and EasyCommerce for one fatals with
+ * "Class EasyCommerce\Bootstrap\Activator not found" because its own autoloader has
+ * not run yet. A platform with no driver contributes nothing to the suite, so loading
+ * it is pure risk -- and by the time a driver lands, whoever writes it is the right
+ * person to work out how that plugin wants to be booted.
+ *
+ * @var array<string, array{dir: string, driver: string}>
+ */
+const TEST_PLATFORMS = array(
+	'fluent-cart'  => array(
+		'dir'    => 'fluent-cart',
+		'driver' => 'Fluent_Cart',
+	),
+	'woocommerce'  => array(
+		'dir'    => 'woocommerce',
+		'driver' => 'Woo_Commerce',
+	),
+	'storeengine'  => array(
+		'dir'    => 'storeengine',
+		'driver' => 'Store_Engine',
+	),
+	'easycommerce' => array(
+		'dir'    => 'easycommerce',
+		'driver' => 'Easy_Commerce',
+	),
+);
+
+/**
+ * Whether a platform's plugin is on disk next to this checkout.
+ *
+ * @param string $id Platform id.
+ *
+ * @return bool
+ */
+function storeseeder_test_platform_available( string $id ): bool {
+	$spec = TEST_PLATFORMS[ $id ] ?? null;
+
+	if ( null === $spec ) {
+		return false;
+	}
+
+	if ( ! class_exists( 'StoreSeeder\\Platforms\\' . $spec['driver'] . '\\Platform' ) ) {
+		return false;
+	}
+
+	return file_exists( TEST_PLUGINS_DIR . '/' . $spec['dir'] . '/' . $spec['dir'] . '.php' );
+}
 
 // Composer autoloader must be loaded before WP_PHPUNIT__DIR will be available.
 require_once TEST_STORESEEDER_DIR . '/vendor/autoload.php';
@@ -47,8 +105,13 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugins being tested
  */
 function _manually_load_plugin() {
-	// Load Fluent Cart if the directory exists.
-	require TEST_FC_DIR . '/fluent-cart.php';
+	// Load whichever platforms are present. Requiring one unconditionally is what
+	// made the suite unrunnable without Fluent Cart specifically.
+	foreach ( TEST_PLATFORMS as $id => $spec ) {
+		if ( storeseeder_test_platform_available( $id ) ) {
+			require TEST_PLUGINS_DIR . '/' . $spec['dir'] . '/' . $spec['dir'] . '.php';
+		}
+	}
 
 	// Load our plugin.
 	require TEST_STORESEEDER_DIR . '/storeseeder.php';
@@ -61,7 +124,7 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
  */
 function install_fluent_cart() {
 	// Skip if Fluent Cart doesn't exist..
-	if ( ! file_exists( TEST_FC_DIR . '/fluent-cart.php' ) ) {
+	if ( ! storeseeder_test_platform_available( 'fluent-cart' ) ) {
 		echo 'Warning: Fluent Cart plugin not found. Some tests may fail.' . PHP_EOL;
 		return;
 	}

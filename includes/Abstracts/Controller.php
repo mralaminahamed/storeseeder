@@ -395,6 +395,27 @@ abstract class Controller extends WP_REST_Controller {
 			);
 		}
 
+		// A driver that claims a resource but ships no writer for it is a bug in the
+		// driver, and one worth naming plainly: without this check the run proceeds,
+		// fails once per requested item, and reports a generic "generation failed"
+		// that says nothing about which of the two halves is missing.
+		if ( null === $platform->writer( $resource_type ) ) {
+			return new WP_Error(
+				'storeseeder_missing_writer',
+				sprintf(
+					/* translators: 1: platform display name, 2: resource name. */
+					__( '%1$s reports that it can generate %2$s but provides no writer for it. This is a fault in the platform driver.', 'storeseeder' ),
+					$platform->label(),
+					$resource_type
+				),
+				array(
+					'status'   => 500,
+					'platform' => $platform->id(),
+					'resource' => $resource_type,
+				)
+			);
+		}
+
 		return $platform;
 	}
 

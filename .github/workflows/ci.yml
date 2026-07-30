@@ -151,14 +151,22 @@ jobs:
           mkdir -p /tmp/wordpress
           tar xzf /tmp/wordpress.tar.gz -C /tmp/wordpress --strip-components=1
 
-      - name: Download Fluent Cart plugin
-        # The test bootstrap loads Fluent Cart from a sibling directory and
-        # installs its schema through DBMigrator, so the plugin has to be on
-        # disk next to this checkout before PHPUnit boots.
+      - name: Download platform plugins
+        # The test bootstrap loads each supported platform from a sibling directory
+        # and installs its schema, so they have to be on disk next to this checkout
+        # before PHPUnit boots. A platform that fails to download is skipped rather
+        # than fatal: its driver's tests then skip too, which is the same thing that
+        # happens on a contributor's machine that has only some of them installed.
         run: |
-          wget -q -O /tmp/fluent-cart.zip https://downloads.wordpress.org/plugin/fluent-cart.latest-stable.zip
-          unzip -q /tmp/fluent-cart.zip -d /tmp/fluent-cart
-          mv /tmp/fluent-cart/fluent-cart ../fluent-cart
+          for slug in fluent-cart woocommerce storeengine easycommerce; do
+            if wget -q -O "/tmp/${slug}.zip" "https://downloads.wordpress.org/plugin/${slug}.latest-stable.zip"; then
+              unzip -q "/tmp/${slug}.zip" -d "/tmp/${slug}-src"
+              mv "/tmp/${slug}-src/${slug}" "../${slug}"
+              echo "::notice::${slug} available for tests"
+            else
+              echo "::warning::${slug} could not be downloaded; its driver tests will skip"
+            fi
+          done
 
       - name: Run PHPUnit
         env:

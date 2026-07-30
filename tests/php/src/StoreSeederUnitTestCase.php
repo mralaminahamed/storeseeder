@@ -8,6 +8,7 @@
 namespace StoreSeeder\Tests;
 
 use Brain\Monkey;
+use StoreSeeder\Platform\Registry;
 use WP_REST_Request;
 use WP_REST_Server;
 use WP_UnitTestCase;
@@ -92,8 +93,27 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 	 * @return void
 	 */
 	protected function require_fluent_cart(): void {
-		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			$this->markTestSkipped( 'Fluent Cart is not active in the test environment.' );
+		$this->require_platform( 'fluent-cart' );
+	}
+
+	/**
+	 * Skip unless one platform's driver can actually write.
+	 *
+	 * Driver tests need the platform itself on disk, and a contributor will rarely
+	 * have all of them. Skipping is the honest outcome — a driver test that passes
+	 * without its platform present is testing nothing.
+	 *
+	 * @param string $id Platform id, as the registry knows it.
+	 *
+	 * @return void
+	 */
+	protected function require_platform( string $id ): void {
+		$platform = Registry::instance()->get( $id );
+
+		if ( null === $platform || ! $platform->is_active() ) {
+			$this->markTestSkipped(
+				sprintf( '%s is not active in the test environment.', $id )
+			);
 		}
 	}
 
