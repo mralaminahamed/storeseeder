@@ -24,6 +24,13 @@ async function hideWpChrome(page: import('@playwright/test').Page) {
          not to this plugin. */
       .helpwp-widget { display: none !important; }
 
+      /* Admin notices describe the capture machine, not the plugin — a listing
+         screenshot should not open with "mcp-adapter is not installed". */
+      #wpbody-content > .notice,
+      #wpbody-content > .updated,
+      #wpbody-content > .error,
+      .notice, .update-nag, .updated, .error { display: none !important; }
+
       /* The plugin picks up the admin colour scheme through these variables,
          so whoever captures the screenshots would otherwise decide what colour
          the listing is. Pin them to the plugin's own indigo so the screenshots
@@ -45,163 +52,35 @@ test.describe('Screenshots', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
   });
 
-  test('1. Dashboard', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/`);
-    await page.getByTestId('app-shell').waitFor();
-    await page.getByTestId('generator-grid').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(1000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-1.png'),
-      fullPage: true,
+  /**
+   * The five shots .wordpress-org/README.md asks for, in its order. Viewport
+   * captures rather than fullPage, so every file lands at exactly 1440x900 —
+   * the directory renders them in a fixed-size carousel, and mismatched heights
+   * jump about as the visitor pages through.
+   */
+  const SHOTS = [
+    { file: 'screenshot-1.png', hash: '', wait: 'generator-grid' },
+    { file: 'screenshot-2.png', hash: '#/generator/products', wait: 'preview-table' },
+    { file: 'screenshot-3.png', hash: '#/generator/customers', wait: 'preview-table' },
+    { file: 'screenshot-4.png', hash: '#/generator/orders', wait: 'preview-table' },
+    { file: 'screenshot-5.png', hash: '#/settings', wait: null },
+  ] as const;
+
+  for (const [index, shot] of SHOTS.entries()) {
+    test(`${index + 1}. ${shot.file}`, async ({ page }) => {
+      await page.goto(`${PLUGIN_URL}${shot.hash}`, { waitUntil: 'domcontentloaded' });
+
+      if (shot.wait) {
+        await page.getByTestId(shot.wait).waitFor({ timeout: 20_000 });
+      } else {
+        await page.getByTestId('sidebar').waitFor({ timeout: 20_000 });
+      }
+
+      await hideWpChrome(page);
+      // Let the preview request settle so no row renders mid-fetch.
+      await page.waitForTimeout(1200);
+
+      await page.screenshot({ path: join(SCREENSHOT_DIR, shot.file) });
     });
-  });
-
-  test('2. Generator page - Products', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/generator/products`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('preview-table').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(1000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-2.png'),
-      fullPage: true,
-    });
-  });
-
-  test('3. Live preview with shuffle', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/generator/products`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('preview-table').waitFor();
-    await hideWpChrome(page);
-    const shuffleBtn = page.getByTestId('shuffle-btn');
-    if (await shuffleBtn.isVisible()) {
-      await shuffleBtn.click();
-      await page.waitForTimeout(500);
-    }
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-3.png'),
-      fullPage: true,
-    });
-  });
-
-  test('4. Command palette', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/`);
-    await page.getByTestId('app-shell').waitFor();
-    await hideWpChrome(page);
-    await page.keyboard.press('Meta+k');
-    await page.getByTestId('command-palette').waitFor();
-    await page.waitForTimeout(500);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-4.png'),
-      fullPage: false,
-    });
-    await page.keyboard.press('Escape');
-  });
-
-  test('5. Batch queue', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/generator/products`);
-    await page.getByTestId('generator-runbar').waitFor();
-
-    await page.getByTestId('add-to-batch').click();
-    await page.getByTestId('batch-chip').waitFor({ timeout: 5000 });
-
-    await page.goto(`${PLUGIN_URL}#/generator/customers`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('add-to-batch').click();
-
-    await page.goto(`${PLUGIN_URL}#/generator/orders`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('add-to-batch').click();
-
-    await hideWpChrome(page);
-    await page.getByTestId('batch-chip').waitFor({ timeout: 5000 });
-    await page.getByTestId('batch-chip').click();
-    await page.getByTestId('batch-tray').waitFor();
-    await page.waitForTimeout(500);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-5.png'),
-      fullPage: false,
-    });
-  });
-
-  test('6. Tweaks panel', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/`);
-    await page.getByTestId('app-shell').waitFor();
-    await hideWpChrome(page);
-    await page.getByTestId('tweaks-button').click();
-    await page.getByTestId('tweaks-panel').waitFor();
-    await page.waitForTimeout(500);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-6.png'),
-      fullPage: false,
-    });
-  });
-
-  test('7. Dark mode', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/`);
-    await page.getByTestId('app-shell').waitFor();
-    await hideWpChrome(page);
-    await page.getByTestId('tweaks-button').click();
-    await page.getByTestId('tweaks-panel').waitFor();
-    await page.getByTestId('tweaks-panel').getByRole('button', { name: /Dark/i }).click();
-    await page.waitForTimeout(500);
-    await page.getByTestId('tweaks-panel').getByRole('button', { name: /Close/i }).click();
-    await page.waitForTimeout(500);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-7.png'),
-      fullPage: true,
-    });
-    // Reset
-    await page.getByTestId('tweaks-button').click();
-    await page.getByTestId('tweaks-panel').waitFor();
-    await page.getByTestId('tweaks-panel').getByRole('button', { name: /Light/i }).click();
-    await page.getByTestId('tweaks-panel').getByRole('button', { name: /Close/i }).click();
-  });
-
-  test('8. Settings page', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/settings`);
-    await page.getByTestId('app-shell').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(1000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-8.png'),
-      fullPage: true,
-    });
-  });
-
-  test('9. Our Plugins page', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/plugins`);
-    await page.getByTestId('app-shell').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(3000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-9.png'),
-      fullPage: true,
-    });
-  });
-
-  test('10. Subscriptions Generator', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/generator/subscriptions`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('preview-table').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(1000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-10.png'),
-      fullPage: true,
-    });
-  });
-
-  test('11. Product Downloads Generator', async ({ page }) => {
-    await page.goto(`${PLUGIN_URL}#/generator/product_downloads`);
-    await page.getByTestId('generator-runbar').waitFor();
-    await page.getByTestId('preview-table').waitFor();
-    await hideWpChrome(page);
-    await page.waitForTimeout(1000);
-    await page.screenshot({
-      path: join(SCREENSHOT_DIR, 'screenshot-11.png'),
-      fullPage: true,
-    });
-  });
+  }
 });
