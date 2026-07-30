@@ -229,4 +229,72 @@ class Product extends Generator {
 
 		return $product->ID;
 	}
+
+	/**
+	 * Preview columns for products
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<int, array{key: string, label: string}>
+	 */
+	protected function get_preview_columns(): array {
+		return array(
+			array(
+				'key'   => 'name',
+				'label' => __( 'Name', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'sku',
+				'label' => __( 'SKU', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'price',
+				'label' => __( 'Price', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'stock',
+				'label' => __( 'Stock', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'status',
+				'label' => __( 'Status', 'storeseeder' ),
+			),
+		);
+	}
+
+	/**
+	 * Build a product preview row
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<string, array{v: mixed, kind: string}>
+	 */
+	protected function build_preview_row(): array {
+		$faker = $this->get_faker();
+
+		return array(
+			'name'   => array(
+				// words() without the $asText flag returns an array, which joins
+				// cleanly — asking for the string form types as array|string.
+				'v'    => ucwords( implode( ' ', (array) $faker->words( 3 ) ) ),
+				'kind' => 'text',
+			),
+			'sku'    => array(
+				'v'    => 'SKU-' . $faker->numberBetween( 1000, 9999 ),
+				'kind' => 'mono',
+			),
+			'price'  => array(
+				'v'    => '$' . number_format( $faker->randomFloat( 2, 5, 500 ), 2 ),
+				'kind' => 'money',
+			),
+			'stock'  => array(
+				'v'    => $faker->numberBetween( 0, 250 ),
+				'kind' => 'num',
+			),
+			'status' => array(
+				'v'    => $faker->randomElement( array( 'publish', 'draft', 'pending' ) ),
+				'kind' => 'status',
+			),
+		);
+	}
 }

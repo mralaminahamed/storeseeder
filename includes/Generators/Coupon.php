@@ -184,4 +184,71 @@ class Coupon extends Generator {
 
 		return $coupon->id;
 	}
+
+	/**
+	 * Preview columns for coupons
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<int, array{key: string, label: string}>
+	 */
+	protected function get_preview_columns(): array {
+		return array(
+			array(
+				'key'   => 'code',
+				'label' => __( 'Code', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'type',
+				'label' => __( 'Type', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'amount',
+				'label' => __( 'Amount', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'limit',
+				'label' => __( 'Usage limit', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'status',
+				'label' => __( 'Status', 'storeseeder' ),
+			),
+		);
+	}
+
+	/**
+	 * Build a coupon preview row
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<string, array{v: mixed, kind: string}>
+	 */
+	protected function build_preview_row(): array {
+		$faker      = $this->get_faker();
+		$percentage = (bool) $faker->boolean();
+
+		return array(
+			'code'   => array(
+				'v'    => strtoupper( $faker->lexify( '????' ) ) . $faker->numberBetween( 10, 99 ),
+				'kind' => 'mono',
+			),
+			'type'   => array(
+				'v'    => $percentage ? 'percentage' : 'fixed',
+				'kind' => 'badge',
+			),
+			'amount' => array(
+				'v'    => $percentage ? $faker->numberBetween( 5, 50 ) . '%' : '$' . number_format( $faker->randomFloat( 2, 5, 100 ), 2 ),
+				'kind' => 'money',
+			),
+			'limit'  => array(
+				'v'    => $faker->numberBetween( 1, 500 ),
+				'kind' => 'num',
+			),
+			'status' => array(
+				'v'    => $faker->randomElement( array( 'active', 'expired', 'scheduled' ) ),
+				'kind' => 'status',
+			),
+		);
+	}
 }
