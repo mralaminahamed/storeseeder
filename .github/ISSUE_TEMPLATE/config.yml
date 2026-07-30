@@ -3,9 +3,15 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/mralaminahamed/storeseeder/blob/trunk/SECURITY.md
     about: Do not file publicly. Email alamin.ahamed.dev@gmail.com — see the security policy.
+  - name: Documentation
+    url: https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/README.md
+    about: Installation, usage, features, architecture, and the development guide.
   - name: Usage question or help
     url: https://github.com/mralaminahamed/storeseeder/blob/trunk/SUPPORT.md
     about: Check the docs and the support guide before opening an issue.
+  - name: Contributing a fix
+    url: https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md
+    about: Setup, coding standards, and the checks a pull request needs to pass.
   - name: Fluent Cart support
     url: https://wordpress.org/support/plugin/fluent-cart/
     about: Questions about Fluent Cart itself, not the test data StoreSeeder generates.
