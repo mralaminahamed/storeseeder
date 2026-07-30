@@ -464,4 +464,70 @@ class Order extends Generator {
 			)
 		);
 	}
+
+	/**
+	 * Preview columns for orders
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<int, array{key: string, label: string}>
+	 */
+	protected function get_preview_columns(): array {
+		return array(
+			array(
+				'key'   => 'number',
+				'label' => __( 'Order', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'customer',
+				'label' => __( 'Customer', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'items',
+				'label' => __( 'Items', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'total',
+				'label' => __( 'Total', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'status',
+				'label' => __( 'Status', 'storeseeder' ),
+			),
+		);
+	}
+
+	/**
+	 * Build an order preview row
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<string, array{v: mixed, kind: string}>
+	 */
+	protected function build_preview_row(): array {
+		$faker = $this->get_faker();
+
+		return array(
+			'number'   => array(
+				'v'    => '#' . $faker->numberBetween( 1000, 99999 ),
+				'kind' => 'mono',
+			),
+			'customer' => array(
+				'v'    => $faker->firstName() . ' ' . $faker->lastName(),
+				'kind' => 'text',
+			),
+			'items'    => array(
+				'v'    => $faker->numberBetween( 1, 8 ),
+				'kind' => 'num',
+			),
+			'total'    => array(
+				'v'    => '$' . number_format( $faker->randomFloat( 2, 10, 2000 ), 2 ),
+				'kind' => 'money',
+			),
+			'status'   => array(
+				'v'    => $faker->randomElement( array( 'completed', 'processing', 'on-hold', 'refunded', 'failed' ) ),
+				'kind' => 'status',
+			),
+		);
+	}
 }

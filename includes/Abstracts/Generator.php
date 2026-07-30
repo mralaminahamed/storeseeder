@@ -407,11 +407,89 @@ abstract class Generator {
 	}
 
 	/**
-	 * Validate generation count
+	 * Build a read-only preview of what generation would produce
 	 *
-	 * Ensures the requested generation count is within acceptable limits
-	 * to prevent memory exhaustion, timeout issues, and performance problems.
-	 * Validates that count is positive and doesn't exceed the maximum batch size.
+	 * Nothing is persisted: rows come from FakerPHP and loaded sample data only,
+	 * which is what makes this safe to call on every parameter change in the
+	 * admin's live preview table.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param int $count Number of preview rows to build. Clamped to 1–25.
+	 *
+	 * @return array{columns: array<int, array{key: string, label: string}>, rows: array<int, array<string, array{v: mixed, kind: string}>>}
+	 */
+	public function preview( int $count ): array {
+		// Clamped so a preview stays cheap no matter what the caller asks for —
+		// it feeds a table that redraws on every parameter change.
+		$count = max( 1, min( 25, $count ) );
+		$rows  = array();
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			$rows[] = $this->build_preview_row();
+		}
+
+		return array(
+			'columns' => $this->get_preview_columns(),
+			'rows'    => $rows,
+		);
+	}
+
+	/**
+	 * Column definitions for the preview table
+	 *
+	 * Each column is an array of:
+	 *   - 'key'   (string) matching a key in every preview row.
+	 *   - 'label' (string) header text.
+	 *
+	 * Concrete generators override this to describe their own resource.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<int, array{key: string, label: string}>
+	 */
+	protected function get_preview_columns(): array {
+		return array(
+			array(
+				'key'   => 'id',
+				'label' => __( 'ID', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'value',
+				'label' => __( 'Value', 'storeseeder' ),
+			),
+		);
+	}
+
+	/**
+	 * Build one representative preview row
+	 *
+	 * Uses FakerPHP and loaded sample data only — this must never write to the
+	 * database, because it runs on every keystroke in the admin.
+	 *
+	 * Each cell is an array of:
+	 *   - 'v'    (mixed)  display value.
+	 *   - 'kind' (string) rendering hint: mono | money | num | status | badge | stars | text.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<string, array{v: mixed, kind: string}>
+	 */
+	protected function build_preview_row(): array {
+		return array(
+			'id'    => array(
+				'v'    => $this->get_faker()->numberBetween( 10000, 99999 ),
+				'kind' => 'mono',
+			),
+			'value' => array(
+				'v'    => $this->get_faker()->words( 2, true ),
+				'kind' => 'text',
+			),
+		);
+	}
+
+	/**
+	 * Validate the requested count
 	 *
 	 * @since 1.0.0
 	 *

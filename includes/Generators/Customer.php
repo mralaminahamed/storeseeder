@@ -839,4 +839,75 @@ class Customer extends Generator {
 
 		return 'bronze';
 	}
+
+	/**
+	 * Preview columns for customers
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<int, array{key: string, label: string}>
+	 */
+	protected function get_preview_columns(): array {
+		return array(
+			array(
+				'key'   => 'name',
+				'label' => __( 'Name', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'email',
+				'label' => __( 'Email', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'city',
+				'label' => __( 'City', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'country',
+				'label' => __( 'Country', 'storeseeder' ),
+			),
+			array(
+				'key'   => 'orders',
+				'label' => __( 'Orders', 'storeseeder' ),
+			),
+		);
+	}
+
+	/**
+	 * Build a customer preview row
+	 *
+	 * Mirrors the fields generate_single_item() fills in, without touching the
+	 * database.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @return array<string, array{v: mixed, kind: string}>
+	 */
+	protected function build_preview_row(): array {
+		$faker = $this->get_faker();
+		$first = $faker->firstName();
+		$last  = $faker->lastName();
+
+		return array(
+			'name'    => array(
+				'v'    => $first . ' ' . $last,
+				'kind' => 'text',
+			),
+			'email'   => array(
+				'v'    => strtolower( $first . '.' . $last ) . '@example.com',
+				'kind' => 'mono',
+			),
+			'city'    => array(
+				'v'    => $faker->city(),
+				'kind' => 'text',
+			),
+			'country' => array(
+				'v'    => $faker->countryCode(),
+				'kind' => 'badge',
+			),
+			'orders'  => array(
+				'v'    => $faker->numberBetween( 0, 50 ),
+				'kind' => 'num',
+			),
+		);
+	}
 }
