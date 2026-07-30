@@ -9,15 +9,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-22T01:13:55+00:00\n"
+"POT-Creation-Date: 2026-07-30T16:24:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:163
-#: class-storeseeder.php:164
+#: class-storeseeder.php:187
+#: class-storeseeder.php:188
 #: includes/MCP/MCP_Server.php:87
 #: includes/MCP/MCP_Server.php:140
 msgid "StoreSeeder"
@@ -43,20 +43,50 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:777
+#: class-storeseeder.php:215
+msgid "Generate Data"
+msgstr ""
+
+#: class-storeseeder.php:220
+msgid "Settings"
+msgstr ""
+
+#: class-storeseeder.php:246
+msgid "Documentation"
+msgstr ""
+
+#: class-storeseeder.php:251
+msgid "Support"
+msgstr ""
+
+#: class-storeseeder.php:256
+msgid "GitHub"
+msgstr ""
+
+#: class-storeseeder.php:1101
 msgid "StoreSeeder requires Fluent Cart plugin to be installed and active."
+msgstr ""
+
+#. translators: 1: opening anchor tag, 2: closing anchor tag
+#: class-storeseeder.php:1118
+#, php-format
+msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
+msgstr ""
+
+#: class-storeseeder.php:1196
+msgid "You are not allowed to do that."
 msgstr ""
 
 #: includes/Abstracts/Ability.php:85
 msgid "Unknown REST error."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:178
+#: includes/Abstracts/Controller.php:229
 msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Abstracts/Controller.php:226
+#: includes/Abstracts/Controller.php:277
 #, php-format
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
@@ -64,84 +94,84 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of items that could not be created.
-#: includes/Abstracts/Controller.php:233
+#: includes/Abstracts/Controller.php:284
 #, php-format
 msgid "%s could not be created."
 msgid_plural "%s could not be created."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Abstracts/Controller.php:294
+#: includes/Abstracts/Controller.php:345
 msgid "Sorry, you are not allowed to generate fake data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:317
+#: includes/Abstracts/Controller.php:368
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:326
+#: includes/Abstracts/Controller.php:377
 msgid "Locale for generated data (e.g., en_US, fr_FR, de_DE)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:333
+#: includes/Abstracts/Controller.php:384
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:339
+#: includes/Abstracts/Controller.php:390
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:345
+#: includes/Abstracts/Controller.php:396
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:349
+#: includes/Abstracts/Controller.php:400
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:356
+#: includes/Abstracts/Controller.php:407
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:365
+#: includes/Abstracts/Controller.php:416
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:369
+#: includes/Abstracts/Controller.php:420
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:374
+#: includes/Abstracts/Controller.php:425
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:381
+#: includes/Abstracts/Controller.php:432
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:385
+#: includes/Abstracts/Controller.php:436
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:390
+#: includes/Abstracts/Controller.php:441
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:425
+#: includes/Abstracts/Controller.php:476
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:451
+#: includes/Abstracts/Controller.php:502
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Abstracts/Controller.php:473
+#: includes/Abstracts/Controller.php:524
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Abstracts/Controller.php:477
+#: includes/Abstracts/Controller.php:528
 msgid "Number of items generated."
 msgstr ""
 
@@ -151,12 +181,20 @@ msgstr ""
 msgid "Generation failed: %s"
 msgstr ""
 
-#: includes/Abstracts/Generator.php:426
+#: includes/Abstracts/Generator.php:455
+msgid "ID"
+msgstr ""
+
+#: includes/Abstracts/Generator.php:459
+msgid "Value"
+msgstr ""
+
+#: includes/Abstracts/Generator.php:504
 msgid "Count must be a positive number."
 msgstr ""
 
 #. translators: %d: Maximum batch size
-#: includes/Abstracts/Generator.php:435
+#: includes/Abstracts/Generator.php:513
 #, php-format
 msgid "Count cannot exceed %d items per batch."
 msgstr ""
@@ -278,6 +316,7 @@ msgid "Generated coupons data."
 msgstr ""
 
 #: includes/Controllers/Customer.php:58
+#: includes/Generators/Order.php:483
 msgid "Customer"
 msgstr ""
 
@@ -318,6 +357,7 @@ msgid "Severity types to generate."
 msgstr ""
 
 #: includes/Controllers/Order.php:58
+#: includes/Generators/Order.php:479
 msgid "Order"
 msgstr ""
 
@@ -678,6 +718,28 @@ msgstr ""
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
+#: includes/Generators/Coupon.php:199
+msgid "Code"
+msgstr ""
+
+#: includes/Generators/Coupon.php:203
+msgid "Type"
+msgstr ""
+
+#: includes/Generators/Coupon.php:207
+msgid "Amount"
+msgstr ""
+
+#: includes/Generators/Coupon.php:211
+msgid "Usage limit"
+msgstr ""
+
+#: includes/Generators/Coupon.php:215
+#: includes/Generators/Order.php:495
+#: includes/Generators/Product.php:260
+msgid "Status"
+msgstr ""
+
 #: includes/Generators/Customer.php:71
 msgid "Customer Profiles with Addresses and Metadata"
 msgstr ""
@@ -700,6 +762,27 @@ msgstr ""
 
 #: includes/Generators/Customer.php:261
 msgid "Failed to create customer using Fluent Cart model."
+msgstr ""
+
+#: includes/Generators/Customer.php:854
+#: includes/Generators/Product.php:244
+msgid "Name"
+msgstr ""
+
+#: includes/Generators/Customer.php:858
+msgid "Email"
+msgstr ""
+
+#: includes/Generators/Customer.php:862
+msgid "City"
+msgstr ""
+
+#: includes/Generators/Customer.php:866
+msgid "Country"
+msgstr ""
+
+#: includes/Generators/Customer.php:870
+msgid "Orders"
 msgstr ""
 
 #: includes/Generators/Label.php:86
@@ -754,6 +837,14 @@ msgstr ""
 msgid "Failed to create order using Fluent Cart model."
 msgstr ""
 
+#: includes/Generators/Order.php:487
+msgid "Items"
+msgstr ""
+
+#: includes/Generators/Order.php:491
+msgid "Total"
+msgstr ""
+
 #: includes/Generators/Order_Tax_Rate.php:65
 msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active."
 msgstr ""
@@ -780,6 +871,18 @@ msgstr ""
 
 #: includes/Generators/Product.php:163
 msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Generators/Product.php:248
+msgid "SKU"
+msgstr ""
+
+#: includes/Generators/Product.php:252
+msgid "Price"
+msgstr ""
+
+#: includes/Generators/Product.php:256
+msgid "Stock"
 msgstr ""
 
 #: includes/Generators/Product_Download.php:66
