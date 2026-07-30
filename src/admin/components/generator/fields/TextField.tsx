@@ -4,11 +4,14 @@ interface TextFieldProps {
   value: string;
   onChange: (v: string) => void;
   ph?: string;
+  /** Lets a caller bind its own <label htmlFor> to this input. */
+  id?: string;
 }
 
-export function TextField({ value, onChange, ph }: TextFieldProps) {
+export function TextField({ value, onChange, ph, id }: TextFieldProps) {
   return (
     <input
+      id={id}
       className="fp-input fp-focusable"
       value={value}
       placeholder={ph}

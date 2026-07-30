@@ -131,51 +131,66 @@ export function PreviewTable({
       )
     : __("seed: random", "storeseeder");
 
+  // A branch per state instead of a ternary chain: an error, nothing to show, or
+  // the table itself.
+  const tableBody = (): JSX.Element => {
+    if (error) {
+      return (
+        <div className="fp-preview-state fp-preview-error">
+          <Icon name="alert" size={18} />
+          <span>{error}</span>
+        </div>
+      );
+    }
+
+    if (0 === columns.length) {
+      return (
+        <div className="fp-preview-state">
+          {loading
+            ? __("Loading preview…", "storeseeder")
+            : __("No preview available.", "storeseeder")}
+        </div>
+      );
+    }
+
+    return (
+      <table
+        className="fp-table"
+        style={loading ? { opacity: 0.55 } : undefined}
+      >
+        <thead>
+          <tr>
+            {cols.map((c) => (
+              <th key={c.key}>{c.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody key={token}>
+          {rows.map((row, i) => (
+            <tr key={i} style={{ animationDelay: `${i * 18}ms` }}>
+              {cols.map((c) =>
+                "_meta" === c.key ? (
+                  <td
+                    key={c.key}
+                    className="cell-mono"
+                    style={{ color: "var(--text-faint)" }}
+                  >
+                    created · src:faker
+                  </td>
+                ) : (
+                  <Cell key={c.key} cell={row[c.key]} />
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   return (
     <div className="fp-table-card" data-testid="preview-table">
-      <div className="fp-table-scroll">
-        {error ? (
-          <div className="fp-preview-state fp-preview-error">
-            <Icon name="alert" size={18} />
-            <span>{error}</span>
-          </div>
-        ) : columns.length === 0 ? (
-          <div className="fp-preview-state">
-            {loading
-              ? __("Loading preview…", "storeseeder")
-              : __("No preview available.", "storeseeder")}
-          </div>
-        ) : (
-          <table className="fp-table" style={loading ? { opacity: 0.55 } : undefined}>
-            <thead>
-              <tr>
-                {cols.map((c) => (
-                  <th key={c.key}>{c.label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody key={token}>
-              {rows.map((row, i) => (
-                <tr key={i} style={{ animationDelay: `${i * 18}ms` }}>
-                  {cols.map((c) =>
-                    c.key === "_meta" ? (
-                      <td
-                        key={c.key}
-                        className="cell-mono"
-                        style={{ color: "var(--text-faint)" }}
-                      >
-                        created · src:faker
-                      </td>
-                    ) : (
-                      <Cell key={c.key} cell={row[c.key]} />
-                    ),
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div className="fp-table-scroll">{tableBody()}</div>
       <div className="fp-table-foot">
         <span>
           {sprintf(

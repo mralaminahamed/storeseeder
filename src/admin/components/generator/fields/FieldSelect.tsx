@@ -6,9 +6,17 @@ interface FieldSelectProps {
   options: string[];
   onChange: (v: string) => void;
   width?: number;
+  /** Lets a caller bind its own <label htmlFor> to the trigger button. */
+  id?: string;
 }
 
-export function FieldSelect({ value, options, onChange, width }: FieldSelectProps) {
+export function FieldSelect({
+  value,
+  options,
+  onChange,
+  width,
+  id,
+}: FieldSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -28,8 +36,15 @@ export function FieldSelect({ value, options, onChange, width }: FieldSelectProp
       ref={ref}
       style={width ? { maxWidth: width } : undefined}
     >
+      {/* This is a combobox controlling a listbox, and it now says so: assistive
+          tech had no way to tell the trigger from an ordinary button, and no way
+          to know whether the list was open or which option was current. */}
       <button
+        id={id}
         type="button"
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
         className={`fp-select-btn fp-focusable${open ? " open" : ""}`}
         onClick={() => setOpen((o) => !o)}
       >
@@ -37,11 +52,13 @@ export function FieldSelect({ value, options, onChange, width }: FieldSelectProp
         <Icon name="updown" size={15} className="fp-select-caret" />
       </button>
       {open && (
-        <div className="fp-select-pop fp-pop">
+        <div className="fp-select-pop fp-pop" role="listbox">
           {options.map((o) => (
             <button
               key={o}
               type="button"
+              role="option"
+              aria-selected={o === value}
               className={`fp-select-opt${o === value ? " sel" : ""}`}
               onClick={() => {
                 onChange(o);

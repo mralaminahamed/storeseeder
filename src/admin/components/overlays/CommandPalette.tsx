@@ -81,19 +81,26 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   return (
     <div
       className="fp-overlay fp-cmd-overlay"
-      onMouseDown={onClose}
+      role="presentation"
+      // Closing on the backdrop itself, rather than stopping propagation inside
+      // the dialog, keeps the handler off the dialog element entirely.
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       data-testid="command-palette"
     >
       <div
         className="fp-cmd-box"
-        onMouseDown={(e) => e.stopPropagation()}
-        onKeyDown={onKey}
+        role="dialog"
+        aria-modal="true"
+        aria-label={__("Command palette", "storeseeder")}
       >
         <div className="fp-cmd-input-row">
           <Icon name="search" size={18} />
           <input
             ref={inputRef}
             className="fp-cmd-input"
+            onKeyDown={onKey}
             placeholder={__(
               "Search generators and pages…",
               "storeseeder",
@@ -116,7 +123,8 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                   {head && (
                     <div className="fp-cmd-group-label">{it.grp}</div>
                   )}
-                  <div
+                  <button
+                    type="button"
                     className={`fp-cmd-item${i === sel ? " sel" : ""}`}
                     onMouseEnter={() => setSel(i)}
                     onClick={() => choose(i)}
@@ -124,7 +132,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
                     <Icon name={it.ic} size={17} className="fp-cmd-ic" />
                     <span>{it.name}</span>
                     {i === sel && <span className="grp">↵</span>}
-                  </div>
+                  </button>
                 </React.Fragment>
               );
             })

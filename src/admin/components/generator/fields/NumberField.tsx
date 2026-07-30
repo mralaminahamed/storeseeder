@@ -7,6 +7,8 @@ interface NumberFieldProps {
   suffix?: string;
   ph?: string;
   width?: number;
+  /** Lets a caller bind its own <label htmlFor> to this input. */
+  id?: string;
 }
 
 export function NumberField({
@@ -16,6 +18,7 @@ export function NumberField({
   suffix,
   ph,
   width,
+  id,
 }: NumberFieldProps) {
   return (
     <div
@@ -24,6 +27,7 @@ export function NumberField({
     >
       {prefix && <span className="fp-affix">{prefix}</span>}
       <input
+        id={id}
         className={`fp-input fp-focusable tnum${prefix ? " has-prefix" : ""}${suffix ? " has-suffix" : ""}`}
         value={value}
         placeholder={ph}

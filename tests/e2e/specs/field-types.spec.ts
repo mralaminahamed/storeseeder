@@ -92,18 +92,18 @@ test.describe('Toggle field — Products: inventory > manage_stock', () => {
   });
 
   test('manage_stock toggle is present', async ({ page }) => {
-    const section = page.locator('[data-param="manage_stock"]');
+    const section = page.locator('[data-param="inventory.manage_stock"]');
     await expect(section).toBeVisible();
     await expect(section.locator('button[role="switch"]')).toBeVisible();
   });
 
   test('toggle is on by default', async ({ page }) => {
-    const section = page.locator('[data-param="manage_stock"]');
+    const section = page.locator('[data-param="inventory.manage_stock"]');
     await expect(section.locator('button[role="switch"]')).toHaveAttribute('aria-checked', 'true');
   });
 
   test('clicking toggle turns it off', async ({ page }) => {
-    const section = page.locator('[data-param="manage_stock"]');
+    const section = page.locator('[data-param="inventory.manage_stock"]');
     await section.locator('button[role="switch"]').click();
     await expect(section.locator('button[role="switch"]')).toHaveAttribute('aria-checked', 'false');
   });

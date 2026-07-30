@@ -136,6 +136,77 @@ export default function SettingsPage() {
     return () => window.removeEventListener(CONSENT_CHANGED_EVENT, onChanged);
   }, [refreshSyncStatus]);
 
+  // Three small helpers rather than ternary chains in the markup: each of these
+  // picks between three states, which reads as a branch per state.
+  const syncIcon = (): string => {
+    if (statusLoading) return "refresh";
+    return syncStatus?.exists ? "check2" : "alert";
+  };
+
+  const syncSummary = (): JSX.Element => {
+    if (statusLoading) {
+      return (
+        <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+          {__("Checking status…", "storeseeder")}
+        </div>
+      );
+    }
+
+    if (syncStatus?.exists) {
+      return (
+        <>
+          <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+            {__("Sample data is synced", "storeseeder")}
+          </div>
+          {syncStatus.last_synced && (
+            <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+              {sprintf(
+                /* translators: %s: date string */
+                __("Last updated: %s", "storeseeder"),
+                formatDate(syncStatus.last_synced) ?? "",
+              )}
+            </div>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <div style={{ fontSize: 13.5, fontWeight: 550 }}>
+          {__("Sample data not found", "storeseeder")}
+        </div>
+        <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+          {__(
+            "Sync to download locale-specific reference data.",
+            "storeseeder",
+          )}
+        </div>
+      </>
+    );
+  };
+
+  const consentHint = (): string => {
+    if ("granted" === syncStatus?.consent) {
+      return __(
+        "Automatic download is allowed. Revoke to stop downloading on visit.",
+        "storeseeder",
+      );
+    }
+
+    if ("declined" === syncStatus?.consent) {
+      return __(
+        "Automatic download is declined. Sync now reopens the consent prompt so you can allow it.",
+        "storeseeder",
+      );
+    }
+
+    return __(
+      "Nothing has been downloaded yet. Sync now asks for your permission first.",
+      "storeseeder",
+    );
+  };
+
   const handleSave = () => {
     saveSettings(settings);
     setSaved(true);
@@ -290,7 +361,7 @@ export default function SettingsPage() {
         >
           <div>
             <div className="fp-set-field">
-              <label className="fp-set-label">
+              <label className="fp-set-label" htmlFor="ss-default-count">
                 {__("Default count", "storeseeder")}
               </label>
               <p className="fp-set-hint">
@@ -300,6 +371,7 @@ export default function SettingsPage() {
                 )}
               </p>
               <NumberField
+                id="ss-default-count"
                 value={settings.defaultCount}
                 width={130}
                 onChange={(v) =>
@@ -309,7 +381,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="fp-set-field">
-              <label className="fp-set-label">
+              <label className="fp-set-label" htmlFor="ss-default-locale">
                 {__("Default locale", "storeseeder")}
               </label>
               <p className="fp-set-hint">
@@ -319,6 +391,7 @@ export default function SettingsPage() {
                 )}
               </p>
               <FieldSelect
+                id="ss-default-locale"
                 value={codeToLabel(settings.defaultLocale)}
                 options={localeLabels}
                 width={320}
@@ -327,7 +400,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="fp-set-field">
-              <label className="fp-set-label">
+              <label className="fp-set-label" htmlFor="ss-default-seed">
                 {__("Default seed", "storeseeder")}
               </label>
               <p className="fp-set-hint">
@@ -338,6 +411,7 @@ export default function SettingsPage() {
               </p>
               <div style={{ maxWidth: 220 }}>
                 <TextField
+                  id="ss-default-seed"
                   value={settings.defaultSeed}
                   ph={__("random (leave blank)", "storeseeder")}
                   onChange={(v) => set("defaultSeed", v)}
@@ -379,7 +453,7 @@ export default function SettingsPage() {
         >
           <div>
             <div className="fp-set-field">
-              <label className="fp-set-label">
+              <label className="fp-set-label" htmlFor="ss-max-runs">
                 {__("Max runs per generator", "storeseeder")}
               </label>
               <p className="fp-set-hint">
@@ -389,6 +463,7 @@ export default function SettingsPage() {
                 )}
               </p>
               <NumberField
+                id="ss-max-runs"
                 value={settings.maxRunsPerGenerator}
                 width={130}
                 onChange={(v) =>
@@ -419,50 +494,10 @@ export default function SettingsPage() {
           <div>
             <div className="fp-set-sync">
               <span className="fp-set-sync-ic">
-                <Icon
-                  name={
-                    statusLoading
-                      ? "refresh"
-                      : syncStatus?.exists
-                        ? "check2"
-                        : "alert"
-                  }
-                  size={19}
-                />
+                <Icon name={syncIcon()} size={19} />
               </span>
               <div>
-                {statusLoading ? (
-                  <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                    {__("Checking status…", "storeseeder")}
-                  </div>
-                ) : syncStatus?.exists ? (
-                  <>
-                    <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                      {__("Sample data is synced", "storeseeder")}
-                    </div>
-                    {syncStatus.last_synced && (
-                      <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                        {sprintf(
-                          /* translators: %s: date string */
-                          __("Last updated: %s", "storeseeder"),
-                          formatDate(syncStatus.last_synced) ?? "",
-                        )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div style={{ fontSize: 13.5, fontWeight: 550 }}>
-                      {__("Sample data not found", "storeseeder")}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
-                      {__(
-                        "Sync to download locale-specific reference data.",
-                        "storeseeder",
-                      )}
-                    </div>
-                  </>
-                )}
+                {syncSummary()}
               </div>
             </div>
 
@@ -479,20 +514,7 @@ export default function SettingsPage() {
             )}
 
             <p className="fp-set-hint" style={{ marginBottom: 12 }}>
-              {syncStatus?.consent === "granted"
-                ? __(
-                    "Automatic download is allowed. Revoke to stop downloading on visit.",
-                    "storeseeder",
-                  )
-                : syncStatus?.consent === "declined"
-                  ? __(
-                      "Automatic download is declined. Sync now reopens the consent prompt so you can allow it.",
-                      "storeseeder",
-                    )
-                  : __(
-                      "Nothing has been downloaded yet. Sync now asks for your permission first.",
-                      "storeseeder",
-                    )}
+              {consentHint()}
             </p>
 
             <div style={{ display: "flex", gap: 8 }}>

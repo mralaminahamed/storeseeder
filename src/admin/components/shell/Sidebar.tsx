@@ -52,7 +52,7 @@ function NavItem({ to, label, ic, count, active, collapsed, testId }: NavItemPro
     >
       <Icon name={ic} size={17} className="fp-nav-ic" stroke={1.7} />
       <span className="fp-nav-text">{label}</span>
-      {count != null && count > 0 && (
+      {"number" === typeof count && count > 0 && (
         <span className="fp-nav-count tnum">{count}</span>
       )}
     </button>

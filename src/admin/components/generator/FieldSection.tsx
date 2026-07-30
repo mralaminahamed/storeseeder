@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import type { FieldDescriptor } from "@/admin/lib/fieldsFromSchema";
 import type { ParamValue } from "@/admin/types";
 import { Toggle } from "@/admin/components/generator/fields/Toggle";
@@ -34,10 +34,10 @@ function isRange(v: ParamValue): v is { lo: number; hi: number } {
  * Renders a single field control based on the FieldDescriptor type.
  *
  * A switch rather than a ternary chain: it dispatches on one discriminant, and the
- * chain it replaced nested five deep. Captions are a `<label>` only where the
- * control underneath is a real input — chips, ranges and the custom select are
- * built from buttons, so those groups carry `role="group"` and an `aria-label`
- * instead of a label pointing at nothing.
+ * chain it replaced nested five deep. A caption is a `<label htmlFor>` wherever
+ * there is a single control to bind to — the inputs, and the select's trigger
+ * button. Chips and ranges have no such element, so those carry `role="group"`
+ * and an `aria-label` rather than a label pointing at nothing.
  */
 export function Field({
   f,
@@ -45,6 +45,7 @@ export function Field({
   onChange,
   hideLabel,
 }: FieldProps): JSX.Element {
+  const controlId = `ss-field-${useId().replace(/:/g, "")}`;
   if ("toggle" === f.type) {
     // Toggle owns its own label rendering — ignore hideLabel.
     return (
@@ -60,6 +61,7 @@ export function Field({
         // NumberField accepts `number | string` as value and calls onChange with a
         // string. Callers that need a number must parse.
         <NumberField
+          id={controlId}
           value={asNumeric(value) || (f.default as number | string) || ""}
           prefix={f.prefix}
           suffix={f.suffix}
@@ -67,24 +69,31 @@ export function Field({
           width={160}
         />
       ) : (
-        <TextField value={asText(value)} ph={f.ph} onChange={onChange} />
+        <TextField
+          id={controlId}
+          value={asText(value)}
+          ph={f.ph}
+          onChange={onChange}
+        />
       );
 
-    // Both wrap a native input, so containing it in the label associates the two
-    // without needing an id to thread through.
+    // Both render a native input, so the caption binds to it by id.
     return (
       <div className="fp-field" data-param={f.key}>
-        {hideLabel ? (
-          control
-        ) : (
-          <label>
-            <span className="fp-field-label">{f.label}</span>
-            {control}
+        {!hideLabel && (
+          <label className="fp-field-label" htmlFor={controlId}>
+            {f.label}
           </label>
         )}
+        {control}
       </div>
     );
   }
+
+  // Chips and ranges are built from buttons and a custom slider, so there is no
+  // single control for a caption to point at; the select's trigger is a button,
+  // which htmlFor may bind to.
+  const isGroup = "chips" === f.type || "range" === f.type;
 
   let control: JSX.Element;
   switch (f.type) {
@@ -112,6 +121,7 @@ export function Field({
     default:
       control = (
         <FieldSelect
+          id={controlId}
           value={asText(value) || (f.default as string) || ""}
           options={f.options ?? []}
           onChange={onChange}
@@ -124,10 +134,17 @@ export function Field({
     <div
       className="fp-field"
       data-param={f.key}
-      role="group"
-      aria-label={f.label}
+      role={isGroup ? "group" : undefined}
+      aria-label={isGroup ? f.label : undefined}
     >
-      {!hideLabel && <span className="fp-field-label">{f.label}</span>}
+      {!hideLabel &&
+        (isGroup ? (
+          <span className="fp-field-label">{f.label}</span>
+        ) : (
+          <label className="fp-field-label" htmlFor={controlId}>
+            {f.label}
+          </label>
+        ))}
       {control}
     </div>
   );

@@ -119,6 +119,7 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
       <div
         className="fp-overlay"
         style={{ background: "transparent", backdropFilter: "none" }}
+        role="presentation"
         onMouseDown={onClose}
       />
       <aside className="fp-tweaks" data-testid="tweaks-panel">
@@ -217,16 +218,17 @@ export function TweaksPanel({ onClose }: TweaksPanelProps) {
                         <Icon name="refresh" size={13} />
                       </button>
                     )}
-                    <label
+                    <span
                       className={`fp-color-swatch${overridden ? " on" : ""}`}
                       style={{ background: value }}
                     >
                       <input
                         type="color"
+                        aria-label={label}
                         value={value}
                         onChange={(e) => setCustomColor(token, e.target.value)}
                       />
-                    </label>
+                    </span>
                   </div>
                 );
               })}

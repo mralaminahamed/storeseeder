@@ -33,6 +33,7 @@ export function BatchTray({ onClose }: BatchTrayProps) {
       <div
         className="fp-overlay"
         style={{ background: "color-mix(in oklch,#000 30%,transparent)" }}
+        role="presentation"
         onMouseDown={onClose}
       />
       <aside className="fp-batch" data-testid="batch-tray">

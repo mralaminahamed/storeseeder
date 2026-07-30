@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 
 import { Icon } from "@/admin/lib/icons";
@@ -15,6 +16,16 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
   const labels = Object.values(all).filter(Boolean).sort();
   const options = labels.length > 0 ? labels : [locale];
 
+  // Escape closes it. Previously the only way out was a click, which left keyboard
+  // users stuck in the overlay.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ("Escape" === e.key) onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
   return (
     <div
       className="fp-overlay"
@@ -23,13 +34,18 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
         justifyContent: "center",
         paddingTop: "14vh",
       }}
-      onMouseDown={onClose}
+      role="presentation"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       data-testid="locale-picker"
     >
       <div
         className="fp-cmd-box"
         style={{ width: "min(420px,92vw)" }}
-        onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={__("Default locale", "storeseeder")}
       >
         <div className="fp-cmd-input-row">
           <Icon name="globe" size={18} />
@@ -39,8 +55,9 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
         </div>
         <div className="fp-cmd-results">
           {options.map((l) => (
-            <div
+            <button
               key={l}
+              type="button"
               className={`fp-cmd-item${l === locale ? " sel" : ""}`}
               onClick={() => {
                 setLocale(l);
@@ -56,7 +73,7 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
                   style={{ marginLeft: "auto", color: "var(--accent)" }}
                 />
               )}
-            </div>
+            </button>
           ))}
         </div>
       </div>

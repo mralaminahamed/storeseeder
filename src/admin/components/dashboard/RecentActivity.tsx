@@ -46,8 +46,9 @@ export function RecentActivity({ runs }: RecentActivityProps) {
         const meta = [localePart, seedPart].filter(Boolean).join(" ");
 
         return (
-          <div
+          <button
             key={i}
+            type="button"
             className="fp-recent-row"
             onClick={() => void navigate(`/generator/${run.route}`)}
           >
@@ -62,7 +63,7 @@ export function RecentActivity({ runs }: RecentActivityProps) {
             </div>
             <StatusPill>{run.success ? __("Success", "storeseeder") : __("Error", "storeseeder")}</StatusPill>
             <span className="fp-recent-time">{timeAgo(run.timestamp)}</span>
-          </div>
+          </button>
         );
       })}
     </div>

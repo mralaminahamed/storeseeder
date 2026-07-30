@@ -117,8 +117,8 @@
 .fp-root .fp-btn[disabled] { opacity:.5; pointer-events:none; }
 
 /* ===== toggle ===== */
-.fp-root .fp-toggle-row { display:flex; align-items:center; gap:11px; cursor:pointer; }
-.fp-root .fp-switch { width:38px; height:22px; border-radius:999px; background:var(--border-strong); border:none; padding:0; position:relative; cursor:pointer; transition:background .18s; flex-shrink:0; }
+.fp-root .fp-toggle-row { display:flex; align-items:center; gap:11px; cursor:pointer; width:auto; }
+.fp-root .fp-switch { display:block; width:38px; height:22px; border-radius:999px; background:var(--border-strong); border:none; padding:0; position:relative; cursor:pointer; transition:background .18s; flex-shrink:0; }
 .fp-root .fp-switch.on { background:var(--accent); }
 .fp-root .fp-knob { position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.3); transition:transform .18s cubic-bezier(.3,1.4,.5,1); }
 .fp-root .fp-switch.on .fp-knob { transform:translateX(16px); }
@@ -222,6 +222,11 @@
 
 /* ===== recent activity ===== */
 .fp-root .fp-recent { padding:6px 6px; }
+/* Rows that navigate are <button>: a div with onClick is unreachable by keyboard.
+   These strip the native button chrome so the layout is unchanged. */
+.fp-root :where(button.fp-recent-row, button.fp-cmd-item, button.fp-toggle-row) {
+  width:100%; background:none; border:0; font:inherit; color:inherit; text-align:left;
+}
 .fp-root .fp-recent-row { display:flex; align-items:center; gap:13px; padding:var(--pad-row-y) var(--pad-row-x); border-radius:var(--r-md); cursor:pointer; }
 .fp-root .fp-recent-row:hover { background:var(--surface-inset); }
 .fp-root .fp-recent-ic { width:calc(var(--tile) - 6px); height:calc(var(--tile) - 6px); border-radius:8px; display:grid; place-items:center; background:var(--surface-inset); color:var(--text-2); flex-shrink:0; }
