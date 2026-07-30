@@ -126,3 +126,8 @@ components.json
 /*.log
 # Local GitHub Actions runner (act)
 .actrc
+
+# Playwright (e2e is dev-only; tests/ is already excluded)
+playwright.config.ts
+playwright.screenshots.config.ts
+test-results/

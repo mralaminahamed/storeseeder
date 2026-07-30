@@ -5,6 +5,11 @@
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report tests/e2e/report",
+    "test:e2e:screenshots": "playwright test --config=playwright.screenshots.config.ts --project=shots",
+    "test:e2e:setup": "bash tests/e2e/setup.sh",
     "packages-update": "wp-scripts packages-update"
   },
   "keywords": [

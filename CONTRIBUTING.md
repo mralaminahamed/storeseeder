@@ -101,6 +101,36 @@ WP_DB_PASS=secret composer test
 The WordPress test suite **drops every table sharing `WP_TABLE_PREFIX`** — never point it at a
 database you care about.
 
+### Browser tests (Playwright)
+
+The e2e suite drives a real WordPress install, so it needs one running with Fluent Cart and
+StoreSeeder active and `yarn build` already run:
+
+```bash
+cp tests/e2e/.env.test.example tests/e2e/.env.test   # set WP_BASE_URL and admin credentials
+yarn test:e2e                                        # all specs
+yarn test:e2e:ui                                     # interactive runner
+yarn test:e2e:report                                 # open the last HTML report
+```
+
+`tests/e2e/auth.setup.ts` logs in once and every spec reuses that session. Values already in the
+environment take precedence over `.env.test`, so CI can supply them directly.
+
+`yarn test:e2e:setup` is an optional helper that sets a known admin password through WP-CLI. It
+**overwrites that account's password** and asks for confirmation first — point it at a throwaway
+install only.
+
+### Regenerating the WordPress.org screenshots
+
+```bash
+yarn test:e2e:screenshots
+```
+
+Writes `screenshot-1.png` … `screenshot-11.png` into `.wordpress-org/`, hiding the WordPress admin
+chrome and pinning the viewport to 1440×900 so every image matches. It drives an installed Chrome
+(`channel: 'chrome'`), so no `playwright install` step is needed. Keep the captions in
+`readme.txt` in step with what the spec captures.
+
 ## Code Style
 
 Full detail lives in [AGENTS.md](AGENTS.md) and the phpcs/PHPStan configs. The essentials:
