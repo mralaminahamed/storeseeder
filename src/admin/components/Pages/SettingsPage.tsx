@@ -11,7 +11,11 @@ import { Icon } from "@/admin/lib/icons";
 import {
   CONSENT_CHANGED_EVENT,
   requestConsentPrompt,
+  readJsonBody,
+  bodyMessage,
+  parseSampleDataStatus,
 } from "@/admin/lib/consent";
+import type { SampleDataStatus } from "@/admin/lib/consent";
 import { getSettings, saveSettings } from "@/admin/lib/settings";
 import { useStats } from "@/admin/providers/StatsProvider";
 import { useToast } from "@/admin/providers/ToastProvider";
@@ -26,13 +30,6 @@ const SUPPORT_URL =
   "https://github.com/mralaminahamed/storeseeder/issues";
 const DOCS_URL =
   "https://github.com/mralaminahamed/storeseeder#readme";
-
-interface SyncStatus {
-  exists: boolean;
-  last_synced: string | null;
-  repo_url: string;
-  consent?: "granted" | "declined" | null;
-}
 
 // ---------------------------------------------------------------------------
 // Settings card shell
@@ -91,7 +88,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   // Sample data sync state
-  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<{
@@ -119,8 +116,8 @@ export default function SettingsPage() {
       fetch(`${restUrl}download-sample`, {
         headers: { "X-WP-Nonce": nonce },
       })
-        .then((r) => r.json())
-        .then((data: SyncStatus) => setSyncStatus(data))
+        .then((r) => readJsonBody(r))
+        .then((body) => setSyncStatus(parseSampleDataStatus(body)))
         .catch(() => setSyncStatus(null)),
     [restUrl, nonce],
   );
@@ -166,13 +163,20 @@ export default function SettingsPage() {
           },
           body: JSON.stringify({ force }),
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`);
-        setSyncResult({ ok: true, message: json.message });
+        const body = await readJsonBody(res);
+        if (!res.ok) {
+          throw new Error(bodyMessage(body, `HTTP ${res.status}`));
+        }
+        setSyncResult({
+          ok: true,
+          message: bodyMessage(body, __("Sample data synced.", "storeseeder")),
+        });
         const statusRes = await fetch(`${restUrl}download-sample`, {
           headers: { "X-WP-Nonce": nonce },
         });
-        if (statusRes.ok) setSyncStatus(await statusRes.json());
+        if (statusRes.ok) {
+          setSyncStatus(parseSampleDataStatus(await readJsonBody(statusRes)));
+        }
       } catch (err) {
         setSyncResult({
           ok: false,
@@ -200,8 +204,10 @@ export default function SettingsPage() {
           },
           body: JSON.stringify({ granted }),
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`);
+        const body = await readJsonBody(res);
+        if (!res.ok) {
+          throw new Error(bodyMessage(body, `HTTP ${res.status}`));
+        }
         setSyncResult({
           ok: true,
           message: granted
@@ -211,7 +217,9 @@ export default function SettingsPage() {
         const statusRes = await fetch(`${restUrl}download-sample`, {
           headers: { "X-WP-Nonce": nonce },
         });
-        if (statusRes.ok) setSyncStatus(await statusRes.json());
+        if (statusRes.ok) {
+          setSyncStatus(parseSampleDataStatus(await readJsonBody(statusRes)));
+        }
       } catch (err) {
         setSyncResult({
           ok: false,

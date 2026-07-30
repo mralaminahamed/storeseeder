@@ -25,8 +25,17 @@ function loadCustomColors(): CustomColors {
 	try {
 		const raw = localStorage.getItem("fp_custom_colors");
 		if (!raw) return {};
-		const parsed = JSON.parse(raw);
-		return parsed && typeof parsed === "object" ? parsed : {};
+		const parsed: unknown = JSON.parse(raw);
+		if (null === parsed || "object" !== typeof parsed) return {};
+
+		// Keep only the string entries: the value is whatever a previous build (or
+		// a hand-edited localStorage) left behind, and every consumer writes it
+		// straight into a CSS custom property.
+		const colors: CustomColors = {};
+		for (const [key, value] of Object.entries(parsed)) {
+			if ("string" === typeof value) colors[key] = value;
+		}
+		return colors;
 	} catch {
 		return {};
 	}

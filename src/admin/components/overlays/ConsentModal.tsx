@@ -7,18 +7,14 @@ import { Icon } from "@/admin/lib/icons";
 import {
   SHOW_CONSENT_EVENT,
   notifyConsentChanged,
+  readJsonBody,
+  bodyMessage,
+  parseSampleDataStatus,
 } from "@/admin/lib/consent";
 import { useToast } from "@/admin/providers/ToastProvider";
 
 const REPO_URL =
   "https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart";
-
-interface SampleStatus {
-  exists: boolean;
-  last_synced: string | null;
-  repo_url: string;
-  consent: "granted" | "declined" | null;
-}
 
 /**
  * Consent gate for the optional GitHub sample-data download.
@@ -60,13 +56,13 @@ export function ConsentModal() {
     let cancelled = false;
 
     fetch(`${restUrl}download-sample`, { headers: { "X-WP-Nonce": nonce } })
-      .then((r) => {
+      .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
+        return parseSampleDataStatus(await readJsonBody(r));
       })
-      .then((s: SampleStatus) => {
-        if (cancelled) return;
-        if (s.consent == null) {
+      .then((s) => {
+        if (cancelled || !s) return;
+        if (null === s.consent) {
           // Undecided: only prompt if the data isn't already present — a
           // pre-existing install should not be nagged.
           if (!s.exists) {
@@ -101,8 +97,10 @@ export function ConsentModal() {
         headers: { "Content-Type": "application/json", "X-WP-Nonce": nonce },
         body: JSON.stringify({ force: false }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`);
+      const body = await readJsonBody(res);
+      if (!res.ok) {
+        throw new Error(bodyMessage(body, `HTTP ${res.status}`));
+      }
       toast(__("Sample data downloaded", "storeseeder"));
       notifyConsentChanged();
       setOpen(false);
