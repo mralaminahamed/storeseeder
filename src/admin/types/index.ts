@@ -5,6 +5,7 @@ declare global {
     storeseederApi?: {
       restUrl?: string;
       restNonce?: string;
+      version?: string;
       ajaxUrl?: string;
       adminColors?: Record<string, string>;
       colorScheme?: string;

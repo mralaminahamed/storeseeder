@@ -475,6 +475,7 @@ class StoreSeeder {
 			array(
 				'restUrl'     => rest_url( 'storeseeder/v1/' ),
 				'restNonce'   => wp_create_nonce( 'wp_rest' ),
+				'version'     => defined( 'STORESEEDER_VERSION' ) ? STORESEEDER_VERSION : '',
 				'adminColors' => $admin_colors,
 				'colorScheme' => $current_color,
 				'locale'      => array(

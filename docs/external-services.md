@@ -22,7 +22,10 @@ either by accepting the one-time consent prompt shown on the plugin admin page, 
 **Sync now** on the Settings page.
 
 Declining costs you nothing functionally: every generator keeps working from built-in defaults. The
-decision is site-wide and can be changed from Settings at any time.
+decision is site-wide and can be changed from Settings at any time — **Sync now** allows and fetches,
+**Revoke** withdraws permission, and **Show consent prompt** reopens the original prompt so you can
+review it. The prompt itself only appears unprompted on a site that has not decided yet, and never on
+a site that already has the sample data.
 
 | | |
 |---|---|

@@ -4,6 +4,7 @@ import { __ } from "@wordpress/i18n";
 
 import { Button } from "@/admin/components/ui/button";
 import { Icon } from "@/admin/lib/icons";
+import { SHOW_CONSENT_EVENT } from "@/admin/lib/consent";
 import { useToast } from "@/admin/providers/ToastProvider";
 
 const REPO_URL =
@@ -21,14 +22,30 @@ interface SampleStatus {
  *
  * Mounted once at the app shell. Because the React app mounts only on the
  * plugin admin page, this overlay can never appear on any other admin screen.
- * Self-gating: shows only when the site-wide decision is undecided AND no
- * sample data is present yet.
+ * Self-gating on load: shows only when the site-wide decision is undecided AND
+ * no sample data is present yet, so a site that has already decided is never
+ * nagged.
+ *
+ * Settings can reopen it on demand via the SHOW_CONSENT_EVENT trigger, which
+ * bypasses that gate — otherwise the prompt would be unreachable once any
+ * decision had been recorded.
  */
 export function ConsentModal() {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ranRef = useRef(false);
+
+  // Settings asks for the prompt explicitly; ignore the load-time gate.
+  useEffect(() => {
+    const reopen = () => {
+      setBusy(false);
+      setOpen(true);
+    };
+
+    window.addEventListener(SHOW_CONSENT_EVENT, reopen);
+    return () => window.removeEventListener(SHOW_CONSENT_EVENT, reopen);
+  }, []);
 
   const api = window.storeseederApi;
   const restUrl = api?.restUrl ?? "";
