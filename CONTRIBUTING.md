@@ -73,6 +73,34 @@ composer makepot                # Regenerate languages/storeseeder.pot after str
 phpunit --filter ClassName::testMethod
 ```
 
+The same four commands run on every push and pull request — see
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml), which lints, analyses, builds,
+and runs PHPUnit across PHP 7.4 through 8.3.
+
+### First-time PHPUnit setup
+
+The suite needs the WordPress test library and a throwaway database. Install both once:
+
+```bash
+bash tests/php/bin/install-wp-tests.sh wordpress_test <db-user> <db-pass> localhost latest
+```
+
+Pass `true` as a sixth argument to skip database creation if `wordpress_test` already exists.
+Fluent Cart must be present as a sibling directory of this plugin — the bootstrap loads it and
+creates its tables through `FluentCart\Database\DBMigrator`, because Fluent Cart's own modules
+query them during `init`.
+
+Connection details come from environment variables declared in `phpunit.xml.dist`
+(`WP_DB_NAME`, `WP_DB_USER`, `WP_DB_PASS`, `WP_DB_HOST`, `WP_TABLE_PREFIX`, `WP_PATH`). Set any
+of them in your shell to override:
+
+```bash
+WP_DB_PASS=secret composer test
+```
+
+The WordPress test suite **drops every table sharing `WP_TABLE_PREFIX`** — never point it at a
+database you care about.
+
 ## Code Style
 
 Full detail lives in [AGENTS.md](AGENTS.md) and the phpcs/PHPStan configs. The essentials:

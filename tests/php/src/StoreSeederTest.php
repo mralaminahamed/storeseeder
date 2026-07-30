@@ -78,6 +78,16 @@ class StoreSeederTest extends StoreSeederUnitTestCase {
 	public function test_rest_routes_registered(): void {
 		$this->require_fluent_cart();
 
+		/*
+		 * Register through a controller rather than the plugin's rest_api_init
+		 * handler. That handler is behind check_dependencies(), which reads the
+		 * active_plugins option — and Brain Monkey (set up for every test in this
+		 * suite) stubs the hook and option layer, so the gate cannot be opened
+		 * from inside a test. Exercising the controller keeps the assertion about
+		 * route registration itself, which is what this test is for.
+		 */
+		( new \StoreSeeder\Controllers\Product() )->register_routes();
+
 		$routes = $this->server->get_routes();
 		$prefix = '/' . $this->namespace;
 

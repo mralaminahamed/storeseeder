@@ -1,0 +1,218 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - trunk
+      - main
+  pull_request:
+    branches:
+      - trunk
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  # ---------------------------------------------------------------------------
+  # JOB 1 — lint
+  # PHP CodeSniffer against WPCS rules.
+  # ---------------------------------------------------------------------------
+  lint:
+    name: "PHP Lint (PHPCS)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: composer-${{ runner.os }}-php74-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php74-
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHP CodeSniffer
+        run: composer phpcs
+
+  # ---------------------------------------------------------------------------
+  # JOB 2 — analyze
+  # PHPStan static analysis at configured level.
+  # ---------------------------------------------------------------------------
+  analyze:
+    name: "PHP Static Analysis (PHPStan)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: composer-${{ runner.os }}-php74-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php74-
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPStan
+        run: composer phpstan
+
+  # ---------------------------------------------------------------------------
+  # JOB 3 — test
+  # PHPUnit across the PHP version matrix.
+  # ---------------------------------------------------------------------------
+  test:
+    name: "PHP Tests (PHP ${{ matrix.php }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "7.4"
+          - "8.0"
+          - "8.1"
+          - "8.2"
+          - "8.3"
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: mysqli, json
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php${{ matrix.php }}-
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install WordPress for testing
+        run: |
+          wget -q -O /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz
+          mkdir -p /tmp/wordpress
+          tar xzf /tmp/wordpress.tar.gz -C /tmp/wordpress --strip-components=1
+
+      - name: Download Fluent Cart plugin
+        # The test bootstrap loads Fluent Cart from a sibling directory and
+        # installs its schema through DBMigrator, so the plugin has to be on
+        # disk next to this checkout before PHPUnit boots.
+        run: |
+          wget -q -O /tmp/fluent-cart.zip https://downloads.wordpress.org/plugin/fluent-cart.latest-stable.zip
+          unzip -q /tmp/fluent-cart.zip -d /tmp/fluent-cart
+          mv /tmp/fluent-cart/fluent-cart ../fluent-cart
+
+      - name: Run PHPUnit
+        env:
+          WP_DB_NAME:           wordpress_test
+          WP_DB_USER:           root
+          WP_DB_PASS:           root
+          WP_DB_HOST:           127.0.0.1
+          WP_PHPUNIT__DIR:      vendor/wp-phpunit/wp-phpunit
+          WP_PATH:              /tmp/wordpress
+        run: composer test
+
+  # ---------------------------------------------------------------------------
+  # JOB 4 — build
+  # Compile frontend assets to verify the build is not broken.
+  # ---------------------------------------------------------------------------
+  build:
+    name: "Frontend Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Bootstrap Node.js runtime (act compatibility)
+        # actions/setup-node@v6 requires `node` in $PATH to bootstrap itself.
+        # catthehacker/ubuntu:act-latest does not ship Node.js, so install via
+        # nvm when running under `act` (ACT env var is injected automatically).
+        if: ${{ env.ACT == 'true' }}
+        run: |
+          export NVM_DIR="$HOME/.nvm"
+          if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+            curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+          fi
+          . "$NVM_DIR/nvm.sh"
+          nvm install 24
+          nvm use 24
+          nvm alias default 24
+          echo "$NVM_DIR/versions/node/$(nvm version)/bin" >> "$GITHUB_PATH"
+
+      - name: Setup Node.js 24 (LTS)
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Cache Yarn node_modules
+        uses: actions/cache@v5
+        with:
+          path: node_modules
+          key: yarn-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn-${{ runner.os }}-
+
+      - name: Install Node dependencies & build assets
+        run: |
+          corepack enable yarn
+          yarn install --immutable
+          yarn build

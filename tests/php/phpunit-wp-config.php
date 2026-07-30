@@ -1,71 +1,61 @@
 <?php
-
-$wordpress_dir = dirname( __DIR__, 2 ) . '/wordpress/';
-if ( ! is_dir( $wordpress_dir ) ) {
-	$wordpress_dir = dirname( __DIR__, 5 ) . '/';
-}
-
-/* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
-define( 'ABSPATH', $wordpress_dir );
+/**
+ * WordPress test configuration for StoreSeeder.
+ *
+ * Every value is driven by an environment variable declared in
+ * phpunit.xml.dist, so the same file works locally and in CI — override any
+ * variable in your shell or workflow to change the target. Nothing secret is
+ * committed here.
+ *
+ * WARNING: the WordPress test suite DROPS AND RECREATES every table sharing
+ * WP_TABLE_PREFIX. Never point this at a production database.
+ *
+ * @package StoreSeeder\Tests
+ */
 
 /*
- * Path to the theme to test with.
- *
- * The 'default' theme is symlinked from test/phpunit/data/themedir1/default into
- * the themes directory of the WordPress installation defined above.
+ * Path to the WordPress installation used for testing. Defaults to the WP root
+ * five levels up (wp-content/plugins/storeseeder/tests/php), which is correct
+ * when the plugin sits inside a normal WordPress checkout.
  */
+define( 'ABSPATH', rtrim( getenv( 'WP_PATH' ) ?: dirname( __DIR__, 5 ), '/\\' ) . DIRECTORY_SEPARATOR );
+
+/* Active theme — kept as 'default' for headless CLI runs. */
 define( 'WP_DEFAULT_THEME', 'default' );
 
-// Test with multisite enabled.
-// Alternatively, use the tests/phpunit/multisite.xml configuration file.
-// define( 'WP_TESTS_MULTISITE', true );
-
-// Force known bugs to be run.
-// Tests with an associated Trac ticket that is still open are normally skipped.
-// define( 'WP_TESTS_FORCE_KNOWN_BUGS', true );
-
-// Test with WordPress debug mode (default).
+/* Debug settings — surface everything, but never onto stdout. */
 define( 'WP_DEBUG', true );
 define( 'WP_DEBUG_LOG', true );
 define( 'WP_DEBUG_DISPLAY', false );
 
-// ** MySQL features ** //
-
-// This configuration file will be used by the copy of WordPress being tested.
-// wordpress/wp-config.php will be ignored.
-
-// WARNING WARNING WARNING!
-// These tests will DROP ALL TABLES in the database with the prefix named below.
-// DO NOT use a production database or one that is shared with something else.
-
-define( 'DB_NAME', getenv( 'WP_DB_NAME' ) ?: 'wp_phpunit_tests' );
+/* Database credentials. */
+define( 'DB_NAME', getenv( 'WP_DB_NAME' ) ?: 'wordpress_test' );
 define( 'DB_USER', getenv( 'WP_DB_USER' ) ?: 'root' );
-define( 'DB_PASSWORD', getenv( 'WP_DB_PASS' ) ?: 'Ap@17011996@' );
+define( 'DB_PASSWORD', getenv( 'WP_DB_PASS' ) ?: '' );
 define( 'DB_HOST', getenv( 'WP_DB_HOST' ) ?: 'localhost' );
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
-/**#@+
- * Authentication Unique Keys and Salts.
- *
- * Change these to different unique phrases!
- * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+/* Authentication keys and salts — fixed values, valid for testing only. */
+define( 'AUTH_KEY', 'storeseeder-test-auth-key-not-for-production-use' );
+define( 'SECURE_AUTH_KEY', 'storeseeder-test-secure-auth-key-not-for-production-use' );
+define( 'LOGGED_IN_KEY', 'storeseeder-test-logged-in-key-not-for-production-use' );
+define( 'NONCE_KEY', 'storeseeder-test-nonce-key-not-for-production-use' );
+define( 'AUTH_SALT', 'storeseeder-test-auth-salt-not-for-production-use' );
+define( 'SECURE_AUTH_SALT', 'storeseeder-test-secure-auth-salt-not-for-production-use' );
+define( 'LOGGED_IN_SALT', 'storeseeder-test-logged-in-salt-not-for-production-use' );
+define( 'NONCE_SALT', 'storeseeder-test-nonce-salt-not-for-production-use' );
+
+/*
+ * Table prefix for the test installation. Must differ from the production
+ * prefix so a misconfigured run cannot drop real tables.
  */
-define( 'AUTH_KEY', 'put your unique phrase here' );
-define( 'SECURE_AUTH_KEY', 'put your unique phrase here' );
-define( 'LOGGED_IN_KEY', 'put your unique phrase here' );
-define( 'NONCE_KEY', 'put your unique phrase here' );
-define( 'AUTH_SALT', 'put your unique phrase here' );
-define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
-define( 'LOGGED_IN_SALT', 'put your unique phrase here' );
-define( 'NONCE_SALT', 'put your unique phrase here' );
+$table_prefix = getenv( 'WP_TABLE_PREFIX' ) ?: 'storeseeder_test_'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
-$table_prefix = 'storeseeder_test_';   // Only numbers, letters, and underscores please!
-
+/* Test site identity. */
 define( 'WP_TESTS_DOMAIN', 'example.org' );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
 define( 'WP_TESTS_TITLE', 'StoreSeeder Test Blog' );
 
 define( 'WP_PHP_BINARY', 'php' );
-
 define( 'WPLANG', '' );
