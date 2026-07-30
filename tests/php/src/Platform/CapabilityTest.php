@@ -1,0 +1,118 @@
+<?php
+/**
+ * Tests for the capability matrix.
+ *
+ * @package StoreSeeder\Tests
+ */
+
+namespace StoreSeeder\Tests\Platform;
+
+use StoreSeeder\Platform\Capability;
+use StoreSeeder\Platform\Registry;
+use StoreSeeder\Platform\Resource;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
+
+/**
+ * @covers \StoreSeeder\Platform\Capability
+ * @covers \StoreSeeder\Abstracts\Platform_Driver
+ */
+class CapabilityTest extends StoreSeederUnitTestCase {
+
+	public function tearDown(): void {
+		remove_all_filters( 'storeseeder_platforms' );
+		remove_all_filters( 'storeseeder_platform_supports_stub-cart' );
+		Registry::reset();
+		parent::tearDown();
+	}
+
+	public function test_supported_carries_no_reason(): void {
+		$capability = Capability::supported();
+
+		$this->assertTrue( $capability->is_supported() );
+		$this->assertSame( '', $capability->get_reason() );
+		$this->assertSame( '', $capability->get_extension() );
+	}
+
+	/**
+	 * "Cannot" and "install this and it can" are different messages, and only the
+	 * second is actionable — so the extension slug has to survive to the client.
+	 */
+	public function test_missing_extension_names_the_plugin(): void {
+		$capability = Capability::missing_extension( 'woocommerce-subscriptions', 'WooCommerce Subscriptions' );
+
+		$this->assertFalse( $capability->is_supported() );
+		$this->assertSame( 'woocommerce-subscriptions', $capability->get_extension() );
+		$this->assertStringContainsString( 'WooCommerce Subscriptions', $capability->get_reason() );
+	}
+
+	public function test_unsupported_explains_itself(): void {
+		$capability = Capability::unsupported( 'No such concept here.' );
+
+		$this->assertFalse( $capability->is_supported() );
+		$this->assertSame( 'No such concept here.', $capability->get_reason() );
+		$this->assertSame( '', $capability->get_extension() );
+	}
+
+	public function test_bare_booleans_are_normalised(): void {
+		$this->assertTrue( Capability::from( true )->is_supported() );
+		$this->assertFalse( Capability::from( false )->is_supported() );
+		$this->assertNotSame( '', Capability::from( false )->get_reason() );
+	}
+
+	public function test_from_passes_a_capability_through(): void {
+		$capability = Capability::unsupported( 'nope' );
+
+		$this->assertSame( $capability, Capability::from( $capability ) );
+	}
+
+	public function test_fluent_cart_supports_every_resource(): void {
+		$platform = Registry::instance()->get( 'fluent-cart' );
+		$supports = $platform->supports();
+
+		foreach ( Resource::all() as $resource_type ) {
+			$this->assertArrayHasKey( $resource_type, $supports );
+			$this->assertTrue( $supports[ $resource_type ]->is_supported(), $resource_type );
+		}
+	}
+
+	/**
+	 * The filter is how a third-party extension announces that it satisfies a
+	 * requirement the driver reported as missing, so it must run last.
+	 */
+	public function test_filter_can_override_a_capability(): void {
+		add_filter(
+			'storeseeder_platforms',
+			static function ( array $platforms ): array {
+				$platforms[] = new StubPlatform(
+					'stub-cart',
+					true,
+					array(
+						Resource::PRODUCT      => true,
+						Resource::SUBSCRIPTION => Capability::missing_extension( 'stub-subs', 'Stub Subscriptions' ),
+					)
+				);
+				return $platforms;
+			}
+		);
+		Registry::reset();
+
+		$platform = Registry::instance()->get( 'stub-cart' );
+		$this->assertFalse( $platform->supports()[ Resource::SUBSCRIPTION ]->is_supported() );
+
+		add_filter(
+			'storeseeder_platform_supports_stub-cart',
+			static function ( array $matrix ): array {
+				$matrix[ Resource::SUBSCRIPTION ] = Capability::supported();
+				return $matrix;
+			}
+		);
+
+		$this->assertTrue( $platform->supports()[ Resource::SUBSCRIPTION ]->is_supported() );
+	}
+
+	public function test_resource_names_are_stable(): void {
+		$this->assertCount( 17, Resource::all() );
+		$this->assertTrue( Resource::exists( 'product' ) );
+		$this->assertFalse( Resource::exists( 'products' ) );
+	}
+}

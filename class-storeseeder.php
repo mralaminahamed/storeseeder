@@ -32,6 +32,8 @@ use StoreSeeder\Controllers\Order_Tax_Rate;
 use StoreSeeder\Controllers\Product_Download;
 use StoreSeeder\Controllers\Subscription;
 use StoreSeeder\MCP\MCP_Server;
+use StoreSeeder\Platform\Registry;
+use StoreSeeder\Platform\Resolver;
 
 /**
  * Main Plugin Class for StoreSeeder
@@ -537,6 +539,9 @@ class StoreSeeder {
 					'label'      => $locale_labels[ $faker_locale ] ?? 'English (United States)',
 					'allLocales' => $locale_labels,
 				),
+				// Inlined so the topbar renders its target on first paint. Fetching it
+				// would flash "Auto" with no platform beside it, then correct itself.
+				'platforms'   => $this->rest_platforms()->get_data(),
 			)
 		);
 
@@ -628,6 +633,101 @@ class StoreSeeder {
 				),
 			)
 		);
+
+		// Register the platform endpoints.
+		register_rest_route(
+			'storeseeder/v1',
+			'/platforms',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_platforms' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+			)
+		);
+
+		register_rest_route(
+			'storeseeder/v1',
+			'/platforms/target',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'rest_set_target_platform' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'platform' => array(
+						// Not enumerated: drivers are extensible through the
+						// storeseeder_platforms filter, so a fixed enum would reject a
+						// valid third-party platform. Resolver validates instead.
+						'type'              => 'string',
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_key',
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * REST: the platforms this site could seed, and which one it will
+	 *
+	 * Capabilities are recomputed here on every request rather than cached, because
+	 * activating a companion plugin has to change the answer immediately — WooCommerce
+	 * gains subscriptions the moment WooCommerce Subscriptions is switched on.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function rest_platforms(): WP_REST_Response {
+		$registry = $this->platforms();
+		$resolver = $this->platform_resolver();
+		$resolved = $resolver->resolve();
+
+		$platforms = array();
+
+		foreach ( $registry->all() as $platform ) {
+			$supports = array();
+
+			foreach ( $platform->supports() as $resource_type => $capability ) {
+				$supports[ $resource_type ] = $capability->to_array();
+			}
+
+			$platforms[] = array(
+				'id'       => $platform->id(),
+				'label'    => $platform->label(),
+				'active'   => $platform->is_active(),
+				'version'  => $platform->version(),
+				'supports' => $supports,
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'platforms' => $platforms,
+				'stored'    => $resolver->stored(),
+				'resolved'  => is_wp_error( $resolved ) ? null : $resolved->id(),
+				'ambiguous' => $resolver->is_ambiguous(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: choose the site-wide target platform
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function rest_set_target_platform( WP_REST_Request $request ) {
+		$stored = $this->platform_resolver()->store( (string) $request->get_param( 'platform' ) );
+
+		if ( is_wp_error( $stored ) ) {
+			return $stored;
+		}
+
+		return $this->rest_platforms();
 	}
 
 	/**
@@ -1095,10 +1195,19 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function dependency_notice(): void {
-		if ( ! $this->is_fluent_cart_active() ) {
+		if ( ! $this->check_dependencies() ) {
+			// Naming the supported platforms rather than one of them: on a site with
+			// none of them installed, "requires Fluent Cart" reads as an instruction
+			// to install the wrong thing.
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
-				esc_html__( 'StoreSeeder requires Fluent Cart plugin to be installed and active.', 'storeseeder' )
+				esc_html(
+					sprintf(
+						/* translators: %s: comma-separated list of supported e-commerce platforms. */
+						__( 'StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s.', 'storeseeder' ),
+						implode( ', ', $this->platforms()->labels() )
+					)
+				)
 			);
 		}
 
@@ -1206,33 +1315,53 @@ class StoreSeeder {
 	/**
 	 * Check if Fluent Cart plugin is active
 	 *
-	 * Verifies that the required Fluent Cart plugin is installed and activated
-	 * by checking the active plugins list. This is a critical dependency check
-	 * that prevents the plugin from functioning without its core requirement.
-	 *
-	 * @since 1.0.0
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Fluent Cart is one driver among several. Ask the driver, or
+	 *                   ask the registry whether anything at all is seedable.
 	 *
 	 * @return bool True if Fluent Cart is active, false otherwise.
 	 */
 	public function is_fluent_cart_active(): bool {
-		$plugin = 'fluent-cart/fluent-cart.php';
+		$platform = $this->platforms()->get( 'fluent-cart' );
 
-		return in_array( $plugin, (array) get_option( 'active_plugins', array() ), true );
+		return null !== $platform && $platform->is_active();
+	}
+
+	/**
+	 * The platform driver registry
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return Registry
+	 */
+	public function platforms(): Registry {
+		return Registry::instance();
+	}
+
+	/**
+	 * Resolver for the target platform
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return Resolver
+	 */
+	public function platform_resolver(): Resolver {
+		return new Resolver( $this->platforms() );
 	}
 
 	/**
 	 * Check plugin dependencies
 	 *
-	 * Validates that all required dependencies are met before enabling plugin features.
-	 * Currently checks for Fluent Cart plugin activation, but can be extended
-	 * for additional dependencies in the future.
+	 * True when at least one supported e-commerce platform is active. It is
+	 * deliberately not "Fluent Cart is active" any more: gating the admin menu and the
+	 * REST routes on one platform is what made every other one unreachable.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool True if all dependencies are met, false otherwise.
 	 */
 	public function check_dependencies(): bool {
-		return $this->is_fluent_cart_active();
+		return $this->platforms()->has_active();
 	}
 
 	/**
