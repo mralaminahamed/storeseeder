@@ -54,6 +54,36 @@ test.describe('Sample-data consent modal', () => {
     expect(declined).toBe(true);
   });
 
+  test('a failed decline keeps the modal open rather than closing unsaved', async ({
+    page,
+  }) => {
+    await page.route('**/download-sample', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          exists: false,
+          last_synced: null,
+          repo_url: '',
+          consent: null,
+        }),
+      });
+    });
+    await page.route('**/download-sample/consent', async (route) => {
+      await route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'nope' }),
+      });
+    });
+
+    await page.goto(PLUGIN_URL);
+    await page.getByTestId('consent-decline').click();
+
+    // Nothing was stored, so the prompt must not pretend the choice was taken.
+    await expect(page.getByTestId('consent-modal')).toBeVisible();
+  });
+
   test('Sync now reopens the prompt instead of downloading when consent is revoked', async ({
     page,
   }) => {

@@ -117,17 +117,23 @@ export function ConsentModal() {
   const decline = useCallback(async () => {
     setBusy(true);
     try {
-      await fetch(`${restUrl}download-sample/consent`, {
+      const res = await fetch(`${restUrl}download-sample/consent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-WP-Nonce": nonce },
         body: JSON.stringify({ granted: false }),
       });
+      // Closing has to mean the decision was stored, otherwise the prompt
+      // silently returns on the next visit as though nothing was chosen.
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      notifyConsentChanged();
+      setOpen(false);
     } catch {
-      /* Best effort — declining is a local preference. */
+      toast(
+        __("Could not save your choice — please try again.", "storeseeder"),
+      );
+      setBusy(false);
     }
-    notifyConsentChanged();
-    setOpen(false);
-  }, [restUrl, nonce]);
+  }, [restUrl, nonce, toast]);
 
   if (!open) return null;
 
