@@ -64,7 +64,7 @@ This plugin is based on and maintains compatibility with the following reference
 
 - **PHP Generators**: Located in `includes/Generators/` - Handle data creation logic
 - **Controllers**: Located in `includes/Controllers/` - REST API endpoints for generators
-- **React Components**: Located in `src/admin/components/Generators/` - Frontend UI for generators
+- **React Components**: Located in `src/components/` - Frontend UI for generators
 - **Data Flow**: React components → REST API → Controllers → Generators → Fluent Cart models
 
 ### Key Patterns Established

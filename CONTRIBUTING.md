@@ -152,7 +152,7 @@ A generator is three coordinated pieces, all following existing patterns:
 1. `includes/Generators/` — a class extending `StoreSeeder\Abstracts\Generator`
 2. `includes/Controllers/` — a REST controller extending `StoreSeeder\Abstracts\Controller`, exposing
    `storeseeder/v1/<resource>/generate` plus the preview route
-3. `src/admin/` — registration so the generator appears in the admin, with its parameter schema
+3. `src/` — registration so the generator appears in the admin, with its parameter schema
 
 Persist through native Fluent Cart models rather than raw SQL, so schema, relationships, and money
 handling match real store data. Copy the closest existing generator as your starting point and add

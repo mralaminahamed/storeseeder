@@ -121,7 +121,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 
 ```mermaid
 flowchart LR
-    A["React admin<br/>src/admin"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
+    A["React admin<br/>src"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
     B -->|"JSON Schema validation"| C["Generator<br/>generate()"]
     C -->|FakerPHP| D["Fluent Cart models"]
     D --> E["WordPress database"]
@@ -142,7 +142,7 @@ includes/
 ```
 
 The admin app is React 18, React Router v7, Radix UI, and Tailwind CSS v4, entered at
-`src/admin/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
+`src/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
 readable source lives in this repository.
 
 ## Development

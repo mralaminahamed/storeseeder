@@ -4,7 +4,7 @@ const path = require("path");
 module.exports = {
   ...defaultConfig,
   entry: {
-    admin: "./src/admin/index.tsx",
+    admin: "./src/index.tsx",
   },
   target: ['web', 'es5'],
   performance: {

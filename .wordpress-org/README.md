@@ -41,7 +41,7 @@ glass lighting:
 for s in 128 256 512; do rsvg-convert -w $s -h $s icon.svg -o "icon-${s}x${s}.png"; done
 ```
 
-`src/admin/components/ui/BrandIcon.tsx` is a hand-kept port of the same SVG for
+`src/components/ui/BrandIcon.tsx` is a hand-kept port of the same SVG for
 the admin UI. Change one, change the other; `tests/php/src/AdminMenuIconTest.php`
 catches drift in the glyph, not in the colours.
 
