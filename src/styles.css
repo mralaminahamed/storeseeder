@@ -443,6 +443,7 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
 
 /* ---- keyframes (global — fine for @keyframes) ---- */
 @keyframes fp-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fp-fade-down { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 @keyframes fp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fp-pop { 0% { opacity: 0; transform: scale(.96) translateY(6px); } 100% { opacity: 1; transform: none; } }
 @keyframes fp-spin { to { transform: rotate(360deg); } }
