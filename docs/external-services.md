@@ -11,15 +11,15 @@ This page is the full disclosure required by the
 
 | Service | Purpose | Triggered by | Optional |
 |---------|---------|--------------|----------|
-| [GitHub](#1-github--sample-data-repository) | Download locale sample data | Administrator accepting the consent prompt, or clicking **Sync now** in Settings | Yes — generators fall back to built-in defaults |
+| [GitHub](#1-github--sample-data-repository) | Download locale sample data | Administrator accepting the consent prompt | Yes — generators fall back to built-in defaults |
 | [WordPress.org](#2-wordpressorg--plugin-directory-api) | List the author's other plugins | Administrator opening the **Our Plugins** page | Yes — the page is informational only |
 
 ## 1. GitHub — sample data repository
 
 Sample data is locale-specific reference data (product names, addresses, customer tags) used to make
-generated content more realistic. It is downloaded **only after an administrator grants consent** —
-either by accepting the one-time consent prompt shown on the plugin admin page, or by clicking
-**Sync now** on the Settings page.
+generated content more realistic. It is downloaded **only after an administrator accepts the consent
+prompt** shown on the plugin admin page. That prompt is the only thing that grants permission; no
+other control does.
 
 Declining costs you nothing functionally: every generator keeps working from built-in defaults. The
 decision is site-wide and can be changed from Settings at any time. **Revoke** withdraws permission.
@@ -32,7 +32,7 @@ has no sample data.
 |---|---|
 | **Service** | GitHub |
 | **Endpoint** | `https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip` |
-| **When the request happens** | Only after an administrator grants consent — by accepting the consent prompt on the plugin admin page, or by clicking **Sync now** on the Settings page. Never on activation, and never on a schedule. |
+| **When the request happens** | Only after an administrator has accepted the consent prompt on the plugin admin page: by the prompt's own approval button, or by **Sync now** / **Force re-sync** in Settings once permission is already on record. Never on activation, and never on a schedule. |
 | **Made by** | The site's PHP process, via the WordPress HTTP API |
 | **Data sent** | An unauthenticated HTTP `GET`. No site, user, or store data is included — only the request itself, plus the IP address and user agent inherent to any HTTP request. |
 | **Data received** | A ZIP archive of JSON reference files, extracted into `wp-content/uploads/storeseeder-sample-data-fluent-cart/` |

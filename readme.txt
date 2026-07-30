@@ -112,13 +112,13 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
 3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
 4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.
-5. Settings — generation defaults, locale, reproducible seed, and run-history retention.
+5. Settings — generation defaults: pre-filled batch size, faker locale, and a fixed seed for reproducible runs.
 
 == Changelog ==
 
 Only the four most recent releases are listed here. The complete history, in Keep a Changelog format, is maintained in the repository:
 
-[CHANGELOG.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
+[Read the full changelog on GitHub](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
 
 = 1.0.0 =
 * Initial release.
@@ -141,7 +141,7 @@ StoreSeeder connects to two external services. Neither is contacted on activatio
 
 **1. GitHub — sample data repository**
 
-Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator grants consent — either by accepting the one-time consent prompt on the plugin admin page, or by clicking "Sync now" on the Settings page. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
+Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator accepts the consent prompt on the plugin admin page — that prompt is the only way permission is granted. Until it is, "Sync now" and "Force re-sync" on the Settings page open the prompt instead of downloading. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
 
 **2. WordPress.org — plugin directory API**
 
@@ -149,17 +149,17 @@ The "Our Plugins" admin page lists the plugin author's other WordPress.org plugi
 
 The full disclosure for each service — endpoint, exactly when the request is made, what is sent and received, and the provider's terms of service and privacy policy — is documented here:
 
-[docs/external-services.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md)
+[Read the external services disclosure](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md)
 
 == Source code ==
 
 The minified JavaScript and CSS in `build/` is compiled from the TypeScript and CSS sources in `src/`, which are not included in the distributed plugin package. The complete, human-readable source is public:
 
-[github.com/mralaminahamed/storeseeder](https://github.com/mralaminahamed/storeseeder)
+[Browse the StoreSeeder source on GitHub](https://github.com/mralaminahamed/storeseeder)
 
 Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS, configured by `webpack.config.js`, `tsconfig.json`, and `postcss.config.js` in the repository root. The build steps are listed under "Development Setup" above; local setup, the full toolchain, and the quality gates are documented in the contributing guide:
 
-[CONTRIBUTING.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
+[Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
 
 == Other Notes ==
 
@@ -167,10 +167,10 @@ Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS,
 
 All generated data is stored in your own WordPress database and is never transmitted anywhere. Generated content is fictional and does not represent real individuals or transactions. The plugin does not collect analytics and does not phone home.
 
-The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [docs/external-services.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md) for the full disclosure.
+The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [the external services disclosure](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md) for the full detail.
 
 **Contributing**
 
 Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Bug reports, feature requests, and pull requests are all welcome — the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) is the place to start. Branching, commit conventions, quality gates, and pull request expectations are all documented in the contributing guide:
 
-[CONTRIBUTING.md](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
+[Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
