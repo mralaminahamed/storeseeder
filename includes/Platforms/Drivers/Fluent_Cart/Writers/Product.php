@@ -103,6 +103,22 @@ final class Product extends Writer {
 	}
 
 	/**
+	 * Whether generated variations are bought once or on a subscription.
+	 *
+	 * A Fluent Cart column with no canonical equivalent, declared by the driver as a platform
+	 * field. It was hardcoded to `onetime`, which made subscription products impossible to seed.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	private function payment_type(): string {
+		$requested = isset( $this->params['payment_type'] ) ? (string) $this->params['payment_type'] : 'onetime';
+
+		return in_array( $requested, array( 'onetime', 'subscription' ), true ) ? $requested : 'onetime';
+	}
+
+	/**
 	 * Ensure an SKU is not already taken.
 	 *
 	 * The fct_product_variations table carries a UNIQUE index on sku, so a collision is
@@ -182,12 +198,12 @@ final class Product extends Writer {
 				'stock_status'     => $stock_status,
 				'total_stock'      => $data['stock'],
 				'available'        => $data['stock'],
-				'payment_type'     => 'onetime',
+				'payment_type'     => $this->payment_type(),
 				'fulfillment_type' => $data['fulfillment_type'],
 				'item_status'      => 'active',
 				'other_info'       => array(
 					'description'  => '',
-					'payment_type' => 'onetime',
+					'payment_type' => $this->payment_type(),
 					'tax_class'    => 'standard',
 					'tax_exempt'   => 'no',
 				),

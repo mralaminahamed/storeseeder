@@ -75,8 +75,12 @@ final class Product extends Writer {
 				'manage_stock'       => true,
 				'stock_quantity'     => $stock,
 				'stock_status'       => $stock > 0 ? 'instock' : 'outofstock',
-				'tax_status'         => 'taxable',
-				'catalog_visibility' => 'visible',
+				// Platform fields, declared by the driver and read from the run's parameters.
+				// See Platform::platform_fields(): these are WooCommerce properties no canonical
+				// entity carries, because no other platform has them.
+				'tax_status'         => $this->platform_param( 'tax_status', 'taxable', array( 'taxable', 'shipping', 'none' ) ),
+				'catalog_visibility' => $this->platform_param( 'catalog_visibility', 'visible', array( 'visible', 'catalog', 'search', 'hidden' ) ),
+				'featured'           => $this->faker()->boolean( $this->featured_ratio() ),
 				// Weight and dimensions on a virtual product are contradictory, and
 				// WooCommerce hides the fields — so an empty string rather than a number.
 				'weight'             => $virtual ? '' : (string) $this->faker()->numberBetween( 1, 40 ),
@@ -107,6 +111,43 @@ final class Product extends Writer {
 		);
 
 		return $this->filter_result( $result, (int) $id, $data );
+	}
+
+	/**
+	 * One of this platform's declared fields, validated against what it allows.
+	 *
+	 * Validated here as well as in the REST schema because a writer can be driven from the CLI,
+	 * from an MCP tool, or from a test — and a value WooCommerce does not recognise is stored
+	 * without complaint and then read as empty.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string             $name     Parameter name.
+	 * @param string             $fallback Value when unset or unrecognised.
+	 * @param array<int, string> $allowed  Values WooCommerce accepts.
+	 *
+	 * @return string
+	 */
+	private function platform_param( string $name, string $fallback, array $allowed ): string {
+		$value = isset( $this->params[ $name ] ) ? (string) $this->params[ $name ] : $fallback;
+
+		return in_array( $value, $allowed, true ) ? $value : $fallback;
+	}
+
+	/**
+	 * How often a generated product is featured, as a percentage.
+	 *
+	 * Zero by default: a shop where every other product is featured is not a useful fixture, and
+	 * the front page treats featured products specially.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return int
+	 */
+	private function featured_ratio(): int {
+		$ratio = isset( $this->params['featured_ratio'] ) ? (int) $this->params['featured_ratio'] : 0;
+
+		return max( 0, min( 100, $ratio ) );
 	}
 
 	/**

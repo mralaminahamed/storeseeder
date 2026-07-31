@@ -97,6 +97,104 @@ abstract class Platform_Driver implements Platform_Interface {
 	}
 
 	/**
+	 * Extra generation parameters this platform understands, for one resource.
+	 *
+	 * The seam for a property only one platform has. WooCommerce products carry a catalogue
+	 * visibility and a tax status; Fluent Cart variations carry a payment type. Neither belongs
+	 * in a canonical entity — a generator may not name a platform, and a field only one platform
+	 * stores would make a fixed seed produce different data on the others.
+	 *
+	 * So these are *write-time hints* rather than entity fields: they arrive as generation
+	 * parameters, this driver's writer reads them from `$this->params`, and every other driver
+	 * neither sees nor cares. The canonical entity, and with it the same-seed guarantee, is
+	 * untouched.
+	 *
+	 * Each entry is a JSON Schema fragment, keyed by parameter name, exactly as a controller's
+	 * `get_resource_specific_params()` returns — so the REST layer, the admin form and the MCP
+	 * input schema all pick it up through the paths they already have.
+	 *
+	 * Empty by default: a driver with no platform-specific fields says nothing rather than
+	 * inventing a shape.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public function fields( string $resource_type ): array {
+		$fields = $this->platform_fields( $resource_type );
+
+		/**
+		 * Filters one platform's extra fields for one resource.
+		 *
+		 * How an extension that adds a column to its platform exposes it for seeding, without
+		 * touching the driver — the field-level counterpart of
+		 * `storeseeder_platform_supports_{$id}`.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_platform_fields_{$id}
+		 *
+		 * @param array<string, mixed> $fields        Schema fragments by name. Typed loosely
+		 *                                            because a filter returns what it likes, and
+		 *                                            what comes back is checked rather than
+		 *                                            trusted.
+		 * @param string               $resource_type Canonical resource name.
+		 * @param Platform_Interface   $platform      The driver being asked.
+		 */
+		$filtered = (array) apply_filters( "storeseeder_platform_fields_{$this->id()}", $fields, $resource_type, $this );
+
+		// Entries a filter invented in the wrong shape are dropped rather than handed to the REST
+		// layer, which would register them as route arguments and fail on the first request. A
+		// numeric key is wrong too — these are keyed by parameter name.
+		$valid = array();
+
+		foreach ( $filtered as $name => $schema ) {
+			if ( is_array( $schema ) && '' !== (string) $name && ! is_numeric( $name ) ) {
+				$valid[ (string) $name ] = $schema;
+			}
+		}
+
+		return $valid;
+	}
+
+	/**
+	 * This driver's own extra fields, before the filter.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected function platform_fields( string $resource_type ): array {
+		unset( $resource_type );
+
+		return array();
+	}
+
+	/**
+	 * Every extra field this platform declares, keyed by resource.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, array<string, array<string, mixed>>>
+	 */
+	public function all_fields(): array {
+		$all = array();
+
+		foreach ( Resource::all() as $resource_type ) {
+			$fields = $this->fields( $resource_type );
+
+			if ( array() !== $fields ) {
+				$all[ $resource_type ] = $fields;
+			}
+		}
+
+		return $all;
+	}
+
+	/**
 	 * Extensions of this platform that are installed, and what they are.
 	 *
 	 * Capabilities already say *whether* a resource can be generated; this says what the

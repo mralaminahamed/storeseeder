@@ -185,6 +185,36 @@ final class Platform extends Platform_Driver {
 	}
 
 	/**
+	 * Fluent Cart-only generation parameters.
+	 *
+	 * `payment_type` is a Fluent Cart variation column with no equivalent elsewhere: a variation
+	 * is bought once or on a recurring basis. The writer hardcoded `onetime`, which made
+	 * subscription products impossible to seed; this exposes the choice without putting a Fluent
+	 * Cart column into a canonical entity.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected function platform_fields( string $resource_type ): array {
+		if ( ! in_array( $resource_type, array( Resource::PRODUCT, Resource::PRODUCT_VARIATION ), true ) ) {
+			return array();
+		}
+
+		return array(
+			'payment_type' => array(
+				'description'       => __( 'Fluent Cart only. Whether generated variations are bought once or on a subscription.', 'storeseeder' ),
+				'type'              => 'string',
+				'enum'              => array( 'onetime', 'subscription' ),
+				'default'           => 'onetime',
+				'sanitize_callback' => 'sanitize_key',
+			),
+		);
+	}
+
+	/**
 	 * Writer classes, keyed by canonical resource.
 	 *
 	 * @since 1.1.0

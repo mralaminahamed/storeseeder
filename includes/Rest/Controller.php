@@ -14,8 +14,11 @@ namespace StoreSeeder\Rest;
 
 use StoreSeeder\Access;
 use StoreSeeder\Generation\Generator;
+use StoreSeeder\Platforms\Capability;
 use StoreSeeder\Platforms\Locale;
+use StoreSeeder\Platforms\Platform_Driver;
 use StoreSeeder\Platforms\Platform_Interface;
+use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver;
 use WP_REST_Controller;
 use WP_REST_Request;
@@ -350,6 +353,14 @@ abstract class Controller extends WP_REST_Controller {
 			$response['errors'] = array_values( array_unique( $errors ) );
 		}
 
+		// Likewise only present when something was actually ignored: what the target could not
+		// use, whether it belonged to another platform or is a field this one cannot store.
+		$ignored = $this->ignored_params( $platform, $request );
+
+		if ( array() !== $ignored ) {
+			$response['ignored'] = $ignored;
+		}
+
 		/**
 		 * Filters the REST API response data.
 		 *
@@ -606,10 +617,104 @@ abstract class Controller extends WP_REST_Controller {
 		// Merge with resource-specific parameters.
 		$resource_params = $this->get_resource_specific_params();
 
-		return array_merge( $base_params, $resource_params );
+		$canonical = array_merge( $base_params, $resource_params );
+
+		// Platform fields never overwrite a canonical parameter: that is what every platform
+		// agrees on, and letting one driver redefine `count` or `locale` would break the
+		// same-seed guarantee for all the others. Merged *into* the canonical set rather than
+		// over it, which is the difference the test caught.
+		return $canonical + $this->get_platform_params();
 	}
 
 
+
+	/**
+	 * Every registered platform's extra parameters for this resource, merged.
+	 *
+	 * The union rather than the resolved platform's own, because routes are registered on
+	 * `rest_api_init` and no platform has been resolved at that point — there is no per-request
+	 * schema to register. So the endpoint accepts any driver's field, discovery lists them all
+	 * with the platform named in each description, and a field sent to a platform that does not
+	 * have it is reported back in the response rather than dropped in silence. See
+	 * `ignored_params()`.
+	 *
+	 * A driver declaring a field that collides with a canonical parameter loses: the canonical
+	 * one is what every platform agrees on, and letting a driver redefine it would break the
+	 * same-seed guarantee for everyone else.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected function get_platform_params(): array {
+		$fields = array();
+
+		foreach ( Platform_Registry::instance()->all() as $platform ) {
+			if ( ! $platform instanceof Platform_Driver ) {
+				continue;
+			}
+
+			foreach ( $platform->fields( $this->get_resource_type() ) as $name => $schema ) {
+				// First declaration wins, and a canonical parameter always beats a platform one:
+				// array_merge() in get_generation_params() puts these last, so a collision would
+				// otherwise let a driver redefine a field every platform agrees on.
+				if ( ! isset( $fields[ $name ] ) ) {
+					$fields[ $name ] = $schema;
+				}
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Parameters the caller sent that the resolved platform will not use.
+	 *
+	 * Two kinds, and both are worth saying out loud: a field belonging to a different platform,
+	 * and a canonical field this platform's capability declares it cannot store. Reporting them
+	 * is the whole point — a control that silently does nothing is the bug this mechanism was
+	 * built to stop repeating.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param Platform_Interface $platform The resolved target.
+	 * @param WP_REST_Request    $request  The request, read for what the caller actually sent.
+	 *
+	 * @return array<int, string>
+	 */
+	protected function ignored_params( Platform_Interface $platform, WP_REST_Request $request ): array {
+		$resource = $this->get_resource_type();
+		$mine     = $platform instanceof Platform_Driver ? $platform->fields( $resource ) : array();
+		$ignored  = array();
+
+		// What the caller *sent*, not what the schema resolved. Every declared argument with a
+		// default is present in the merged parameters whether or not anyone asked for it, so
+		// comparing against those would report every other platform's field on every run — and a
+		// warning that always fires is one nobody reads.
+		$sent = array_merge(
+			(array) $request->get_json_params(),
+			(array) $request->get_body_params(),
+			(array) $request->get_query_params()
+		);
+
+		// Another platform's field, accepted by the schema and meaningless here.
+		foreach ( array_keys( $this->get_platform_params() ) as $name ) {
+			if ( array_key_exists( $name, $sent ) && ! isset( $mine[ $name ] ) ) {
+				$ignored[] = $name;
+			}
+		}
+
+		// A canonical field this platform stores the resource without.
+		$capability = $platform->supports()[ $resource ] ?? null;
+
+		if ( $capability instanceof Capability ) {
+			foreach ( $capability->get_ignored_fields() as $field ) {
+				$ignored[] = $field;
+			}
+		}
+
+		return array_values( array_unique( $ignored ) );
+	}
 
 	/**
 	 * Validate date parameter
