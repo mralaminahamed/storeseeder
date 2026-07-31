@@ -9,6 +9,7 @@
 namespace StoreSeeder\MCP\Abilities;
 
 use StoreSeeder\MCP\Ability;
+use StoreSeeder\Platforms\Status;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -34,7 +35,7 @@ class Generate_Orders extends Ability {
 	 * {@inheritdoc}
 	 */
 	public static function description(): string {
-		return __( 'Generate realistic Fluent Cart orders with line items, addresses, payment details, shipping calculations, tax breakdowns, and fulfilment status. Requires at least one product with variations and one customer to exist.', 'storeseeder' );
+		return __( 'Generate realistic orders with line items priced from the catalogue, billing and shipping addresses, payment details, shipping and tax, a shopper note and the dates a paid or completed order carries. Requires at least one product to exist, and one customer unless guest orders are asked for.', 'storeseeder' );
 	}
 
 	/**
@@ -42,51 +43,51 @@ class Generate_Orders extends Ability {
 	 */
 	protected static function input_properties(): array {
 		return array(
-			'order_status'         => array(
-				'type'        => 'string',
-				'description' => __( 'Status of generated orders. Allowed: pending, processing, completed, cancelled, on_hold, refunded, mixed. Default: mixed.', 'storeseeder' ),
-				'enum'        => array( 'pending', 'processing', 'completed', 'cancelled', 'on_hold', 'refunded', 'mixed' ),
-				'default'     => 'mixed',
-			),
-			'customer_type'        => array(
-				'type'        => 'string',
-				'description' => __( 'Whose customer accounts to attach. Allowed: existing, new, mixed, specific. Default: mixed.', 'storeseeder' ),
-				'enum'        => array( 'existing', 'new', 'mixed', 'specific' ),
-				'default'     => 'mixed',
-			),
-			'specific_customer_id' => array(
-				'type'        => 'integer',
-				'description' => __( 'WordPress user ID to attach all orders to. Only used when customer_type is "specific".', 'storeseeder' ),
-				'minimum'     => 1,
-			),
-			'min_total'            => array(
-				'type'        => 'number',
-				'description' => __( 'Minimum order total (USD). Default: 10.', 'storeseeder' ),
-				'default'     => 10,
-			),
-			'max_total'            => array(
-				'type'        => 'number',
-				'description' => __( 'Maximum order total (USD). Default: 1000.', 'storeseeder' ),
-				'default'     => 1000,
-			),
-			'min_items'            => array(
-				'type'        => 'integer',
-				'description' => __( 'Minimum line items per order. Default: 1.', 'storeseeder' ),
-				'minimum'     => 1,
-				'default'     => 1,
-			),
-			'max_items'            => array(
-				'type'        => 'integer',
-				'description' => __( 'Maximum line items per order (1–20). Default: 5.', 'storeseeder' ),
-				'minimum'     => 1,
-				'maximum'     => 20,
-				'default'     => 5,
-			),
-			'payment_methods'      => array(
+			'order_status'     => array(
 				'type'        => 'array',
-				'description' => __( 'Payment methods to distribute across orders. Allowed: stripe, paypal, bank_transfer, cash_on_delivery, credit_card. Default: ["stripe","paypal","bank_transfer"].', 'storeseeder' ),
+				'description' => __( 'Statuses to draw from. Allowed: pending, processing, on_hold, completed, cancelled, refunded, failed. Default: a spread across all of them.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::order_statuses(),
+				),
+			),
+			'items_per_order'  => array(
+				'type'        => 'object',
+				'description' => __( 'Line items per order, as a min and max. Default: 1 to 3.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'integer' ),
+					'max' => array( 'type' => 'integer' ),
+				),
+			),
+			'payment_methods'  => array(
+				'type'        => 'array',
+				'description' => __( 'Payment methods to distribute across orders. Default: ["stripe","paypal","cod"].', 'storeseeder' ),
 				'items'       => array( 'type' => 'string' ),
-				'default'     => array( 'stripe', 'paypal', 'bank_transfer' ),
+			),
+			'countries'        => array(
+				'type'        => 'array',
+				'description' => __( 'Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is what makes generated data obviously fake.', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+			),
+			'include_customer' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Attach a customer account. False generates guest orders, which every store takes and no fixture had. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'customer_id'      => array(
+				'type'        => 'integer',
+				'description' => __( 'Attach every order to this customer, for giving one account an order history. Ignored when include_customer is false.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+			'include_shipping' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Charge shipping. False generates orders with no shipping line, which is what a download-only store looks like. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'include_tax'      => array(
+				'type'        => 'boolean',
+				'description' => __( 'Apply tax. Default: true.', 'storeseeder' ),
+				'default'     => true,
 			),
 		);
 	}
@@ -128,37 +129,31 @@ class Generate_Orders extends Ability {
 		}
 
 		if ( isset( $input['order_status'] ) ) {
-			$payload['order_status'] = $input['order_status'];
+			$payload['order_status'] = (array) $input['order_status'];
 		}
 
-		if ( isset( $input['customer_type'] ) ) {
-			$payload['customer_type'] = $input['customer_type'];
+		if ( isset( $input['items_per_order'] ) ) {
+			$payload['items_per_order'] = (array) $input['items_per_order'];
 		}
-
-		if ( isset( $input['specific_customer_id'] ) ) {
-			$payload['specific_customer_id'] = (int) $input['specific_customer_id'];
-		}
-
-		$payload['order_value'] = array(
-			'min_total' => $input['min_total'] ?? 10,
-			'max_total' => $input['max_total'] ?? 1000,
-		);
-
-		$payload['items_per_order'] = array(
-			'min' => $input['min_items'] ?? 1,
-			'max' => $input['max_items'] ?? 5,
-		);
 
 		if ( isset( $input['payment_methods'] ) ) {
 			$payload['payment_methods'] = (array) $input['payment_methods'];
 		}
 
-		if ( isset( $input['customer_distribution'] ) ) {
-			$payload['customer_distribution'] = $input['customer_distribution'];
+		// Flattened for the client, nested for the generator: an MCP client writes a list of
+		// countries and should not have to know the shape the admin form happens to send.
+		if ( isset( $input['countries'] ) ) {
+			$payload['geographical_distribution'] = array( 'countries' => (array) $input['countries'] );
 		}
 
-		if ( isset( $input['geographical_distribution'] ) ) {
-			$payload['geographical_distribution'] = $input['geographical_distribution'];
+		foreach ( array( 'include_customer', 'include_shipping', 'include_tax' ) as $flag ) {
+			if ( isset( $input[ $flag ] ) ) {
+				$payload[ $flag ] = (bool) $input[ $flag ];
+			}
+		}
+
+		if ( isset( $input['customer_id'] ) ) {
+			$payload['customer_id'] = (int) $input['customer_id'];
 		}
 
 		return $payload;

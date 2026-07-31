@@ -205,42 +205,24 @@ export const generators: Generator[] = [
     popular: true,
     parameterConfig: {
       order_status: {
-        description: __("Order status distribution", "storeseeder"),
-        type: "string",
-        enum: ["pending", "processing", "completed", "cancelled", "on_hold", "refunded", "mixed"],
-        default: "mixed",
+        description: __("Statuses to draw from", "storeseeder"),
+        type: "array",
+        items: {
+          type: "string",
+          enum: ["pending", "processing", "on_hold", "completed", "cancelled", "failed", "refunded"],
+        },
+        default: ["completed", "processing", "pending"],
       },
-      customer_type: {
-        description: __("Type of customers for orders", "storeseeder"),
-        type: "string",
-        enum: ["existing", "new", "mixed", "specific"],
-        default: "mixed",
+      include_customer: {
+        description: __("Attach a customer account (off generates guest orders)", "storeseeder"),
+        type: "boolean",
+        default: true,
       },
-      specific_customer_id: {
-        description: __("Specific customer ID (when customer_type is 'specific')", "storeseeder"),
+      customer_id: {
+        description: __("Attach every order to this customer, to give one account an order history", "storeseeder"),
         type: "integer",
         minimum: 1,
-        dependsOn: { customer_type: "specific" },
-      },
-      customer_distribution: {
-        description: __("Customer type distribution for mixed mode", "storeseeder"),
-        type: "object",
-        properties: {
-          existing_ratio: {
-            description: __("Percentage of existing customers (0–100)", "storeseeder"),
-            type: "integer",
-            minimum: 0,
-            maximum: 100,
-            default: 70,
-          },
-          new_ratio: {
-            description: __("Percentage of new customers (0–100)", "storeseeder"),
-            type: "integer",
-            minimum: 0,
-            maximum: 100,
-            default: 30,
-          },
-        },
+        dependsOn: { include_customer: true },
       },
       items_per_order: {
         description: __("Number of items per order", "storeseeder"),
@@ -251,10 +233,12 @@ export const generators: Generator[] = [
         },
       },
       payment_methods: {
+        // The same five the endpoint validates. This list used to offer `cash_on_delivery` and
+        // `credit_card`, which REST rejected outright — so two of the choices failed the run.
         description: __("Payment methods to use", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["stripe", "paypal", "bank_transfer", "cash_on_delivery", "credit_card"] },
-        default: ["stripe", "paypal", "bank_transfer"],
+        items: { type: "string", enum: ["stripe", "paypal", "cod", "bank_transfer", "check"] },
+        default: ["stripe", "paypal", "cod"],
       },
       geographical_distribution: {
         description: __("Geographic distribution of orders", "storeseeder"),
@@ -267,6 +251,16 @@ export const generators: Generator[] = [
             default: ["US", "CA", "GB"],
           },
         },
+      },
+      include_shipping: {
+        description: __("Charge shipping (off is what a download-only store looks like)", "storeseeder"),
+        type: "boolean",
+        default: true,
+      },
+      include_tax: {
+        description: __("Apply tax", "storeseeder"),
+        type: "boolean",
+        default: true,
       },
     },
   },

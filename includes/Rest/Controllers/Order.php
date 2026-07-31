@@ -11,6 +11,7 @@
 
 namespace StoreSeeder\Rest\Controllers;
 
+use StoreSeeder\Platforms\Status;
 use StoreSeeder\Rest\Controller;
 use StoreSeeder\Generation\Generators\Order as OrderGenerator;
 
@@ -92,17 +93,20 @@ class Order extends Controller {
 	 */
 	protected function get_resource_specific_params(): array {
 		return array(
-			'order_status'      => array(
-				'description'       => __( 'Order status for generated orders.', 'storeseeder' ),
+			'order_status'              => array(
+				// The canonical vocabulary, all of it. The enum was missing `on_hold` and
+				// `failed`, which the generator's own default spread uses — so two of the
+				// statuses it produced could not be asked for.
+				'description'       => __( 'Statuses to draw from for generated orders.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
-					'enum' => array( 'pending', 'processing', 'completed', 'cancelled', 'refunded' ),
+					'enum' => Status::order_statuses(),
 				),
 				'default'           => array( 'completed', 'processing', 'pending' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
-			'payment_methods'   => array(
+			'payment_methods'           => array(
 				'description' => __( 'Payment methods to use for orders.', 'storeseeder' ),
 				'type'        => 'array',
 				'items'       => array(
@@ -111,30 +115,35 @@ class Order extends Controller {
 				),
 				'default'     => array( 'stripe', 'paypal', 'cod' ),
 			),
-			'order_value_range' => array(
-				'description' => __( 'Order total value range.', 'storeseeder' ),
+			// `order_value_range` was declared here and is gone. An order's total is the sum of
+			// the catalogue prices of the products it points at, plus tax and shipping — so a
+			// requested range could only be honoured by pricing line items at something other
+			// than what the store sells them for, which makes every revenue figure disagree with
+			// the catalogue it came from. Control the range through `price_range` on products.
+			'geographical_distribution' => array(
+				// Declared at last: the admin has been sending this and the generator reading it,
+				// with nothing in between describing or validating it.
+				'description' => __( 'Countries to draw order addresses from.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
-					'min' => array(
-						'description' => __( 'Minimum order value.', 'storeseeder' ),
-						'type'        => 'number',
-						'minimum'     => 1,
-						'default'     => 10,
-					),
-					'max' => array(
-						'description' => __( 'Maximum order value.', 'storeseeder' ),
-						'type'        => 'number',
-						'minimum'     => 1,
-						'default'     => 1000,
+					'countries' => array(
+						'description' => __( 'Two-letter country codes.', 'storeseeder' ),
+						'type'        => 'array',
+						'items'       => array( 'type' => 'string' ),
 					),
 				),
 			),
-			'include_customer'  => array(
-				'description' => __( 'Include customer data with orders.', 'storeseeder' ),
+			'include_customer'          => array(
+				'description' => __( 'Attach a customer account. Off generates guest orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
-			'items_per_order'   => array(
+			'customer_id'               => array(
+				'description' => __( 'Attach every order to this customer, for building one account an order history.', 'storeseeder' ),
+				'type'        => 'integer',
+				'minimum'     => 1,
+			),
+			'items_per_order'           => array(
 				'description' => __( 'Number of items per order range.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
@@ -152,12 +161,12 @@ class Order extends Controller {
 					),
 				),
 			),
-			'include_shipping'  => array(
+			'include_shipping'          => array(
 				'description' => __( 'Include shipping costs in orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
-			'include_tax'       => array(
+			'include_tax'               => array(
 				'description' => __( 'Include tax calculations in orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
