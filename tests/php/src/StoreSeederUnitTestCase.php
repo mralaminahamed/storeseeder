@@ -8,7 +8,7 @@
 namespace StoreSeeder\Tests;
 
 use Brain\Monkey;
-use StoreSeeder\Platform\Registry;
+use StoreSeeder\Platforms\Registry;
 use WP_REST_Request;
 use WP_REST_Server;
 use WP_UnitTestCase;

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Order_Tax_Rate;
+use StoreSeeder\Controllers\Resources\Order_Tax_Rate;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order_Tax_Rate REST controller.
  *
- * @covers \StoreSeeder\Controllers\Order_Tax_Rate
+ * @covers \StoreSeeder\Controllers\Resources\Order_Tax_Rate
  */
 class OrderTaxRateRESTControllerTest extends StoreSeederUnitTestCase {
 

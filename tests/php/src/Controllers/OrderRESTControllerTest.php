@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Order;
+use StoreSeeder\Controllers\Resources\Order;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order REST controller.
  *
- * @covers \StoreSeeder\Controllers\Order
+ * @covers \StoreSeeder\Controllers\Resources\Order
  */
 class OrderRESTControllerTest extends StoreSeederUnitTestCase {
 

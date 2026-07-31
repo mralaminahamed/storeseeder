@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Log;
+use StoreSeeder\Generators\Resources\Log;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Log generator.
  *
- * @covers \StoreSeeder\Generators\Log
+ * @covers \StoreSeeder\Generators\Resources\Log
  */
 class LogGeneratorTest extends StoreSeederUnitTestCase {
 

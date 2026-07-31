@@ -10,12 +10,12 @@
 
 namespace StoreSeeder\Tests\Platform;
 
-use StoreSeeder\Platform\Registry;
-use StoreSeeder\Platform\Resolver;
+use StoreSeeder\Platforms\Registry;
+use StoreSeeder\Platforms\Resolver;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
- * @covers \StoreSeeder\Platform\Resolver
+ * @covers \StoreSeeder\Platforms\Resolver
  */
 class ResolverTest extends StoreSeederUnitTestCase {
 

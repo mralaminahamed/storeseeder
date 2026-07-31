@@ -58,7 +58,7 @@ function storeseeder_test_platform_available( string $id ): bool {
 		return false;
 	}
 
-	if ( ! class_exists( 'StoreSeeder\\Platforms\\' . $spec['driver'] . '\\Platform' ) ) {
+	if ( ! class_exists( 'StoreSeeder\\Platforms\\Drivers\\' . $spec['driver'] . '\\Platform' ) ) {
 		return false;
 	}
 

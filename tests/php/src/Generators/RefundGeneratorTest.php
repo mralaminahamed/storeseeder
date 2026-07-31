@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Refund;
+use StoreSeeder\Generators\Resources\Refund;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Refund generator.
  *
- * @covers \StoreSeeder\Generators\Refund
+ * @covers \StoreSeeder\Generators\Resources\Refund
  */
 class RefundGeneratorTest extends StoreSeederUnitTestCase {
 

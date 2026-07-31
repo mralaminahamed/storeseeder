@@ -14,26 +14,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use StoreSeeder\Controllers\Product;
-use StoreSeeder\Controllers\Customer;
-use StoreSeeder\Controllers\Order;
-use StoreSeeder\Controllers\Coupon;
-use StoreSeeder\Controllers\Product_Variation;
-use StoreSeeder\Controllers\Shipping_Plan;
-use StoreSeeder\Controllers\Tax_Class;
-use StoreSeeder\Controllers\Transaction;
-use StoreSeeder\Controllers\Cart_Session;
-use StoreSeeder\Controllers\Attribute;
-use StoreSeeder\Controllers\Refund;
-use StoreSeeder\Controllers\Log;
-use StoreSeeder\Controllers\Shipping_Class;
-use StoreSeeder\Controllers\Label;
-use StoreSeeder\Controllers\Order_Tax_Rate;
-use StoreSeeder\Controllers\Product_Download;
-use StoreSeeder\Controllers\Subscription;
+use StoreSeeder\Controllers\Resources\Product;
+use StoreSeeder\Controllers\Resources\Customer;
+use StoreSeeder\Controllers\Resources\Order;
+use StoreSeeder\Controllers\Resources\Coupon;
+use StoreSeeder\Controllers\Resources\Product_Variation;
+use StoreSeeder\Controllers\Resources\Shipping_Plan;
+use StoreSeeder\Controllers\Resources\Tax_Class;
+use StoreSeeder\Controllers\Resources\Transaction;
+use StoreSeeder\Controllers\Resources\Cart_Session;
+use StoreSeeder\Controllers\Resources\Attribute;
+use StoreSeeder\Controllers\Resources\Refund;
+use StoreSeeder\Controllers\Resources\Log;
+use StoreSeeder\Controllers\Resources\Shipping_Class;
+use StoreSeeder\Controllers\Resources\Label;
+use StoreSeeder\Controllers\Resources\Order_Tax_Rate;
+use StoreSeeder\Controllers\Resources\Product_Download;
+use StoreSeeder\Controllers\Resources\Subscription;
 use StoreSeeder\MCP\MCP_Server;
-use StoreSeeder\Platform\Registry;
-use StoreSeeder\Platform\Resolver;
+use StoreSeeder\Platforms\Registry;
+use StoreSeeder\Platforms\Resolver;
 
 /**
  * Main Plugin Class for StoreSeeder

@@ -21,19 +21,19 @@ const MU_DIR = process.env.STORESEEDER_E2E_MU_DIR;
 
 const STUB_MU_PLUGIN = `<?php
 add_filter( 'storeseeder_platforms', static function ( array $platforms ): array {
-	if ( ! class_exists( '\\\\StoreSeeder\\\\Abstracts\\\\Platform_Driver' ) ) {
+	if ( ! class_exists( '\\\\StoreSeeder\\\\Platforms\\\\Platform_Driver' ) ) {
 		return $platforms;
 	}
-	$platforms[] = new class() extends \\StoreSeeder\\Abstracts\\Platform_Driver {
+	$platforms[] = new class() extends \\StoreSeeder\\Platforms\\Platform_Driver {
 		public function id(): string { return 'stub-cart'; }
 		public function label(): string { return 'Stub Cart'; }
 		public function is_active(): bool { return true; }
 		public function version(): ?string { return '2.0.0'; }
 		protected function capabilities(): array {
 			$matrix = array();
-			foreach ( \\StoreSeeder\\Platform\\Resource::all() as $r ) { $matrix[ $r ] = true; }
-			$matrix[ \\StoreSeeder\\Platform\\Resource::SUBSCRIPTION ] =
-				\\StoreSeeder\\Platform\\Capability::missing_extension( 'stub-subs', 'Stub Subscriptions' );
+			foreach ( \\StoreSeeder\\Platforms\\Resource::all() as $r ) { $matrix[ $r ] = true; }
+			$matrix[ \\StoreSeeder\\Platforms\\Resource::SUBSCRIPTION ] =
+				\\StoreSeeder\\Platforms\\Capability::missing_extension( 'stub-subs', 'Stub Subscriptions' );
 			return $matrix;
 		}
 		protected function writer_classes(): array { return array(); }

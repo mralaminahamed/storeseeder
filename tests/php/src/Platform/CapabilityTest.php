@@ -7,14 +7,14 @@
 
 namespace StoreSeeder\Tests\Platform;
 
-use StoreSeeder\Platform\Capability;
-use StoreSeeder\Platform\Registry;
-use StoreSeeder\Platform\Resource;
+use StoreSeeder\Platforms\Capability;
+use StoreSeeder\Platforms\Registry;
+use StoreSeeder\Platforms\Resource;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
- * @covers \StoreSeeder\Platform\Capability
- * @covers \StoreSeeder\Abstracts\Platform_Driver
+ * @covers \StoreSeeder\Platforms\Capability
+ * @covers \StoreSeeder\Platforms\Platform_Driver
  */
 class CapabilityTest extends StoreSeederUnitTestCase {
 

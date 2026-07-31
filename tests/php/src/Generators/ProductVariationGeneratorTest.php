@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Product_Variation;
+use StoreSeeder\Generators\Resources\Product_Variation;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Variation generator.
  *
- * @covers \StoreSeeder\Generators\Product_Variation
+ * @covers \StoreSeeder\Generators\Resources\Product_Variation
  */
 class ProductVariationGeneratorTest extends StoreSeederUnitTestCase {
 

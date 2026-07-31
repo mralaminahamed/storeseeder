@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Attribute;
+use StoreSeeder\Controllers\Resources\Attribute;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Attribute REST controller.
  *
- * @covers \StoreSeeder\Controllers\Attribute
+ * @covers \StoreSeeder\Controllers\Resources\Attribute
  */
 class AttributeRESTControllerTest extends StoreSeederUnitTestCase {
 

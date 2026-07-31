@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Shipping_Plan;
+use StoreSeeder\Controllers\Resources\Shipping_Plan;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Shipping_Plan REST controller.
  *
- * @covers \StoreSeeder\Controllers\Shipping_Plan
+ * @covers \StoreSeeder\Controllers\Resources\Shipping_Plan
  */
 class ShippingPlanRESTControllerTest extends StoreSeederUnitTestCase {
 

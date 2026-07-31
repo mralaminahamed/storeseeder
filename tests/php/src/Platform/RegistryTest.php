@@ -7,11 +7,11 @@
 
 namespace StoreSeeder\Tests\Platform;
 
-use StoreSeeder\Platform\Registry;
+use StoreSeeder\Platforms\Registry;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
- * @covers \StoreSeeder\Platform\Registry
+ * @covers \StoreSeeder\Platforms\Registry
  */
 class RegistryTest extends StoreSeederUnitTestCase {
 

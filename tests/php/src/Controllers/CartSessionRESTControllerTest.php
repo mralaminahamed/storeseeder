@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Cart_Session;
+use StoreSeeder\Controllers\Resources\Cart_Session;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Cart_Session REST controller.
  *
- * @covers \StoreSeeder\Controllers\Cart_Session
+ * @covers \StoreSeeder\Controllers\Resources\Cart_Session
  */
 class CartSessionRESTControllerTest extends StoreSeederUnitTestCase {
 

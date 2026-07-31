@@ -11,10 +11,10 @@
 
 namespace StoreSeeder\Tests\Platform;
 
-use StoreSeeder\Abstracts\Platform_Driver;
-use StoreSeeder\Abstracts\Writer;
-use StoreSeeder\Platform\Capability;
-use StoreSeeder\Platform\Resource;
+use StoreSeeder\Platforms\Platform_Driver;
+use StoreSeeder\Platforms\Writer;
+use StoreSeeder\Platforms\Capability;
+use StoreSeeder\Platforms\Resource;
 
 /**
  * Configurable fake driver.

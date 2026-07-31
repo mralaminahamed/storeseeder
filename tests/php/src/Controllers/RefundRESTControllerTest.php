@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Refund;
+use StoreSeeder\Controllers\Resources\Refund;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Refund REST controller.
  *
- * @covers \StoreSeeder\Controllers\Refund
+ * @covers \StoreSeeder\Controllers\Resources\Refund
  */
 class RefundRESTControllerTest extends StoreSeederUnitTestCase {
 
