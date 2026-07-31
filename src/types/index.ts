@@ -25,8 +25,36 @@ declare global {
        * Absent on an older build, in which case the provider fetches instead.
        */
       platforms?: PlatformState;
+      /** What MCP would need on this site, and what it has. */
+      mcp?: McpStatus;
     };
   }
+}
+
+/**
+ * MCP's two dependencies, and whether the site has them.
+ *
+ * Separate booleans rather than one `available`, because "install the Abilities API" and
+ * "install mcp-adapter" are different instructions and the user needs the right one.
+ */
+export interface McpStatus {
+  available: boolean;
+  abilities_api: boolean;
+  adapter: boolean;
+  /** How many generators there are — two tools each, at most. */
+  abilities: number;
+  /** How many tools are actually exposed under the current settings. */
+  tools: number;
+  /** Master switch: whether StoreSeeder serves an MCP server at all. */
+  enabled: boolean;
+  /** Whether the read-only preview tools are exposed. */
+  preview: boolean;
+  /** Whether the generate tools — the ones that write rows — are exposed. */
+  generate: boolean;
+  /** Whether the current user may change any of the three. */
+  can_manage: boolean;
+  /** The endpoint an MCP client connects to. */
+  route: string;
 }
 
 /**

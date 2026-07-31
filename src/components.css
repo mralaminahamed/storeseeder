@@ -361,6 +361,11 @@
 .fp-root .fp-set-section-title { display:flex; align-items:center; gap:9px; margin:0; font-size:var(--fs-h2); font-weight:600; letter-spacing:-.01em; color:var(--text); }
 .fp-root .fp-set-section-desc { margin:3px 0 0; font-size:var(--fs-hint); color:var(--text-3); }
 /* Instant save needs visible feedback now the Save buttons are gone. */
+.fp-root .fp-set-reqs { list-style:none; margin:0 0 12px; padding:0; display:flex; flex-direction:column; gap:7px; }
+.fp-root .fp-set-reqs li { display:flex; align-items:flex-start; gap:8px; font-size:var(--fs-hint); color:var(--text-2); }
+.fp-root .fp-set-reqs svg { flex:none; margin-top:1px; }
+.fp-root .fp-set-reqs .is-met { color:var(--green); }
+.fp-root .fp-set-reqs .is-missing { color:var(--red); }
 .fp-root .fp-set-saved { display:inline-flex; align-items:center; gap:4px; font-size:var(--fs-micro); font-weight:500; color:var(--green); animation:fp-pop .16s cubic-bezier(.2,.8,.2,1) both; }
 .fp-root .fp-set-scope { margin-left:8px; vertical-align:middle; font-weight:500; }
 .fp-root .fp-set-card-title { display:flex; align-items:center; }

@@ -22,6 +22,8 @@ import type { SampleDataStatus } from "@/lib/consent";
 import { getSettings, saveSettings } from "@/lib/settings";
 import { fetchAccess, saveAllowedRoles } from "@/lib/access";
 import type { AccessState } from "@/lib/access";
+import { fetchMcp, parseMcpStatus, saveMcpToggle } from "@/lib/mcp";
+import type { McpToggle } from "@/lib/mcp";
 import { requestTweaksPanel } from "@/lib/events";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
@@ -179,6 +181,15 @@ export default function SettingsPage() {
   // Locales come from the server, which lists exactly what the REST API accepts.
   // Options carry the code so the label never has to be mapped back to one.
   const locales = localeOptions();
+  // Inlined by the server: what MCP needs depends on which plugins are active, which
+  // cannot change while this page is open, so there is nothing to fetch or to skeleton.
+  // Held in state all the same, because the three switches below change it.
+  const [mcp, setMcp] = useState(
+    window.storeseederApi?.mcp
+      ? parseMcpStatus(window.storeseederApi.mcp)
+      : null,
+  );
+  const [savingMcp, setSavingMcp] = useState(false);
 
   // Applied and stored on change. The page used to have two "Save settings" buttons
   // writing the same object, next to three cards that saved the instant you touched
@@ -501,6 +512,59 @@ export default function SettingsPage() {
     }
   };
 
+  /**
+   * Flip one MCP switch.
+   *
+   * Optimistic, then replaced by what the server stored: the master switch withdraws the
+   * other two, and the tool count is the server's arithmetic, not a guess made here.
+   */
+  const toggleMcp = async (toggle: McpToggle, value: boolean) => {
+    if (!mcp) return;
+
+    setMcp({ ...mcp, [toggle]: value });
+    setSavingMcp(true);
+
+    try {
+      setMcp(await saveMcpToggle(toggle, value));
+    } catch {
+      setMcp(await fetchMcp().catch(() => mcp));
+      toast(__("Could not save the AI tool settings", "storeseeder"));
+    } finally {
+      setSavingMcp(false);
+    }
+  };
+
+  /** The card's headline icon: a warning only when something is actually wrong. */
+  const mcpIcon = (): IconName => {
+    if (!mcp) return "alert";
+    if (!mcp.available) return "alert";
+    if (!mcp.enabled || 0 === mcp.tools) return "info";
+    return "check2";
+  };
+
+  /** One line saying what an AI client can currently do here. */
+  const mcpSummary = (): string => {
+    if (!mcp || !mcp.available) {
+      return __("Not available on this site", "storeseeder");
+    }
+
+    if (!mcp.enabled) return __("Off — no tools are exposed", "storeseeder");
+
+    if (0 === mcp.tools) {
+      return __(
+        "On, but neither kind of tool is allowed — nothing is exposed",
+        "storeseeder",
+      );
+    }
+
+    return sprintf(
+      /* translators: 1: number of tools exposed, 2: number of generators. */
+      __("Active — %1$d tools across %2$d generators", "storeseeder"),
+      mcp.tools,
+      mcp.abilities,
+    );
+  };
+
   const handleClearData = () => {
     clearStats();
     toast(__("Run history cleared", "storeseeder"));
@@ -705,6 +769,145 @@ export default function SettingsPage() {
                   )}
                 </p>
               )}
+            </div>
+          </SetCard>
+        )}
+
+        {/* MCP. Site-wide, since it depends on which plugins are active — and reported
+            rather than hidden when unavailable: the two things it needs are not StoreSeeder's
+            to install, so naming them is the only useful thing this card can do. */}
+        {mcp && (
+          <SetCard
+            icon="sparkles"
+            scope="site"
+            testId="settings-mcp"
+            title={__("AI tools (MCP)", "storeseeder")}
+            desc={__(
+              "Exposes the generators as tools an AI client can call, so test data can be asked for in words rather than clicked.",
+              "storeseeder",
+            )}
+          >
+            <div>
+              <div className="fp-set-sync">
+                <span className="fp-set-sync-ic">
+                  <Icon name={mcpIcon()} size={19} />
+                </span>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+                    {mcpSummary()}
+                  </div>
+                  {mcp.available && mcp.enabled && 0 < mcp.tools && (
+                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                      <code>{mcp.route}</code>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Three switches, in the order the risk grows: whether there is an AI
+                  surface at all, whether an agent may look, whether it may write. Two
+                  tools per generator is what makes that last one a real boundary — with
+                  generation off an agent can still answer "what would 50 orders look
+                  like?", and cannot put them in the store. */}
+              {mcp.available && (
+                <div style={{ marginTop: 4 }}>
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled}
+                      disabled={!mcp.can_manage || savingMcp}
+                      onChange={(v) => void toggleMcp("enabled", v)}
+                      testId="mcp-enabled"
+                      label={__("Enable AI tools", "storeseeder")}
+                      hint={__(
+                        "Serves the MCP endpoint. Off means no tools at all, and a client can no longer connect.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
+
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled && mcp.preview}
+                      disabled={!mcp.can_manage || !mcp.enabled || savingMcp}
+                      onChange={(v) => void toggleMcp("preview", v)}
+                      testId="mcp-preview"
+                      label={sprintf(
+                        /* translators: %d: number of generators. */
+                        __("Allow preview tools (%d)", "storeseeder"),
+                        mcp.abilities,
+                      )}
+                      hint={__(
+                        "Read-only. Shows the rows a run would create, and writes nothing.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
+
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled && mcp.generate}
+                      disabled={!mcp.can_manage || !mcp.enabled || savingMcp}
+                      onChange={(v) => void toggleMcp("generate", v)}
+                      testId="mcp-generate"
+                      label={sprintf(
+                        /* translators: %d: number of generators. */
+                        __("Allow generating (%d, writes rows)", "storeseeder"),
+                        mcp.abilities,
+                      )}
+                      hint={__(
+                        "Lets an agent insert data into the store. Off leaves it able to preview only.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
+
+                  {!mcp.can_manage && (
+                    <p className="fp-set-hint">
+                      {__(
+                        "Only administrators can change what an AI client may do.",
+                        "storeseeder",
+                      )}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* One line per missing dependency, because "install the Abilities API" and
+                  "install mcp-adapter" are different jobs and a combined message sends the
+                  reader looking for the wrong one. */}
+              {!mcp.available && (
+                <ul className="fp-set-reqs">
+                  <li>
+                    <Icon
+                      name={mcp.abilities_api ? "check2" : "x"}
+                      size={14}
+                      className={mcp.abilities_api ? "is-met" : "is-missing"}
+                    />
+                    {__(
+                      "WordPress Abilities API — bundled with WordPress 6.9 and later, or installable as a plugin",
+                      "storeseeder",
+                    )}
+                  </li>
+                  <li>
+                    <Icon
+                      name={mcp.adapter ? "check2" : "x"}
+                      size={14}
+                      className={mcp.adapter ? "is-met" : "is-missing"}
+                    />
+                    {__(
+                      "The mcp-adapter plugin, which serves the tools to a client",
+                      "storeseeder",
+                    )}
+                  </li>
+                </ul>
+              )}
+
+              <p className="fp-set-hint mb-0">
+                {__(
+                  "Optional. Nothing else changes when it is absent — the admin, the REST API and WP-CLI all work the same. The same tools are also reachable through mcp-adapter's own default server, under whatever these switches allow.",
+                  "storeseeder",
+                )}
+              </p>
             </div>
           </SetCard>
         )}
