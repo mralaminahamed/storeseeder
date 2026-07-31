@@ -149,16 +149,35 @@ Fluent Cart's compare-at price, and WooCommerce's cost of goods is Fluent Cart's
 
 ### Orders
 
-- `order_status` — `pending`, `processing`, `completed`, `cancelled`, `on_hold`, `refunded`, `mixed`
-- `customer_type` — `existing` | `new` | `mixed` | `specific`
-- `specific_customer_id` — shown only when `customer_type` is `specific`; the one conditional
-  field in the whole schema
-- `customer_distribution`
+- `order_status` — any of `pending`, `processing`, `on_hold`, `completed`, `cancelled`, `refunded`,
+  `failed`; a list, drawn from at random
 - `items_per_order` — `{ min, max }`
-- `payment_methods` — `stripe`, `paypal`, `bank_transfer`, `cash_on_delivery`, `credit_card`
+- `payment_methods` — `stripe`, `paypal`, `cod`, `bank_transfer`, `check`
 - `geographical_distribution` — `US`, `CA`, `GB`, `AU`, `DE`, `FR`
+- `include_customer` — off generates guest orders
+- `customer_id` — attach every order to one account, to give it a purchase history
+- `include_shipping` — off generates orders with no shipping line at all, which is what a
+  download-only store looks like; that is a different order from one shipped for free, and both
+  are generated
+- `include_tax`
 
-The remaining fourteen follow the same pattern; the admin renders whatever the schema declares.
+Orders had the same problem products did, worse: seven parameter groups declared and none read, so
+asking for completed orders got the usual spread and every order carried one to three items whatever
+range was set. Two parameters are gone rather than left decorative. `order_value_range` cannot be
+honoured — an order's total is the sum of the catalogue prices of the products it points at, so a
+requested range could only be met by charging something other than what the store sells for; use
+`price_range` on products instead. `customer_type` and `customer_distribution` described a
+new-versus-existing split that no writer implemented; `customer_id` covers the case that was
+actually useful.
+
+An order now carries `discount_total`, `shipping_total`, `customer_note`, `ip_address`,
+`user_agent`, `paid_at` and `completed_at`, and both addresses carry a `company`. The dates follow
+the status rather than being invented: only a paid order has a payment date, only a completed one a
+completion date. Fluent Cart has no company column on an order address and reports it under
+`ignored`.
+
+The remaining fourteen resources follow the same pattern; the admin renders whatever the schema
+declares.
 
 ## Locales
 

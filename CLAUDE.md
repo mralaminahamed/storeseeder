@@ -53,10 +53,16 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 401 PHP tests / 2195 assertions, and 215 Jest tests
+**Current baselines: 520 PHP tests / 3759 assertions, and 215 Jest tests
 (`yarn test:unit`).** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
+
+The PHP figure is the sum of per-directory runs — `vendor/bin/phpunit tests/php/src/<dir>` for
+each of `Generators`, `Rest`, `Platform`, `MCP`, `CLI`, `Generation`, `Controllers`, plus the
+nine files at the root of `tests/php/src/`. One invocation over the whole tree stalls on this
+machine once both platform plugins are loaded; the per-directory blocks cover the same files and
+take about two minutes.
 
 ## Architecture, and the invariants that matter
 
@@ -154,7 +160,17 @@ declared in `generators.ts`, a controller's `get_resource_specific_params()` or 
 agree, because they are three declarations of one contract.
 
 When a parameter cannot be honoured, remove it. `Capability::supported_except()` is for a field one
-*platform* cannot store, not for one nothing implements.
+*platform* cannot store, not for one nothing implements — and not for one whose *intent* was met.
+Fluent Cart's `shipping_total` is NOT NULL, so it cannot tell an unshipped order from a free-shipped
+one, but switching shipping off still charges nothing; listing the field would tell the caller their
+request was dropped when it was not, and a false alarm is worse than the lost nuance.
+
+Two parameters that survived three surfaces without ever being readable, for the shape of the
+mistake: `order_value_range` asked for a total range, and a total is the sum of the catalogue prices
+of the products the order points at — both writers price line items from the real product, because an
+order line at $412 for a $19 product makes every revenue figure disagree with the store. And
+`customer_type` / `customer_distribution` described a new-versus-existing split no writer implemented;
+`customer_id` replaced them, which is the part that was useful.
 
 ### A platform-specific field is a parameter, never an entity field
 
