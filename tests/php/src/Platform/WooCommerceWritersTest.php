@@ -247,13 +247,15 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 	/**
 	 * A canonical order entity.
 	 *
-	 * @param string $status Canonical status.
+	 * @param string               $status Canonical status.
+	 * @param array<string, mixed> $extra  Fields merged over the defaults.
 	 *
 	 * @return array<string, mixed>
 	 */
-	private function order_entity( string $status = Status::COMPLETED ): array {
+	private function order_entity( string $status = Status::COMPLETED, array $extra = array() ): array {
 		$address = array(
 			'name'      => 'Ada Lovelace',
+			'company'   => '',
 			'address_1' => '1 Test Street',
 			'address_2' => '',
 			'city'      => 'London',
@@ -263,25 +265,35 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 			'phone'     => '01234 567890',
 		);
 
-		return array(
-			'items'          => array(
-				array(
-					'unit_price' => 1000,
-					'quantity'   => 2,
+		return array_merge(
+			array(
+				'items'          => array(
+					array(
+						'unit_price' => 1000,
+						'quantity'   => 2,
+					),
 				),
+				'tax_rate'       => 0,
+				'use_coupon'     => false,
+				'discount_total' => 0,
+				'shipping_total' => 0,
+				'currency'       => 'USD',
+				'status'         => $status,
+				'payment_method' => 'stripe',
+				'invoice_no'     => 'INV-1',
+				'receipt_number' => 'RCP-1',
+				'customer_note'  => '',
+				'ip_address'     => '198.51.100.7',
+				'user_agent'     => 'StoreSeeder/1.0',
+				'paid_at'        => null,
+				'completed_at'   => null,
+				'addresses'      => array(
+					'billing'  => $address,
+					'shipping' => $address,
+				),
+				'created_at'     => '2026-01-01 10:00:00',
 			),
-			'tax_rate'       => 0,
-			'use_coupon'     => false,
-			'currency'       => 'USD',
-			'status'         => $status,
-			'payment_method' => 'stripe',
-			'invoice_no'     => 'INV-1',
-			'receipt_number' => 'RCP-1',
-			'addresses'      => array(
-				'billing'  => $address,
-				'shipping' => $address,
-			),
-			'created_at'     => '2026-01-01 10:00:00',
+			$extra
 		);
 	}
 
@@ -337,6 +349,127 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 		$this->assertWPError( $result );
 		$this->assertSame( 'no_products', $result->get_error_code() );
 		$this->assertStringContainsString( 'products', $result->get_error_message() );
+	}
+
+	/**
+	 * Shipping is a line item in WooCommerce, not a column. Setting `set_shipping_total()` before
+	 * `calculate_totals()` looks right and is discarded — the totals run recomputes shipping from
+	 * the order's shipping lines, of which there were none.
+	 */
+	public function test_shipping_becomes_a_line_item_and_survives_the_totals_run(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-SHIP' ) ) ) );
+
+		$result = $this->writer( Resource::ORDER )->write( $this->order_entity( Status::COMPLETED, array( 'shipping_total' => 675 ) ) );
+		$this->assertNotWPError( $result );
+
+		$order = wc_get_order( $result['id'] );
+
+		$this->assertSame( '6.75', $order->get_shipping_total() );
+		$this->assertCount( 1, $order->get_items( 'shipping' ) );
+	}
+
+	/**
+	 * Free shipping is still a shipping line, worth nothing and named for the method — which is what
+	 * a real WooCommerce order looks like when a free-shipping zone matched. Omitting the line would
+	 * make the order look as though shipping was never considered.
+	 */
+	public function test_free_shipping_is_a_zero_line_named_for_the_method(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-FREE' ) ) ) );
+
+		$result = $this->writer( Resource::ORDER )->write( $this->order_entity( Status::COMPLETED, array( 'shipping_total' => 0 ) ) );
+		$this->assertNotWPError( $result );
+
+		$order = wc_get_order( $result['id'] );
+
+		$this->assertSame( '0', $order->get_shipping_total() );
+
+		$lines = $order->get_items( 'shipping' );
+		$this->assertCount( 1, $lines );
+
+		$line = reset( $lines );
+		$this->assertSame( 'free_shipping', $line->get_method_id() );
+		// `0.00` on the line, `0` on the order: WooCommerce formats a line total to the currency's
+		// decimals and an order total to the shortest form. Compared numerically rather than
+		// asserting one of the two spellings.
+		$this->assertSame( 0.0, (float) $line->get_total() );
+	}
+
+	/**
+	 * A discount set before the totals run is wiped by it, which is why it is applied afterwards.
+	 * The assertion is on the total rather than on a discount column, because that is where a lost
+	 * discount actually shows.
+	 */
+	public function test_a_discount_reduces_the_total(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-DISC' ) ) ) );
+
+		$full = $this->writer( Resource::ORDER )->write( $this->order_entity() );
+		$cut  = $this->writer( Resource::ORDER )->write( $this->order_entity( Status::COMPLETED, array( 'discount_total' => 500 ) ) );
+
+		$this->assertNotWPError( $full );
+		$this->assertNotWPError( $cut );
+
+		$this->assertSame(
+			round( (float) wc_get_order( $full['id'] )->get_total() - 5, 2 ),
+			round( (float) wc_get_order( $cut['id'] )->get_total(), 2 )
+		);
+	}
+
+	public function test_an_order_carries_the_shopper_metadata(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-META' ) ) ) );
+
+		$result = $this->writer( Resource::ORDER )->write(
+			$this->order_entity(
+				Status::COMPLETED,
+				array(
+					'customer_note' => 'Leave it with the neighbour.',
+					'ip_address'    => '203.0.113.9',
+					'user_agent'    => 'StoreSeeder/Test',
+					'paid_at'       => '2026-01-02 11:00:00',
+					'completed_at'  => '2026-01-03 12:00:00',
+				)
+			)
+		);
+		$this->assertNotWPError( $result );
+
+		$order = wc_get_order( $result['id'] );
+
+		$this->assertSame( 'Leave it with the neighbour.', $order->get_customer_note() );
+		$this->assertSame( '203.0.113.9', $order->get_customer_ip_address() );
+		$this->assertSame( 'StoreSeeder/Test', $order->get_customer_user_agent() );
+		$this->assertNotNull( $order->get_date_paid() );
+		$this->assertNotNull( $order->get_date_completed() );
+	}
+
+	/**
+	 * The dates are set after the status, because `set_status( 'completed' )` stamps both itself and
+	 * would overwrite a date set before it.
+	 */
+	public function test_an_unpaid_order_has_no_payment_date(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-UNPAID' ) ) ) );
+
+		$result = $this->writer( Resource::ORDER )->write( $this->order_entity( Status::ON_HOLD ) );
+		$this->assertNotWPError( $result );
+
+		$order = wc_get_order( $result['id'] );
+
+		$this->assertNull( $order->get_date_paid() );
+		$this->assertNull( $order->get_date_completed() );
+	}
+
+	public function test_a_company_reaches_both_addresses(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'ORDER-CO' ) ) ) );
+
+		$entity = $this->order_entity();
+		$entity['addresses']['billing']['company']  = 'Analytical Engines Ltd';
+		$entity['addresses']['shipping']['company'] = 'Analytical Engines Ltd';
+
+		$result = $this->writer( Resource::ORDER )->write( $entity );
+		$this->assertNotWPError( $result );
+
+		$order = wc_get_order( $result['id'] );
+
+		$this->assertSame( 'Analytical Engines Ltd', $order->get_billing_company() );
+		$this->assertSame( 'Analytical Engines Ltd', $order->get_shipping_company() );
 	}
 
 	// -----------------------------------------------------------------------------------
