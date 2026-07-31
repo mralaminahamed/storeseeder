@@ -20,7 +20,7 @@ storeseeder/
 │   ├── Rest/                    # REST surface
 │   │   ├── Controller.php       #   abstract base: params, validation, platform resolution
 │   │   ├── Registry.php         #   owns storeseeder_rest_controllers
-│   │   └── Controllers/         #   18 controllers, one per resource
+│   │   └── Controllers/         #   19 controllers, one per resource
 │   ├── CLI/                     # WP-CLI surface (only registers when WP_CLI is present)
 │   │   ├── Command.php          #   abstract base: resource resolution, payload building
 │   │   ├── Registry.php         #   owns storeseeder_cli_commands
@@ -30,7 +30,7 @@ storeseeder/
 │   │   ├── Registry.php         #   owns storeseeder_mcp_abilities
 │   │   ├── Settings.php         #   the three switches: AI surface, preview, generate
 │   │   ├── Ability.php          #   abstract base: dispatches through the REST API
-│   │   └── Abilities/           #   17 self-describing abilities, one per resource
+│   │   └── Abilities/           #   19 self-describing abilities, one per resource
 │   └── Platforms/               # Where data goes
 │       ├── Platform_Interface.php  # what a platform must answer
 │       ├── Platform_Driver.php     # abstract base for shipped drivers
@@ -38,17 +38,17 @@ storeseeder/
 │       ├── Registry.php            # holds drivers; owns storeseeder_platforms
 │       ├── Resolver.php            # auto | explicit → one target platform
 │       ├── Capability.php          # can this platform do this, and why not
-│       ├── Resource.php            # the 18 canonical resource names
+│       ├── Resource.php            # the 19 canonical resource names
 │       ├── Status.php              # canonical status vocabulary
 │       ├── Locale.php              # the 75 generatable locales; owns storeseeder_locales
 │       └── Drivers/
 │           ├── Fluent_Cart/
 │           │   ├── Platform.php    # capability matrix + writer map
-│           │   └── Writers/        # 18 writers, one per resource
+│           │   └── Writers/        # 19 writers, one per resource
 │           └── Woo_Commerce/
-│               ├── Platform.php    # matrix: 15 supported, 3 refused with reasons
+│               ├── Platform.php    # matrix: 16 supported, 3 refused with reasons
 │               ├── Writer.php      # shared money, status and foreign-key helpers
-│               └── Writers/        # 15 writers, through WooCommerce's CRUD objects
+│               └── Writers/        # 16 writers, through WooCommerce's CRUD objects
 ├── src/                         # React admin (TypeScript)
 │   ├── index.tsx                # entry point, mounts into #storeseeder-root
 │   ├── components/              # App.tsx, Pages/, shell/, generator/, home/,

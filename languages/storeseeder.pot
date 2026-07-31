@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T17:52:05+00:00\n"
+"POT-Creation-Date: 2026-07-31T18:35:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -255,6 +255,7 @@ msgstr ""
 #: includes/CLI/Commands/Platforms.php:177
 #: includes/CLI/Commands/Platforms.php:187
 #: includes/CLI/Commands/Sample_Data.php:176
+#: includes/Generation/Generators/Brand.php:188
 msgid "yes"
 msgstr ""
 
@@ -264,6 +265,7 @@ msgstr ""
 
 #: includes/CLI/Commands/Platforms.php:187
 #: includes/CLI/Commands/Sample_Data.php:176
+#: includes/Generation/Generators/Brand.php:188
 msgid "no"
 msgstr ""
 
@@ -378,6 +380,29 @@ msgstr ""
 msgid "Product Attribute Groups with Terms"
 msgstr ""
 
+#: includes/Generation/Generators/Brand.php:93
+msgid "Brands"
+msgstr ""
+
+#: includes/Generation/Generators/Brand.php:146
+#: includes/Rest/Controllers/Brand.php:39
+msgid "Brand"
+msgstr ""
+
+#: includes/Generation/Generators/Brand.php:150
+msgid "Slug"
+msgstr ""
+
+#: includes/Generation/Generators/Brand.php:154
+#: build/admin-app.js:19576
+#: build/admin-app.js:25449
+msgid "Products"
+msgstr ""
+
+#: includes/Generation/Generators/Brand.php:158
+msgid "Sub-brand"
+msgstr ""
+
 #: includes/Generation/Generators/Cart_Session.php:42
 #: build/admin-app.js:26207
 msgid "Cart Sessions"
@@ -444,12 +469,12 @@ msgid "Orders"
 msgstr ""
 
 #: includes/Generation/Generators/Label.php:63
-#: build/admin-app.js:26396
+#: build/admin-app.js:26421
 msgid "Labels"
 msgstr ""
 
 #: includes/Generation/Generators/License.php:58
-#: build/admin-app.js:26436
+#: build/admin-app.js:26461
 msgid "Licenses"
 msgstr ""
 
@@ -493,7 +518,7 @@ msgid "Total"
 msgstr ""
 
 #: includes/Generation/Generators/Order_Tax_Rate.php:41
-#: build/admin-app.js:26406
+#: build/admin-app.js:26431
 msgid "Order Tax Lines"
 msgstr ""
 
@@ -510,7 +535,7 @@ msgid "Stock"
 msgstr ""
 
 #: includes/Generation/Generators/Product_Download.php:41
-#: build/admin-app.js:26416
+#: build/admin-app.js:26441
 msgid "Product Downloads"
 msgstr ""
 
@@ -528,7 +553,7 @@ msgid "Partial refund"
 msgstr ""
 
 #: includes/Generation/Generators/Shipping_Class.php:58
-#: build/admin-app.js:26386
+#: build/admin-app.js:26411
 msgid "Shipping Classes"
 msgstr ""
 
@@ -538,7 +563,7 @@ msgid "Shipping Plans"
 msgstr ""
 
 #: includes/Generation/Generators/Subscription.php:63
-#: build/admin-app.js:26426
+#: build/admin-app.js:26451
 msgid "Subscriptions"
 msgstr ""
 
@@ -565,7 +590,7 @@ msgid "%1$s records cannot be removed from %2$s automatically."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Attributes.php:30
-msgid "Generate Attributes"
+msgid "Generate Product Attributes"
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Attributes.php:37
@@ -574,6 +599,18 @@ msgstr ""
 
 #: includes/MCP/Abilities/Generate_Attributes.php:46
 msgid "Array of generated attribute objects with id, name, type, slug, and values array."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Brands.php:30
+msgid "Generate Product Brands"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Brands.php:37
+msgid "Generate product brands and attach them to existing products, for testing brand archives, filters and product pages. Brands need a platform that has them: WooCommerce, EasyCommerce and Fluent Cart do, and the store must already have products to attach them to."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Brands.php:46
+msgid "Array of generated brand objects with id, name, slug, how many products it was attached to, and its parent brand when it is a sub-brand."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Cart_Sessions.php:30
@@ -1050,7 +1087,7 @@ msgstr ""
 
 #: includes/Platforms/Capability.php:133
 #: includes/Rest/Controller.php:400
-#: build/admin-app.js:27038
+#: build/admin-app.js:27063
 msgid "Not supported by this platform."
 msgstr ""
 
@@ -1069,6 +1106,10 @@ msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Attribute.php:66
 msgid "Failed to create attribute group."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Brand.php:60
+msgid "Fluent Cart is not active on this site, so its brand taxonomy is not registered."
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:50
@@ -1352,6 +1393,10 @@ msgstr ""
 msgid "WooCommerce is not active on this site."
 msgstr ""
 
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Brand.php:59
+msgid "WooCommerce does not have brands registered on this site. They are core in WooCommerce 9.6 and later."
+msgstr ""
+
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:69
 msgid "No products were found. Generate products before generating cart sessions."
 msgstr ""
@@ -1492,7 +1537,9 @@ msgid "This platform cannot remove generated %s records automatically."
 msgstr ""
 
 #. translators: %s: canonical resource name, e.g. license.
+#. translators: %s: canonical resource name, e.g. brand.
 #: includes/Platforms/Writer.php:150
+#: includes/Platforms/Writer.php:264
 #, php-format
 msgid "The plugin that stores generated %s records is no longer active."
 msgstr ""
@@ -2097,7 +2144,7 @@ msgid "Generated %1$s %2$s"
 msgstr ""
 
 #: build/admin-app.js:19374
-#: build/admin-app.js:27494
+#: build/admin-app.js:27519
 msgid "An error occurred."
 msgstr ""
 
@@ -2151,11 +2198,6 @@ msgstr ""
 
 #: build/admin-app.js:19570
 msgid "New generation"
-msgstr ""
-
-#: build/admin-app.js:19576
-#: build/admin-app.js:25449
-msgid "Products"
 msgstr ""
 
 #: build/admin-app.js:19585
@@ -3496,7 +3538,7 @@ msgid "Cart recovery rate percentage (0–100)"
 msgstr ""
 
 #: build/admin-app.js:26308
-msgid "Attributes"
+msgid "Product Attributes"
 msgstr ""
 
 #: build/admin-app.js:26312
@@ -3508,133 +3550,153 @@ msgid "Types of attributes to generate"
 msgstr ""
 
 #: build/admin-app.js:26328
-msgid "Refunds"
+msgid "Product Brands"
 msgstr ""
 
 #: build/admin-app.js:26332
-msgid "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs."
+msgid "Generate product brands and attach them to existing products, for testing brand archives, filters, and product pages. Needs a platform that has brands, and products to attach them to."
 msgstr ""
 
 #: build/admin-app.js:26333
-msgid "Store owners testing refund workflows, payment gateway developers"
+msgid "Store owners with multi-brand catalogues, theme developers"
 msgstr ""
 
 #: build/admin-app.js:26338
-msgid "Order statuses eligible for refund generation"
+msgid "How many products to attach each brand to"
 msgstr ""
 
-#: build/admin-app.js:26347
-msgid "Payment gateways for transaction IDs"
+#: build/admin-app.js:26345
+msgid "Percentage created as sub-brands of an existing brand (0–100)"
+msgstr ""
+
+#: build/admin-app.js:26353
+msgid "Refunds"
 msgstr ""
 
 #: build/admin-app.js:26357
+msgid "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs."
+msgstr ""
+
+#: build/admin-app.js:26358
+msgid "Store owners testing refund workflows, payment gateway developers"
+msgstr ""
+
+#: build/admin-app.js:26363
+msgid "Order statuses eligible for refund generation"
+msgstr ""
+
+#: build/admin-app.js:26372
+msgid "Payment gateways for transaction IDs"
+msgstr ""
+
+#: build/admin-app.js:26382
 msgid "Logs"
 msgstr ""
 
-#: build/admin-app.js:26361
+#: build/admin-app.js:26386
 msgid "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails."
 msgstr ""
 
-#: build/admin-app.js:26362
+#: build/admin-app.js:26387
 msgid "Developers testing audit logs, admin panel log views"
 msgstr ""
 
-#: build/admin-app.js:26367
+#: build/admin-app.js:26392
 msgid "Log severity types to generate"
 msgstr ""
 
-#: build/admin-app.js:26376
+#: build/admin-app.js:26401
 msgid "Object types to generate log entries for"
 msgstr ""
 
-#: build/admin-app.js:26390
+#: build/admin-app.js:26415
 msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag."
 msgstr ""
 
-#: build/admin-app.js:26391
+#: build/admin-app.js:26416
 msgid "Store owners configuring shipping rate groups"
 msgstr ""
 
-#: build/admin-app.js:26400
+#: build/admin-app.js:26425
 msgid "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to."
 msgstr ""
 
-#: build/admin-app.js:26401
+#: build/admin-app.js:26426
 msgid "Teams segmenting orders and customers with tags"
 msgstr ""
 
-#: build/admin-app.js:26410
+#: build/admin-app.js:26435
 msgid "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates."
 msgstr ""
 
-#: build/admin-app.js:26411
+#: build/admin-app.js:26436
 msgid "Developers testing tax reports and collected-tax views"
 msgstr ""
 
-#: build/admin-app.js:26420
+#: build/admin-app.js:26445
 msgid "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products."
 msgstr ""
 
-#: build/admin-app.js:26421
+#: build/admin-app.js:26446
 msgid "Developers testing digital-product fulfillment"
 msgstr ""
 
-#: build/admin-app.js:26430
+#: build/admin-app.js:26455
 msgid "Generate subscription records against existing orders. Records seed as fixtures; charging them is your platform's job and may need a paid add-on. Requires existing orders and products."
 msgstr ""
 
-#: build/admin-app.js:26431
+#: build/admin-app.js:26456
 msgid "Developers testing recurring-billing views and reports"
 msgstr ""
 
-#: build/admin-app.js:26440
+#: build/admin-app.js:26465
 msgid "Create software licences against existing orders — keys, site limits, activation counts and expiry dates, including licences already at their limit and some long expired. Requires Fluent Cart Pro, which owns the licensing tables."
 msgstr ""
 
-#: build/admin-app.js:26441
+#: build/admin-app.js:26466
 msgid "Developers testing licence validation, activation limits and renewal notices"
 msgstr ""
 
-#: build/admin-app.js:26474
+#: build/admin-app.js:26499
 msgid "Core"
 msgstr ""
 
-#: build/admin-app.js:26476
+#: build/admin-app.js:26501
 msgid "Advanced"
 msgstr ""
 
-#: build/admin-app.js:26478
+#: build/admin-app.js:26503
 msgid "Enhanced"
 msgstr ""
 
-#: build/admin-app.js:26749
+#: build/admin-app.js:26774
 msgid "Generation locale"
 msgstr ""
 
-#: build/admin-app.js:27020
+#: build/admin-app.js:27045
 msgid "Auto"
 msgstr ""
 
 #. translators: %s: name of the platform that Auto resolved to.
-#: build/admin-app.js:27022
+#: build/admin-app.js:27047
 #, js-format
 msgid "Auto · %s"
 msgstr ""
 
 #. translators: %1$s: total items, %2$s: number of generators
-#: build/admin-app.js:27503
+#: build/admin-app.js:27528
 #, js-format
 msgid "Batch complete · %1$s items"
 msgstr ""
 
 #. translators: %s: number of generators run
-#: build/admin-app.js:27504
+#: build/admin-app.js:27529
 #, js-format
 msgid "%s generator run"
 msgid_plural "%s generators run"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/admin-app.js:27506
+#: build/admin-app.js:27531
 msgid "Batch failed"
 msgstr ""

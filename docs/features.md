@@ -3,7 +3,7 @@
 What StoreSeeder does. Everything listed here exists in the shipped code — where a capability is
 planned rather than present, it says so.
 
-## The 18 generators
+## The 19 generators
 
 Grouped as the admin groups them. Each writes through the target platform's own models, so
 generated records carry the same validation, relationships and money handling as real ones.
@@ -23,6 +23,7 @@ generated records carry the same validation, relationships and money handling as
 |---|---|---|
 | **Product Variations** | Extra priced variations on existing products, with unique SKUs | Products |
 | **Attributes** | Attribute groups (Colour, Size, Material…) with terms, bound to real variations | Products |
+| **Brands** | Product brands, attached to existing products, optionally nested as sub-brands | Products |
 | **Product Downloads** | Downloadable files on products, plus download permissions on existing orders | Products, Orders |
 | **Cart Sessions** | Abandoned and active carts containing real products | Products |
 | **Transactions** | Payment transactions against real orders | Orders |
@@ -44,8 +45,8 @@ first rather than failing opaquely.
 StoreSeeder writes through a **platform driver**, so the same generators can seed different
 e-commerce plugins.
 
-- **Fluent Cart** — shipped, all 18 resources. Licences are conditional: the tables belong to Fluent Cart Pro, so without it the resource reports that plugin by name
-- **WooCommerce** — shipped, 15 of the 18 resources. Written through WooCommerce's own CRUD
+- **Fluent Cart** — shipped, all 19 resources. Licences are conditional: the tables belong to Fluent Cart Pro, so without it the resource reports that plugin by name
+- **WooCommerce** — shipped, 16 of the 19 resources. Written through WooCommerce's own CRUD
   objects (`WC_Product`, `WC_Order`, `WC_Customer`, `WC_Coupon`), the same route
   `wc-smooth-generator` takes, so records are valid under HPOS or the post store and fire the
   hooks other extensions listen for. Subscriptions need WooCommerce Subscriptions; transactions,
@@ -64,6 +65,7 @@ different answers:
 
 | Resource | Fluent Cart | WooCommerce |
 |---|---|---|
+| Brands | `product-brands` taxonomy | `product_brand` taxonomy (core since 9.6) |
 | Transactions | a payment record per attempt | payment lives on the order — no separate record |
 | Labels | labels on orders and customers | no order or customer labels |
 | Licences | needs Fluent Cart Pro | not a core concept |
