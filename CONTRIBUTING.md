@@ -109,6 +109,22 @@ WP_DB_PASS=secret composer test
 The WordPress test suite **drops every table sharing `WP_TABLE_PREFIX`** — never point it at a
 database you care about.
 
+### TypeScript unit tests (Jest)
+
+```bash
+yarn test:unit            # once
+yarn test:unit:watch      # while working
+yarn test:unit:coverage
+```
+
+Tests live **beside the code they test** — `src/lib/locales.test.ts` next to
+`src/lib/locales.ts` — so a module and its tests move and get reviewed together. Two rules
+follow from the setup: name the file `*.test.ts(x)`, because `*.spec.ts` belongs to
+Playwright and each runner would try to execute the other's files; and import from
+`@jest/globals` rather than relying on ambient globals, which is what keeps the tests
+type-checked. Jest transpiles through Babel and does not check types, so run
+`npx tsc --noEmit` alongside it.
+
 ### Browser tests (Playwright)
 
 The e2e suite drives a real WordPress install, so it needs one running with StoreSeeder and a

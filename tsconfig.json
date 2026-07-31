@@ -21,5 +21,8 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  // Tests live beside their sources under src/, so they are type-checked by the same
+  // `npx tsc --noEmit` run as the code. That is deliberate: it is the only type-check
+  // the tests get, since Jest transpiles through Babel and does not type-check.
+  "exclude": ["node_modules", "build", "vendor"]
 }

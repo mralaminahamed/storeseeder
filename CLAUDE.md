@@ -28,7 +28,8 @@ composer makepot              # requires build/admin-app.js to exist first
 # Frontend
 yarn build                    # webpack via @wordpress/scripts
 yarn lint:js                  # eslint (flat config)
-npx tsc --noEmit              # NOT wired to any script, but it does catch real errors
+yarn test:unit                # Jest — 137 tests, colocated as src/**/*.test.ts
+npx tsc --noEmit              # the only type-check the tests get; Jest uses Babel
 yarn test:e2e                 # Playwright — see the warning below
 ```
 
@@ -52,7 +53,8 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baseline: 319 tests, 1746 assertions.** For any refactor claiming no behaviour
+**Current baselines: 319 PHP tests / 1746 assertions, and 137 Jest tests
+(`yarn test:unit`).** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
 
@@ -175,6 +177,10 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
   falls back to `en_US` in silence, the other 67 produced English with no error. Adding a locale
   means FakerPHP ships a provider for it; `LocaleTest::test_list_matches_fakerphp_exactly()`
   fails otherwise.
+- **Jest owns `*.test.ts(x)`, Playwright owns `*.spec.ts`.** Both would otherwise collect
+  the other's files, and a Playwright spec under Jest fails with a confusing error about
+  `test.describe`. Jest tests sit **beside their source** (`src/lib/locales.test.ts`), not
+  in a parallel tree; PHP tests stay under `tests/php/`, mirroring `includes/`.
 - **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
 - **Sample data lives in a separate repo** and downloads only after an administrator accepts
   the consent prompt. That prompt is the only thing granting permission — see

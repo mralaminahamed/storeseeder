@@ -36,9 +36,43 @@ yarn start                  # webpack watch
 yarn build                  # production bundle -> build/admin-app.js
 yarn lint:js                # ESLint (flat config)
 yarn lint:js:fix
+yarn test:unit              # Jest unit tests
+yarn test:unit:watch
+yarn test:unit:coverage
 yarn packages-update        # update @wordpress/* packages
 npx tsc --noEmit            # not wired to a script, still catches real errors
 ```
+
+### TypeScript unit tests
+
+Jest, configured by `jest.config.js`, with tests **beside the code they test**:
+
+```
+src/lib/locales.ts
+src/lib/locales.test.ts
+```
+
+That is a deliberate choice over a parallel `tests/` tree. A module and its tests move,
+rename and get reviewed together, and a module with no test is visible by the absence of a
+neighbour rather than by comparing two directory listings.
+
+Three things worth knowing before adding one:
+
+- **Naming decides the runner.** Jest collects `*.test.ts(x)`; Playwright collects
+  `*.spec.ts`. Cross them and each tries to execute the other's files — a Playwright spec
+  under Jest fails with a confusing error about `test.describe`.
+- **TypeScript runs through Babel, not ts-jest.** `@wordpress/babel-preset-default` already
+  carries `@babel/preset-typescript`, so types are *erased*, not checked. `npx tsc --noEmit`
+  covers `src/` including the tests, and is the only type-check they get. ts-jest would
+  check the same files a second time, more slowly, for no extra signal.
+- **Import from `@jest/globals`** (`import { describe, it, expect } from "@jest/globals"`)
+  rather than relying on ambient globals. That is what lets the tests type-check without an
+  `@types/jest` dependency.
+
+`src/test/setup.ts` runs before every file and resets the two browser globals the modules
+read — `window.storeseederApi`, which the server inlines in production, and `localStorage` —
+so one test cannot leak state into the next. That is the failure mode that makes a suite pass
+in one order and fail in another.
 
 ### PHP
 
@@ -452,6 +486,7 @@ Separately, `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` 
 - [ ] `CHANGELOG.md` updated; `readme.txt` changelog carries the recent entries
 - [ ] `composer test` — the count matches the recorded baseline
 - [ ] `composer phpcs`, `composer phpstan`, `yarn lint:js`, `npx tsc --noEmit`
+- [ ] `yarn test:unit` — the Jest count matches the recorded baseline
 - [ ] `composer phpcs:plugin-review` for the WordPress.org ruleset
 - [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
 - [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)

@@ -98,6 +98,14 @@ const ICONS = {
  */
 export type IconName = keyof typeof ICONS;
 
+/**
+ * The same names at runtime, for checks the type system cannot make.
+ *
+ * `Icon` falls back to `box` for an unknown name, so a wrong name is invisible in the UI
+ * — generators.test.ts asserts every declared `iconName` is really here.
+ */
+export const ICON_NAMES = Object.keys( ICONS ) as IconName[];
+
 export function Icon({ name, size = 18, stroke = 1.75, fill = "none", className = "", style = {} }:
   { name: IconName; size?: number; stroke?: number; fill?: string; className?: string; style?: React.CSSProperties }) {
   const p = ICONS[name] ?? ICONS.box;

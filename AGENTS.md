@@ -88,12 +88,22 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
 
 - **PHP: PHPUnit**, under `tests/php/src/`, mirroring the `includes/` layout. New behaviour
   needs a test; a bug fix needs the test that would have caught it.
-- **Frontend: Playwright**, under `tests/e2e/`. There is no Jest and no React Testing Library
-  in this project — do not add imports assuming otherwise.
+- **TypeScript units: Jest**, colocated — `src/lib/locales.test.ts` sits beside
+  `src/lib/locales.ts`, so a module and its tests move and get reviewed together, and an
+  untested module shows up as a missing neighbour. Run with `yarn test:unit`.
+- **Browser: Playwright**, under `tests/e2e/`. There is no React Testing Library here; a
+  test that needs to render a component either gets one added deliberately or belongs in
+  Playwright.
+- **File naming is load-bearing**: Jest collects `*.test.ts(x)`, Playwright collects
+  `*.spec.ts`. Cross them and each runner tries to execute the other's files.
+- Jest transpiles through Babel and does **not** type-check. `npx tsc --noEmit` is the only
+  type-check the tests get, so run it as part of the same pass.
+- Import test helpers from `@jest/globals` rather than relying on ambient globals — that is
+  what keeps the tests type-checked without an `@types/jest` dependency.
 - `tests/e2e/setup.sh` resets the admin password. Never run it, or `yarn test:e2e`, against a
   site whose credentials matter without asking first.
-- The current baseline is **256 tests, 1052 assertions**. A refactor claiming no behaviour
-  change must return that number identically, not merely pass.
+- Baselines: **319 PHP tests / 1746 assertions**, **137 Jest tests**. A refactor claiming no
+  behaviour change must return those numbers identically, not merely pass.
 
 ## General
 
