@@ -341,47 +341,68 @@ export const generators: Generator[] = [
     route: "product-variations",
     resource: "product_variation",
     parameterConfig: {
-      specific_product_id: {
-        description: __("Specific product ID to generate variations for", "storeseeder"),
-        type: "integer",
-        minimum: 1,
-      },
-      product_types: {
-        description: __("Product types to consider for variation generation", "storeseeder"),
+      variation_types: {
+        description: __("Attribute axes to build variations from", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["simple", "variable", "grouped", "external", "digital"] },
-        default: ["simple", "variable"],
+        items: { type: "string", enum: ["size", "color", "material", "style", "flavor", "weight", "dimension"] },
+        default: ["size", "color"],
       },
-      price_variance: {
-        description: __("Price variance settings for variations", "storeseeder"),
+      attributes_per_product: {
+        description: __("How many axes each variation carries", "storeseeder"),
         type: "object",
         properties: {
-          min_percentage: { description: __("Minimum variance %", "storeseeder"), type: "number", minimum: -50, maximum: 50, default: -20 },
-          max_percentage: { description: __("Maximum variance %", "storeseeder"), type: "number", minimum: -50, maximum: 100, default: 30 },
+          min: { description: __("Minimum axes", "storeseeder"), type: "integer", minimum: 1, maximum: 5, default: 1 },
+          max: { description: __("Maximum axes", "storeseeder"), type: "integer", minimum: 1, maximum: 5, default: 2 },
         },
       },
-      stock_settings: {
-        description: __("Stock management settings for variations", "storeseeder"),
+      variations_per_attribute: {
+        description: __("How many distinct values each axis draws from", "storeseeder"),
         type: "object",
         properties: {
-          manage_stock: { description: __("Enable stock management", "storeseeder"), type: "boolean", default: true },
+          min: { description: __("Minimum values", "storeseeder"), type: "integer", minimum: 2, maximum: 10, default: 3 },
+          max: { description: __("Maximum values", "storeseeder"), type: "integer", minimum: 2, maximum: 10, default: 8 },
+        },
+      },
+      price_variation_range: {
+        // `price_variance` was this control's name here, and the endpoint has always called it
+        // `price_variation_range`. Neither was read, which is the only reason both survived.
+        description: __("How far a variation's price sits from its parent's, as a percentage", "storeseeder"),
+        type: "object",
+        properties: {
+          min_percentage: { description: __("Minimum variance %", "storeseeder"), type: "number", minimum: -90, maximum: 500, default: -20 },
+          max_percentage: { description: __("Maximum variance %", "storeseeder"), type: "number", minimum: -90, maximum: 500, default: 50 },
+        },
+      },
+      inventory: {
+        description: __("Inventory settings for variations", "storeseeder"),
+        type: "object",
+        properties: {
+          manage_stock: { description: __("Track stock per variation", "storeseeder"), type: "boolean", default: true },
           stock_range: {
             description: __("Stock quantity range", "storeseeder"),
             type: "object",
             properties: {
               min: { type: "integer", minimum: 0, default: 0 },
-              max: { type: "integer", minimum: 1, default: 100 },
+              max: { type: "integer", minimum: 0, default: 100 },
             },
           },
         },
       },
-      variation_attributes: {
-        description: __("Attribute generation settings", "storeseeder"),
-        type: "object",
-        properties: {
-          create_missing_attributes: { description: __("Create missing attributes if needed", "storeseeder"), type: "boolean", default: true },
-          max_attributes_per_variation: { description: __("Maximum attributes per variation", "storeseeder"), type: "integer", minimum: 1, maximum: 10, default: 3 },
-        },
+      generate_skus: {
+        description: __("Give each variation a SKU", "storeseeder"),
+        type: "boolean",
+        default: true,
+      },
+      product_id: {
+        description: __("Attach every variation to this product, to build out one option matrix", "storeseeder"),
+        type: "integer",
+        minimum: 1,
+      },
+      exclude_product_ids: {
+        description: __("Products to skip when choosing a parent", "storeseeder"),
+        type: "array",
+        items: { type: "integer" },
+        default: [],
       },
     },
   },

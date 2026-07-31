@@ -146,26 +146,65 @@ class Product_Variation extends Controller {
 				'description' => __( 'Price variation range as percentage of base price.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
+					// Neither bound is pinned to zero. A range of +10 to +12 is a legitimate ask —
+					// every variation dearer than the base — and the old `maximum: 0` on the
+					// minimum rejected it outright with "Invalid parameter(s)".
 					'min_percentage' => array(
 						'description' => __( 'Minimum price variation percentage.', 'storeseeder' ),
 						'type'        => 'number',
-						'minimum'     => -50,
-						'maximum'     => 0,
+						'minimum'     => -90,
+						'maximum'     => 500,
 						'default'     => -20,
 					),
 					'max_percentage' => array(
 						'description' => __( 'Maximum price variation percentage.', 'storeseeder' ),
 						'type'        => 'number',
-						'minimum'     => 0,
-						'maximum'     => 200,
+						'minimum'     => -90,
+						'maximum'     => 500,
 						'default'     => 50,
 					),
 				),
 			),
-			'include_inventory'        => array(
-				'description' => __( 'Include inventory management for variations.', 'storeseeder' ),
-				'type'        => 'boolean',
-				'default'     => true,
+			// `inventory` rather than `include_inventory`, which is the name Products already uses
+			// for the same idea, and the shape the admin and the MCP ability were sending as
+			// `stock_settings`. Three names for one switch is how none of them came to be read.
+			'inventory'                => array(
+				'description' => __( 'Inventory settings for variations.', 'storeseeder' ),
+				'type'        => 'object',
+				'properties'  => array(
+					'manage_stock' => array(
+						'description' => __( 'Track stock per variation. Off leaves them in stock with no quantity.', 'storeseeder' ),
+						'type'        => 'boolean',
+						'default'     => true,
+					),
+					'stock_range'  => array(
+						'description' => __( 'Stock quantity range.', 'storeseeder' ),
+						'type'        => 'object',
+						'properties'  => array(
+							'min' => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'default' => 0,
+							),
+							'max' => array(
+								'type'    => 'integer',
+								'minimum' => 0,
+								'default' => 100,
+							),
+						),
+					),
+				),
+			),
+			'product_id'               => array(
+				'description' => __( 'Attach every variation to this product, to build out one option matrix.', 'storeseeder' ),
+				'type'        => 'integer',
+				'minimum'     => 1,
+			),
+			'exclude_product_ids'      => array(
+				'description' => __( 'Products to skip when choosing a parent.', 'storeseeder' ),
+				'type'        => 'array',
+				'items'       => array( 'type' => 'integer' ),
+				'default'     => array(),
 			),
 			'generate_skus'            => array(
 				'description' => __( 'Generate unique SKUs for each variation.', 'storeseeder' ),
