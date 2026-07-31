@@ -119,6 +119,45 @@ abstract class Writer {
 	}
 
 	/**
+	 * Let integrators reshape what a write reports back.
+	 *
+	 * Every writer offers this, and the hook name is derived from `resource()` rather than
+	 * written out per writer — which is how three of them (attributes, logs, refunds) came to
+	 * offer no filter at all, and how the shipping-plan writer ended up firing
+	 * `storeseeder_shipping_method_generation_result` after the resource was renamed. A
+	 * derived name cannot drift from the resource it belongs to.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $result What the writer is about to return.
+	 * @param int|string           $id     The created record's identifier.
+	 * @param array<string, mixed> $data   The platform-shaped data used to create it.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function filter_result( array $result, $id, array $data ): array {
+		/**
+		 * Filters one generated record's reported result.
+		 *
+		 * `{$resource}` is the canonical resource name — `storeseeder_product_generation_result`,
+		 * `storeseeder_cart_session_generation_result`, and so on for all eighteen.
+		 *
+		 * @since 1.0.0
+		 * @hook  storeseeder_{$resource}_generation_result
+		 *
+		 * @param array<string, mixed> $result The generation result data.
+		 * @param int|string           $id     The created record's id.
+		 * @param array<string, mixed> $data   The data used for creation.
+		 */
+		return (array) apply_filters(
+			"storeseeder_{$this->resource()}_generation_result",
+			$result,
+			$id,
+			$data
+		);
+	}
+
+	/**
 	 * The shared FakerPHP instance.
 	 *
 	 * @since 1.1.0

@@ -97,17 +97,7 @@ final class Product_Download extends Writer {
 			'created_at'          => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the product download generation result data.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_product_download_generation_result
-		 *
-		 * @param array $result The generation result data.
-		 * @param int   $id     The created download ID.
-		 * @param array $data   The original data used for creation.
-		 */
-		return apply_filters( 'storeseeder_product_download_generation_result', $result, $download->id, $data );
+		return $this->filter_result( $result, $download->id, $data );
 	}
 
 	/**

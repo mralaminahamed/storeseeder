@@ -184,19 +184,7 @@ final class Order extends Writer {
 			'created_at'  => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the order generation result data.
-		 *
-		 * Allows developers to modify the returned order data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_order_generation_result
-		 *
-		 * @param array $result     The order generation result data.
-		 * @param int   $order_id   The created order ID.
-		 * @param array $order_data The original order data used for creation.
-		 */
-		return apply_filters( 'storeseeder_order_generation_result', $result, $order->id, $order_data );
+		return $this->filter_result( $result, $order->id, $order_data );
 	}
 
 	/**

@@ -98,13 +98,15 @@ final class Attribute extends Writer {
 			(int) $entity['link_count']
 		);
 
-		return array(
+		$result = array(
 			'id'     => (int) $group->id,
 			'name'   => $title,
 			'slug'   => $slug,
 			'values' => $values,
 			'linked' => $linked,
 		);
+
+		return $this->filter_result( $result, (int) $group->id, $entity );
 	}
 
 	/**

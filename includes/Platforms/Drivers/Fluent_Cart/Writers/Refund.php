@@ -102,7 +102,7 @@ final class Refund extends Writer {
 			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'storeseeder' ) );
 		}
 
-		return array(
+		$result = array(
 			'id'        => (int) $refund->id,
 			'order_id'  => (int) $charge->order_id,
 			'parent_id' => (int) $charge->id,
@@ -112,5 +112,7 @@ final class Refund extends Writer {
 			'type'      => $type,
 			'reason'    => $reason,
 		);
+
+		return $this->filter_result( $result, (int) $refund->id, $entity );
 	}
 }

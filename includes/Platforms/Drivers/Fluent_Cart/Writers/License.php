@@ -142,17 +142,7 @@ final class License extends Writer {
 			'created_at'       => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the licence generation result data.
-		 *
-		 * @since 1.1.0
-		 * @hook  storeseeder_license_generation_result
-		 *
-		 * @param array<string, mixed> $result The generation result data.
-		 * @param int                  $id     The created licence id.
-		 * @param array<string, mixed> $data   The data used for creation.
-		 */
-		return apply_filters( 'storeseeder_license_generation_result', $result, (int) $license->id, $data );
+		return $this->filter_result( $result, (int) $license->id, $data );
 	}
 
 	/**

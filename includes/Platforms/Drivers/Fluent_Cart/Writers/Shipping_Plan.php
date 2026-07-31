@@ -95,19 +95,26 @@ final class Shipping_Plan extends Writer {
 			'created_at' => $shipping_method->created_at,
 		);
 
+		$result = $this->filter_result( $result, $shipping_method->id, $plan_data );
+
 		/**
-		 * Filters the shipping method generation result data.
+		 * Filters the shipping-plan generation result data.
 		 *
-		 * Allows developers to modify the returned shipping method data after generation.
+		 * @since      1.0.0
+		 * @deprecated 1.1.0 Use storeseeder_shipping_plan_generation_result, which matches the
+		 *             canonical resource name. This one is fired afterwards so callbacks
+		 *             registered against it keep running; it will go in a future major.
 		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_shipping_method_generation_result
-		 *
-		 * @param array $result          The shipping method generation result data.
-		 * @param int   $method_id       The created shipping method ID.
-		 * @param array $plan_data       The original shipping method data used for creation.
+		 * @param array<string, mixed> $result The generation result data.
+		 * @param int                  $id     The created shipping method id.
+		 * @param array<string, mixed> $data   The data used for creation.
 		 */
-		return apply_filters( 'storeseeder_shipping_method_generation_result', $result, $shipping_method->id, $plan_data );
+		return (array) apply_filters(
+			'storeseeder_shipping_method_generation_result',
+			$result,
+			$shipping_method->id,
+			$plan_data
+		);
 	}
 
 	/**

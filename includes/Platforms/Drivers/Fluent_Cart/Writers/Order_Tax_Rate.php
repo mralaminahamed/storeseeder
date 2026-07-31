@@ -104,17 +104,7 @@ final class Order_Tax_Rate extends Writer {
 			'created_at'  => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the order tax line generation result data.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_order_tax_rate_generation_result
-		 *
-		 * @param array $result The generation result data.
-		 * @param int   $id     The created row ID.
-		 * @param array $data   The original data used for creation.
-		 */
-		return apply_filters( 'storeseeder_order_tax_rate_generation_result', $result, $tax_line->id, $data );
+		return $this->filter_result( $result, $tax_line->id, $data );
 	}
 
 	/**

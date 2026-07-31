@@ -99,19 +99,7 @@ final class Product extends Writer {
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the product generation result data.
-		 *
-		 * Allows developers to modify the returned product data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_product_generation_result
-		 *
-		 * @param array $result       The product generation result data.
-		 * @param int   $product_id   The created product ID.
-		 * @param array $product_data The original product data used for creation.
-		 */
-		return apply_filters( 'storeseeder_product_generation_result', $result, $product_id, $data );
+		return $this->filter_result( $result, $product_id, $data );
 	}
 
 	/**

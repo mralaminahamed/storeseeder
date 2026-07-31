@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T11:23:21+00:00\n"
+"POT-Creation-Date: 2026-07-31T13:05:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -141,7 +141,7 @@ msgid "Output only the number of items created."
 msgstr ""
 
 #. translators: 1: number of items, 2: resource name.
-#: includes/CLI/Commands/Generate.php:155
+#: includes/CLI/Commands/Generate.php:163
 #, php-format
 msgid "Generated %1$d %2$s."
 msgstr ""
@@ -175,31 +175,31 @@ msgid "Platform id to write to from now on, or auto."
 msgstr ""
 
 #. translators: %s: platform id, or "auto".
-#: includes/CLI/Commands/Platforms.php:93
+#: includes/CLI/Commands/Platforms.php:97
 #, php-format
 msgid "Target platform set to %s."
 msgstr ""
 
-#: includes/CLI/Commands/Platforms.php:111
+#: includes/CLI/Commands/Platforms.php:117
 msgid "No platform drivers are registered, so there is nowhere to write to."
 msgstr ""
 
-#: includes/CLI/Commands/Platforms.php:127
+#: includes/CLI/Commands/Platforms.php:133
 msgid "More than one platform is active and none is chosen, so a run will refuse rather than guess. Set one with --set=<id>."
 msgstr ""
 
-#: includes/CLI/Commands/Platforms.php:171
-#: includes/CLI/Commands/Platforms.php:181
-#: includes/CLI/Commands/Sample_Data.php:166
+#: includes/CLI/Commands/Platforms.php:177
+#: includes/CLI/Commands/Platforms.php:187
+#: includes/CLI/Commands/Sample_Data.php:176
 msgid "yes"
 msgstr ""
 
-#: includes/CLI/Commands/Platforms.php:173
+#: includes/CLI/Commands/Platforms.php:179
 msgid "auto"
 msgstr ""
 
-#: includes/CLI/Commands/Platforms.php:181
-#: includes/CLI/Commands/Sample_Data.php:166
+#: includes/CLI/Commands/Platforms.php:187
+#: includes/CLI/Commands/Sample_Data.php:176
 msgid "no"
 msgstr ""
 
@@ -215,7 +215,7 @@ msgstr ""
 msgid "Locale to preview in."
 msgstr ""
 
-#: includes/CLI/Commands/Preview.php:130
+#: includes/CLI/Commands/Preview.php:138
 msgid "The preview returned no rows."
 msgstr ""
 
@@ -231,47 +231,47 @@ msgstr ""
 msgid "Re-download even when the files are already present."
 msgstr ""
 
-#: includes/CLI/Commands/Sample_Data.php:125
+#: includes/CLI/Commands/Sample_Data.php:131
 msgid "Sample data has not been consented to on this site. An administrator has to accept the prompt on the StoreSeeder admin page first; generators work from built-in defaults until then."
 msgstr ""
 
-#: includes/CLI/Commands/Sample_Data.php:138
+#: includes/CLI/Commands/Sample_Data.php:148
 #: build/admin-app.js:22
 msgid "Sample data synced."
 msgstr ""
 
-#: includes/CLI/Commands/Sample_Data.php:155
+#: includes/CLI/Commands/Sample_Data.php:165
 msgid "granted"
 msgstr ""
 
-#: includes/CLI/Commands/Sample_Data.php:157
+#: includes/CLI/Commands/Sample_Data.php:167
 msgid "declined"
 msgstr ""
 
-#: includes/CLI/Commands/Sample_Data.php:159
+#: includes/CLI/Commands/Sample_Data.php:169
 msgid "never asked"
 msgstr ""
 
 #. translators: %s: yes or no.
-#: includes/CLI/Commands/Sample_Data.php:165
+#: includes/CLI/Commands/Sample_Data.php:175
 #, php-format
 msgid "Downloaded:  %s"
 msgstr ""
 
 #. translators: %s: granted, declined, or never asked.
-#: includes/CLI/Commands/Sample_Data.php:170
+#: includes/CLI/Commands/Sample_Data.php:180
 #, php-format
 msgid "Consent:     %s"
 msgstr ""
 
 #. translators: %s: ISO 8601 date.
-#: includes/CLI/Commands/Sample_Data.php:178
+#: includes/CLI/Commands/Sample_Data.php:188
 #, php-format
 msgid "Last synced: %s"
 msgstr ""
 
 #. translators: %s: repository URL.
-#: includes/CLI/Commands/Sample_Data.php:186
+#: includes/CLI/Commands/Sample_Data.php:196
 #, php-format
 msgid "Source:      %s"
 msgstr ""
@@ -381,6 +381,11 @@ msgstr ""
 #: includes/Generation/Generators/Label.php:63
 #: build/admin-app.js:4
 msgid "Labels"
+msgstr ""
+
+#: includes/Generation/Generators/License.php:58
+#: build/admin-app.js:4
+msgid "Licenses"
 msgstr ""
 
 #: includes/Generation/Generators/Log.php:80
@@ -624,6 +629,18 @@ msgstr ""
 
 #: includes/MCP/Abilities/Generate_Labels.php:46
 msgid "Array of generated label objects with id, value, and attached count."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Licenses.php:30
+msgid "Generate Licenses"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Licenses.php:37
+msgid "Generate software licences against existing orders — keys, site limits, activation counts and expiry dates, including some already at their activation limit and some expired. On Fluent Cart this requires Fluent Cart Pro, which owns the licensing tables; the request is refused with that reason when it is not active. Requires existing orders and products."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Licenses.php:46
+msgid "Array of generated licence objects with id, license_key, status, order_id, customer_id, site_limit, activation_count and expiration_date."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Logs.php:30
@@ -938,8 +955,13 @@ msgstr ""
 msgid "Not supported by this platform."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:52
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:72
 msgid "Fluent Cart"
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:137
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:171
+msgid "Fluent Cart Pro"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Attribute.php:49
@@ -971,11 +993,11 @@ msgstr ""
 msgid "Failed to create coupon."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:127
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:115
 msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:159
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:147
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
@@ -997,6 +1019,26 @@ msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Label.php:73
 msgid "Failed to create label."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/License.php:84
+msgid "Licences are stored by Fluent Cart Pro, which is not active on this site. Install and activate Fluent Cart Pro to generate them."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/License.php:95
+msgid "No orders were found. Generate orders before generating licences."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/License.php:106
+msgid "No product variations were found. Generate products before generating licences."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/License.php:128
+msgid "Failed to create the licence."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/License.php:139
+msgid "unlimited"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Log.php:64
@@ -1129,11 +1171,11 @@ msgstr ""
 msgid "Failed to create tax class."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:154
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:142
 msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:178
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:166
 msgid "Failed to create tax class using Fluent Cart model."
 msgstr ""
 
@@ -1427,6 +1469,10 @@ msgstr ""
 
 #: includes/Rest/Controllers/Label.php:39
 msgid "Label"
+msgstr ""
+
+#: includes/Rest/Controllers/License.php:41
+msgid "License"
 msgstr ""
 
 #: includes/Rest/Controllers/Log.php:35
@@ -2294,6 +2340,14 @@ msgstr ""
 
 #: build/admin-app.js:4
 msgid "Developers testing recurring-billing views and reports"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Create software licences against existing orders — keys, site limits, activation counts and expiry dates, including licences already at their limit and some long expired. Requires Fluent Cart Pro, which owns the licensing tables."
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Developers testing licence validation, activation limits and renewal notices"
 msgstr ""
 
 #: build/admin-app.js:4

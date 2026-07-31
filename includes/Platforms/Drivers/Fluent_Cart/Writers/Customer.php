@@ -131,19 +131,7 @@ final class Customer extends Writer {
 			'last_login'      => $meta['last_login'],
 		);
 
-		/**
-		 * Filters the customer generation result data.
-		 *
-		 * Allows developers to modify the returned customer data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_customer_generation_result
-		 *
-		 * @param array $result        The customer generation result data.
-		 * @param int   $customer_id   The created customer ID.
-		 * @param array $customer_data The original customer data used for creation.
-		 */
-		$result = apply_filters( 'storeseeder_customer_generation_result', $result, $customer_id, $entity );
+		$result = $this->filter_result( $result, $customer_id, $entity );
 
 		/**
 		 * Fires after a customer has been successfully created.

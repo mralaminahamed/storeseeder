@@ -106,7 +106,7 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
   what keeps the tests type-checked without an `@types/jest` dependency.
 - `tests/e2e/setup.sh` resets the admin password. Never run it, or `yarn test:e2e`, against a
   site whose credentials matter without asking first.
-- Baselines: **319 PHP tests / 1746 assertions**, **198 Jest tests**. A refactor claiming no
+- Baselines: **345 PHP tests / 1927 assertions**, **198 Jest tests**. A refactor claiming no
   behaviour change must return those numbers identically, not merely pass.
 
 ## General

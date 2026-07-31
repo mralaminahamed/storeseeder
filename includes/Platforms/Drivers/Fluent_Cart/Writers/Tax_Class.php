@@ -81,19 +81,7 @@ final class Tax_Class extends Writer {
 			'created_at'    => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the tax class generation result data.
-		 *
-		 * Allows developers to modify the returned tax class data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_tax_class_generation_result
-		 *
-		 * @param array $result    The tax class generation result data.
-		 * @param int   $tax_id    The created tax class ID.
-		 * @param array $tax_data  The original tax class data used for creation.
-		 */
-		return apply_filters( 'storeseeder_tax_class_generation_result', $result, $tax_id, $tax_data );
+		return $this->filter_result( $result, $tax_id, $tax_data );
 	}
 
 	/**

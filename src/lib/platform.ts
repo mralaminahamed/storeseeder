@@ -52,10 +52,6 @@ export function parsePlatformState(value: unknown): PlatformState | null {
   return isPlatformState(value) ? value : null;
 }
 
-export function fetchPlatforms(): Promise<PlatformState | null> {
-  return apiFetch({ path: "/storeseeder/v1/platforms" }).then(parsePlatformState);
-}
-
 export function setTargetPlatform(
   platform: string,
 ): Promise<PlatformState | null> {

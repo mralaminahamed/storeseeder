@@ -362,7 +362,15 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_capability` | filter | The capability required to use StoreSeeder. Governs the admin menu, every REST route, every MCP ability and the AJAX handlers together, so access cannot be widened for one and not the others. An unusable return falls back to `manage_options` |
 | `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
 | `storeseeder_cli_commands` | filter | Add or remove a `wp storeseeder` subcommand |
-| `storeseeder_license_generation_result` | filter | Inspect or reshape a generated licence, as every writer offers for its own resource |
+| `storeseeder_{resource}_generation_result` | filter | Inspect or reshape what one write reports — `storeseeder_product_generation_result` and so on, for all eighteen. The name is derived from the writer's resource by `Writer::filter_result()`, so it cannot drift from it |
+| `storeseeder_shipping_method_generation_result` | filter | **Deprecated in 1.1.0.** The shipping-plan writer's old hook, kept firing after the correctly named one so existing callbacks keep working. Use `storeseeder_shipping_plan_generation_result` |
+| `storeseeder_customer_data_before_create` | filter | The customer entity immediately before the write. Predates `storeseeder_canonical_entity`, which does the same job for every resource and is the one to reach for |
+| `storeseeder_after_customer_created` | action | Fires after a customer row exists. Resource-specific, for the same historical reason; `storeseeder_after_write_{platform}_{resource}` covers all of them |
+| `storeseeder_hide_foreign_admin_notices` | filter | Return false to let other plugins' admin notices show on StoreSeeder's screen |
+| `storeseeder_menu_icon_variant` | filter | Which icon variant the admin menu uses |
+| `storeseeder_set_postname_permalinks` | filter | Return false to stop activation switching the site to post-name permalinks |
+| `storeseeder_rest_message` | filter | The message a generate response carries |
+| `storeseeder_rest_response` | filter | The whole generate response, last of all |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
 | `storeseeder_canonical_entity` | filter | Mutate every neutral entity, whatever its resource. Runs before the per-resource filter, which therefore wins |

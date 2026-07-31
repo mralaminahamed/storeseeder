@@ -95,6 +95,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Three writers offered no result filter, and one was named after a resource that no longer
+  exists.** Attributes, logs and refunds returned their result with no hook at all, while the
+  other fifteen resources had one — so integration code written against "every writer fires
+  `storeseeder_{resource}_generation_result`" was wrong for three of eighteen. And the
+  shipping-plan writer still fired `storeseeder_shipping_method_generation_result`, left over
+  from before the resource was renamed. The hook name is now derived from the writer's own
+  resource by `Writer::filter_result()`, so it cannot drift again; the old shipping hook keeps
+  firing after the correct one, deprecated, so existing callbacks still run. Two tests fail if
+  a writer stops offering the filter or starts hardcoding a name.
+- Nineteen hooks were undocumented, including every per-resource result filter and the admin
+  filters for notices, menu icon and permalinks. The architecture table is now checked against
+  the source.
+- `jest.config.js` would have shipped in the release zip; `.distignore` had not been revisited
+  since Jest arrived.
+- The recorded test baselines in CLAUDE.md and AGENTS.md were two and five commits stale, which
+  makes them useless for the one thing they are for — noticing that a refactor changed the
+  count.
+- The icon set carried `grid`, byte-identical to `dashboard`: one glyph under two names, which
+  is the ambiguity the icon pass was meant to remove. Also dropped two dead exports,
+  `fetchPlatforms()` and `toLabel()`.
 - **The locale picker was a lie.** The admin offered seventy-three locales while the REST API
   accepted six, and FakerPHP falls back to `en_US` without complaining — so sixty-seven of them
   silently produced English. `pt_AO` was offered with no provider behind it, while `ar_EG`,

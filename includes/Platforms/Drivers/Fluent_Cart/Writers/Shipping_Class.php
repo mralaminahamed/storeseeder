@@ -75,17 +75,7 @@ final class Shipping_Class extends Writer {
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the shipping class generation result data.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_shipping_class_generation_result
-		 *
-		 * @param array $result The shipping class generation result data.
-		 * @param int   $id     The created shipping class ID.
-		 * @param array $data   The original data used for creation.
-		 */
-		return apply_filters( 'storeseeder_shipping_class_generation_result', $result, $shipping_class->id, $data );
+		return $this->filter_result( $result, $shipping_class->id, $data );
 	}
 
 	/**

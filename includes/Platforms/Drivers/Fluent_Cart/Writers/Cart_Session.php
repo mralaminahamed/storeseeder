@@ -106,19 +106,7 @@ final class Cart_Session extends Writer {
 			'created_at'     => $cart->created_at,
 		);
 
-		/**
-		 * Filters the cart session generation result data.
-		 *
-		 * Allows developers to modify the returned cart session data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_cart_session_generation_result
-		 *
-		 * @param array $result         The cart session generation result data.
-		 * @param int   $cart_id        The created cart ID.
-		 * @param array $session_data   The original cart session data used for creation.
-		 */
-		return apply_filters( 'storeseeder_cart_session_generation_result', $result, $cart->cart_hash, $session_data );
+		return $this->filter_result( $result, $cart->cart_hash, $session_data );
 	}
 
 	/**

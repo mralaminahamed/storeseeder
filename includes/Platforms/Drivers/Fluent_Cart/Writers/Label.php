@@ -82,16 +82,7 @@ final class Label extends Writer {
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the label generation result data.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_label_generation_result
-		 *
-		 * @param array $result The label generation result data.
-		 * @param int   $id     The created label ID.
-		 */
-		return apply_filters( 'storeseeder_label_generation_result', $result, $label->id );
+		return $this->filter_result( $result, $label->id, $entity );
 	}
 
 	/**

@@ -26,10 +26,10 @@
   "require-dev": {
     "brain/monkey": "^2.6",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-    "mralaminahamed/easycommerce-stubs": "^1.47",
-    "mralaminahamed/fluent-cart-pro-stubs": "^1.5",
-    "mralaminahamed/fluent-cart-stubs": "^1.6.0.1",
-    "mralaminahamed/storeengine-stubs": "^2.2",
+    "mralaminahamed/easycommerce-stubs": "^1.47.1",
+    "mralaminahamed/fluent-cart-pro-stubs": "^1.5.3.1",
+    "mralaminahamed/fluent-cart-stubs": "^1.6.0.2",
+    "mralaminahamed/storeengine-stubs": "^2.2.0.1",
     "php-stubs/wordpress-stubs": "^6.4",
     "php-stubs/wp-cli-stubs": "^2.12",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
@@ -39,7 +39,7 @@
     "squizlabs/php_codesniffer": "^3.7",
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-coding-standards/wpcs": "^3.1",
-    "wp-phpunit/wp-phpunit": "^6.8",
+    "wp-phpunit/wp-phpunit": "^7.0",
     "yoast/phpunit-polyfills": "^4.0"
   },
   "config": {

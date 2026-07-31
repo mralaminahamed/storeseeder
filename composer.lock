@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76205937f1077b423f5d903e21398d7c",
+    "content-hash": "9181f939c5d8df3cad4cbc05adbe2c78",
     "packages": [
         {
             "name": "bluemmb/faker-picsum-photos-provider",
@@ -661,27 +661,27 @@
         },
         {
             "name": "mralaminahamed/easycommerce-stubs",
-            "version": "v1.47",
+            "version": "v1.47.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs.git",
-                "reference": "4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9"
+                "reference": "49174cbe59e576d574bd4edd94e21c4b35ae5b02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mralaminahamed/phpstan-easycommerce-stubs/zipball/4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9",
-                "reference": "4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-easycommerce-stubs/zipball/49174cbe59e576d574bd4edd94e21c4b35ae5b02",
+                "reference": "49174cbe59e576d574bd4edd94e21c4b35ae5b02",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4",
-                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0 || ^7.0"
             },
             "require-dev": {
-                "php-stubs/generator": "^0.8.0",
+                "php-stubs/generator": "^0.9.0",
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpunit/phpunit": "^9.5 || ^10.5 || ^11.0",
+                "squizlabs/php_codesniffer": "^3.13"
             },
             "suggest": {
                 "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
@@ -758,20 +758,20 @@
                 "issues": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs/issues",
                 "source": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs"
             },
-            "time": "2026-07-31T11:53:26+00:00"
+            "time": "2026-07-31T12:54:33+00:00"
         },
         {
             "name": "mralaminahamed/fluent-cart-pro-stubs",
-            "version": "v1.5.3",
+            "version": "v1.5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs.git",
-                "reference": "e81a881721a6d9deec42721c9e7f80aa6743b734"
+                "reference": "eb46208e502b53e0dc1dffb838a51321b5153478"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-pro-stubs/zipball/e81a881721a6d9deec42721c9e7f80aa6743b734",
-                "reference": "e81a881721a6d9deec42721c9e7f80aa6743b734",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-pro-stubs/zipball/eb46208e502b53e0dc1dffb838a51321b5153478",
+                "reference": "eb46208e502b53e0dc1dffb838a51321b5153478",
                 "shasum": ""
             },
             "require": {
@@ -779,10 +779,10 @@
                 "php": ">=7.4"
             },
             "require-dev": {
-                "php-stubs/generator": "^0.8.0",
+                "php-stubs/generator": "^0.9.0",
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpunit/phpunit": "^9.5 || ^10.5 || ^11.0",
+                "squizlabs/php_codesniffer": "^3.13"
             },
             "suggest": {
                 "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
@@ -853,31 +853,31 @@
                 "issues": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs/issues",
                 "source": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs"
             },
-            "time": "2026-07-31T12:02:56+00:00"
+            "time": "2026-07-31T12:54:37+00:00"
         },
         {
             "name": "mralaminahamed/fluent-cart-stubs",
-            "version": "v1.6.0.1",
+            "version": "v1.6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs.git",
-                "reference": "ba336e1f73ef6ef14e0c1de4963891f4dd50a766"
+                "reference": "250e209b0df11d7cd6d23cfb180dd2f5102499d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-stubs/zipball/ba336e1f73ef6ef14e0c1de4963891f4dd50a766",
-                "reference": "ba336e1f73ef6ef14e0c1de4963891f4dd50a766",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-stubs/zipball/250e209b0df11d7cd6d23cfb180dd2f5102499d6",
+                "reference": "250e209b0df11d7cd6d23cfb180dd2f5102499d6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4",
-                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0 || ^7.0"
             },
             "require-dev": {
-                "php-stubs/generator": "^0.8.0",
+                "php-stubs/generator": "^0.9.0",
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpunit/phpunit": "^9.5 || ^10.5 || ^11.0",
+                "squizlabs/php_codesniffer": "^3.13"
             },
             "suggest": {
                 "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
@@ -954,31 +954,31 @@
                 "issues": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs/issues",
                 "source": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs"
             },
-            "time": "2026-07-31T12:00:18+00:00"
+            "time": "2026-07-31T12:54:31+00:00"
         },
         {
             "name": "mralaminahamed/storeengine-stubs",
-            "version": "v2.2.0",
+            "version": "v2.2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mralaminahamed/phpstan-storeengine-stubs.git",
-                "reference": "2b0b869d20771160f01242eb1a5f0b8e7d12fa73"
+                "reference": "a5497fe2266c5764673bffa6a0478af924ef4d15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mralaminahamed/phpstan-storeengine-stubs/zipball/2b0b869d20771160f01242eb1a5f0b8e7d12fa73",
-                "reference": "2b0b869d20771160f01242eb1a5f0b8e7d12fa73",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-storeengine-stubs/zipball/a5497fe2266c5764673bffa6a0478af924ef4d15",
+                "reference": "a5497fe2266c5764673bffa6a0478af924ef4d15",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4",
-                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0 || ^7.0"
             },
             "require-dev": {
-                "php-stubs/generator": "^0.8.0",
+                "php-stubs/generator": "^0.9.0",
                 "phpstan/phpstan": "^2.0",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpunit/phpunit": "^9.5 || ^10.5 || ^11.0",
+                "squizlabs/php_codesniffer": "^3.13"
             },
             "suggest": {
                 "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
@@ -1055,7 +1055,7 @@
                 "issues": "https://github.com/mralaminahamed/phpstan-storeengine-stubs/issues",
                 "source": "https://github.com/mralaminahamed/phpstan-storeengine-stubs"
             },
-            "time": "2026-07-31T11:53:26+00:00"
+            "time": "2026-07-31T12:54:35+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -3573,16 +3573,16 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "6.9.5",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "15fd216bf6516670d8d07b938675925bfa5c15b0"
+                "reference": "0d17335392d78b12b3e7e6b519cd53db728df52a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/15fd216bf6516670d8d07b938675925bfa5c15b0",
-                "reference": "15fd216bf6516670d8d07b938675925bfa5c15b0",
+                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/0d17335392d78b12b3e7e6b519cd53db728df52a",
+                "reference": "0d17335392d78b12b3e7e6b519cd53db728df52a",
                 "shasum": ""
             },
             "type": "library",
@@ -3617,7 +3617,7 @@
                 "issues": "https://github.com/wp-phpunit/issues",
                 "source": "https://github.com/wp-phpunit/wp-phpunit"
             },
-            "time": "2026-02-04T01:48:23+00:00"
+            "time": "2026-07-10T02:38:55+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",

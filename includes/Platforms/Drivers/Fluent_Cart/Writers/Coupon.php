@@ -97,19 +97,7 @@ final class Coupon extends Writer {
 			'created_at'  => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the coupon generation result data.
-		 *
-		 * Allows developers to modify the returned coupon data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_coupon_generation_result
-		 *
-		 * @param array $result       The coupon generation result data.
-		 * @param int   $coupon_id    The created coupon ID.
-		 * @param array $coupon_data  The original coupon data used for creation.
-		 */
-		return apply_filters( 'storeseeder_coupon_generation_result', $result, $coupon_id, $coupon_data );
+		return $this->filter_result( $result, $coupon_id, $coupon_data );
 	}
 
 	/**

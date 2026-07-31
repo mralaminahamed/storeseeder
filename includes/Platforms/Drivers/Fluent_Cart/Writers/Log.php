@@ -97,7 +97,7 @@ final class Log extends Writer {
 			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'storeseeder' ) );
 		}
 
-		return array(
+		$result = array(
 			'id'          => (int) $activity->id,
 			'module_name' => $module,
 			'module_type' => $module_type,
@@ -105,5 +105,7 @@ final class Log extends Writer {
 			'log_type'    => $entity['log_type'],
 			'title'       => $entity['title'],
 		);
+
+		return $this->filter_result( $result, (int) $activity->id, $entity );
 	}
 }

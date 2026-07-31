@@ -110,19 +110,7 @@ final class Transaction extends Writer {
 			'created_at'     => $transaction->created_at,
 		);
 
-		/**
-		 * Filters the transaction generation result data.
-		 *
-		 * Allows developers to modify the returned transaction data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_transaction_generation_result
-		 *
-		 * @param array $result            The transaction generation result data.
-		 * @param int   $transaction_id    The created transaction ID.
-		 * @param array $transaction_data  The original transaction data used for creation.
-		 */
-		return apply_filters( 'storeseeder_transaction_generation_result', $result, $transaction->id, $transaction_data );
+		return $this->filter_result( $result, $transaction->id, $transaction_data );
 	}
 
 	/**

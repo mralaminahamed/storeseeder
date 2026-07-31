@@ -116,19 +116,7 @@ final class Product_Variation extends Writer {
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
-		/**
-		 * Filters the product variation generation result data.
-		 *
-		 * Allows developers to modify the returned product variation data after generation.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_product_variation_generation_result
-		 *
-		 * @param array $result          The product variation generation result data.
-		 * @param int   $variation_id    The created product variation ID.
-		 * @param array $variation_data  The original product variation data used for creation.
-		 */
-		return apply_filters( 'storeseeder_product_variation_generation_result', $result, $variation->id, $variation_data );
+		return $this->filter_result( $result, $variation->id, $variation_data );
 	}
 
 	/**
