@@ -823,6 +823,17 @@ export const generators: Generator[] = [
  * while the sidebar filtered on the literal `"Core"`, so on a translated site the
  * comparison failed and the sidebar groups came out empty.
  */
+/**
+ * The display name for a canonical resource name.
+ *
+ * The server speaks in resources (`cart_session`), the admin in names ("Cart Sessions"), and
+ * this is the one place that maps between them. Falls back to the raw key rather than to
+ * nothing, so a resource added by a third-party platform still reads as something.
+ */
+export function resourceLabel(resource: string): string {
+  return generators.find((g) => g.resource === resource)?.name ?? resource;
+}
+
 export const CATEGORY_ORDER = ["Core", "Advanced", "Enhanced"] as const;
 
 export type Category = (typeof CATEGORY_ORDER)[number];

@@ -24,6 +24,13 @@ import { fetchAccess, saveAllowedRoles } from "@/lib/access";
 import type { AccessState } from "@/lib/access";
 import { fetchMcp, parseMcpStatus, saveMcpToggle } from "@/lib/mcp";
 import type { McpToggle } from "@/lib/mcp";
+import {
+  fetchGenerated,
+  deleteGenerated,
+  purgeGenerated,
+} from "@/lib/generated";
+import type { GeneratedState } from "@/lib/generated";
+import { resourceLabel } from "@/lib/generators";
 import { requestTweaksPanel } from "@/lib/events";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
@@ -42,6 +49,10 @@ const SUPPORT_URL =
   "https://github.com/mralaminahamed/storeseeder/issues";
 const DOCS_URL =
   "https://github.com/mralaminahamed/storeseeder#readme";
+// Automattic's remote-MCP proxy: the package a desktop client is pointed at, and the place
+// the connection details are documented. Linked rather than restated, because the config
+// format is theirs to change.
+const MCP_CLIENT_URL = "https://github.com/Automattic/mcp-wordpress-remote";
 
 // ---------------------------------------------------------------------------
 // Settings card shell
@@ -190,6 +201,16 @@ export default function SettingsPage() {
       : null,
   );
   const [savingMcp, setSavingMcp] = useState(false);
+
+  // What StoreSeeder has created, from its own ledger — the only thing the delete below is
+  // ever allowed to touch.
+  const [generated, setGenerated] = useState<GeneratedState | null>(null);
+  const [purging, setPurging] = useState(false);
+  // Two-step rather than a browser confirm(): a native dialog blocks the page and looks
+  // nothing like the rest of the admin.
+  const [confirmPurge, setConfirmPurge] = useState(false);
+  const [purgeNote, setPurgeNote] = useState("");
+  const [purgeErrors, setPurgeErrors] = useState<string[]>([]);
 
   // Applied and stored on change. The page used to have two "Save settings" buttons
   // writing the same object, next to three cards that saved the instant you touched
@@ -477,6 +498,16 @@ export default function SettingsPage() {
       .catch(() => setAccessFailed(true));
   }, []);
 
+  const refreshGenerated = useCallback(() => {
+    // Failure leaves the card showing nothing to delete, which is the safe direction: it
+    // offers no button rather than a button with a made-up count on it.
+    void fetchGenerated()
+      .then(setGenerated)
+      .catch(() => setGenerated(null));
+  }, []);
+
+  useEffect(refreshGenerated, [refreshGenerated]);
+
   const toggleRole = async (role: string, granted: boolean) => {
     if (!access) return;
 
@@ -562,6 +593,90 @@ export default function SettingsPage() {
       __("Active — %1$d tools across %2$d generators", "storeseeder"),
       mcp.tools,
       mcp.abilities,
+    );
+  };
+
+  /**
+   * Delete every row StoreSeeder recorded creating.
+   *
+   * Batched by the server, so this reports progress between rounds rather than holding a
+   * spinner: clearing a few thousand rows takes several requests, and a page that looks
+   * frozen invites a reload halfway through.
+   */
+  const handlePurge = async () => {
+    setConfirmPurge(false);
+    setPurging(true);
+    setPurgeErrors([]);
+    setPurgeNote("");
+
+    try {
+      const result = await purgeGenerated("", (deleted, remaining) =>
+        setPurgeNote(
+          sprintf(
+            /* translators: 1: rows deleted so far, 2: rows still to go. */
+            __("Deleted %1$s, %2$s to go…", "storeseeder"),
+            deleted.toLocaleString(),
+            remaining.toLocaleString(),
+          ),
+        ),
+      );
+
+      setPurgeErrors(result.errors);
+      setPurgeNote("");
+      toast(
+        sprintf(
+          /* translators: %s: number of rows deleted. */
+          __("Deleted %s generated rows", "storeseeder"),
+          result.deleted.toLocaleString(),
+        ),
+      );
+    } catch {
+      toast(__("Could not delete the generated data", "storeseeder"));
+    } finally {
+      setPurging(false);
+      refreshGenerated();
+    }
+  };
+
+  /**
+   * Drop the records without touching the store.
+   *
+   * For a ledger that no longer matches reality — a database restored from elsewhere, rows
+   * removed by hand — where the alternative is a count that can never be cleared.
+   */
+  const handleForget = async () => {
+    setPurging(true);
+
+    try {
+      const result = await deleteGenerated("", true);
+      setPurgeErrors([]);
+      toast(
+        sprintf(
+          /* translators: %s: number of records dropped. */
+          __("Forgot %s records; the rows are untouched", "storeseeder"),
+          result.forgotten.toLocaleString(),
+        ),
+      );
+    } catch {
+      toast(__("Could not clear the records", "storeseeder"));
+    } finally {
+      setPurging(false);
+      refreshGenerated();
+    }
+  };
+
+  /** What the delete button says, which depends on whether there is anything to delete. */
+  const purgeButtonLabel = (): string => {
+    if (purging) return __("Deleting…", "storeseeder");
+
+    const total = generated?.total ?? 0;
+
+    if (0 === total) return __("No generated data to delete", "storeseeder");
+
+    return sprintf(
+      /* translators: %s: number of rows. */
+      __("Delete generated data (%s rows)", "storeseeder"),
+      total.toLocaleString(),
     );
   };
 
@@ -902,12 +1017,21 @@ export default function SettingsPage() {
                 </ul>
               )}
 
-              <p className="fp-set-hint mb-0">
+              <p className="fp-set-hint">
                 {__(
                   "Optional. Nothing else changes when it is absent — the admin, the REST API and WP-CLI all work the same. The same tools are also reachable through mcp-adapter's own default server, under whatever these switches allow.",
                   "storeseeder",
                 )}
               </p>
+
+              {/* A client needs a proxy and an application password, neither of which this
+                  page can hand out. Automattic's package documents both, and is where the
+                  config format is kept up to date. */}
+              <a href={MCP_CLIENT_URL} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="sm" icon="external" type="button">
+                  {__("How to connect a client", "storeseeder")}
+                </Button>
+              </a>
             </div>
           </SetCard>
         )}
@@ -1248,6 +1372,108 @@ export default function SettingsPage() {
           danger
         >
           <div>
+            {/* First, because it is the only action here that touches the store. The count
+                comes from the plugin's own ledger of rows it wrote, so this deletes what
+                StoreSeeder created and nothing that resembles it. */}
+            <div className="fp-danger-act" data-testid="danger-generated">
+              <div>
+                {confirmPurge ? (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <Button
+                      variant="danger"
+                      icon="trash"
+                      onClick={() => void handlePurge()}
+                      disabled={purging}
+                      data-testid="delete-generated-confirm"
+                    >
+                      {sprintf(
+                        /* translators: %s: number of rows. */
+                        __("Yes, delete %s rows", "storeseeder"),
+                        (generated?.total ?? 0).toLocaleString(),
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setConfirmPurge(false)}
+                      disabled={purging}
+                    >
+                      {__("Cancel", "storeseeder")}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="danger"
+                    icon="trash"
+                    onClick={() => setConfirmPurge(true)}
+                    disabled={purging || 0 === (generated?.total ?? 0)}
+                    data-testid="delete-generated"
+                  >
+                    {purgeButtonLabel()}
+                  </Button>
+                )}
+              </div>
+
+              <p className="fp-set-hint" style={{ marginTop: 7 }}>
+                {0 === (generated?.total ?? 0)
+                  ? __(
+                      "Nothing recorded yet. Rows created by StoreSeeder are logged so they can be removed later; anything generated before this version was released is not in that log.",
+                      "storeseeder",
+                    )
+                  : __(
+                      "Permanently removes the products, orders, customers and other rows StoreSeeder created, along with what hangs off them. Only rows StoreSeeder recorded creating are touched — your own data is never matched on.",
+                      "storeseeder",
+                    )}
+              </p>
+
+              {/* The breakdown is what makes the number checkable before it is acted on. */}
+              {generated && 0 < generated.resources.length && (
+                <ul className="fp-set-reqs" data-testid="generated-breakdown">
+                  {generated.resources.map((row) => (
+                    <li key={row.resource}>
+                      <Icon name="list" size={14} />
+                      {sprintf(
+                        /* translators: 1: resource name, e.g. Products. 2: number of rows. */
+                        __("%1$s — %2$s", "storeseeder"),
+                        resourceLabel(row.resource),
+                        row.count.toLocaleString(),
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {purgeNote && (
+                <p className="fp-set-hint" aria-live="polite">
+                  {purgeNote}
+                </p>
+              )}
+
+              {/* A refusal names its reason once, not once per row, and offers the only
+                  thing that can clear a count that will never delete: forgetting it. */}
+              {0 < purgeErrors.length && (
+                <div style={{ marginTop: 4 }}>
+                  {purgeErrors.map((error) => (
+                    <p
+                      className="fp-set-hint"
+                      style={{ color: "var(--red)" }}
+                      key={error}
+                    >
+                      {error}
+                    </p>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon="x"
+                    onClick={() => void handleForget()}
+                    disabled={purging}
+                  >
+                    {__("Forget the remaining records", "storeseeder")}
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div className="fp-danger-act">
               <div>
                 <Button variant="danger" icon="trash" onClick={handleClearData}>
