@@ -65,7 +65,7 @@ final class Shipping_Plan extends Writer {
 		}
 
 		$plan_data = array(
-			'zone_id'    => $this->get_or_create_shipping_zone(),
+			'zone_id'    => $this->zone_for( (array) $entity['regions'] ),
 			'title'      => $entity['title'],
 			'type'       => self::METHOD_TYPE[ $entity['type'] ] ?? 'fixed',
 			// amount is a DECIMAL(10,2) of major currency units — Fluent Cart scales
@@ -74,9 +74,20 @@ final class Shipping_Plan extends Writer {
 			'amount'     => round( (int) $entity['amount'] / 100, 2 ),
 			'settings'   => array(
 				'description' => $entity['description'],
+				// The delivery estimate. `settings` is Fluent Cart's own blob for what a method
+				// carries beyond its columns, which is where a window belongs — the title shows it
+				// to a shopper, and this keeps the numbers readable by anything that looks.
+				'delivery'    => array(
+					'min_days' => (int) ( $entity['delivery_min'] ?? 0 ),
+					'max_days' => (int) ( $entity['delivery_max'] ?? 0 ),
+				),
 			),
 			'is_enabled' => $entity['enabled'],
-			'states'     => $entity['regions'], // Empty array means all states in the zone.
+			// Fluent Cart's `states` is a state list within the zone, not a country list, so the
+			// canonical regions do not belong in it: a two-letter country code there matches no
+			// state and silently narrows the method to nothing. Empty means every state in the zone,
+			// which is what a country-level plan means here.
+			'states'     => array(),
 		);
 
 		$shipping_method = $this->create_shipping_method( $plan_data );
@@ -118,32 +129,122 @@ final class Shipping_Plan extends Writer {
 	}
 
 	/**
-	 * Get or create a shipping zone for the shipping method.
+	 * The zone covering a set of countries, created if it does not exist yet.
+	 *
+	 * Fluent Cart zones speak three dialects: `all` for the whole world, a bare country code for one
+	 * country, and `selection` with a country list in `meta`. Everything went into one "Worldwide
+	 * Shipping" zone before this, so `coverage_areas` could not have been honoured even if anything
+	 * had read it — every generated method was available everywhere.
 	 *
 	 * @since 1.1.0
 	 *
+	 * @param array<int, string> $regions Canonical region list; empty means worldwide.
+	 *
 	 * @return int Shipping zone ID.
 	 */
-	private function get_or_create_shipping_zone(): int {
-		// Check if ShippingZone model is available.
+	private function zone_for( array $regions ): int {
 		if ( ! class_exists( ShippingZoneModel::class ) ) {
-			return 1; // Fallback to zone ID 1 if model not available.
+			return 1; // Fallback to zone ID 1 if the model is not available.
 		}
 
-		// Try to find an existing zone, or create a default one.
-		$zone = ShippingZoneModel::query()->where( 'region', 'all' )->first();
+		$countries = array();
 
-		if ( ! $zone ) {
-			$zone = ShippingZoneModel::query()->create(
-				array(
-					'name'   => 'Worldwide Shipping',
-					'region' => 'all',
-					'order'  => 0,
-				)
+		foreach ( $regions as $region ) {
+			// `store_country` is the generator's placeholder for wherever this store sells from,
+			// which only this side knows.
+			$countries[] = 'store_country' === $region
+				? $this->store_country()
+				: strtoupper( (string) $region );
+		}
+
+		$countries = array_values( array_unique( array_filter( $countries ) ) );
+
+		if ( array() === $countries ) {
+			return $this->zone( 'all', __( 'Worldwide Shipping', 'storeseeder' ), array() );
+		}
+
+		if ( 1 === count( $countries ) ) {
+			return $this->zone(
+				$countries[0],
+				sprintf(
+					/* translators: %s: two-letter country code. */
+					__( '%s Shipping', 'storeseeder' ),
+					$countries[0]
+				),
+				array()
 			);
 		}
 
-		return $zone->id;
+		sort( $countries );
+
+		return $this->zone(
+			'selection',
+			sprintf(
+				/* translators: %s: comma-separated country codes. */
+				__( 'Shipping to %s', 'storeseeder' ),
+				implode( ', ', $countries )
+			),
+			array(
+				'countries'      => $countries,
+				'selection_type' => 'included',
+			)
+		);
+	}
+
+	/**
+	 * Find or create one zone.
+	 *
+	 * Matched on name as well as region, because two `selection` zones differ only by their country
+	 * list — which lives in `meta`, where a query cannot reach it reliably.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string               $region Fluent Cart's region value.
+	 * @param string               $name   Zone name.
+	 * @param array<string, mixed> $meta   Zone meta.
+	 *
+	 * @return int
+	 */
+	private function zone( string $region, string $name, array $meta ): int {
+		$existing = ShippingZoneModel::query()
+			->where( 'region', $region )
+			->where( 'name', $name )
+			->first();
+
+		if ( $existing instanceof ShippingZoneModel ) {
+			return (int) $existing->id;
+		}
+
+		$created = ShippingZoneModel::query()->create(
+			array(
+				'name'   => $name,
+				'region' => $region,
+				'meta'   => $meta,
+				'order'  => 0,
+			)
+		);
+
+		return $created instanceof ShippingZoneModel ? (int) $created->id : 1;
+	}
+
+	/**
+	 * The country this store sells from.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Two-letter country code.
+	 */
+	private function store_country(): string {
+		$base = (string) get_option( 'fluent_cart_store_country', '' );
+
+		if ( '' === $base ) {
+			$settings = (array) get_option( 'fluent_cart_settings', array() );
+			$base     = (string) ( $settings['store_country'] ?? '' );
+		}
+
+		// WordPress has no store country of its own, so US is the fallback rather than a guess from
+		// the site locale — a locale is a language, not a place of business.
+		return '' !== $base ? strtoupper( $base ) : 'US';
 	}
 
 	/**
