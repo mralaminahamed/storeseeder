@@ -33,7 +33,8 @@ Generate realistic test data for WordPress e-commerce stores. Start with the
 
 - **REST API** — every generator exposes `POST storeseeder/v1/<rest-base>/generate` and
   `POST storeseeder/v1/<rest-base>/preview`, plus `GET /platforms`, `POST /platforms/target`,
-  and the sample-data routes. All require the `manage_options` capability. The REST base is
+  and the sample-data routes. All require `manage_options`, or whatever `storeseeder_capability`
+  returns. The REST base is
   not always the resource name: `cart_session` is served at `cart-sessions` and `tax_class` at
   `tax_classes`. [Usage](usage.md#rest-api) lists all seventeen.
 - **Hooks** — filters and actions across the generation lifecycle, described in

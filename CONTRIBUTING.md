@@ -16,9 +16,14 @@ By taking part in this project you agree to the [Code of Conduct](CODE_OF_CONDUC
 
 ## Local Setup
 
-Requirements: PHP 7.4+, Composer, Node.js 16+, and a WordPress install with
-[Fluent Cart](https://wordpress.org/plugins/fluent-cart/) active. StoreSeeder declares Fluent Cart
-through the `Requires Plugins` header, so WordPress blocks activation without it.
+Requirements: PHP 7.4+, Composer, Node.js 16+, and a WordPress install with one supported
+e-commerce platform active — [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) is the driver
+shipped today.
+
+There is no `Requires Plugins` header, deliberately: it would have made WordPress refuse activation
+without Fluent Cart specifically, which would put every other platform out of reach. StoreSeeder
+activates either way and reports what is missing, so a driver can be developed against a store
+plugin that is not installed yet.
 
 ```bash
 git clone https://github.com/mralaminahamed/storeseeder.git
@@ -86,9 +91,12 @@ bash tests/php/bin/install-wp-tests.sh wordpress_test <db-user> <db-pass> localh
 ```
 
 Pass `true` as a sixth argument to skip database creation if `wordpress_test` already exists.
-Fluent Cart must be present as a sibling directory of this plugin — the bootstrap loads it and
-creates its tables through `FluentCart\Database\DBMigrator`, because Fluent Cart's own modules
-query them during `init`.
+A platform is loaded from a sibling directory only when StoreSeeder ships a driver for it, so
+Fluent Cart must be present as a sibling of this plugin — the bootstrap loads it and creates its
+tables through `FluentCart\Database\DBMigrator`, because Fluent Cart's own modules query them
+during `init`. Tests needing a platform that is absent skip themselves through
+`require_platform( $id )` rather than failing, since no contributor will have every platform
+installed.
 
 Connection details come from environment variables declared in `phpunit.xml.dist`
 (`WP_DB_NAME`, `WP_DB_USER`, `WP_DB_PASS`, `WP_DB_HOST`, `WP_TABLE_PREFIX`, `WP_PATH`). Set any
@@ -103,8 +111,10 @@ database you care about.
 
 ### Browser tests (Playwright)
 
-The e2e suite drives a real WordPress install, so it needs one running with Fluent Cart and
-StoreSeeder active and `yarn build` already run:
+The e2e suite drives a real WordPress install, so it needs one running with StoreSeeder and a
+supported platform active, and `yarn build` already run. The multi-platform specs register a stub
+driver through the public `storeseeder_platforms` filter rather than requiring a second store
+plugin — which incidentally proves the extension point works from outside:
 
 ```bash
 cp tests/e2e/.env.test.example tests/e2e/.env.test   # set WP_BASE_URL and admin credentials
@@ -137,7 +147,7 @@ Full detail lives in [AGENTS.md](AGENTS.md) and the phpcs/PHPStan configs. The e
 
 **PHP** — WordPress coding standards, PSR-4 under the `StoreSeeder\` namespace, PHP 7.4 compatible.
 PascalCase classes, PHPDoc on every class, method, and property. Validate REST input against JSON
-Schema, require the `manage_options` capability, and prefer `WP_Error` over exceptions crossing the
+Schema, gate on `StoreSeeder\Access` rather than a literal capability, and prefer `WP_Error` over exceptions crossing the
 REST boundary.
 
 **TypeScript / React** — functional components with hooks, TypeScript everywhere, Tailwind CSS v4 for
@@ -184,7 +194,8 @@ squash or rebase unless asked.
 
 ## Reporting Bugs
 
-Use the bug report template and include the StoreSeeder, Fluent Cart, WordPress, and PHP versions,
+Use the bug report template and include the StoreSeeder, platform (e.g. Fluent Cart), WordPress, and
+PHP versions,
 the generator and parameters involved, exact steps, and any errors from `debug.log` or the browser
 console.
 

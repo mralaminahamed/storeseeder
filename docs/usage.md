@@ -284,7 +284,7 @@ an empty list — a request that created no rows did not succeed.
 | `400` | `storeseeder_platform_inactive` | Known driver, but its plugin is not active |
 | `400` | `storeseeder_unsupported_resource` | The target cannot represent this resource. Carries the reason and, where one applies, the plugin slug that would enable it. |
 | `500` | `storeseeder_missing_writer` | A driver claims the resource but ships no writer — a bug in that driver |
-| `403` | `rest_forbidden` | Caller lacks `manage_options` |
+| `403` | `rest_forbidden` | Caller lacks the required capability (`manage_options` by default) |
 
 ### Preview
 

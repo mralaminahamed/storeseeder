@@ -191,7 +191,8 @@ platform, which an MCP client can set with the `platform` parameter.
 
 ## Security
 
-- `manage_options` required on every REST route and AJAX handler
+- One capability gate — `StoreSeeder\Access`, default `manage_options` — for the admin screen, every
+  REST route, every MCP ability and the AJAX handlers
 - Parameters validated by the JSON Schema registered with each route, each with a
   `sanitize_callback`
 - Nonce-protected admin requests

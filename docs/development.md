@@ -522,7 +522,9 @@ validation, MCP) follows from that.
 
 ### Security
 
-- **Capability checks**: every REST route and AJAX handler verifies `manage_options`
+- **Capability checks**: every REST route, MCP ability and AJAX handler gates on
+  `StoreSeeder\Access::current_user_can()` — never a literal capability, or a site could be granted
+  the routes and not the page
 - **Input validation**: parameters are validated by the JSON Schema registered with
   `register_rest_route`, with `sanitize_callback` on each
 - **Nonces**: the admin sends `X-WP-Nonce` via `@wordpress/api-fetch`; the AJAX handler checks

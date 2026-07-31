@@ -4,8 +4,8 @@
 
 # StoreSeeder
 
-**Realistic test data for Fluent Cart stores.**
-17 generators, live preview, batch queue, and a modern admin UI.
+**Realistic test data for WordPress e-commerce platforms.**
+17 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
 
 [![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
@@ -23,9 +23,12 @@
 
 ## What It Does
 
-Pick a generator, configure its parameters, click **Generate**. Every record is created through native
-Fluent Cart models, so it respects the same schema, relationships, validation, and money handling as
-real data — and stays compatible across Fluent Cart updates.
+Pick a generator, configure its parameters, click **Generate**. Every record is created through the
+target platform's own models, so it respects the same schema, relationships, validation, and money
+handling as real data — and stays compatible across that platform's updates.
+
+Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
+that, and the same seventeen generators feed every driver. Fluent Cart is the driver shipped today.
 
 Built for:
 
@@ -51,17 +54,39 @@ yarn install
 yarn build
 ```
 
-**Requirements** — WordPress 6.5+, PHP 7.4+ (8.0+ recommended), and
-[Fluent Cart](https://wordpress.org/plugins/fluent-cart/) active. Fluent Cart is a hard dependency
-declared through the `Requires Plugins` header, so WordPress blocks activation without it. Budget
-256MB of memory, or 512MB for large datasets. The plugin header and [`readme.txt`](readme.txt) are the
-source of truth for these numbers.
+**Requirements** — WordPress 6.5+, PHP 7.4+ (8.0+ recommended), and one supported e-commerce
+platform active. Today that means [Fluent Cart](https://wordpress.org/plugins/fluent-cart/).
+
+There is deliberately **no `Requires Plugins` header**: it would make WordPress refuse activation
+without Fluent Cart specifically, so no other platform could ever be reached. StoreSeeder activates
+regardless and says what is missing instead. Budget 256MB of memory, or 512MB for large datasets. The
+plugin header and [`readme.txt`](readme.txt) are the source of truth for these numbers.
+
+## Platforms
+
+| Platform | Status |
+|----------|--------|
+| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — all 17 resources |
+| EasyCommerce, WooCommerce, StoreEngine | Planned |
+| Anything else | A third party can register a driver from their own plugin, with no changes here |
+
+The target is chosen in the topbar and in **Settings**, and defaults to `Auto`. One platform active
+resolves silently; with several active there is no safe default, so the generator page asks before it
+runs — writing rows into the wrong store is not a failure you would notice afterwards. The choice is
+stored **site-wide**, so two administrators cannot unknowingly seed different platforms.
+
+Support is computed per request, never cached, because it is conditional: WooCommerce has no
+subscriptions until WooCommerce Subscriptions is active, and StoreEngine gates several resources
+behind addons. A resource the target cannot represent is dimmed with its reason — naming the plugin
+that would enable it — and the REST API answers 400 rather than reporting success and writing
+nothing.
 
 ## Generators
 
-Seventeen generators, grouped by category in the admin. Several build on others — orders need products
-and customers, refunds need charge transactions — and each one reports clearly when a prerequisite is
-missing.
+Seventeen generators, grouped by category in the admin, all platform-neutral — a generator names no
+platform, which is what lets one of them feed every driver and lets a fixed seed produce identical
+data on all of them. Several build on others — orders need products and customers, refunds need charge
+transactions — and each one reports clearly when a prerequisite is missing.
 
 | Generator | Category | What it creates |
 |-----------|----------|-----------------|
@@ -72,7 +97,7 @@ missing.
 | Product Variations | Advanced | Additional priced variations attached to existing products, with unique SKUs |
 | Shipping Plans | Advanced | Shipping methods and zones with fixed and free-shipping rates |
 | Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
-| Tax Classes | Advanced | Tax classes with the geographic rate rows Fluent Cart applies to orders |
+| Tax Classes | Advanced | Tax classes with the geographic rate rows the platform applies to orders |
 | Order Tax Lines | Advanced | Per-order tax lines linking orders to tax rates with collected tax |
 | Transactions | Advanced | Payment transactions tied to real orders, with gateways and statuses |
 | Refunds | Advanced | Full and partial refunds against existing charge transactions |
@@ -80,7 +105,7 @@ missing.
 | Cart Sessions | Advanced | Abandoned and completed cart sessions with real product foreign keys |
 | Labels | Advanced | Labels (tags) attached to existing orders and customers |
 | Product Downloads | Advanced | Downloadable files for products, with download permissions on existing orders |
-| Subscriptions | Advanced | Subscription records against existing orders (active billing requires Fluent Cart Pro) |
+| Subscriptions | Advanced | Subscription records against existing orders (on Fluent Cart, active billing requires Pro) |
 | Logs | Advanced | Activity log entries across orders, products, customers, and system events |
 
 Full per-generator detail in [docs/features.md](docs/features.md).
@@ -95,20 +120,22 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Command palette | <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>K</kbd> to jump to any generator or page |
 | Run history | Per-generator run log in browser `localStorage`; recent runs in the sidebar, all-time stats on the dashboard |
 | Design-token UI | Light/dark themes, accent palettes, and comfortable/compact density — all scoped to the plugin, so WordPress chrome is never restyled |
-| Settings | Default count, locale, reproducible seed, metadata preference, run-history limit, and sample-data sync |
+| Multi-platform | One driver per store plugin; the target is site-wide, and capabilities are resolved per request rather than declared once |
+| 75 locales | Every locale FakerPHP ships a provider for, searchable by name or code. The picker offers exactly what the REST API accepts |
+| Settings | Target platform, default count, locale, reproducible seed, metadata preference, run-history limit, appearance, and sample-data sync |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
 | REST API | 17 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
 | MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
-| Hook system | Filters and actions across the generation lifecycle |
+| Hook system | Filters and actions across the generation lifecycle, plus one filter for the capability required to use the plugin |
 
 ## Documentation
 
 | Page | What it covers |
 |------|----------------|
 | [docs/](docs/README.md) | Documentation index |
-| [Installation](docs/installation.md) | Requirements, install paths, activation with Fluent Cart |
+| [Installation](docs/installation.md) | Requirements, install paths, and choosing a target platform |
 | [Usage](docs/usage.md) | Running generators, live preview, batch queue, settings, run history |
-| [Features](docs/features.md) | The 17 generators and what each writes into the store |
+| [Features](docs/features.md) | The 17 generators, the platform matrix, locales, and what each generator writes |
 | [Architecture](docs/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
 | [Development](docs/development.md) | Local setup, build and test commands, adding a generator, release process |
 | [External Services](docs/external-services.md) | The two outbound requests, what they send, and how to opt out |
@@ -153,12 +180,14 @@ PHP lives under the PSR-4 namespace `StoreSeeder\`:
 storeseeder.php           Plugin bootstrap
 class-storeseeder.php     Singleton orchestrator
 includes/
+  Access.php                         One capability gate: menu, REST, MCP, AJAX
   Generation/Generator.php           Base generator (FakerPHP, batch, preview, logging)
   Generation/Generators/             17 concrete generators — no platform knowledge
   Rest/Controller.php                Base REST controller (WP_REST_Controller)
   Rest/Controllers/                  17 REST controllers
   Rest/Registry.php                  Controller registry — storeseeder_rest_controllers
   Platforms/                         Platform layer: registry, resolver, capabilities
+  Platforms/Locale.php               The 75 generatable locales
   Platforms/Writer.php               Base writer — persists one resource
   Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 17 writers
   MCP/                               MCP server + abilities
@@ -196,24 +225,31 @@ has to pass.
 ## Extensibility
 
 ```php
-// Modify generated data before creation
-add_filter( 'storeseeder_customer_data_before_create', function( $data ) {
-    $data['first_name'] = 'Test';
-    return $data;
+// Register a platform from your own plugin. This is the whole surface needed:
+// the generators, REST API and admin pick it up with no changes to StoreSeeder.
+add_filter( 'storeseeder_platforms', function ( array $platforms ): array {
+    $platforms[] = new My_Store_Driver(); // extends StoreSeeder\Platforms\Platform_Driver
+    return $platforms;
 } );
 
-// Hook after an item is created
-add_action( 'storeseeder_after_customer_created', function( $customer_id, $result, $data ) {
-    // custom logic
-}, 10, 3 );
+// Change generated data before it is written — the entity is platform-neutral here,
+// so this applies to every platform equally. Drop the _entity suffix for one resource.
+add_filter( 'storeseeder_canonical_entity', function ( array $entity, string $resource ): array {
+    $entity['meta']['seeded_by'] = 'nightly-fixture';
+    return $entity;
+}, 10, 2 );
 
-// Filter a generation result
-add_filter( 'storeseeder_product_generation_result', function( $result, $product_id, $data ) {
-    return $result;
-}, 10, 3 );
+// Widen who may generate. Governs the admin menu, REST, MCP and AJAX together.
+add_filter( 'storeseeder_capability', fn() => 'edit_shop_orders' );
+
+// Observe a write, per platform and resource. Fires for failures too.
+add_action( 'storeseeder_after_write_fluent-cart_product', function ( $result, $entity ) {
+    // custom logic
+}, 10, 2 );
 ```
 
-More hooks, with copy-paste examples, in [docs/architecture.md](docs/architecture.md).
+The full table — every filter and action, with what each receives — is in
+[docs/architecture.md](docs/architecture.md#extension-points).
 
 ## External Services
 
@@ -222,7 +258,7 @@ neither fires on activation.
 
 | Service | Endpoint | Triggered by |
 |---------|----------|--------------|
-| GitHub | `github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/<branch>.zip` | An administrator granting consent — the prompt on the plugin admin page, or **Sync now** in Settings |
+| GitHub | `github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/<branch>.zip` | An administrator granting consent — the prompt on the plugin admin page, or **Sync now** in Settings. `storeseeder_sample_data_source` points it elsewhere |
 | WordPress.org | `api.wordpress.org/plugins/info/1.2/` | An administrator opening the **Our Plugins** page; requested by the browser |
 
 Full disclosure — exactly what each request sends and receives, provider terms and privacy policies,
@@ -231,7 +267,9 @@ and what StoreSeeder deliberately does not do — in
 
 ## Security
 
-- Every REST endpoint requires the `manage_options` capability
+- Every REST endpoint, MCP ability and admin screen requires `manage_options` — or whatever
+  `storeseeder_capability` returns, which governs all of them together so access cannot be widened
+  for one surface and not another
 - Parameters are validated against JSON Schema before processing
 - Sample-data archives are validated entry by entry before extraction, rejecting absolute paths and
   `..` traversal segments (zip-slip)

@@ -1,6 +1,6 @@
 {
   "name": "mralaminahamed/storeseeder",
-  "description": "Comprehensive Fluent Cart test data generator with 17 generators, live preview, schema-driven parameter configuration, WordPress admin colour integration, and a modern React Router v7 interface.",
+  "description": "Test data generator for WordPress e-commerce platforms: 17 platform-neutral generators behind a driver layer, live preview, schema-driven parameter configuration, WordPress admin colour integration, and a modern React Router v7 interface.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
   "authors": [

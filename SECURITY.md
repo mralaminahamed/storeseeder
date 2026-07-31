@@ -31,7 +31,7 @@ When reporting a vulnerability, please include as much information as possible:
 4. **Proof of concept** or exploit code (if applicable)
 5. **Impact** assessment of the vulnerability
 6. **Suggested fix** (if you have one)
-7. **WordPress/Fluent Cart version** where the issue was discovered
+7. **WordPress version, and the e-commerce platform and version** where the issue was discovered
 8. **Plugin version** affected
 
 ### Response Timeline
@@ -65,7 +65,11 @@ This plugin implements comprehensive security measures across all components:
 
 ### Access Control & Authentication
 
-- Capability checks (`manage_options`) for all administrative functions
+- Capability checks for all administrative functions, through `StoreSeeder\Access` — one gate for
+  the admin screen, the REST routes, the MCP abilities and the AJAX handlers, so access cannot be
+  granted to one and withheld from another. Default `manage_options`; `storeseeder_capability`
+  changes it, and a value the filter returns that `current_user_can()` could not use falls back to
+  the default rather than through
 - Nonce verification for all AJAX requests and form submissions
 - Proper user permission validation before data generation
 - WordPress authentication integration
@@ -132,8 +136,8 @@ echo wp_kses_post( $description );
 #### Capability Checks
 
 ```php
-// Good - Permission verification
-if ( ! current_user_can( 'manage_options' ) ) {
+// Good - Permission verification through the single gate, not a literal capability
+if ( ! StoreSeeder\Access::current_user_can() ) {
     wp_die( __( 'Insufficient permissions.', 'storeseeder' ) );
 }
 ```
@@ -211,7 +215,10 @@ The following are generally NOT considered security vulnerabilities:
 
 - Issues in third-party dependencies (report to respective maintainers)
 - WordPress core vulnerabilities (report to WordPress security team)
-- Fluent Cart vulnerabilities (report to Fluent Cart team)
+- Vulnerabilities in the e-commerce platform being written to, such as Fluent Cart (report to that
+  platform's team)
+- Vulnerabilities in a third-party platform driver registered through `storeseeder_platforms`
+  (report to whoever ships the driver)
 - Social engineering attacks
 - Physical access attacks
 - Denial of Service attacks requiring excessive resources
@@ -276,7 +283,10 @@ When security vulnerabilities are confirmed:
 - [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)
 - [Plugin Security Handbook](https://developer.wordpress.org/plugins/security/)
 
-### Fluent Cart Security
+### Platform security
+
+StoreSeeder writes through the target platform's own models, so that platform's guidance applies to
+the data it creates. For the driver shipped today:
 
 - [Fluent Cart Security Best Practices](https://fluentcart.com/docs/security/)
 - [Fluent Cart Developer Security Guidelines](https://fluentcart.com/docs/developer-security/)

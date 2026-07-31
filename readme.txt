@@ -8,25 +8,29 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic Fluent Cart test data with 17 generators, a modern React admin, schema-driven configuration, and optional MCP integration.
+Generate realistic e-commerce test data with 17 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
 
 == Description ==
 
-StoreSeeder generates realistic test data for the Fluent Cart e-commerce platform. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
+StoreSeeder generates realistic test data for WordPress e-commerce platforms. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
-All data is created through native Fluent Cart models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with Fluent Cart updates.
+Where the data lands is decided by a **platform driver**, and the same seventeen generators feed every driver. **Fluent Cart is the driver included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
+
+All data is created through the target platform's own models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with that platform's updates.
 
 **Sample data is optional and consent-based.** StoreSeeder can download locale-specific reference data (product names, addresses, customer tags) from GitHub to make generated content more realistic. Nothing is downloaded until you accept a one-time consent prompt on the plugin's admin page. After that, StoreSeeder will re-fetch the files if they go missing. No data about your site is ever transmitted, and declining costs you no functionality — generators fall back to built-in defaults. You can change the decision at any time from Settings.
 
 **Highlights**
 
 * **17 generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs.
+* **One driver per platform** — the generators are platform-neutral, so the same fixed seed produces identical data wherever it is written. Fluent Cart ships; the driver layer is public for the rest.
 * **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
 * **Live preview** — a read-only preview of real faker rows that refreshes as you change settings, without persisting anything.
+* **75 locales** — names, addresses, phone numbers, and postcodes in any locale FakerPHP ships a provider for. The picker offers exactly what the REST API accepts, searchable by name or code.
 * **Schema-driven configuration** — each generator renders its own fields from a parameter schema: nested options, ranges, toggles, and intelligent defaults.
 * **REST API** — every generator is exposed at `storeseeder/v1/<resource>/generate` for programmatic use.
 * **Optional MCP integration** — expose generators as AI tools via the WordPress Abilities API (see below).
-* **Extensible** — filters and actions cover the full generation lifecycle.
+* **Extensible** — filters and actions cover the full generation lifecycle, one filter registers a whole platform, and one filter sets the capability required to use the plugin.
 
 **Generators**
 
@@ -45,7 +49,7 @@ All data is created through native Fluent Cart models, so generated records resp
 * **Cart Sessions** — abandoned and active cart sessions.
 * **Labels** — labels (tags) attached to existing orders and customers.
 * **Product Downloads** — downloadable files for products, with download permissions on existing orders.
-* **Subscriptions** — subscription records against existing orders (active billing requires Fluent Cart Pro).
+* **Subscriptions** — subscription records against existing orders (on Fluent Cart, active billing requires Pro).
 * **Logs** — activity log entries across orders, products, customers, and system events.
 
 **Model Context Protocol (MCP) Integration**
@@ -75,14 +79,20 @@ The plugin can optionally expose every generator as an MCP tool so AI clients (e
 = Requirements =
 * WordPress 6.5+
 * PHP 7.4+ (8.0+ recommended)
-* Fluent Cart plugin (active) — enforced by the `Requires Plugins` header
+* One supported e-commerce platform, active. Today: Fluent Cart. StoreSeeder activates without it and tells you what is missing, rather than blocking activation — blocking would rule out every other platform.
 * 256MB memory minimum (512MB for large datasets)
 * MCP integration (optional): WordPress Abilities API + `mcp-adapter` plugin
 
 == Frequently Asked Questions ==
 
-= How does Fluent Cart integration work? =
-Generators persist through native Fluent Cart Eloquent models, preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data.
+= Which e-commerce platforms are supported? =
+Fluent Cart, today, for all 17 resources. Support is provided by a platform driver rather than wired into the generators, so more can be added — drivers for other platforms are planned. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
+
+= How does platform integration work? =
+Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models, in Fluent Cart's case — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data.
+
+= Can I add support for my own platform? =
+Yes, from your own plugin and without patching this one. Register a driver on the `storeseeder_platforms` filter and the generators, REST API, and admin pick it up. A driver answers what it is called, whether it is active, which resources it supports, and which writer handles each one. See the architecture documentation for the full contract.
 
 = How many generators are included? =
 Seventeen: products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs.
@@ -91,7 +101,7 @@ Seventeen: products, product variations, customers, orders, transactions, refund
 Several generators build on others: orders need products and customers; refunds need charge transactions; order tax lines need orders and tax rates; product downloads and subscriptions need products and orders. Generate the prerequisites first, and each generator reports clearly when something is missing.
 
 = Do subscriptions require Fluent Cart Pro? =
-The subscriptions table ships in Fluent Cart core, so records are generated as fixtures without Pro. Active billing and management require Fluent Cart Pro and a subscription-capable gateway.
+The subscriptions table ships in Fluent Cart core, so records are generated as fixtures without Pro. Active billing and management require Fluent Cart Pro and a subscription-capable gateway. On other platforms, subscription support depends on what that platform provides — StoreSeeder reports which plugin would enable it rather than hiding the generator.
 
 = Is it safe for production? =
 Use only in development or staging. Always back up your database before generating, and start with small batches.
@@ -102,8 +112,14 @@ Yes. The plugin fires filters and actions across the generation lifecycle — mo
 = What is the MCP integration for? =
 It exposes generators as AI tools via the WordPress Abilities API, so an MCP-capable assistant can create test data conversationally. It is optional and off unless the Abilities API and `mcp-adapter` are present.
 
+= In which languages can data be generated? =
+Seventy-five locales — every one FakerPHP ships a provider for. Names, addresses, phone numbers, company names, and postcodes follow the chosen locale. The picker offers exactly the set the REST API accepts, and is searchable by language name or locale code.
+
+= Who can generate data? =
+Administrators — the `manage_options` capability — for the admin screen, the REST routes, and the MCP tools alike. A single filter, `storeseeder_capability`, changes that for all of them at once, so access cannot be granted to the API and withheld from the page.
+
 = How do I remove generated data? =
-Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before removing.
+Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back up before removing.
 
 == Screenshots ==
 
@@ -111,7 +127,7 @@ Use WordPress/Fluent Cart deletion tools or a cleanup plugin. Back up before rem
 2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
 3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
 4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.
-5. Settings — generation defaults: pre-filled batch size, faker locale, and a fixed seed for reproducible runs.
+5. Settings — the target platform, generation defaults (pre-filled batch size, locale, and a fixed seed for reproducible runs), and appearance.
 
 == Changelog ==
 
@@ -161,13 +177,13 @@ Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS,
 [Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
 
 
-**Privacy**
+== Privacy ==
 
 All generated data is stored in your own WordPress database and is never transmitted anywhere. Generated content is fictional and does not represent real individuals or transactions. The plugin does not collect analytics and does not phone home.
 
 The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [the external services disclosure](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/external-services.md) for the full detail.
 
-**Contributing**
+== Contributing ==
 
 Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Bug reports, feature requests, and pull requests are all welcome — the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) is the place to start. Branching, commit conventions, quality gates, and pull request expectations are all documented in the contributing guide:
 
