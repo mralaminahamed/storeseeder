@@ -101,6 +101,7 @@ final class Registry {
 			Controllers\Attribute::class,
 			Controllers\Brand::class,
 			Controllers\Product_Category::class,
+			Controllers\Product_Tag::class,
 			Controllers\Refund::class,
 			Controllers\Log::class,
 			Controllers\Shipping_Class::class,
