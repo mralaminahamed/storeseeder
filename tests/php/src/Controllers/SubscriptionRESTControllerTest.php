@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Resources\Subscription;
+use StoreSeeder\Rest\Controllers\Subscription;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Subscription REST controller.
  *
- * @covers \StoreSeeder\Controllers\Resources\Subscription
+ * @covers \StoreSeeder\Rest\Controllers\Subscription
  */
 class SubscriptionRESTControllerTest extends StoreSeederUnitTestCase {
 

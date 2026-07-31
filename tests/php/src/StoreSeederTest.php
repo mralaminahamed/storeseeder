@@ -86,7 +86,7 @@ class StoreSeederTest extends StoreSeederUnitTestCase {
 		 * from inside a test. Exercising the controller keeps the assertion about
 		 * route registration itself, which is what this test is for.
 		 */
-		( new \StoreSeeder\Controllers\Resources\Product() )->register_routes();
+		( new \StoreSeeder\Rest\Controllers\Product() )->register_routes();
 
 		$routes = $this->server->get_routes();
 		$prefix = '/' . $this->namespace;

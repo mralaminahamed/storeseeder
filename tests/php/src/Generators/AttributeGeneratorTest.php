@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Attribute;
+use StoreSeeder\Generation\Generators\Attribute;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Attribute generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Attribute
+ * @covers \StoreSeeder\Generation\Generators\Attribute
  */
 class AttributeGeneratorTest extends StoreSeederUnitTestCase {
 

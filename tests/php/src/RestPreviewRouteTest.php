@@ -11,8 +11,8 @@ use StoreSeeder;
 use WP_REST_Request;
 
 /**
- * @covers \StoreSeeder\Controllers\Controller
- * @covers \StoreSeeder\Generators\Generator
+ * @covers \StoreSeeder\Rest\Controller
+ * @covers \StoreSeeder\Generation\Generator
  */
 class RestPreviewRouteTest extends StoreSeederUnitTestCase {
 
@@ -58,23 +58,23 @@ class RestPreviewRouteTest extends StoreSeederUnitTestCase {
 	 */
 	private function register_controllers(): void {
 		$controllers = array(
-			new \StoreSeeder\Controllers\Resources\Product(),
-			new \StoreSeeder\Controllers\Resources\Customer(),
-			new \StoreSeeder\Controllers\Resources\Order(),
-			new \StoreSeeder\Controllers\Resources\Coupon(),
-			new \StoreSeeder\Controllers\Resources\Product_Variation(),
-			new \StoreSeeder\Controllers\Resources\Shipping_Plan(),
-			new \StoreSeeder\Controllers\Resources\Tax_Class(),
-			new \StoreSeeder\Controllers\Resources\Transaction(),
-			new \StoreSeeder\Controllers\Resources\Cart_Session(),
-			new \StoreSeeder\Controllers\Resources\Attribute(),
-			new \StoreSeeder\Controllers\Resources\Refund(),
-			new \StoreSeeder\Controllers\Resources\Log(),
-			new \StoreSeeder\Controllers\Resources\Shipping_Class(),
-			new \StoreSeeder\Controllers\Resources\Label(),
-			new \StoreSeeder\Controllers\Resources\Order_Tax_Rate(),
-			new \StoreSeeder\Controllers\Resources\Product_Download(),
-			new \StoreSeeder\Controllers\Resources\Subscription(),
+			new \StoreSeeder\Rest\Controllers\Product(),
+			new \StoreSeeder\Rest\Controllers\Customer(),
+			new \StoreSeeder\Rest\Controllers\Order(),
+			new \StoreSeeder\Rest\Controllers\Coupon(),
+			new \StoreSeeder\Rest\Controllers\Product_Variation(),
+			new \StoreSeeder\Rest\Controllers\Shipping_Plan(),
+			new \StoreSeeder\Rest\Controllers\Tax_Class(),
+			new \StoreSeeder\Rest\Controllers\Transaction(),
+			new \StoreSeeder\Rest\Controllers\Cart_Session(),
+			new \StoreSeeder\Rest\Controllers\Attribute(),
+			new \StoreSeeder\Rest\Controllers\Refund(),
+			new \StoreSeeder\Rest\Controllers\Log(),
+			new \StoreSeeder\Rest\Controllers\Shipping_Class(),
+			new \StoreSeeder\Rest\Controllers\Label(),
+			new \StoreSeeder\Rest\Controllers\Order_Tax_Rate(),
+			new \StoreSeeder\Rest\Controllers\Product_Download(),
+			new \StoreSeeder\Rest\Controllers\Subscription(),
 		);
 
 		foreach ( $controllers as $controller ) {
@@ -156,7 +156,7 @@ class RestPreviewRouteTest extends StoreSeederUnitTestCase {
 	public function test_generator_clamps_below_one(): void {
 		// The route cannot deliver count=0 (schema minimum is 1), so the lower
 		// clamp is exercised on the generator directly.
-		$generator = new \StoreSeeder\Generators\Resources\Product();
+		$generator = new \StoreSeeder\Generation\Generators\Product();
 		$generator->set_locale( 'en_US' );
 		$generator->set_faker();
 		$generator->set_generation_params( array() );

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Subscription;
+use StoreSeeder\Generation\Generators\Subscription;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Subscription generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Subscription
+ * @covers \StoreSeeder\Generation\Generators\Subscription
  */
 class SubscriptionGeneratorTest extends StoreSeederUnitTestCase {
 

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Transaction;
+use StoreSeeder\Generation\Generators\Transaction;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Transaction generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Transaction
+ * @covers \StoreSeeder\Generation\Generators\Transaction
  */
 class TransactionGeneratorTest extends StoreSeederUnitTestCase {
 

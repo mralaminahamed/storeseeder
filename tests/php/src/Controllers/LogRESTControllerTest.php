@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Resources\Log;
+use StoreSeeder\Rest\Controllers\Log;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Log REST controller.
  *
- * @covers \StoreSeeder\Controllers\Resources\Log
+ * @covers \StoreSeeder\Rest\Controllers\Log
  */
 class LogRESTControllerTest extends StoreSeederUnitTestCase {
 

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Cart_Session;
+use StoreSeeder\Generation\Generators\Cart_Session;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Cart_Session generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Cart_Session
+ * @covers \StoreSeeder\Generation\Generators\Cart_Session
  */
 class CartSessionGeneratorTest extends StoreSeederUnitTestCase {
 

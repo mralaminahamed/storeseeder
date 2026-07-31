@@ -211,7 +211,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'products', __( 'Array of generated product objects with id, title, type, variations count, price_range, and stock_status.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Products::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Products::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -259,7 +259,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'customers', __( 'Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Customers::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Customers::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -318,7 +318,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'orders', __( 'Array of generated order objects with id, order_number, status, total, payment_method, and item count.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Orders::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Orders::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -386,7 +386,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'coupons', __( 'Array of generated coupon objects with id, code, type, offer, status, usage_limit, and validity dates.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Coupons::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Coupons::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -427,7 +427,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'product_variations', __( 'Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Product_Variations::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Product_Variations::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -464,7 +464,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'shipping_plans', __( 'Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Shipping_Plans::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Shipping_Plans::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -494,7 +494,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'tax_classes', __( 'Array of generated tax class objects with id, name, active status, rates array, and covered regions.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Tax_Classes::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Tax_Classes::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -530,7 +530,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'transactions', __( 'Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Transactions::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Transactions::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -580,7 +580,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'cart_sessions', __( 'Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Cart_Sessions::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Cart_Sessions::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -590,7 +590,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'attributes', __( 'Array of generated attribute objects with id, name, type, slug, and values array.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Attributes::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Attributes::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -600,7 +600,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'refunds', __( 'Array of generated refund objects with id, order_id, amount, status, and payment_gateway.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Refunds::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Refunds::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -622,7 +622,7 @@ class MCP_Server {
 					)
 				),
 				'output_schema'       => $this->build_output_schema( 'logs', __( 'Array of generated log objects with id, object, action, type, note, and is_public.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Logs::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Logs::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -632,7 +632,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'shipping_classes', __( 'Array of generated shipping class objects with id, name, cost, and per_item.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Shipping_Classes::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Shipping_Classes::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -642,7 +642,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'labels', __( 'Array of generated label objects with id, value, and attached count.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Labels::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Labels::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -652,7 +652,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'order_tax_rates', __( 'Array of generated order tax line objects with id, order_id, tax_rate_id, and total_tax.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Order_Tax_Rates::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Order_Tax_Rates::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -662,7 +662,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'product_downloads', __( 'Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Product_Downloads::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Product_Downloads::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 
@@ -672,7 +672,7 @@ class MCP_Server {
 				'category'            => 'storeseeder',
 				'input_schema'        => $this->build_input_schema( array() ),
 				'output_schema'       => $this->build_output_schema( 'subscriptions', __( 'Array of generated subscription objects with id, uuid, customer_id, item_name, billing_interval, status, and recurring_total.', 'storeseeder' ) ),
-				'execute_callback'    => array( Abilities\Resources\Generate_Subscriptions::class, 'execute' ),
+				'execute_callback'    => array( Abilities\Generate_Subscriptions::class, 'execute' ),
 				'permission_callback' => array( $this, 'permission_callback' ),
 			),
 

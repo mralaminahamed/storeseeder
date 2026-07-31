@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Product_Download;
+use StoreSeeder\Generation\Generators\Product_Download;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Download generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Product_Download
+ * @covers \StoreSeeder\Generation\Generators\Product_Download
  */
 class ProductDownloadGeneratorTest extends StoreSeederUnitTestCase {
 

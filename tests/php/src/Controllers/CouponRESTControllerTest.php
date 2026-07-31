@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Resources\Coupon;
+use StoreSeeder\Rest\Controllers\Coupon;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Coupon REST controller.
  *
- * @covers \StoreSeeder\Controllers\Resources\Coupon
+ * @covers \StoreSeeder\Rest\Controllers\Coupon
  */
 class CouponRESTControllerTest extends StoreSeederUnitTestCase {
 

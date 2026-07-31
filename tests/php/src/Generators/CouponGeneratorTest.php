@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Coupon;
+use StoreSeeder\Generation\Generators\Coupon;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Coupon generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Coupon
+ * @covers \StoreSeeder\Generation\Generators\Coupon
  */
 class CouponGeneratorTest extends StoreSeederUnitTestCase {
 

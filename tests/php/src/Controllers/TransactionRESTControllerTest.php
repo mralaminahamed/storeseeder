@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Resources\Transaction;
+use StoreSeeder\Rest\Controllers\Transaction;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Transaction REST controller.
  *
- * @covers \StoreSeeder\Controllers\Resources\Transaction
+ * @covers \StoreSeeder\Rest\Controllers\Transaction
  */
 class TransactionRESTControllerTest extends StoreSeederUnitTestCase {
 

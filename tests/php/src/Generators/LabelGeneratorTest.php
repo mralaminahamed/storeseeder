@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Label;
+use StoreSeeder\Generation\Generators\Label;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Label generator.
  *
- * @covers \StoreSeeder\Generators\Resources\Label
+ * @covers \StoreSeeder\Generation\Generators\Label
  */
 class LabelGeneratorTest extends StoreSeederUnitTestCase {
 
