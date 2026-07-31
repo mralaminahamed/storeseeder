@@ -24,6 +24,7 @@ namespace StoreSeeder\Platforms;
  */
 final class Resource {
 	const ATTRIBUTE         = 'attribute';
+	const BRAND             = 'brand';
 	const CART_SESSION      = 'cart_session';
 	const COUPON            = 'coupon';
 	const CUSTOMER          = 'customer';
@@ -51,6 +52,10 @@ final class Resource {
 	 */
 	public static function all(): array {
 		return array(
+			// Before products, because this list is generation order and the cleanup walks it
+			// backwards: a brand has to outlive the products carrying it, or the term is gone
+			// before the products that reference it are.
+			self::BRAND,
 			self::PRODUCT,
 			self::PRODUCT_VARIATION,
 			self::PRODUCT_DOWNLOAD,

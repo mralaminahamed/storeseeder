@@ -99,6 +99,7 @@ final class Registry {
 			Controllers\Transaction::class,
 			Controllers\Cart_Session::class,
 			Controllers\Attribute::class,
+			Controllers\Brand::class,
 			Controllers\Refund::class,
 			Controllers\Log::class,
 			Controllers\Shipping_Class::class,

@@ -222,6 +222,7 @@ final class Platform extends Platform_Driver {
 	protected function writer_classes(): array {
 		return array(
 			Resource::ATTRIBUTE         => Writers\Attribute::class,
+			Resource::BRAND             => Writers\Brand::class,
 			Resource::CART_SESSION      => Writers\Cart_Session::class,
 			Resource::COUPON            => Writers\Coupon::class,
 			Resource::CUSTOMER          => Writers\Customer::class,

@@ -27,7 +27,7 @@ class Generate_Attributes extends Ability {
 	 * {@inheritdoc}
 	 */
 	public static function label(): string {
-		return __( 'Generate Attributes', 'storeseeder' );
+		return __( 'Generate Product Attributes', 'storeseeder' );
 	}
 
 	/**
