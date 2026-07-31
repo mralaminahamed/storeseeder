@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T23:13:02+00:00\n"
+"POT-Creation-Date: 2026-07-31T23:30:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -585,9 +585,39 @@ msgstr ""
 msgid "Shipping Classes"
 msgstr ""
 
-#: includes/Generation/Generators/Shipping_Plan.php:51
+#: includes/Generation/Generators/Shipping_Plan.php:42
 #: build/admin-app.js:4
 msgid "Shipping Plans"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Plan.php:235
+msgid "Standard Shipping"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Plan.php:236
+msgid "Express Shipping"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Plan.php:237
+msgid "Overnight Shipping"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Plan.php:238
+msgid "Free Shipping"
+msgstr ""
+
+#. translators: 1: method name, 2: number of days.
+#: includes/Generation/Generators/Shipping_Plan.php:246
+#, php-format
+msgid "%1$s (%2$d day)"
+msgid_plural "%1$s (%2$d days)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: method name, 2: minimum days, 3: maximum days.
+#: includes/Generation/Generators/Shipping_Plan.php:254
+#, php-format
+msgid "%1$s (%2$d–%3$d days)"
 msgstr ""
 
 #: includes/Generation/Generators/Subscription.php:63
@@ -598,6 +628,26 @@ msgstr ""
 #: includes/Generation/Generators/Tax_Class.php:40
 #: build/admin-app.js:4
 msgid "Tax Classes"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:202
+msgid "Standard Rate"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:203
+msgid "Reduced Rate"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:204
+msgid "Zero Rate"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:205
+msgid "Tax Exempt"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:206
+msgid "Digital Goods"
 msgstr ""
 
 #: includes/Generation/Generators/Transaction.php:43
@@ -1049,26 +1099,34 @@ msgid "Generate Shipping Plans"
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Shipping_Plans.php:37
-msgid "Generate realistic shipping plans with tiered pricing methods (price-based, weight-based, quantity-based), regional coverage, delivery timeframes, and taxability settings."
+msgid "Generate shipping methods with their zones: a service level, a cost, the countries the zone covers and a delivery estimate. Tiered weight- and quantity-based rates are not generated — neither platform has one in core."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Shipping_Plans.php:47
-msgid "Shipping method types. Allowed: standard, express, overnight, pickup, free, weight_based, flat_rate. Default: [\"standard\",\"express\",\"free\"]."
+msgid "Service levels to generate. Allowed: standard, express, overnight, free. A flat rate underneath, named and timed for the service — neither platform has an \"express\" method type. Default: [\"standard\",\"express\",\"free\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Shipping_Plans.php:53
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:56
 msgid "Minimum shipping cost (USD). Default: 0."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Shipping_Plans.php:59
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:62
 msgid "Maximum shipping cost (USD). Default: 50."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Shipping_Plans.php:65
-msgid "Geographic coverage. Allowed: domestic, international, regional, worldwide. Default: [\"domestic\",\"international\"]."
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:68
+msgid "Which countries a zone covers. Allowed: domestic, international, regional, worldwide. Domestic means wherever the store sells from. Default: [\"domestic\",\"international\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Shipping_Plans.php:78
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:77
+msgid "Lower bound for the delivery estimate, in days. The service level narrows it. Default: 1."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:83
+msgid "Upper bound for the delivery estimate, in days. Default: 14."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:96
 msgid "Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count."
 msgstr ""
 
@@ -1101,10 +1159,18 @@ msgid "ISO-2 country codes to generate tax rates for. Default: [\"US\",\"CA\",\"
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Tax_Classes.php:59
-msgid "Include compound tax rate configurations. Default: true."
+msgid "Allow compound rates, which stack on top of the ones before them — a state tax over a federal one. Default: true."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Tax_Classes.php:71
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:64
+msgid "How precise a rate row is. Allowed: country, state, city, postcode. A more precise row outranks a broader one. Default: [\"country\",\"state\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:73
+msgid "Percentage bands per class type. A zero-rated or exempt class is always zero, whatever is given here."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:107
 msgid "Array of generated tax class objects with id, name, active status, rates array, and covered regions."
 msgstr ""
 
@@ -1437,8 +1503,24 @@ msgstr ""
 msgid "Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:85
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:96
 msgid "Failed to create shipping method."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:163
+msgid "Worldwide Shipping"
+msgstr ""
+
+#. translators: %s: two-letter country code.
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:171
+#, php-format
+msgid "%s Shipping"
+msgstr ""
+
+#. translators: %s: comma-separated country codes.
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:184
+#, php-format
+msgid "Shipping to %s"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:53
@@ -1462,11 +1544,11 @@ msgstr ""
 msgid "Failed to create tax class."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:142
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:150
 msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:166
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:174
 msgid "Failed to create tax class using Fluent Cart model."
 msgstr ""
 
@@ -1503,15 +1585,15 @@ msgstr ""
 msgid "Licensing is not a WooCommerce core concept, and the extensions that add it each use their own storage."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:244
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:249
 msgid "WooCommerce only. Percentage of products marked featured (0–100)."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:252
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:257
 msgid "WooCommerce only. Where generated products appear."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:259
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:264
 msgid "WooCommerce only. Whether generated products are taxable."
 msgstr ""
 
@@ -1535,9 +1617,9 @@ msgstr ""
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Class.php:61
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Class.php:109
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:68
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:141
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:149
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Tax_Class.php:56
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Tax_Class.php:117
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Tax_Class.php:121
 msgid "WooCommerce is not active on this site."
 msgstr ""
 
@@ -1586,12 +1668,12 @@ msgid "Failed to create the order."
 msgstr ""
 
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:272
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:178
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:186
 msgid "Free shipping"
 msgstr ""
 
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:272
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:179
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:187
 msgid "Flat rate"
 msgstr ""
 
@@ -1643,15 +1725,15 @@ msgstr ""
 msgid "partial"
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:95
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:103
 msgid "Failed to create the shipping zone."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:101
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:109
 msgid "Failed to add the shipping method."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:119
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:127
 msgid "free"
 msgstr ""
 
@@ -2160,43 +2242,39 @@ msgstr ""
 msgid "Shipping Plan"
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:78
-msgid "Types of shipping methods to generate."
+#: includes/Rest/Controllers/Shipping_Plan.php:83
+msgid "Service levels to generate. A flat rate underneath, named and timed for the service."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:96
-msgid "Shipping cost range."
+#: includes/Rest/Controllers/Shipping_Plan.php:93
+msgid "Shipping cost range. Free shipping costs nothing regardless."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:100
+#: includes/Rest/Controllers/Shipping_Plan.php:97
 msgid "Minimum shipping cost."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:106
+#: includes/Rest/Controllers/Shipping_Plan.php:103
 msgid "Maximum shipping cost."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:114
-msgid "Geographic coverage areas."
+#: includes/Rest/Controllers/Shipping_Plan.php:111
+msgid "Which countries the zone covers. Domestic means wherever the store sells from."
 msgstr ""
 
 #: includes/Rest/Controllers/Shipping_Plan.php:124
-msgid "Shipping calculation methods."
+msgid "Delivery estimate bounds, in days. The service level narrows them."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:134
-msgid "Delivery time ranges."
-msgstr ""
-
-#: includes/Rest/Controllers/Shipping_Plan.php:138
+#: includes/Rest/Controllers/Shipping_Plan.php:128
 msgid "Minimum delivery days."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:144
+#: includes/Rest/Controllers/Shipping_Plan.php:134
 msgid "Maximum delivery days."
 msgstr ""
 
-#: includes/Rest/Controllers/Shipping_Plan.php:164
+#: includes/Rest/Controllers/Shipping_Plan.php:154
 msgid "Generated shipping plans with methods and regions."
 msgstr ""
 
@@ -2216,31 +2294,31 @@ msgstr ""
 msgid "Tax jurisdictions to generate rates for."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:98
+#: includes/Rest/Controllers/Tax_Class.php:100
 msgid "Tax rate ranges by type."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:102
+#: includes/Rest/Controllers/Tax_Class.php:104
 msgid "Standard tax rate range."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:120
+#: includes/Rest/Controllers/Tax_Class.php:122
 msgid "Reduced tax rate range."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:140
+#: includes/Rest/Controllers/Tax_Class.php:142
 msgid "Geographic coverage for tax rates."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:144
+#: includes/Rest/Controllers/Tax_Class.php:146
 msgid "Countries to generate tax rates for."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:153
+#: includes/Rest/Controllers/Tax_Class.php:155
 msgid "Include compound tax rates."
 msgstr ""
 
-#: includes/Rest/Controllers/Tax_Class.php:172
+#: includes/Rest/Controllers/Tax_Class.php:174
 msgid "Generated tax classes with location-based rates."
 msgstr ""
 
@@ -2579,7 +2657,7 @@ msgid "Store owners, shipping plugin developers, logistics teams"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Types of shipping methods to generate"
+msgid "Service levels to generate (a flat rate underneath, named and timed)"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2596,10 +2674,6 @@ msgstr ""
 
 #: build/admin-app.js:4
 msgid "Geographic coverage areas"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Shipping calculation methods"
 msgstr ""
 
 #: build/admin-app.js:4

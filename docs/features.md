@@ -385,6 +385,41 @@ to write. `customer_type` enumerated a new-versus-existing split no writer imple
 and `guest_cart_ratio` are what was useful in it, and `guest_only` is still accepted as a way of
 asking for a guest ratio of 100.
 
+### Shipping plans
+
+- `shipping_types` — service levels: `standard`, `express`, `overnight`, `free`
+- `cost_range` — `{ min, max }`
+- `coverage_areas` — `domestic`, `international`, `regional`, `worldwide`
+- `delivery_timeframes` — `{ min_days, max_days }`, narrowed by the service level
+
+A service level is a flat rate with a name and a delivery window, because neither platform has an
+"express" method *type* — only free shipping is a type of its own. The old enum mixed three ideas: a
+service (`standard`), a method type (`flat_rate`), and a calculation method (`weight_based`).
+`calculation_methods` is gone with it: neither platform has a weight-, price- or quantity-based method
+in core, so three of its four values could only have produced a flat rate under another name.
+
+Coverage is real now. WooCommerce zones take the country list; Fluent Cart's take `all`, a single
+country, or a `selection` with the list in meta — everything went into one "Worldwide Shipping" zone
+before this, so every generated method was available everywhere. `domestic` resolves to wherever the
+store sells from, which only the writer knows.
+
+### Tax classes
+
+- `tax_types` — `standard`, `reduced`, `zero`, `exempt`, `digital`
+- `rate_ranges` — a percentage band per type
+- `jurisdictions` — `country`, `state`, `city`, `postcode`
+- `location_coverage` — `countries`, `include_compound`
+
+A class is named for what it is: "Standard Rate", not "Corrupti Quia Tax". A zero-rated or exempt class
+is zero whatever band is given, since a class whose name contradicts its rate is worse than no class.
+`jurisdictions` decides how precise a rate row is, and a more precise row outranks a broader one —
+otherwise the country-level row matches first and the postcode row never applies. `county` is gone from
+the enum: neither platform has a column for one.
+
+Both platforms have had city and postcode columns all along and neither was written. On WooCommerce
+they are not columns on the rate row at all — they live in `woocommerce_tax_rate_locations`, one row per
+value, reachable only through `WC_Tax::_update_tax_rate_cities()` and `_update_tax_rate_postcodes()`.
+
 ### Supported, but not in full
 
 A platform can store a resource without storing everything a canonical entity carries, and the
@@ -394,6 +429,7 @@ capability says which fields it drops rather than the writer discarding them qui
 |---|---|---|---|
 | WooCommerce | Customers | `with_account` | A WooCommerce customer *is* a WordPress user; there is no account-less customer record |
 | WooCommerce | Shipping Classes | `cost`, `per_item` | A class's cost belongs to a shipping *method*, so the same class costs different amounts per zone |
+| WooCommerce | Shipping Plans | `delivery_min`, `delivery_max` | A core shipping method has a cost, a tax status and a title, and no delivery estimate — that is a table-rate plugin's feature. The window is still visible, because the generated title carries it |
 | WooCommerce | Coupons | `starts_at` | `WC_Coupon` has an expiry and no start date, so a coupon that becomes valid next week cannot be expressed |
 | Fluent Cart | Products | `backorders` | A boolean column where the canonical vocabulary has three values, so "allow, but notify" cannot be stored |
 | Fluent Cart | Orders | `company` | `fct_order_addresses` has no company column, and nothing reads one out of the meta blob |
