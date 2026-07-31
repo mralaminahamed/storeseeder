@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - trunk
-      - main
   pull_request:
     branches:
       - trunk
-      - main
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -230,6 +228,14 @@ jobs:
         # Fails the job on errors only. The remaining warnings live in the
         # Playwright specs, where a fixed settle wait is deliberate.
         run: yarn lint:js
+
+      - name: Type-check
+        # Not part of the build: webpack transpiles through Babel and never
+        # type-checks, so without this a type error ships.
+        run: npx tsc --noEmit
+
+      - name: Run unit tests (Jest)
+        run: yarn test:unit
 
       - name: Build assets
         run: yarn build
