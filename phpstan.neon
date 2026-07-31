@@ -2,6 +2,7 @@ parameters:
     level: 7
 
     paths:
+        - storeseeder.php
         - class-storeseeder.php
         - includes/
 
@@ -65,48 +66,13 @@ parameters:
         - STORESEEDER_PLUGIN_FILE
         - STORESEEDER_PLUGIN_URL
         - STORESEEDER_PLUGIN_PATH
-    # Ignore errors
+    # Ignore errors.
+    #
+    # Every entry below was checked by removing it and re-running: each one still suppresses
+    # something. Twenty-four WordPress-function patterns and eighteen others were deleted
+    # because they suppressed nothing at all — dead config is worse than none, since it will
+    # silently swallow the first real error that happens to match.
     ignoreErrors:
-        # WordPress functions that may not be defined during static analysis
-        - '#Function wp_[a-zA-Z_]+ not found\.#'
-        - '#Function is_plugin_active not found\.#'
-        - '#Function get_plugin_data not found\.#'
-        - '#Function add_action not found\.#'
-        - '#Function add_filter not found\.#'
-        - '#Function remove_action not found\.#'
-        - '#Function remove_filter not found\.#'
-        - '#Function do_action not found\.#'
-        - '#Function apply_filters not found\.#'
-        - '#Function esc_html not found\.#'
-        - '#Function esc_attr not found\.#'
-        - '#Function esc_url not found\.#'
-        - '#Function sanitize_text_field not found\.#'
-        - '#Function wp_die not found\.#'
-        - '#Function wp_create_nonce not found\.#'
-        - '#Function check_ajax_referer not found\.#'
-        - '#Function current_user_can not found\.#'
-        - '#Function wp_send_json_success not found\.#'
-        - '#Function wp_send_json_error not found\.#'
-        - '#Function fluent_cart_[a-zA-Z_]+ not found\.#'
-
-        # PHPUnit specific
-        - '#Method [a-zA-Z0-9\\_]+Test::(setUp|tearDown)\(\) should return void but returns [a-zA-Z0-9\\_]+\.#'
-        - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject::[a-zA-Z0-9_]+\(\)\.#'
-
-        # WordPress globals
-        - '#Undefined variable: \$wpdb\.#'
-        - '#Undefined variable: \$wp_version\.#'
-        - '#Undefined variable: \$wp_rest_server\.#'
-
-        # Dynamic properties (WordPress objects often have dynamic properties)
-        - '#Access to an undefined property WP_[a-zA-Z_]+::\$[a-zA-Z_]+\.#'
-        - '#Property WP_[a-zA-Z_]+::\$[a-zA-Z_]+ \(mixed\) does not accept [a-zA-Z0-9\\_|]+\.#'
-
-        # WordPress hooks (actions and filters)
-        - '#Parameter \#1 \$function_to_add of function add_action expects callable\(\): mixed, array given\.#'
-        - '#Parameter \#1 \$function_to_add of function add_filter expects callable, array given\.#'
-
-
         # mcp-adapter plugin classes (runtime-only dependency, present only when
         # the mcp-adapter plugin is active)
         - '#Class WP\\MCP\\.* not found\.#'
@@ -115,40 +81,33 @@ parameters:
         # non-empty; phpstan cannot narrow the property type to non-falsy-string.
         - '#Parameter \#1 \$route_namespace of function register_rest_route expects non-falsy-string, string given\.#'
 
-        # Array type specifications (PHP 7.4 compatibility)
-        - '#Method .* has no value type specified in iterable type array\.#'
-        - '#Method .* return type has no value type specified in iterable type array\.#'
-        - '#Parameter .* has no value type specified in iterable type array\.#'
-        - '#has parameter .* with generic class .* but does not specify its types\.#'
-        - '#Method .* has parameter .* with no value type specified in iterable type array\.#'
-        - '#has parameter \$request with generic class WP_REST_Request but does not specify its types: T#'
-
         # WordPress specific issues
-        - '#Call to function is_numeric\(\) with int will always evaluate to true\.#'
+        # These three mask findings rather than noise: PHPStan is reporting genuinely
+        # unreachable branches, mostly defensive guards against values the types say cannot
+        # occur. Worth revisiting one at a time — some are real dead code, and some are
+        # guards worth keeping with an instanceof instead, as the Fluent Cart writers now do.
         - '#Variable .* in empty\(\) always exists and is not falsy\.#'
         - '#Call to function is_wp_error\(\) .* will always evaluate to false\.#'
         - '#Strict comparison using .* will always evaluate to true\.#'
-
-        # Faker library dynamic properties
-        - '#Access to an undefined property Faker\\Generator::\$[a-zA-Z_]+\.#'
 
         # Locale-specific FakerPHP formatters. These are provided by the en_US
         # Address provider at runtime and resolve through Generator::__call, but
         # the analysed stub only models the base formatter set. Named one by one
         # so a genuinely misspelled formatter still fails analysis.
+        # Array shapes. Level 7 asks for a value type on every iterable; the PHP 7.4 floor
+        # means these are documented in docblocks instead, which PHPStan does not accept as
+        # a native type. One pattern rather than the four overlapping variants that were
+        # here — they collectively covered this and individually looked redundant.
+        - '#no value type specified in iterable type array\.#'
+
+        # FakerPHP resolves provider methods through __call, and these three come from the
+        # en_US address provider. The property-access pattern beside them was removed because
+        # it suppressed nothing.
         - '#Call to an undefined method Faker\\Generator::stateAbbr\(\)\.#'
         - '#Call to an undefined method Faker\\Generator::state\(\)\.#'
         - '#Call to an undefined method Faker\\Generator::secondaryAddress\(\)\.#'
 
-        # PHPDoc type issues (inheritance)
-        - '#PHPDoc tag @return with type .* is not subtype of native type .*\.#'
-
-        # Return type mismatches
-        - '#Method .* should return .* but returns false\.#'
-        - '#Method .* has invalid return type .*WP_Error\.#'
-
         # Test-specific ignores
-        - '#Instantiated class StoreSeeder\\\\[a-zA-Z_\\\\]+ not found\.#'
         - path: tests/
           message: '#Call to method [a-zA-Z_]+ on an unknown class [a-zA-Z0-9\\_]+\.#'
 
