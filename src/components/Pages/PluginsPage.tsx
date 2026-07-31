@@ -4,6 +4,7 @@ import { decodeEntities } from "@wordpress/html-entities";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 
 interface WPPlugin {
   name: string;
@@ -61,27 +62,28 @@ export default function PluginsPage() {
         </div>
       </div>
 
+      {/* Placeholder cards in the real grid, so the layout does not jump when six
+          plugins land. Uses the shared Skeleton rather than the flat grey boxes this
+          page grew for itself before there was one. */}
       {loading && (
-        <div className="fp-plugins-grid">
+        <div className="fp-plugins-grid" data-testid="plugins-skeleton">
+          <span className="sr-only" role="status">
+            {__("Loading plugins…", "storeseeder")}
+          </span>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="fp-card fp-plugin-card" aria-hidden>
               <div className="fp-plugin-head">
-                <span
-                  className="fp-plugin-ic"
-                  style={{ background: "var(--surface-inset)" }}
-                />
-                <div>
-                  <div
-                    className="fp-plugin-name"
-                    style={{
-                      width: 120,
-                      height: 12,
-                      background: "var(--surface-inset)",
-                      borderRadius: 4,
-                    }}
+                <Skeleton className="fp-plugin-ic" width={38} height={38} radius={10} />
+                <div style={{ flex: 1 }}>
+                  <Skeleton width={128} height={12} />
+                  <Skeleton
+                    width={84}
+                    height={10}
+                    style={{ marginTop: 7 }}
                   />
                 </div>
               </div>
+              <SkeletonText lines={2} className="fp-plugin-skel-body" />
             </div>
           ))}
         </div>

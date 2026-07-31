@@ -1,52 +1,52 @@
 import React from "react";
-import { useId } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { Icon } from "@/lib/icons";
+
+import { FieldSelect } from "@/components/generator/fields/FieldSelect";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
 
 /**
  * Picks the store a run writes to.
  *
- * Sits immediately left of the locale pill, because the two answer the same kind
- * of question — locale decides what the data looks like, this decides where it
- * lands — and the second is the more consequential of the two.
+ * Sits immediately left of the locale pill, because the two answer the same kind of
+ * question — locale decides what the data looks like, this decides where it lands — and
+ * the second is the more consequential of the two.
  *
- * Renders nothing when only one platform is installed. A select with a single
- * option is a decision the user does not have, and showing it would imply
- * otherwise.
+ * Renders nothing when fewer than two platforms are installed. A select with one option
+ * is a decision the user does not have, and showing it would imply otherwise; the
+ * Settings page still names the target either way.
+ *
+ * Uses the app's own select rather than a native `<select>`: the native one cannot carry
+ * the icon, the pill treatment or the check mark the rest of the admin uses, and it
+ * draws its list in the operating system's chrome — a light menu over a dark app.
  */
 export function PlatformSelect() {
   const { active, selected, label, setTarget, ambiguous } = usePlatform();
-  const id = useId();
 
   if (active.length < 2) return null;
 
   return (
-    <span className="fp-platform-select" data-testid="platform-select">
-      <label htmlFor={id} className="screen-reader-text">
-        {__("Target platform", "storeseeder")}
-      </label>
-      <Icon name="store" size={14} aria-hidden="true" />
-      <select
-        id={id}
-        className="fp-platform-select-control fp-focusable"
-        value={selected}
-        onChange={(e) => void setTarget(e.target.value)}
-        // Flagged rather than merely unset: with several platforms active and no
-        // choice made, this control is the thing standing between the user and a
-        // run, so it should look like it wants attention.
-        data-needs-choice={ambiguous ? "true" : undefined}
-        title={__("Which store generated data is written to", "storeseeder")}
-      >
-        <option value={AUTO}>{label}</option>
-        {active.map((platform) => (
-          <option key={platform.id} value={platform.id}>
-            {platform.label}
-          </option>
-        ))}
-      </select>
-    </span>
+    <FieldSelect
+      variant="pill"
+      icon="store"
+      testId="platform-select"
+      ariaLabel={__("Target platform", "storeseeder")}
+      title={__("Which store generated data is written to", "storeseeder")}
+      value={selected}
+      // Auto first, labelled with what it resolved to, so the target is never hidden
+      // behind the word "Auto".
+      options={[
+        { value: AUTO, label },
+        ...active.map((platform) => ({
+          value: platform.id,
+          label: platform.label,
+        })),
+      ]}
+      onChange={(platform) => void setTarget(platform)}
+      // Flagged rather than merely unset: with several platforms active and no choice
+      // made, this control is the thing standing between the user and a run.
+      needsChoice={ambiguous}
+    />
   );
 }
 

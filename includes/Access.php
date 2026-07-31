@@ -34,6 +34,26 @@ final class Access {
 	const DEFAULT_CAPABILITY = 'manage_options';
 
 	/**
+	 * Site option holding the roles an administrator has additionally allowed.
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const ROLES_OPTION = 'storeseeder_allowed_roles';
+
+	/**
+	 * The role that can always use StoreSeeder, and the only one that may grant others.
+	 *
+	 * Kept out of the stored list rather than pre-checked in it: an administrator who
+	 * could clear their own access would be one confirmation dialog away from a site
+	 * where nobody can reach the plugin or undo the setting.
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const ADMIN_ROLE = 'administrator';
+
+	/**
 	 * The capability required to generate data and reach the admin page.
 	 *
 	 * @since 1.1.0
@@ -69,13 +89,129 @@ final class Access {
 	}
 
 	/**
+	 * Roles an administrator has allowed, beyond whoever holds the capability.
+	 *
+	 * Filtered against the roles the site actually defines, so a role deleted after being
+	 * allowed stops granting anything — and so a stored value cannot smuggle in a role
+	 * name that WordPress does not know.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string> Role slugs, never including the administrator role.
+	 */
+	public static function allowed_roles(): array {
+		$stored = get_option( self::ROLES_OPTION, array() );
+
+		if ( ! is_array( $stored ) ) {
+			return array();
+		}
+
+		$known = array_keys( self::assignable_roles() );
+
+		return array_values( array_intersect( array_map( 'strval', $stored ), $known ) );
+	}
+
+	/**
+	 * Record which roles may use StoreSeeder.
+	 *
+	 * Callers must check that the current user may *change* this — holding the plugin's
+	 * own capability is not enough, or an allowed editor could widen access further.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<int, mixed> $roles Role slugs to allow.
+	 *
+	 * @return array<int, string> The roles as stored, after validation.
+	 */
+	public static function set_allowed_roles( array $roles ): array {
+		$known = array_keys( self::assignable_roles() );
+		$clean = array_values(
+			array_unique(
+				array_intersect( array_map( 'strval', $roles ), $known )
+			)
+		);
+
+		update_option( self::ROLES_OPTION, $clean, false );
+
+		return $clean;
+	}
+
+	/**
+	 * The roles an administrator may choose between, slug => display name.
+	 *
+	 * Excludes the administrator role, which always has access.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, string>
+	 */
+	public static function assignable_roles(): array {
+		$roles = array();
+
+		foreach ( wp_roles()->get_names() as $slug => $name ) {
+			if ( self::ADMIN_ROLE === $slug ) {
+				continue;
+			}
+
+			$roles[ (string) $slug ] = translate_user_role( (string) $name );
+		}
+
+		return $roles;
+	}
+
+	/**
+	 * Whether the current user holds one of the allowed roles.
+	 *
+	 * Roles rather than a capability, because this is the setting a site owner reasons
+	 * about: "editors may generate data" is a sentence they can check, and
+	 * `edit_others_posts` is not.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	private static function current_user_has_allowed_role(): bool {
+		$allowed = self::allowed_roles();
+
+		if ( array() === $allowed ) {
+			return false;
+		}
+
+		$user = wp_get_current_user();
+
+		// A logged-out visitor still gets a WP_User back, with ID 0 and no roles.
+		if ( 0 === $user->ID ) {
+			return false;
+		}
+
+		return array() !== array_intersect( (array) $user->roles, $allowed );
+	}
+
+	/**
+	 * Whether the current user may change who has access.
+	 *
+	 * Deliberately not the plugin's own capability: a role granted through the setting
+	 * must not be able to grant more roles, or the setting would be self-escalating.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public static function current_user_can_manage(): bool {
+		return current_user_can( self::DEFAULT_CAPABILITY );
+	}
+
+	/**
 	 * Whether the current user may use StoreSeeder.
+	 *
+	 * Two ways in: the capability — `manage_options` unless filtered — or one of the
+	 * roles an administrator allowed on the Settings page.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return bool
 	 */
 	public static function current_user_can(): bool {
-		return current_user_can( self::capability() );
+		return current_user_can( self::capability() ) || self::current_user_has_allowed_role();
 	}
 }

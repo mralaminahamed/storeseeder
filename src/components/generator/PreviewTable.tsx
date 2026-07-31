@@ -6,6 +6,7 @@ import { fetchPreview } from "@/lib/preview";
 import { Badge } from "@/components/ui/badge";
 import { StatusPill } from "@/components/ui/status-pill";
 import { Icon } from "@/lib/icons";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 import type { PreviewCell, PreviewColumn } from "@/lib/preview";
 
@@ -143,12 +144,35 @@ export function PreviewTable({
       );
     }
 
+    // First load: a skeleton table rather than a line of text, because the table is
+    // what is coming and its shape is known — five columns of rows. Subsequent loads
+    // keep the previous rows and dim them, which is better than replacing content the
+    // user is reading with placeholders.
+    if (0 === columns.length && loading) {
+      return (
+        <div className="fp-preview-skel" data-testid="preview-skeleton">
+          <span className="sr-only" role="status">
+            {__("Loading preview…", "storeseeder")}
+          </span>
+          {Array.from({ length: 6 }).map((_row, row) => (
+            <div className="fp-skel-row" key={row}>
+              {Array.from({ length: 5 }).map((_col, col) => (
+                <Skeleton
+                  key={col}
+                  height={row === 0 ? 9 : 12}
+                  width={0 === col ? "22%" : "18%"}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     if (0 === columns.length) {
       return (
         <div className="fp-preview-state">
-          {loading
-            ? __("Loading preview…", "storeseeder")
-            : __("No preview available.", "storeseeder")}
+          {__("No preview available.", "storeseeder")}
         </div>
       );
     }

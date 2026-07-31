@@ -83,18 +83,28 @@
 .fp-root .fp-locale-pill:hover { border-color:var(--border-strong); }
 
 /* ---------------------------------------------------------------------------
-   Platform select — sits left of the locale pill and answers the more
-   consequential of the two questions: not what the data looks like, but which
-   store it lands in. Styled as a pill to match, since they are peers.
+   Pill select — the topbar treatment of .fp-select, used by the platform picker.
+   It sits left of the locale pill and answers the more consequential of the two
+   questions: not what the data looks like, but which store it lands in, so it is
+   shaped like the locale pill because the two are peers.
    --------------------------------------------------------------------------- */
-.fp-root .fp-platform-select { display:flex; align-items:center; gap:calc(var(--gap-ctl) - 1px); padding:calc(var(--pad-pill-y) - 1px) calc(var(--pad-pill-x) - 2px) calc(var(--pad-pill-y) - 1px) var(--pad-pill-x); border:1px solid var(--border); border-radius:var(--r-full); color:var(--text-2); }
-.fp-root .fp-platform-select:hover { border-color:var(--border-strong); }
-.fp-root .fp-platform-select-control { border:0; background:transparent; color:inherit; font-size:var(--fs-ctl-sm); font-family:inherit; padding:0 2px; cursor:pointer; max-width:22ch; }
-.fp-root .fp-platform-select-control:focus { outline:none; }
+.fp-root .fp-select.is-pill { position:relative; }
+.fp-root .fp-select.is-pill .fp-select-btn {
+  width:auto; height:auto; gap:var(--gap-ctl);
+  padding:var(--pad-pill-y) calc(var(--pad-pill-x) - 2px) var(--pad-pill-y) var(--pad-pill-x);
+  border-radius:var(--r-full); background:none; color:var(--text-2); font-size:var(--fs-ctl-sm);
+}
+.fp-root .fp-select.is-pill .fp-select-btn span { flex:0 1 auto; max-width:22ch; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fp-root .fp-select.is-pill .fp-select-ic { color:inherit; flex:none; }
+.fp-root .fp-select.is-pill .fp-select-caret { width:13px; height:13px; }
+/* The popup is wider than the trigger, which is content-sized; anchoring it right
+   keeps it inside the viewport on a narrow admin. */
+.fp-root .fp-select.is-pill .fp-select-pop { left:auto; right:0; min-width:max(100%, 200px); }
 
 /* No target chosen yet: this control is the only thing between the user and a
    run, so it asks for attention rather than blending in. */
-.fp-root .fp-platform-select:has(> [data-needs-choice]) { border-color:var(--accent-line); background:var(--accent-soft); color:var(--accent); }
+.fp-root .fp-select.is-pill .fp-select-btn[data-needs-choice] { border-color:var(--accent-line); background:var(--accent-soft); color:var(--accent); }
+.fp-root .fp-select.is-pill .fp-select-btn[data-needs-choice] .fp-select-caret { color:var(--accent); }
 .fp-root .fp-icon-btn { width:var(--ctl-h-icon); height:var(--ctl-h-icon); display:grid; place-items:center; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); color:var(--text-2); cursor:pointer; }
 .fp-root .fp-icon-btn:hover { border-color:var(--border-strong); color:var(--text); }
 
@@ -138,6 +148,10 @@
 .fp-root .fp-switch.on .fp-knob { transform:translateX(calc(var(--switch-w) - var(--switch-knob) - 4px)); }
 .fp-root .fp-toggle-label { font-size:var(--fs-ctl); color:var(--text); display:flex; flex-direction:column; }
 .fp-root .fp-toggle-hint { font-size:var(--fs-hint); color:var(--text-3); }
+/* A setting the user may read but not change — the Settings access card for anyone
+   who is not an administrator. */
+.fp-root .fp-toggle-row:disabled { cursor:default; opacity:.62; }
+.fp-root .fp-toggle-row:disabled .fp-switch { background:var(--border); }
 
 /* ===== stepper ===== */
 .fp-root .fp-stepper { display:inline-flex; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
@@ -318,12 +332,38 @@
 .fp-root .fp-gen-progress { position:absolute; inset:0; background:color-mix(in oklab,var(--surface) 70%,transparent); backdrop-filter:blur(3px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:5; border-radius:var(--r-lg); }
 .fp-root .fp-progress-track { width:240px; height:6px; border-radius:999px; background:var(--surface-inset); overflow:hidden; }
 .fp-root .fp-progress-fill { height:100%; background:var(--accent); border-radius:999px; }
+/* ===== skeletons =====
+   Placeholders for content that is on its way. The shimmer is a background-position
+   animation, which the global prefers-reduced-motion rule reduces to a static tint. */
+.fp-root .fp-skel {
+  display:block; background:linear-gradient(90deg, var(--surface-inset) 0%, var(--surface-2) 42%, var(--surface-inset) 84%);
+  background-size:200% 100%; animation:fp-shimmer 1.25s linear infinite; border-radius:var(--r-sm);
+}
+.fp-root .fp-skel-text { display:flex; flex-direction:column; gap:7px; width:100%; }
+.fp-root .fp-skel-row { display:flex; align-items:center; gap:11px; }
+.fp-root .fp-plugin-skel-body { margin-top:14px; }
+/* The preview's skeleton stands in for the table, so it carries the table's own
+   padding — otherwise the rows shift when the real one replaces it. */
+.fp-root .fp-preview-skel { display:flex; flex-direction:column; gap:14px; padding:var(--pad-cell-y) var(--pad-cell-x); }
+
 .fp-root .fp-spinner { width:30px; height:30px; border-radius:50%; border:3px solid var(--border); border-top-color:var(--accent); animation:fp-spin .8s linear infinite; }
 
 @media (max-width:1080px){ .fp-root .fp-gen-wrap{ grid-template-columns:1fr; } .fp-root .fp-config-col{ border-right:none; border-bottom:1px solid var(--border);} }
 
 /* ===== settings ===== */
 .fp-root .fp-settings-col { max-width:680px; }
+
+/* Settings sections. Cards are grouped by who a change affects — the site, or just
+   this browser — because that is the first thing worth knowing before touching one on
+   a site other people use. */
+.fp-root .fp-set-section { margin-bottom:var(--mb-section); }
+.fp-root .fp-set-section-head { margin-bottom:var(--mb-field); }
+.fp-root .fp-set-section-title { display:flex; align-items:center; gap:9px; margin:0; font-size:var(--fs-h2); font-weight:600; letter-spacing:-.01em; color:var(--text); }
+.fp-root .fp-set-section-desc { margin:3px 0 0; font-size:var(--fs-hint); color:var(--text-3); }
+/* Instant save needs visible feedback now the Save buttons are gone. */
+.fp-root .fp-set-saved { display:inline-flex; align-items:center; gap:4px; font-size:var(--fs-micro); font-weight:500; color:var(--green); animation:fp-pop .16s cubic-bezier(.2,.8,.2,1) both; }
+.fp-root .fp-set-scope { margin-left:8px; vertical-align:middle; font-weight:500; }
+.fp-root .fp-set-card-title { display:flex; align-items:center; }
 .fp-root .fp-set-card { padding:var(--pad-card-lg-y) var(--pad-card-lg-x); margin-bottom:var(--pad-card); }
 .fp-root .fp-set-card-head { display:flex; gap:13px; margin-bottom:var(--pad-card); }
 .fp-root .fp-set-card-ic { width:calc(var(--tile) - 2px); height:calc(var(--tile) - 2px); border-radius:9px; flex-shrink:0; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }

@@ -82,6 +82,77 @@ test.describe('Settings', () => {
     });
   });
 
+  test.describe('Layout', () => {
+    test('cards are grouped by who a change affects', async ({ page }) => {
+      const sections = page.locator('.fp-set-section');
+      await expect(sections).toHaveCount(3);
+
+      // Site-wide first: what it writes and who may write it, before personal taste.
+      await expect(sections.nth(0)).toContainText('This site');
+      await expect(sections.nth(0).getByTestId('settings-target-platform')).toBeVisible();
+      await expect(sections.nth(1)).toContainText('Your preferences');
+      await expect(sections.nth(1).getByTestId('settings-appearance')).toBeVisible();
+    });
+
+    test('a scope badge says which is which', async ({ page }) => {
+      await expect(
+        page.getByTestId('settings-target-platform').getByText('Site-wide'),
+      ).toBeVisible();
+      await expect(
+        page.getByTestId('settings-appearance').getByText('This browser'),
+      ).toBeVisible();
+    });
+
+    test('preferences save on change, with no Save button left to press', async ({
+      page,
+    }) => {
+      await expect(page.getByRole('button', { name: /Save settings/i })).toHaveCount(0);
+
+      const count = page.locator('#ss-default-count');
+      await count.fill('42');
+      await count.blur();
+
+      await expect(page.getByTestId('settings-saved')).toBeVisible();
+
+      // Written, not merely displayed.
+      const stored = await page.evaluate(() => {
+        const raw = localStorage.getItem('ec_fp_settings');
+        return raw ? (JSON.parse(raw) as { defaultCount?: number }).defaultCount : null;
+      });
+      expect(stored).toBe(42);
+    });
+  });
+
+  test.describe('Access', () => {
+    test('lists the roles that can be granted, never Administrator', async ({ page }) => {
+      const card = page.getByTestId('settings-access');
+
+      await expect(card).toBeVisible();
+      await expect(card.getByTestId('role-editor')).toBeVisible();
+      await expect(card.getByTestId('role-administrator')).toHaveCount(0);
+    });
+
+    test('granting a role persists across a reload', async ({ page }) => {
+      const toggle = page.getByTestId('settings-access').getByTestId('role-editor');
+
+      await expect(toggle).toHaveAttribute('aria-checked', 'false');
+      await toggle.click();
+      await expect(toggle).toHaveAttribute('aria-checked', 'true');
+
+      await page.reload();
+      await page.getByTestId('settings-access').waitFor();
+      await expect(
+        page.getByTestId('settings-access').getByTestId('role-editor'),
+      ).toHaveAttribute('aria-checked', 'true');
+
+      // Leave the site as it was found — this one is stored server-side.
+      await page.getByTestId('settings-access').getByTestId('role-editor').click();
+      await expect(
+        page.getByTestId('settings-access').getByTestId('role-editor'),
+      ).toHaveAttribute('aria-checked', 'false');
+    });
+  });
+
   test('the sample data card links to the repository the server reports', async ({
     page,
   }) => {

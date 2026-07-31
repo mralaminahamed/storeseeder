@@ -624,6 +624,35 @@ class StoreSeeder {
 			)
 		);
 
+		// Register the access endpoints. Reading who has access needs only the plugin's
+		// own gate; changing it needs manage_options, so a role granted through this
+		// setting cannot widen it further.
+		register_rest_route(
+			'storeseeder/v1',
+			'/access',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_access' ),
+					'permission_callback' => array( $this, 'rest_access_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_set_access' ),
+					'permission_callback' => array( $this, 'rest_manage_access_permission_check' ),
+					'args'                => array(
+						'roles' => array(
+							'type'     => 'array',
+							'required' => true,
+							'items'    => array(
+								'type' => 'string',
+							),
+						),
+					),
+				),
+			)
+		);
+
 		register_rest_route(
 			'storeseeder/v1',
 			'/platforms/target',
@@ -643,6 +672,72 @@ class StoreSeeder {
 				),
 			)
 		);
+	}
+
+	/**
+	 * REST: who may generate data.
+	 *
+	 * Reports the roles on offer, the ones allowed, the effective capability, and whether
+	 * the caller may change any of it — the admin renders the card read-only otherwise
+	 * rather than offering a control that would 403.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response Access payload.
+	 */
+	public function rest_access(): WP_REST_Response {
+		return new WP_REST_Response(
+			array(
+				'capability'    => Access::capability(),
+				'filtered'      => Access::capability() !== Access::DEFAULT_CAPABILITY,
+				'adminRole'     => Access::ADMIN_ROLE,
+				'roles'         => Access::assignable_roles(),
+				'allowedRoles'  => Access::allowed_roles(),
+				'canManage'     => Access::current_user_can_manage(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: set which roles may generate data.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `roles` holds the slugs to allow.
+	 *
+	 * @return WP_REST_Response The access payload after the change.
+	 */
+	public function rest_set_access( WP_REST_Request $request ): WP_REST_Response {
+		Access::set_allowed_roles( (array) $request->get_param( 'roles' ) );
+
+		return $this->rest_access();
+	}
+
+	/**
+	 * Permission check for reading who has access.
+	 *
+	 * Administrators can always read it, even where a filter narrowed the capability past
+	 * what they hold — otherwise the one setting that could undo that lock-out would be
+	 * behind the lock.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public function rest_access_permission_check(): bool {
+		return Access::current_user_can() || Access::current_user_can_manage();
+	}
+
+	/**
+	 * Permission check for changing who has access.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool True when the current user may grant access to others.
+	 */
+	public function rest_manage_access_permission_check(): bool {
+		return Access::current_user_can_manage();
 	}
 
 	/**

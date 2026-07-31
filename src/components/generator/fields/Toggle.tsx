@@ -5,6 +5,9 @@ interface ToggleProps {
   onChange: (v: boolean) => void;
   label?: string;
   hint?: string;
+  /** Renders the row inert — for a setting the current user may read but not change. */
+  disabled?: boolean;
+  testId?: string;
 }
 
 /**
@@ -16,12 +19,21 @@ interface ToggleProps {
  * free: clicking the caption still toggles, and the accessible name comes from the
  * row's own text rather than a separate aria binding.
  */
-export function Toggle({ checked, onChange, label, hint }: ToggleProps) {
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  hint,
+  disabled,
+  testId,
+}: ToggleProps) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={!!checked}
+      disabled={disabled}
+      data-testid={testId}
       onClick={() => onChange(!checked)}
       className="fp-toggle-row fp-focusable"
     >

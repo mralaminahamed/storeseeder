@@ -77,6 +77,12 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
   rule, a dot, a knob offset — is fine.
 - **New icons go in `src/lib/icons.tsx` as Lucide path data**, and one concept gets one glyph.
   A name with no entry silently renders `box`.
+- **An async region shows a skeleton, not a line of text or nothing at all.** Use
+  `Skeleton` / `SkeletonText` from `src/components/ui/Skeleton.tsx`, shaped like the
+  content that is coming so the layout does not jump, with an `sr-only` `role="status"`
+  beside it. `.fp-spinner` stays for waits with no predictable shape, such as a
+  generation run. Distinguish "failed" from "still loading" — a skeleton that never
+  resolves is worse than an error.
 
 ## Testing
 

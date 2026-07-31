@@ -4,6 +4,7 @@ import { __, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
 import { Seg } from "@/components/ui/Seg";
+import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { Toggle } from "@/components/generator/fields/Toggle";
 import { NumberField } from "@/components/generator/fields/NumberField";
 import { TextField } from "@/components/generator/fields/TextField";
@@ -19,8 +20,10 @@ import {
 } from "@/lib/consent";
 import type { SampleDataStatus } from "@/lib/consent";
 import { getSettings, saveSettings } from "@/lib/settings";
+import { fetchAccess, saveAllowedRoles } from "@/lib/access";
+import type { AccessState } from "@/lib/access";
 import { requestTweaksPanel } from "@/lib/events";
-import { DEFAULT_LOCALE, localeLabel, localeOptions } from "@/lib/locales";
+import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
 import { useStats } from "@/providers/StatsProvider";
@@ -42,11 +45,46 @@ const DOCS_URL =
 // Settings card shell
 // ---------------------------------------------------------------------------
 
+/**
+ * A settings group, with a heading that says who the settings inside affect.
+ *
+ * The page had none: site-wide settings and per-browser preferences sat in one column
+ * in an order nobody chose, and the only clue about which was which was a note below
+ * the fold. Scope is the first thing you need to know before changing a setting on a
+ * site other people use.
+ */
+function SetSection({
+  title,
+  desc,
+  note,
+  children,
+}: {
+  title: string;
+  desc: string;
+  /** Transient status for the whole section, e.g. the save marker. */
+  note?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="fp-set-section">
+      <div className="fp-set-section-head">
+        <h2 className="fp-set-section-title">
+          {title}
+          {note}
+        </h2>
+        <p className="fp-set-section-desc">{desc}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 function SetCard({
   icon,
   title,
   desc,
   danger,
+  scope,
   testId,
   children,
 }: {
@@ -54,6 +92,8 @@ function SetCard({
   title: string;
   desc: string;
   danger?: boolean;
+  /** Who a change here affects. Shown as a badge, because it changes the stakes. */
+  scope?: "site" | "browser";
   testId?: string;
   children: React.ReactNode;
 }) {
@@ -80,6 +120,17 @@ function SetCard({
         <div>
           <div className={`fp-set-card-title${danger ? " fp-danger-label" : ""}`}>
             {title}
+            {/* The site badge is accented because it is the one with consequences for
+                other people; the browser badge is the quiet default. */}
+            {scope && (
+              <span
+                className={`fp-badge fp-set-scope${"site" === scope ? " tone-accent" : ""}`}
+              >
+                {"site" === scope
+                  ? __("Site-wide", "storeseeder")
+                  : __("This browser", "storeseeder")}
+              </span>
+            )}
           </div>
           <div className="fp-set-card-desc">{desc}</div>
         </div>
@@ -107,6 +158,13 @@ export default function SettingsPage() {
     setTarget: setPlatformTarget,
   } = usePlatform();
 
+  // Who may generate. Server-held, unlike the rest of this page.
+  const [access, setAccess] = useState<AccessState | null>(null);
+  // Distinguished from "still loading", so a failed fetch says so instead of showing a
+  // skeleton that never resolves.
+  const [accessFailed, setAccessFailed] = useState(false);
+  const [savingRoles, setSavingRoles] = useState(false);
+
   // Sample data sync state
   const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -122,10 +180,29 @@ export default function SettingsPage() {
   // Options carry the code so the label never has to be mapped back to one.
   const locales = localeOptions();
 
+  // Applied and stored on change. The page used to have two "Save settings" buttons
+  // writing the same object, next to three cards that saved the instant you touched
+  // them — so a value could be typed, left unsaved, and then written by a button in a
+  // different card. These are browser preferences, so there is nothing to lose by
+  // writing them immediately, and it makes one model for the whole page.
   const set = <K extends keyof typeof settings>(
     key: K,
     value: (typeof settings)[K],
-  ) => setSettings((s) => ({ ...s, [key]: value }));
+  ) =>
+    setSettings((s) => {
+      const next = { ...s, [key]: value };
+      saveSettings(next);
+      setSaved(true);
+      return next;
+    });
+
+  // Clear the marker a moment after the last change, rather than per keystroke.
+  useEffect(() => {
+    if (!saved) return;
+
+    const t = setTimeout(() => setSaved(false), 1600);
+    return () => clearTimeout(t);
+  }, [saved, settings]);
 
   const refreshSyncStatus = useCallback(
     () =>
@@ -162,9 +239,12 @@ export default function SettingsPage() {
   const syncSummary = (): JSX.Element => {
     if (statusLoading) {
       return (
-        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
-          {__("Checking status…", "storeseeder")}
-        </div>
+        <>
+          <SkeletonText lines={2} />
+          <span className="sr-only" role="status">
+            {__("Checking status…", "storeseeder")}
+          </span>
+        </>
       );
     }
 
@@ -221,12 +301,6 @@ export default function SettingsPage() {
       "Nothing has been downloaded yet. Sync now asks for your permission first.",
       "storeseeder",
     );
-  };
-
-  const handleSave = () => {
-    saveSettings(settings);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleSync = useCallback(
@@ -342,11 +416,8 @@ export default function SettingsPage() {
     });
   }
 
-  const platformLabel = (id: string) =>
-    platformOptions.find((o) => o.id === id)?.label ?? id;
-
-  const handlePlatformChange = (label: string) => {
-    const next = platformOptions.find((o) => o.label === label);
+  const handlePlatformChange = (id: string) => {
+    const next = platformOptions.find((o) => o.id === id);
     if (!next || next.id === platformSelected) return;
 
     void setPlatformTarget(next.id).then(() =>
@@ -389,6 +460,47 @@ export default function SettingsPage() {
     );
   };
 
+  useEffect(() => {
+    void fetchAccess()
+      .then(setAccess)
+      .catch(() => setAccessFailed(true));
+  }, []);
+
+  const toggleRole = async (role: string, granted: boolean) => {
+    if (!access) return;
+
+    const next = granted
+      ? [...access.allowedRoles, role]
+      : access.allowedRoles.filter((r) => r !== role);
+
+    // Optimistic, then corrected by what the server stored — it drops roles the site
+    // no longer defines, so the response is the truth, not the request.
+    setAccess({ ...access, allowedRoles: next });
+    setSavingRoles(true);
+
+    try {
+      setAccess(await saveAllowedRoles(next));
+      toast(
+        granted
+          ? sprintf(
+              /* translators: %s: role name. */
+              __("%s can now generate data", "storeseeder"),
+              access.roles[role] ?? role,
+            )
+          : sprintf(
+              /* translators: %s: role name. */
+              __("%s can no longer generate data", "storeseeder"),
+              access.roles[role] ?? role,
+            ),
+      );
+    } catch {
+      setAccess(await fetchAccess().catch(() => access));
+      toast(__("Could not save who has access", "storeseeder"));
+    } finally {
+      setSavingRoles(false);
+    }
+  };
+
   const handleClearData = () => {
     clearStats();
     toast(__("Run history cleared", "storeseeder"));
@@ -427,7 +539,7 @@ export default function SettingsPage() {
           <h1 className="fp-h1">{__("Settings", "storeseeder")}</h1>
           <p className="fp-sub">
             {__(
-              "Configure default behaviour for data generation.",
+              "What StoreSeeder writes, who may write it, and how this admin looks.",
               "storeseeder",
             )}
           </p>
@@ -435,6 +547,10 @@ export default function SettingsPage() {
       </div>
 
       <div className="fp-settings-col">
+        <SetSection
+          title={__("This site", "storeseeder")}
+          desc={__("Stored on the server and shared by everyone who uses StoreSeeder here.", "storeseeder")}
+        >
         {/* Target platform. Site-wide, stored server-side, and the same option the
             topbar selector writes — it belongs where someone configuring the plugin
             will look for it, not only behind a dropdown in the header. */}
@@ -444,6 +560,7 @@ export default function SettingsPage() {
         <SetCard
           icon="store"
           testId="settings-target-platform"
+          scope="site"
           title={__("Target platform", "storeseeder")}
           desc={__(
             "Where generated data is written. Applies to every user on this site.",
@@ -458,8 +575,11 @@ export default function SettingsPage() {
               <p className="fp-set-hint">{platformHint()}</p>
               <FieldSelect
                 id="ss-target-platform"
-                value={platformLabel(platformSelected)}
-                options={platformOptions.map((o) => o.label)}
+                value={platformSelected}
+                options={platformOptions.map((o) => ({
+                  value: o.id,
+                  label: o.label,
+                }))}
                 width={320}
                 onChange={handlePlatformChange}
               />
@@ -479,216 +599,120 @@ export default function SettingsPage() {
           </div>
         </SetCard>
 
-        {/* Generation defaults */}
-        <SetCard
-          icon="sliders"
-          title={__("Generation defaults", "storeseeder")}
-          desc={__(
-            "Pre-fill values on every generator page.",
-            "storeseeder",
-          )}
-        >
-          <div>
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-count">
-                {__("Default count", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {__(
-                  "Number of items pre-filled on every generator page.",
-                  "storeseeder",
-                )}
-              </p>
-              <NumberField
-                id="ss-default-count"
-                value={settings.defaultCount}
-                width={130}
-                onChange={(v) =>
-                  set("defaultCount", Math.max(1, parseInt(v, 10) || 1))
-                }
-              />
+        {/* Who may generate. Server-held and site-wide, unlike everything below it,
+            and the only setting on this page with a security consequence — generated
+            rows go straight into the store's own tables. */}
+        {!access && !accessFailed && (
+          <SetCard
+            icon="users"
+            scope="site"
+            testId="settings-access-loading"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <div className="fp-skel-text" aria-hidden="true">
+              <Skeleton height={34} />
+              <Skeleton height={34} />
+              <Skeleton height={34} width="72%" />
             </div>
+            <span className="sr-only" role="status">
+              {__("Loading roles…", "storeseeder")}
+            </span>
+          </SetCard>
+        )}
 
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-locale">
-                {__("Default locale", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {sprintf(
-                  /* translators: %d: number of available locales. */
-                  __(
-                    "Locale used when generating data — %d available, all accepted by the REST API.",
+        {accessFailed && (
+          <SetCard
+            icon="users"
+            scope="site"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <p className="fp-set-hint mb-0" style={{ color: "var(--red)" }}>
+              {__(
+                "Could not load who has access. Reload the page to try again.",
+                "storeseeder",
+              )}
+            </p>
+          </SetCard>
+        )}
+
+        {access && (
+          <SetCard
+            icon="users"
+            testId="settings-access"
+            scope="site"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <div>
+              {Object.keys(access.roles).length === 0 && (
+                <p className="fp-set-hint mb-0">
+                  {__(
+                    "This site defines no roles other than Administrator.",
                     "storeseeder",
-                  ),
-                  locales.length,
-                )}
-              </p>
-              <FieldSelect
-                id="ss-default-locale"
-                value={localeLabel(settings.defaultLocale)}
-                options={locales.map((l) => l.label)}
-                width={320}
-                onChange={(label) =>
-                  set(
-                    "defaultLocale",
-                    locales.find((l) => l.label === label)?.code ??
-                      DEFAULT_LOCALE,
-                  )
-                }
-              />
+                  )}
+                </p>
+              )}
+
+              {Object.entries(access.roles).map(([slug, name]) => (
+                <div className="fp-set-field full" key={slug}>
+                  <Toggle
+                    checked={access.allowedRoles.includes(slug)}
+                    disabled={!access.canManage || savingRoles}
+                    onChange={(granted) => void toggleRole(slug, granted)}
+                    testId={`role-${slug}`}
+                    label={name}
+                    hint={
+                      access.allowedRoles.includes(slug)
+                        ? __(
+                            "Can generate data, and can write it into the live store.",
+                            "storeseeder",
+                          )
+                        : __("No access.", "storeseeder")
+                    }
+                  />
+                </div>
+              ))}
+
+              {!access.canManage && (
+                <p className="fp-set-hint mb-0">
+                  {__(
+                    "Only administrators can change who has access, so that a role granted here cannot widen it further.",
+                    "storeseeder",
+                  )}
+                </p>
+              )}
+
+              {access.filtered && (
+                <p className="fp-set-hint mb-0">
+                  {sprintf(
+                    /* translators: %s: capability name, e.g. edit_shop_orders. */
+                    __(
+                      "Code on this site also grants access through the %s capability, via the storeseeder_capability filter.",
+                      "storeseeder",
+                    ),
+                    access.capability,
+                  )}
+                </p>
+              )}
             </div>
-
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-seed">
-                {__("Default seed", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {__(
-                  "Fixed seed for reproducible runs. Leave blank for random output.",
-                  "storeseeder",
-                )}
-              </p>
-              <div style={{ maxWidth: 220 }}>
-                <TextField
-                  id="ss-default-seed"
-                  value={settings.defaultSeed}
-                  ph={__("random (leave blank)", "storeseeder")}
-                  onChange={(v) => set("defaultSeed", v)}
-                />
-              </div>
-            </div>
-
-            <div className="fp-set-field full">
-              <Toggle
-                checked={settings.defaultIncludeMeta}
-                onChange={(v) => set("defaultIncludeMeta", v)}
-                label={__(
-                  "Include metadata by default",
-                  "storeseeder",
-                )}
-                hint={__(
-                  "Pre-check the Include Metadata toggle on every generator.",
-                  "storeseeder",
-                )}
-              />
-            </div>
-
-            <Button variant="primary" icon="check" onClick={handleSave}>
-              {saved
-                ? __("Saved!", "storeseeder")
-                : __("Save settings", "storeseeder")}
-            </Button>
-          </div>
-        </SetCard>
-
-        {/* Run history */}
-        <SetCard
-          icon="history"
-          title={__("Run history", "storeseeder")}
-          desc={__(
-            "Control how much history is retained.",
-            "storeseeder",
-          )}
-        >
-          <div>
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-max-runs">
-                {__("Max runs per generator", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {__(
-                  "How many recent runs to store in history per generator type.",
-                  "storeseeder",
-                )}
-              </p>
-              <NumberField
-                id="ss-max-runs"
-                value={settings.maxRunsPerGenerator}
-                width={130}
-                onChange={(v) =>
-                  set(
-                    "maxRunsPerGenerator",
-                    Math.min(50, Math.max(5, parseInt(v, 10) || 10)),
-                  )
-                }
-              />
-            </div>
-            <Button variant="primary" icon="check" onClick={handleSave}>
-              {saved
-                ? __("Saved!", "storeseeder")
-                : __("Save settings", "storeseeder")}
-            </Button>
-          </div>
-        </SetCard>
-
-        {/* Appearance. Theme and density only — accent and per-token colors stay in
-            Tweaks, which is linked below rather than reproduced here. Both read the
-            same ThemeProvider, so a change made in one shows in the other. */}
-        <SetCard
-          icon="palette"
-          testId="settings-appearance"
-          title={__("Appearance", "storeseeder")}
-          desc={__(
-            "How the admin looks. Saved in this browser, per user.",
-            "storeseeder",
-          )}
-        >
-          <div>
-            <div className="fp-set-field">
-              <span className="fp-set-label">{__("Theme", "storeseeder")}</span>
-              <p className="fp-set-hint">
-                {__(
-                  "Independent of the WordPress admin colour scheme.",
-                  "storeseeder",
-                )}
-              </p>
-              <Seg<Theme>
-                value={theme}
-                onChange={setTheme}
-                ariaLabel={__("Theme", "storeseeder")}
-                options={[
-                  { v: "light", label: __("Light", "storeseeder"), ic: "sun" },
-                  { v: "dark", label: __("Dark", "storeseeder"), ic: "moon" },
-                ]}
-              />
-            </div>
-
-            <div className="fp-set-field">
-              <span className="fp-set-label">{__("Density", "storeseeder")}</span>
-              <p className="fp-set-hint">
-                {__(
-                  "Compact tightens row heights and padding across every page.",
-                  "storeseeder",
-                )}
-              </p>
-              <Seg<Density>
-                value={density}
-                onChange={setDensity}
-                ariaLabel={__("Density", "storeseeder")}
-                options={[
-                  {
-                    v: "comfortable",
-                    label: __("Comfortable", "storeseeder"),
-                  },
-                  { v: "compact", label: __("Compact", "storeseeder") },
-                ]}
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              icon="sliders"
-              onClick={requestTweaksPanel}
-            >
-              {__("Accent & custom colours…", "storeseeder")}
-            </Button>
-          </div>
-        </SetCard>
+          </SetCard>
+        )}
 
         {/* Sample data */}
         <SetCard
           icon="database"
+          scope="site"
           title={__("Sample data", "storeseeder")}
           desc={__(
             "Locale-specific reference data used by generators to produce realistic output.",
@@ -770,7 +794,220 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
+        </SetSection>
 
+        <SetSection
+          title={__("Your preferences", "storeseeder")}
+          desc={__("Stored in this browser, for you alone. Nothing here changes what anyone else sees.", "storeseeder")}
+          note={
+            saved ? (
+              <span className="fp-set-saved" data-testid="settings-saved">
+                <Icon name="check2" size={13} />
+                {__("Saved", "storeseeder")}
+              </span>
+            ) : null
+          }
+        >
+        {/* Generation defaults */}
+        <SetCard
+          icon="sliders"
+          scope="browser"
+          title={__("Generation defaults", "storeseeder")}
+          desc={__(
+            "Pre-fill values on every generator page.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-count">
+                {__("Default count", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "Number of items pre-filled on every generator page.",
+                  "storeseeder",
+                )}
+              </p>
+              <NumberField
+                id="ss-default-count"
+                value={settings.defaultCount}
+                width={130}
+                onChange={(v) =>
+                  set("defaultCount", Math.max(1, parseInt(v, 10) || 1))
+                }
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-locale">
+                {__("Default locale", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {sprintf(
+                  /* translators: %d: number of available locales. */
+                  __(
+                    "Locale used when generating data — %d available, all accepted by the REST API.",
+                    "storeseeder",
+                  ),
+                  locales.length,
+                )}
+              </p>
+              <FieldSelect
+                id="ss-default-locale"
+                value={settings.defaultLocale}
+                options={locales.map((l) => ({
+                  value: l.code,
+                  label: l.label,
+                }))}
+                width={320}
+                onChange={(code) => set("defaultLocale", code || DEFAULT_LOCALE)}
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-seed">
+                {__("Default seed", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "Fixed seed for reproducible runs. Leave blank for random output.",
+                  "storeseeder",
+                )}
+              </p>
+              <div style={{ maxWidth: 220 }}>
+                <TextField
+                  id="ss-default-seed"
+                  value={settings.defaultSeed}
+                  ph={__("random (leave blank)", "storeseeder")}
+                  onChange={(v) => set("defaultSeed", v)}
+                />
+              </div>
+            </div>
+
+            <div className="fp-set-field full">
+              <Toggle
+                checked={settings.defaultIncludeMeta}
+                onChange={(v) => set("defaultIncludeMeta", v)}
+                label={__(
+                  "Include metadata by default",
+                  "storeseeder",
+                )}
+                hint={__(
+                  "Pre-check the Include Metadata toggle on every generator.",
+                  "storeseeder",
+                )}
+              />
+            </div>
+          </div>
+        </SetCard>
+
+        {/* Appearance. Theme and density only — accent and per-token colors stay in
+            Tweaks, which is linked below rather than reproduced here. Both read the
+            same ThemeProvider, so a change made in one shows in the other. */}
+        <SetCard
+          icon="palette"
+          testId="settings-appearance"
+          scope="browser"
+          title={__("Appearance", "storeseeder")}
+          desc={__(
+            "How the admin looks. Saved in this browser, per user.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Theme", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Independent of the WordPress admin colour scheme.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Theme>
+                value={theme}
+                onChange={setTheme}
+                ariaLabel={__("Theme", "storeseeder")}
+                options={[
+                  { v: "light", label: __("Light", "storeseeder"), ic: "sun" },
+                  { v: "dark", label: __("Dark", "storeseeder"), ic: "moon" },
+                ]}
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Density", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Compact tightens row heights and padding across every page.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Density>
+                value={density}
+                onChange={setDensity}
+                ariaLabel={__("Density", "storeseeder")}
+                options={[
+                  {
+                    v: "comfortable",
+                    label: __("Comfortable", "storeseeder"),
+                  },
+                  { v: "compact", label: __("Compact", "storeseeder") },
+                ]}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              icon="sliders"
+              onClick={requestTweaksPanel}
+            >
+              {__("Accent & custom colours…", "storeseeder")}
+            </Button>
+          </div>
+        </SetCard>
+
+        {/* Run history */}
+        <SetCard
+          icon="history"
+          scope="browser"
+          title={__("Run history", "storeseeder")}
+          desc={__(
+            "Control how much history is retained.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-max-runs">
+                {__("Max runs per generator", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "How many recent runs to store in history per generator type.",
+                  "storeseeder",
+                )}
+              </p>
+              <NumberField
+                id="ss-max-runs"
+                value={settings.maxRunsPerGenerator}
+                width={130}
+                onChange={(v) =>
+                  set(
+                    "maxRunsPerGenerator",
+                    Math.min(50, Math.max(5, parseInt(v, 10) || 10)),
+                  )
+                }
+              />
+            </div>          </div>
+        </SetCard>
+        </SetSection>
+
+        <SetSection
+          title={__("Plugin", "storeseeder")}
+          desc={__("Version, links, and the actions that cannot be undone.", "storeseeder")}
+        >
         {/* About */}
         <SetCard
           icon="info"
@@ -846,6 +1083,8 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
+        </SetSection>
+
       </div>
     </div>
   );
