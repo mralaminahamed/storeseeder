@@ -267,7 +267,10 @@
 /* ===== generator page ===== */
 .fp-root .fp-gen-main { flex:1; min-height:0; display:flex; flex-direction:column; }
 .fp-root .fp-gen-body { flex:1; overflow-y:auto; }
-.fp-root .fp-gen-wrap { display:grid; grid-template-columns:minmax(420px,460px) 1fr; gap:0; min-height:100%; }
+.fp-root .fp-gen-wrap { display:grid; grid-template-columns:minmax(420px,460px) 1fr; gap:0; min-height:100%; transition:grid-template-columns .28s cubic-bezier(.4,0,.2,1); }
+/* Resizing across the breakpoint should not snap. Suppressed under reduced-motion, where a
+   layout that slides is exactly what the setting asks against. */
+@media (prefers-reduced-motion:reduce){ .fp-root .fp-gen-wrap { transition:none; } }
 .fp-root .fp-config-col { padding:var(--pad-col-y) var(--pad-col-x) var(--pad-col-b); border-right:1px solid var(--border); }
 .fp-root .fp-config-head { display:flex; gap:14px; margin-bottom:8px; }
 .fp-root .fp-config-ic { width:var(--tile-lg); height:var(--tile-lg); border-radius:12px; flex-shrink:0; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
@@ -349,6 +352,10 @@
 .fp-root .fp-spinner { width:30px; height:30px; border-radius:50%; border:3px solid var(--border); border-top-color:var(--accent); animation:fp-spin .8s linear infinite; }
 
 @media (max-width:1080px){ .fp-root .fp-gen-wrap{ grid-template-columns:1fr; } .fp-root .fp-config-col{ border-right:none; border-bottom:1px solid var(--border);} }
+/* Above 1440px the config column gets the room its fields now need — platform-specific
+   parameters land there too — while the preview keeps absorbing the rest, the same shape as the
+   base rule rather than two fixed columns leaving whitespace on a wide monitor. */
+@media (min-width:1441px){ .fp-root .fp-gen-wrap{ grid-template-columns:minmax(460px,620px) 1fr; } }
 
 /* ===== settings ===== */
 .fp-root .fp-settings-col { max-width:680px; }
