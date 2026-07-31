@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T22:00:36+00:00\n"
+"POT-Creation-Date: 2026-07-31T22:11:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -419,24 +419,24 @@ msgstr ""
 msgid "Coupons"
 msgstr ""
 
-#: includes/Generation/Generators/Coupon.php:103
+#: includes/Generation/Generators/Coupon.php:248
 msgid "Code"
 msgstr ""
 
-#: includes/Generation/Generators/Coupon.php:107
+#: includes/Generation/Generators/Coupon.php:252
 #: includes/Generation/Generators/Product.php:263
 msgid "Type"
 msgstr ""
 
-#: includes/Generation/Generators/Coupon.php:111
+#: includes/Generation/Generators/Coupon.php:256
 msgid "Amount"
 msgstr ""
 
-#: includes/Generation/Generators/Coupon.php:115
+#: includes/Generation/Generators/Coupon.php:260
 msgid "Usage limit"
 msgstr ""
 
-#: includes/Generation/Generators/Coupon.php:119
+#: includes/Generation/Generators/Coupon.php:264
 #: includes/Generation/Generators/Order.php:326
 #: includes/Generation/Generators/Product.php:275
 msgid "Status"
@@ -686,42 +686,66 @@ msgid "Generate realistic Fluent Cart discount coupons with various discount typ
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Coupons.php:47
-msgid "Discount types to include. Allowed: percentage, fixed, free_shipping, products. Default: [\"percentage\",\"fixed\"]."
+msgid "Discount types to include. Allowed: percentage, fixed, free_shipping. Default: [\"percentage\",\"fixed\"]. A free-shipping coupon carries no amount."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:53
+#: includes/MCP/Abilities/Generate_Coupons.php:56
 msgid "Minimum percentage discount (5–95). Default: 10."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:60
+#: includes/MCP/Abilities/Generate_Coupons.php:63
 msgid "Maximum percentage discount (5–95). Default: 50."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:67
+#: includes/MCP/Abilities/Generate_Coupons.php:70
 msgid "Minimum fixed discount amount (USD). Default: 5."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:72
+#: includes/MCP/Abilities/Generate_Coupons.php:75
 msgid "Maximum fixed discount amount (USD). Default: 100."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:77
+#: includes/MCP/Abilities/Generate_Coupons.php:80
 msgid "Add usage-limit rules to coupons. Default: true."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:82
+#: includes/MCP/Abilities/Generate_Coupons.php:85
 msgid "Maximum total uses per coupon when set_usage_limits is true (1–1000). Default: 100."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:89
+#: includes/MCP/Abilities/Generate_Coupons.php:92
+msgid "Maximum uses per customer (1–10). Never exceeds max_uses, which Fluent Cart rejects outright. Default: 1."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:99
+msgid "Which restrictions to put on the generated coupons."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:103
+msgid "Require a minimum cart subtotal. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:107
+msgid "Cap the cart subtotal the coupon applies to. WooCommerce only. Default: false."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:111
+msgid "Refuse the coupon on discounted products. WooCommerce only. Default: false."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:115
+msgid "Restrict some coupons to specific products. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:121
 msgid "Minimum coupon validity period in days. Default: 7."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:95
+#: includes/MCP/Abilities/Generate_Coupons.php:127
 msgid "Maximum coupon validity period in days (1–365). Default: 90."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Coupons.php:109
+#: includes/MCP/Abilities/Generate_Coupons.php:141
 msgid "Array of generated coupon objects with id, code, type, offer, status, usage_limit, and validity dates."
 msgstr ""
 
@@ -1144,7 +1168,7 @@ msgid "Fluent Cart"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Platform.php:137
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:195
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:201
 msgid "Fluent Cart Pro"
 msgstr ""
 
@@ -1152,7 +1176,7 @@ msgstr ""
 msgid "Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:223
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:229
 msgid "Fluent Cart only. Whether generated variations are bought once or on a subscription."
 msgstr ""
 
@@ -1176,7 +1200,7 @@ msgstr ""
 msgid "Failed to create cart session."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:62
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:63
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:47
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:76
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:72
@@ -1185,15 +1209,15 @@ msgstr ""
 msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:86
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:92
 msgid "Failed to create coupon."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:115
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:121
 msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:147
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:177
 msgid "Failed to create coupon using Fluent Cart model."
 msgstr ""
 
@@ -1427,15 +1451,15 @@ msgstr ""
 msgid "Licensing is not a WooCommerce core concept, and the extensions that add it each use their own storage."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:239
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:244
 msgid "WooCommerce only. Percentage of products marked featured (0–100)."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:247
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:252
 msgid "WooCommerce only. Where generated products appear."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:254
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:259
 msgid "WooCommerce only. Whether generated products are taxable."
 msgstr ""
 
@@ -1444,7 +1468,7 @@ msgstr ""
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Attribute.php:134
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:60
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:66
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:139
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:184
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:60
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:149
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:74
@@ -1481,11 +1505,11 @@ msgstr ""
 msgid "Failed to create the cart session."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:108
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:133
 msgid "Failed to create the coupon."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:116
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:141
 msgid "free shipping"
 msgstr ""
 
@@ -1839,27 +1863,27 @@ msgstr ""
 msgid "Types of discount coupons to generate"
 msgstr ""
 
-#: includes/Rest/Controllers/Coupon.php:88
+#: includes/Rest/Controllers/Coupon.php:92
 #: build/admin-app.js:4
 msgid "Discount value range"
 msgstr ""
 
-#: includes/Rest/Controllers/Coupon.php:116
+#: includes/Rest/Controllers/Coupon.php:120
 #: build/admin-app.js:4
 msgid "Usage limitation settings"
 msgstr ""
 
-#: includes/Rest/Controllers/Coupon.php:138
+#: includes/Rest/Controllers/Coupon.php:142
 #: build/admin-app.js:4
 msgid "Coupon validity period configuration"
 msgstr ""
 
-#: includes/Rest/Controllers/Coupon.php:156
+#: includes/Rest/Controllers/Coupon.php:160
 #: build/admin-app.js:4
 msgid "Coupon usage restrictions"
 msgstr ""
 
-#: includes/Rest/Controllers/Coupon.php:190
+#: includes/Rest/Controllers/Coupon.php:194
 msgid "Generated coupons data."
 msgstr ""
 

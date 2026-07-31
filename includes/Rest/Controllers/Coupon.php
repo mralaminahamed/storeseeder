@@ -77,11 +77,15 @@ class Coupon extends Controller {
 			'discount_types'  => array(
 				'description'       => __( 'Types of discount coupons to generate', 'storeseeder' ),
 				'type'              => 'array',
+				// `fixed`, not `fixed_amount`: that spelling is not one of Fluent Cart's four types
+				// and WooCommerce's writer maps from the canonical name, so a caller asking for
+				// `fixed_amount` matched nothing and got the full spread. `buy_x_get_y` is gone
+				// because it needs buy and get product lists that no generator produces.
 				'items'             => array(
 					'type' => 'string',
-					'enum' => array( 'percentage', 'fixed_amount', 'free_shipping', 'buy_x_get_y' ),
+					'enum' => array( 'percentage', 'fixed', 'free_shipping' ),
 				),
-				'default'           => array( 'percentage', 'fixed_amount' ),
+				'default'           => array( 'percentage', 'fixed' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'discount_range'  => array(

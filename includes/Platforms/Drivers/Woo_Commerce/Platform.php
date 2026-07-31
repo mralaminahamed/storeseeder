@@ -211,6 +211,11 @@ final class Platform extends Platform_Driver {
 			);
 		}
 
+		// A WooCommerce coupon has an expiry and no start: `WC_Coupon` carries `date_expires` and
+		// nothing else, so a coupon that becomes valid next Tuesday cannot be expressed. The
+		// generated one is simply live from the moment it is written.
+		$matrix[ Resource::COUPON ] = Capability::supported_except( array( 'starts_at' ) );
+
 		return $matrix;
 	}
 

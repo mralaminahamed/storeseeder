@@ -84,20 +84,45 @@ final class Coupon extends Writer {
 		$coupon = new WC_Coupon();
 
 		try {
-			$coupon->set_props(
-				array(
-					'code'           => $code,
-					'description'    => $entity['description'],
-					'discount_type'  => self::DISCOUNT_TYPE[ $type ] ?? 'fixed_cart',
-					'amount'         => $amount,
-					'free_shipping'  => $free_shipping,
-					'usage_limit'    => (int) $entity['usage_limit'],
-					'date_expires'   => (string) $entity['expires_at'],
-					// Individual use off: a generated coupon that cannot combine with
-					// another makes multi-coupon behaviour impossible to test.
-					'individual_use' => false,
-				)
+			$props = array(
+				'code'               => $code,
+				'description'        => $entity['description'],
+				'discount_type'      => self::DISCOUNT_TYPE[ $type ] ?? 'fixed_cart',
+				'amount'             => $amount,
+				'free_shipping'      => $free_shipping,
+				'date_expires'       => (string) $entity['expires_at'],
+				// WooCommerce states the inverse: a stackable coupon is one not marked for
+				// individual use.
+				'individual_use'     => ! ( $entity['stackable'] ?? true ),
+				'exclude_sale_items' => (bool) ( $entity['exclude_sale_items'] ?? false ),
 			);
+
+			// Null is an unlimited coupon and WooCommerce spells that as an empty limit, not as a
+			// limit of zero — zero would reject the coupon on its first use.
+			if ( null !== ( $entity['usage_limit'] ?? null ) ) {
+				$props['usage_limit'] = (int) $entity['usage_limit'];
+			}
+
+			if ( null !== ( $entity['usage_limit_per_user'] ?? null ) ) {
+				$props['usage_limit_per_user'] = (int) $entity['usage_limit_per_user'];
+			}
+
+			// Cart thresholds arrive in minor units and WooCommerce wants a decimal string.
+			if ( null !== ( $entity['minimum_amount'] ?? null ) ) {
+				$props['minimum_amount'] = $this->to_decimal( (int) $entity['minimum_amount'] );
+			}
+
+			if ( null !== ( $entity['maximum_amount'] ?? null ) ) {
+				$props['maximum_amount'] = $this->to_decimal( (int) $entity['maximum_amount'] );
+			}
+
+			$products = $this->restricted_product_ids( (int) ( $entity['product_count'] ?? 0 ) );
+
+			if ( array() !== $products ) {
+				$props['product_ids'] = $products;
+			}
+
+			$coupon->set_props( $props );
 
 			$id = $coupon->save();
 		} catch ( WC_Data_Exception $e ) {
@@ -121,6 +146,26 @@ final class Coupon extends Writer {
 		);
 
 		return $this->filter_result( $result, (int) $id, $result );
+	}
+
+	/**
+	 * Draw the products a coupon is restricted to.
+	 *
+	 * The generator says how many, never which: only the platform knows what exists, and a coupon
+	 * pointing at a product id that is not there restricts itself to nothing.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $count How many products to restrict to.
+	 *
+	 * @return array<int, int>
+	 */
+	private function restricted_product_ids( int $count ): array {
+		if ( $count < 1 ) {
+			return array();
+		}
+
+		return array_slice( $this->product_ids( $count ), 0, $count );
 	}
 
 	/**

@@ -176,6 +176,29 @@ the status rather than being invented: only a paid order has a payment date, onl
 completion date. Fluent Cart has no company column on an order address and reports it under
 `ignored`.
 
+### Coupons
+
+- `discount_types` — any of `percentage`, `fixed`, `free_shipping`
+- `discount_range` — `min_percentage`, `max_percentage`, `min_fixed`, `max_fixed`
+- `usage_limits` — `set_usage_limits`, `max_uses`, `max_uses_per_user`
+- `validity_period` — `{ min_days, max_days }`
+- `restrictions` — `minimum_spend`, `maximum_spend`, `exclude_sale_items`, `product_restrictions`
+
+Five groups, and until now none of them reached the generator: asking for percentage coupons got a
+spread across all three types, and every discount came out between 5 and 50 percent or 5 and 100
+dollars. The type vocabularies also disagreed — the endpoint accepted `fixed_amount` and the admin
+offered `products`, neither of which is a type any platform has, so choosing either failed the
+request or silently produced the full spread.
+
+A coupon now carries `usage_limit_per_user`, `starts_at`, `minimum_amount`, `maximum_amount`,
+`exclude_sale_items`, `stackable` and a product-restriction count. Switching usage limits off leaves
+them **null**, which is an unlimited coupon — a limit of zero would reject the coupon on its first
+use. The per-customer limit never exceeds the total, which Fluent Cart rejects outright.
+
+Some coupons have not started yet, which is the checkout case no fixture had. WooCommerce has no
+start date — `WC_Coupon` carries an expiry and nothing else — and reports `starts_at` under
+`ignored`.
+
 The remaining fourteen resources follow the same pattern; the admin renders whatever the schema
 declares.
 
@@ -269,6 +292,10 @@ capability says which fields it drops rather than the writer discarding them qui
 |---|---|---|---|
 | WooCommerce | Customers | `with_account` | A WooCommerce customer *is* a WordPress user; there is no account-less customer record |
 | WooCommerce | Shipping Classes | `cost`, `per_item` | A class's cost belongs to a shipping *method*, so the same class costs different amounts per zone |
+| WooCommerce | Coupons | `starts_at` | `WC_Coupon` has an expiry and no start date, so a coupon that becomes valid next week cannot be expressed |
+| Fluent Cart | Products | `backorders` | A boolean column where the canonical vocabulary has three values, so "allow, but notify" cannot be stored |
+| Fluent Cart | Orders | `company` | `fct_order_addresses` has no company column, and nothing reads one out of the meta blob |
+| Fluent Cart | Coupons | `maximum_amount`, `exclude_sale_items` | Its conditions have a minimum and no maximum — `max_discount_amount` caps the discount, not the cart — and its validation does not know about sale prices |
 
 The generator page prints those under the fields, so a setting that will not apply says so before
 the run rather than after it.

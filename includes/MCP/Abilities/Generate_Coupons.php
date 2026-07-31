@@ -44,8 +44,11 @@ class Generate_Coupons extends Ability {
 		return array(
 			'discount_types'    => array(
 				'type'        => 'array',
-				'description' => __( 'Discount types to include. Allowed: percentage, fixed, free_shipping, products. Default: ["percentage","fixed"].', 'storeseeder' ),
-				'items'       => array( 'type' => 'string' ),
+				'description' => __( 'Discount types to include. Allowed: percentage, fixed, free_shipping. Default: ["percentage","fixed"]. A free-shipping coupon carries no amount.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'percentage', 'fixed', 'free_shipping' ),
+				),
 				'default'     => array( 'percentage', 'fixed' ),
 			),
 			'min_percentage'    => array(
@@ -83,6 +86,35 @@ class Generate_Coupons extends Ability {
 				'minimum'     => 1,
 				'maximum'     => 1000,
 				'default'     => 100,
+			),
+			'max_uses_per_user' => array(
+				'type'        => 'integer',
+				'description' => __( 'Maximum uses per customer (1–10). Never exceeds max_uses, which Fluent Cart rejects outright. Default: 1.', 'storeseeder' ),
+				'minimum'     => 1,
+				'maximum'     => 10,
+				'default'     => 1,
+			),
+			'restrictions'      => array(
+				'type'        => 'object',
+				'description' => __( 'Which restrictions to put on the generated coupons.', 'storeseeder' ),
+				'properties'  => array(
+					'minimum_spend'        => array(
+						'type'        => 'boolean',
+						'description' => __( 'Require a minimum cart subtotal. Default: true.', 'storeseeder' ),
+					),
+					'maximum_spend'        => array(
+						'type'        => 'boolean',
+						'description' => __( 'Cap the cart subtotal the coupon applies to. WooCommerce only. Default: false.', 'storeseeder' ),
+					),
+					'exclude_sale_items'   => array(
+						'type'        => 'boolean',
+						'description' => __( 'Refuse the coupon on discounted products. WooCommerce only. Default: false.', 'storeseeder' ),
+					),
+					'product_restrictions' => array(
+						'type'        => 'boolean',
+						'description' => __( 'Restrict some coupons to specific products. Default: true.', 'storeseeder' ),
+					),
+				),
 			),
 			'validity_min_days' => array(
 				'type'        => 'integer',
@@ -148,9 +180,14 @@ class Generate_Coupons extends Ability {
 		);
 
 		$payload['usage_limits'] = array(
-			'set_usage_limits' => $input['set_usage_limits'] ?? true,
-			'max_uses'         => $input['max_uses'] ?? 100,
+			'set_usage_limits'  => $input['set_usage_limits'] ?? true,
+			'max_uses'          => $input['max_uses'] ?? 100,
+			'max_uses_per_user' => $input['max_uses_per_user'] ?? 1,
 		);
+
+		if ( isset( $input['restrictions'] ) ) {
+			$payload['restrictions'] = (array) $input['restrictions'];
+		}
 
 		$payload['validity_period'] = array(
 			'min_days' => $input['validity_min_days'] ?? 7,
