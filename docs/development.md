@@ -285,6 +285,16 @@ from `src/lib/icons.tsx`, and the parameter schema.
 **No React is needed.** Fields render from the parameter schema through
 `src/lib/fieldsFromSchema.ts`.
 
+### Optional: expose it to AI clients
+
+Add an ability in `includes/MCP/Abilities/`, extending `MCP\Ability` with `label()`,
+`description()`, `output()` and — if the endpoint takes nested parameters — `input_properties()`
+and `build_payload()`. List it in `MCP\Registry::default_classes()`.
+
+Its ability id derives from `REST_BASE`, so it cannot end up pointing at a different endpoint
+than the one it dispatches to. Keep `input_properties()` and `build_payload()` in step: the
+first declares the flat input an MCP client sends, the second re-nests it for the REST route.
+
 ## 🧪 Testing
 
 ### PHP

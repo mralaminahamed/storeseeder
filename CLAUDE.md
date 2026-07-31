@@ -68,6 +68,7 @@ includes/
   Rest/           Controller.php (abstract)  + Controllers/*   17 controllers
                   Registry.php               owns storeseeder_rest_controllers
   MCP/            MCP_Server.php
+                  Registry.php               owns storeseeder_mcp_abilities
                   Ability.php (abstract)     + Abilities/*     17 abilities
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php

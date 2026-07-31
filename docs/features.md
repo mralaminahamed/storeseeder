@@ -160,6 +160,7 @@ Filters and actions across the whole lifecycle, with the full table in
 - `storeseeder_platforms` — register a platform driver; the entire surface needed to add one
 - `storeseeder_rest_controllers` — add or remove a REST controller, so a driver can expose a
   resource of its own
+- `storeseeder_mcp_abilities` — add or remove an MCP ability
 - `storeseeder_canonical_{resource}` — change generated data before it is written, for every
   platform at once
 - `storeseeder_generated_item_{type}`, `storeseeder_after_batch_generate_{type}` — observe or
@@ -175,7 +176,8 @@ assistant — can create test data conversationally. Requires the WordPress Abil
 
 It degrades gracefully: with either dependency absent, MCP does nothing and the rest of the
 plugin is unaffected. Abilities dispatch through the REST API rather than calling generators
-directly, so they inherit the same validation and platform resolution.
+directly, so they inherit the same validation and platform resolution — including the target
+platform, which an MCP client can set with the `platform` parameter.
 
 ## Security
 

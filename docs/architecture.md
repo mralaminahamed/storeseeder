@@ -19,9 +19,10 @@ storeseeder/
 │   │   ├── Registry.php         #   owns storeseeder_rest_controllers
 │   │   └── Controllers/         #   17 controllers, one per resource
 │   ├── MCP/                     # Model Context Protocol integration (optional)
-│   │   ├── MCP_Server.php       #   ability + tool registration
+│   │   ├── MCP_Server.php       #   server + category registration
+│   │   ├── Registry.php         #   owns storeseeder_mcp_abilities
 │   │   ├── Ability.php          #   abstract base: dispatches through the REST API
-│   │   └── Abilities/           #   17 abilities, one per resource
+│   │   └── Abilities/           #   17 self-describing abilities, one per resource
 │   └── Platforms/               # Where data goes
 │       ├── Platform_Interface.php  # what a platform must answer
 │       ├── Platform_Driver.php     # abstract base for shipped drivers
@@ -329,6 +330,7 @@ this one.
 |---|---|---|
 | `storeseeder_platforms` | filter | Register a driver. The whole surface needed to add a platform. |
 | `storeseeder_rest_controllers` | filter | Add or remove a REST controller, so a driver can expose a resource of its own |
+| `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
 | `storeseeder_canonical_{resource}` | filter | Mutate the neutral entity before it is written — applies to every platform equally |
