@@ -420,16 +420,18 @@ export const generators: Generator[] = [
     resource: "shipping_plan",
     parameterConfig: {
       shipping_types: {
-        description: __("Types of shipping methods to generate", "storeseeder"),
+        // Service levels. `pickup` and `weight_based` were offered here and are not service levels:
+        // neither platform has either as a method type in core.
+        description: __("Service levels to generate (a flat rate underneath, named and timed)", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["standard", "express", "overnight", "pickup", "free", "weight_based", "flat_rate"] },
+        items: { type: "string", enum: ["standard", "express", "overnight", "free"] },
         default: ["standard", "express", "free"],
       },
       cost_range: {
         description: __("Shipping cost range", "storeseeder"),
         type: "object",
         properties: {
-          min: { description: __("Minimum cost", "storeseeder"), type: "number", minimum: 0, default: 0 },
+          min: { description: __("Minimum cost", "storeseeder"), type: "number", minimum: 0, default: 5 },
           max: { description: __("Maximum cost", "storeseeder"), type: "number", minimum: 0, default: 50 },
         },
       },
@@ -439,18 +441,12 @@ export const generators: Generator[] = [
         items: { type: "string", enum: ["domestic", "international", "regional", "worldwide"] },
         default: ["domestic", "international"],
       },
-      calculation_methods: {
-        description: __("Shipping calculation methods", "storeseeder"),
-        type: "array",
-        items: { type: "string", enum: ["flat_rate", "weight_based", "price_based", "quantity_based"] },
-        default: ["flat_rate", "weight_based"],
-      },
       delivery_timeframes: {
         description: __("Delivery time ranges", "storeseeder"),
         type: "object",
         properties: {
           min_days: { description: __("Minimum delivery days", "storeseeder"), type: "integer", minimum: 0, default: 1 },
-          max_days: { description: __("Maximum delivery days", "storeseeder"), type: "integer", minimum: 1, default: 14 },
+          max_days: { description: __("Maximum delivery days", "storeseeder"), type: "integer", minimum: 0, default: 14 },
         },
       },
     },
@@ -477,7 +473,8 @@ export const generators: Generator[] = [
       jurisdictions: {
         description: __("Tax jurisdictions to generate rates for", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["country", "state", "city", "county", "postcode"] },
+        // `county` is gone: neither platform has a column for one.
+        items: { type: "string", enum: ["country", "state", "city", "postcode"] },
         default: ["country", "state"],
       },
       rate_ranges: {

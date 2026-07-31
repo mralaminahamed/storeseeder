@@ -76,10 +76,18 @@ final class Shipping_Plan extends Writer {
 		$zone = new WC_Shipping_Zone();
 		$zone->set_zone_name( (string) $entity['title'] );
 
-		// Regions arrive empty from the generator — a plan with no region is a valid
-		// WooCommerce zone, so one is drawn here rather than left blank, which would make
-		// every generated zone match nothing and never appear at checkout.
-		$regions = (array) $entity['regions'];
+		// A worldwide plan arrives with no regions, and a WooCommerce zone matching nothing never
+		// appears at checkout — so one is drawn rather than left blank. `store_country` is the
+		// generator's placeholder for "wherever this store is", which only this side knows.
+		$regions = array();
+
+		foreach ( (array) $entity['regions'] as $region ) {
+			$regions[] = 'store_country' === $region
+				? $this->store_country()
+				: strtoupper( (string) $region );
+		}
+
+		$regions = array_values( array_unique( array_filter( $regions ) ) );
 
 		if ( array() === $regions ) {
 			$regions = array( strtoupper( $this->faker()->randomElement( array( 'US', 'GB', 'DE', 'FR', 'CA', 'AU' ) ) ) );
@@ -190,5 +198,20 @@ final class Shipping_Plan extends Writer {
 		}
 
 		update_option( 'woocommerce_' . $method . '_' . $instance_id . '_settings', $settings );
+	}
+
+	/**
+	 * The country this store sells from.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string Two-letter country code.
+	 */
+	private function store_country(): string {
+		$base = (string) WC()->countries->get_base_country();
+
+		// A store with no base country set is possible on a fresh install, and US is the fallback
+		// rather than a guess from the site locale — a locale is a language, not a place of business.
+		return '' !== $base ? strtoupper( $base ) : 'US';
 	}
 }

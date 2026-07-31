@@ -75,32 +75,29 @@ class Shipping_Plan extends Controller {
 	protected function get_resource_specific_params(): array {
 		return array(
 			'shipping_types'      => array(
-				'description'       => __( 'Types of shipping methods to generate.', 'storeseeder' ),
+				// Service levels, which is what these are. The old enum mixed three ideas: a service
+				// (`standard`, `express`), a method type (`flat_rate`, `free`) and a calculation
+				// method (`weight_based`). Neither platform has an "express" method *type* — both
+				// have a flat rate that can be called one, with a delivery window and a name, which
+				// is what the difference is. `flat_rate` is still accepted and means `standard`.
+				'description'       => __( 'Service levels to generate. A flat rate underneath, named and timed for the service.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
-					'enum' => array(
-						'standard',
-						'express',
-						'overnight',
-						'pickup',
-						'free',
-						'weight_based',
-						'flat_rate',
-					),
+					'enum' => array( 'standard', 'express', 'overnight', 'free', 'flat_rate' ),
 				),
 				'default'           => array( 'standard', 'express', 'free' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'cost_range'          => array(
-				'description' => __( 'Shipping cost range.', 'storeseeder' ),
+				'description' => __( 'Shipping cost range. Free shipping costs nothing regardless.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min' => array(
 						'description' => __( 'Minimum shipping cost.', 'storeseeder' ),
 						'type'        => 'number',
 						'minimum'     => 0,
-						'default'     => 0,
+						'default'     => 5,
 					),
 					'max' => array(
 						'description' => __( 'Maximum shipping cost.', 'storeseeder' ),
@@ -111,7 +108,7 @@ class Shipping_Plan extends Controller {
 				),
 			),
 			'coverage_areas'      => array(
-				'description'       => __( 'Geographic coverage areas.', 'storeseeder' ),
+				'description'       => __( 'Which countries the zone covers. Domestic means wherever the store sells from.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
@@ -120,18 +117,11 @@ class Shipping_Plan extends Controller {
 				'default'           => array( 'domestic', 'international' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
-			'calculation_methods' => array(
-				'description'       => __( 'Shipping calculation methods.', 'storeseeder' ),
-				'type'              => 'array',
-				'items'             => array(
-					'type' => 'string',
-					'enum' => array( 'flat_rate', 'weight_based', 'price_based', 'quantity_based' ),
-				),
-				'default'           => array( 'flat_rate', 'weight_based' ),
-				'sanitize_callback' => array( $this, 'sanitize_array' ),
-			),
 			'delivery_timeframes' => array(
-				'description' => __( 'Delivery time ranges.', 'storeseeder' ),
+				// `calculation_methods` used to sit beside this and is gone: neither platform has a
+				// weight-, price- or quantity-based method in core, so three of its four values could
+				// only ever have produced a flat rate under another name.
+				'description' => __( 'Delivery estimate bounds, in days. The service level narrows them.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'min_days' => array(
@@ -143,7 +133,7 @@ class Shipping_Plan extends Controller {
 					'max_days' => array(
 						'description' => __( 'Maximum delivery days.', 'storeseeder' ),
 						'type'        => 'integer',
-						'minimum'     => 1,
+						'minimum'     => 0,
 						'default'     => 14,
 					),
 				),

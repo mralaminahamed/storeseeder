@@ -53,7 +53,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 623 PHP tests / 7101 assertions, and 215 Jest tests
+**Current baselines: 640 PHP tests / 7610 assertions, and 215 Jest tests
 (`yarn test:unit`).** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.

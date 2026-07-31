@@ -67,16 +67,20 @@ final class Tax_Class extends Writer {
 		$slug  = (string) $created['slug'];
 		$rates = (array) $entity['rates'];
 
-		// The entity's own country/state/rate is the primary rate; `rates` carries the rest.
-		// Prepending it keeps the record consistent with what the generator reported.
-		array_unshift(
-			$rates,
-			array(
-				'country' => $entity['country'],
-				'state'   => $entity['state'],
-				'rate'    => $entity['rate'],
-			)
-		);
+		// `rates` already opens with the class's own country, state and rate — the entity's
+		// top-level fields are that same row, reported for convenience. Prepending them again wrote
+		// a second, less precise copy of the primary rate: WooCommerce applies one rate per
+		// priority level, so a priority-1 duplicate beside the real priority-4 row taxed every
+		// order twice.
+		if ( array() === $rates ) {
+			$rates = array(
+				array(
+					'country' => $entity['country'],
+					'state'   => $entity['state'],
+					'rate'    => $entity['rate'],
+				),
+			);
+		}
 
 		$written = $this->insert_rates( $slug, $name, $rates );
 
@@ -163,14 +167,33 @@ final class Tax_Class extends Writer {
 					'tax_rate_state'    => strtoupper( (string) ( $rate['state'] ?? '' ) ),
 					'tax_rate'          => (string) ( $rate['rate'] ?? 0 ),
 					'tax_rate_name'     => $name,
-					'tax_rate_priority' => 1,
-					'tax_rate_compound' => 0,
+					// A more precise rate has to outrank a broader one, or the country row matches
+					// first and the postcode row never applies. Fixed at 1 before this, which made
+					// every rate in a class compete on equal terms.
+					'tax_rate_priority' => max( 1, (int) ( $rate['priority'] ?? 1 ) ),
+					'tax_rate_compound' => ! empty( $rate['compound'] ) ? 1 : 0,
 					'tax_rate_shipping' => 1,
 					'tax_rate_class'    => $slug,
 				)
 			);
 
 			if ( $id ) {
+				// City and postcode are *not* columns on the rate row — WooCommerce keeps them in
+				// `woocommerce_tax_rate_locations`, one row per value, and passing them to
+				// `_insert_tax_rate()` fails the whole insert with "Unknown column
+				// 'tax_rate_city'". These two helpers are the only way in.
+				$city = (string) ( $rate['city'] ?? '' );
+
+				if ( '' !== $city ) {
+					WC_Tax::_update_tax_rate_cities( (int) $id, $city );
+				}
+
+				$postcode = (string) ( $rate['postcode'] ?? '' );
+
+				if ( '' !== $postcode ) {
+					WC_Tax::_update_tax_rate_postcodes( (int) $id, $postcode );
+				}
+
 				++$written;
 			}
 		}

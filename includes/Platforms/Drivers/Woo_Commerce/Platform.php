@@ -216,6 +216,11 @@ final class Platform extends Platform_Driver {
 		// generated one is simply live from the moment it is written.
 		$matrix[ Resource::COUPON ] = Capability::supported_except( array( 'starts_at' ) );
 
+		// A WooCommerce shipping method has a cost, a tax status and a title, and no delivery
+		// estimate — that is a feature of table-rate plugins, not of core's flat rate. The window is
+		// still visible to a shopper, because the generated title carries it.
+		$matrix[ Resource::SHIPPING_PLAN ] = Capability::supported_except( array( 'delivery_min', 'delivery_max' ) );
+
 		return $matrix;
 	}
 
