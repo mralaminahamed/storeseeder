@@ -1,0 +1,193 @@
+# CLAUDE.md
+
+Guidance for Claude Code working in this repository. Facts here were verified against the
+code; where a statement is a rule rather than an observation, the reason is given, because a
+rule without a reason gets worked around.
+
+`AGENTS.md` also exists and covers general coding style. Where the two disagree, this file is
+the one that was checked against the source — see **Known contradictions in AGENTS.md** at
+the end.
+
+## What this plugin is
+
+StoreSeeder generates realistic test data for WordPress e-commerce platforms. It is not
+single-platform: a **platform driver** decides where data lands, and the same generators feed
+every platform. Fluent Cart is the only driver shipped so far; EasyCommerce, WooCommerce and
+StoreEngine are planned, and a third party can add one from their own plugin.
+
+## Commands
+
+```bash
+# PHP
+composer test                 # PHPUnit — needs env, see below
+composer phpcs                # WPCS. Scans includes/ ONLY
+composer phpcbf               # autofix
+composer phpstan              # level max over includes/ + class-storeseeder.php
+composer makepot              # requires build/admin-app.js to exist first
+
+# Frontend
+yarn build                    # webpack via @wordpress/scripts
+yarn lint:js                  # eslint (flat config)
+npx tsc --noEmit              # NOT wired to any script, but it does catch real errors
+yarn test:e2e                 # Playwright — see the warning below
+```
+
+### Running PHPUnit locally
+
+`composer test` on its own will fail with a database error. The suite needs a dedicated
+database and three environment variables:
+
+```bash
+mysql -uroot -ppassword -e "CREATE DATABASE IF NOT EXISTS wordpress_test;"
+export WP_PHPUNIT__DIR="$PWD/vendor/wp-phpunit/wp-phpunit" \
+       WP_DB_PASS=password \
+       WP_PATH=/Users/alamin/Sites/easycommerce-shop
+vendor/bin/phpunit
+```
+
+`phpunit.xml.dist` declares `WP_DB_PASS` as empty, which is right for CI and wrong for this
+machine; PHPUnit does not override an already-exported variable, so exporting wins.
+
+The suite loads real platform plugins from sibling directories. A platform is loaded only
+when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
+absent platform skip via `require_platform( $id )`.
+
+**Current baseline: 256 tests, 1052 assertions.** For any refactor claiming no behaviour
+change, that number must come back *identical*, not merely green. A changed count means a
+reference was missed.
+
+## Architecture, and the invariants that matter
+
+```
+React → REST → Controller → Generator → canonical entity → Writer → platform models
+```
+
+```
+includes/
+  Generators/     Generator.php (abstract)          + Resources/*   17 generators
+  Controllers/    Controller.php (abstract)         + Resources/*   17 controllers
+  MCP/            MCP_Server.php
+                  Abilities/Ability.php (abstract)  + Resources/*   17 abilities
+  Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
+                  Registry.php  Resolver.php  Capability.php
+                  Resource.php  Status.php
+                  Drivers/Fluent_Cart/Platform.php + Writers/*      17 writers
+```
+
+Each abstract sits at the root of the scope it governs; children nest one level beneath.
+`class-storeseeder.php` stays at the repo root, global namespace, loaded by classmap.
+
+### Four rules that are load-bearing
+
+**1. A generator may not name a platform.** No models, no table names, no platform-specific
+status strings, no database reads. `build_entity()` is FakerPHP and loaded sample data only.
+This is what lets one generator feed every platform and lets a fixed seed produce the same
+data everywhere.
+
+**2. Money in a canonical entity is an integer in the currency's minor unit.** Never a float —
+binary rounding on a price is a real bug and an invisible one. Fluent Cart stores cents so its
+writers pass it through; WooCommerce, StoreEngine and EasyCommerce want decimals, so those
+writers divide.
+
+**3. Statuses use the canonical vocabulary in `Platforms/Status.php`**, mapped per writer.
+The canonical names are deliberately no single platform's spelling — WooCommerce needs a
+`wc-` prefix, Fluent Cart does not.
+
+**4. Foreign keys and uniqueness belong to the writer, not the generator.** An order needs
+real product variations to have line items and their real prices to have a total; a generator
+proposes an SKU and the platform that owns the unique index checks it and re-rolls. So a
+writer legitimately reads before it writes. What it must never do is invent a name, address,
+date or quantity — those arrive on the entity, already localised.
+
+### Capabilities are computed, never cached
+
+`Platform::supports()` runs per request. Support is conditional: WooCommerce has no
+subscriptions until WooCommerce Subscriptions is active, StoreEngine gates several resources
+behind addons. Caching the matrix in an option would make plugin activation fail to register.
+An unsupported resource reports *which plugin would enable it*, so the UI can say "install
+WooCommerce Subscriptions" rather than dimming a tile in silence.
+
+### Extension points
+
+`storeseeder_platforms` is the whole surface needed to add a platform — append an object
+implementing `Platform_Interface` (extending `Platform_Driver` is shortest) and the
+generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{id}`,
+`storeseeder_platform_supports_{id}`, `storeseeder_canonical_{resource}`,
+`storeseeder_target_platform`, and `storeseeder_before_write_{platform}_{resource}` /
+`_after_write_`.
+
+## Conventions that differ from what you would guess
+
+- **PHP indents with tabs**, per WPCS — even though `.editorconfig` says 4 spaces. The
+  `.editorconfig` is wrong for PHP; follow the code.
+- **PHP methods and variables are `snake_case`** (`build_entity`, `get_resource_type`), not
+  camelCase.
+- **PHP filenames are PascalCase with underscores** (`Order_Tax_Rate.php`,
+  `Platform_Driver.php`), a PSR-4/WPCS hybrid permitted by two sniff exclusions in
+  `phpcs.xml`. Do not "fix" them to `class-*.php`.
+- **TypeScript indents with 2 spaces.**
+- **PHP floor is 7.4.** No union return types, `match`, enums, constructor promotion, or
+  readonly. Document `array|WP_Error` in a docblock and omit the return type, as the existing
+  abstracts do.
+- **`curly` is `['error', 'multi-line']`,** not `all`. Single-line guards like
+  `if (!open) return null;` are the house style, and no Prettier pass runs behind `--fix`, so
+  `all` rewrites them to `if (!open) {return null;}` and leaves them that way.
+- **Font weights are round hundreds only** — 400, 500, 600, 700. No 350/450/550.
+- **REST bases and canonical resource names are different key spaces.** `cart_session` is
+  served at `cart-sessions`, `tax_class` at `tax_classes`. No singularisation rule survives
+  `shipping_classes`, so generators carry an explicit `resource` alongside `route`. Never
+  derive one from the other.
+
+## Traps
+
+- **`$resource` as a parameter name fails PHPCS** — WPCS treats `resource` as reserved. Use
+  `$resource_type`.
+- **`phpcs.xml` scans `includes/` only.** `class-storeseeder.php` and `storeseeder.php` are
+  not checked by it (only by `phpcs.plugin-review.xml`), so a violation there passes CI.
+- **`wp i18n make-pot` cannot read `.tsx`.** Admin strings are extracted from the compiled
+  bundle, which is why `composer makepot` guards on `build/admin-app.js` existing.
+- **The webpack entry is named `admin-app`, not `admin`, on purpose.** wp-cli mangles any
+  bundle whose name ends in `min.js` (`admin.js` → `a.js`), which breaks core's
+  `load_script_textdomain()` md5 lookup. Do not rename it.
+- **There is no `Requires Plugins` header.** It was removed deliberately: it made WordPress
+  refuse activation without Fluent Cart, so no other platform could ever be reached. Do not
+  add it back.
+- **`tests/e2e/setup.sh` resets the admin password.** Never run it, or `yarn test:e2e`
+  against a site whose credentials matter, without asking first.
+- **`playwright.config.ts` excludes `screenshots.spec.ts` and `banners.spec.ts`** from the
+  default project so runs do not clobber the shipped WordPress.org PNGs. Those are driven
+  through `playwright.screenshots.config.ts`.
+- **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
+- **Sample data lives in a separate repo** and downloads only after an administrator accepts
+  the consent prompt. That prompt is the only thing granting permission — see
+  `docs/external-services.md`, and keep readme.txt in agreement with the code.
+
+## When changing a generator
+
+A resource needs five pieces:
+
+1. `includes/Generators/Resources/` — extends `Generators\Generator`, implements
+   `build_entity()`
+2. `includes/Platforms/Drivers/<Platform>/Writers/` — extends `Platforms\Writer`
+3. That driver's `writer_classes()` and `capabilities()`
+4. `includes/Platforms/Resource.php` — the canonical name
+5. `src/lib/generators.ts` — admin registration, parameter schema, and the `resource` key
+
+A driver that declares support but ships no writer is reported as
+`storeseeder_missing_writer` rather than failing once per item.
+
+## Known contradictions in AGENTS.md
+
+Flagged rather than silently corrected. Several statements there disagree with the code:
+
+- "Method/variable names: camelCase" — the codebase is snake_case throughout.
+- "File names: snake_case with hyphens (e.g. `product-generator.php`)" — filenames are
+  PascalCase with underscores.
+- "4 spaces indentation (PHP), tabs (JS)" — reversed: PHP uses tabs, TS uses 2 spaces.
+- "Use `wc_get_template*` functions" — a WooCommerce-ism; this plugin has no templates.
+- "Jest/React Testing Library for JS tests" — there are none; frontend testing is Playwright.
+- "GeneratorBase Component" and the "Recent Improvements (2025)" section describe code that
+  no longer exists.
+- The "Reference Plugins" section names `easycommerce-fakerpress` as authoritative. That
+  relationship is inverted now: it is a fork of this codebase, and the plan is to absorb it
+  as the EasyCommerce driver and retire it.
