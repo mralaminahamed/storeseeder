@@ -64,17 +64,19 @@ React → REST → Controller → Generator → canonical entity → Writer → 
 
 ```
 includes/
-  Generators/     Generator.php (abstract)          + Resources/*   17 generators
-  Controllers/    Controller.php (abstract)         + Resources/*   17 controllers
+  Generation/     Generator.php (abstract)   + Generators/*    17 generators
+  Rest/           Controller.php (abstract)  + Controllers/*   17 controllers
+                  Registry.php               owns storeseeder_rest_controllers
   MCP/            MCP_Server.php
-                  Abilities/Ability.php (abstract)  + Resources/*   17 abilities
+                  Ability.php (abstract)     + Abilities/*     17 abilities
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php
                   Resource.php  Status.php
                   Drivers/Fluent_Cart/Platform.php + Writers/*      17 writers
 ```
 
-Each abstract sits at the root of the scope it governs; children nest one level beneath.
+Directories are named for the layer, not for what is inside them: each abstract sits at the
+layer root and its concrete children in a plural directory beneath it.
 `class-storeseeder.php` stays at the repo root, global namespace, loaded by classmap.
 
 ### Four rules that are load-bearing
@@ -164,14 +166,16 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 
 ## When changing a generator
 
-A resource needs five pieces:
+A resource needs six pieces:
 
-1. `includes/Generators/Resources/` — extends `Generators\Generator`, implements
+1. `includes/Generation/Generators/` — extends `Generation\Generator`, implements
    `build_entity()`
 2. `includes/Platforms/Drivers/<Platform>/Writers/` — extends `Platforms\Writer`
 3. That driver's `writer_classes()` and `capabilities()`
 4. `includes/Platforms/Resource.php` — the canonical name
-5. `src/lib/generators.ts` — admin registration, parameter schema, and the `resource` key
+5. `includes/Rest/Controllers/` — extends `Rest\Controller`, listed in
+   `Rest\Registry::default_classes()` (or added through `storeseeder_rest_controllers`)
+6. `src/lib/generators.ts` — admin registration, parameter schema, and the `resource` key
 
 A driver that declares support but ships no writer is reported as
 `storeseeder_missing_writer` rather than failing once per item.

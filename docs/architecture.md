@@ -11,17 +11,17 @@ storeseeder/
 ├── storeseeder.php              # Plugin header, constants, bootstrap
 ├── class-storeseeder.php        # Singleton orchestrator: menu, assets, REST wiring
 ├── includes/                    # PHP backend. PSR-4: StoreSeeder\ → includes/
-│   ├── Generators/              # What data looks like — no platform knowledge
+│   ├── Generation/              # What data looks like — no platform knowledge
 │   │   ├── Generator.php        #   abstract base: FakerPHP, batching, preview, logging
-│   │   └── Resources/           #   17 concrete generators, one per resource
-│   ├── Controllers/             # REST surface
+│   │   └── Generators/          #   17 concrete generators, one per resource
+│   ├── Rest/                    # REST surface
 │   │   ├── Controller.php       #   abstract base: params, validation, platform resolution
-│   │   └── Resources/           #   17 controllers, one per resource
+│   │   ├── Registry.php         #   owns storeseeder_rest_controllers
+│   │   └── Controllers/         #   17 controllers, one per resource
 │   ├── MCP/                     # Model Context Protocol integration (optional)
 │   │   ├── MCP_Server.php       #   ability + tool registration
-│   │   └── Abilities/
-│   │       ├── Ability.php      #   abstract base: dispatches through the REST API
-│   │       └── Resources/       #   17 abilities, one per resource
+│   │   ├── Ability.php          #   abstract base: dispatches through the REST API
+│   │   └── Abilities/           #   17 abilities, one per resource
 │   └── Platforms/               # Where data goes
 │       ├── Platform_Interface.php  # what a platform must answer
 │       ├── Platform_Driver.php     # abstract base for shipped drivers
@@ -58,14 +58,14 @@ storeseeder/
 The layout states the class hierarchy: each abstract sits at the root of the scope it
 governs, and its concrete children nest one level beneath it.
 
-- **`includes/Generators/`** — shapes data. A generator names no platform: no models, no
+- **`includes/Generation/`** — shapes data. A generator names no platform: no models, no
   table names, no platform status strings, no database reads. That restriction is what lets
   one generator feed every platform, and lets a fixed seed produce the same data on all of
   them.
 - **`includes/Platforms/`** — persists data. Writers are the only place a platform's models,
   tables and status spellings appear. Drivers register through the
   `storeseeder_platforms` filter, so a platform can be added from a separate plugin.
-- **`includes/Controllers/`** — the REST surface, and where the target platform is resolved
+- **`includes/Rest/`** — the REST surface, and where the target platform is resolved
   for a request.
 - **`includes/MCP/`** — optional AI tooling; abilities dispatch through the REST API rather
   than calling generators directly.
@@ -80,11 +80,11 @@ flowchart TD
         UI["Pages &middot; schema-driven fields<br/>live preview &middot; batch queue"]
     end
 
-    subgraph rest["includes/Controllers/ &mdash; REST"]
+    subgraph rest["includes/Rest/ &mdash; REST"]
         CTRL["Controller<br/>validates params, resolves the target"]
     end
 
-    subgraph gen["includes/Generators/ &mdash; what data looks like"]
+    subgraph gen["includes/Generation/ &mdash; what data looks like"]
         GEN["Generator<br/><code>build_entity()</code><br/>FakerPHP only"]
     end
 
@@ -269,7 +269,7 @@ unknowingly seed different platforms.
 
 ### Abstract base classes
 
-#### `Generators\Generator`
+#### `Generation\Generator`
 
 ```php
 abstract class Generator {
@@ -292,7 +292,7 @@ accident.
 `preview( int $count )` builds rows from `build_entity()` and writes nothing, which is what
 makes it safe to call on every keystroke in the admin.
 
-#### `Controllers\Controller`
+#### `Rest\Controller`
 
 ```php
 abstract class Controller extends WP_REST_Controller {
@@ -328,6 +328,7 @@ this one.
 | Hook | Kind | Purpose |
 |---|---|---|
 | `storeseeder_platforms` | filter | Register a driver. The whole surface needed to add a platform. |
+| `storeseeder_rest_controllers` | filter | Add or remove a REST controller, so a driver can expose a resource of its own |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
 | `storeseeder_canonical_{resource}` | filter | Mutate the neutral entity before it is written — applies to every platform equally |

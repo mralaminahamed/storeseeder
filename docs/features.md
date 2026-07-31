@@ -158,6 +158,8 @@ Filters and actions across the whole lifecycle, with the full table in
 [architecture.md](architecture.md#extension-points). The ones worth knowing:
 
 - `storeseeder_platforms` — register a platform driver; the entire surface needed to add one
+- `storeseeder_rest_controllers` — add or remove a REST controller, so a driver can expose a
+  resource of its own
 - `storeseeder_canonical_{resource}` — change generated data before it is written, for every
   platform at once
 - `storeseeder_generated_item_{type}`, `storeseeder_after_batch_generate_{type}` — observe or

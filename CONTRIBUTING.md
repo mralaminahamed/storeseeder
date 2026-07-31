@@ -149,14 +149,14 @@ styling, `@wordpress/i18n` for strings, and no `console.log` in shipped code.
 
 A generator is three coordinated pieces, all following existing patterns:
 
-1. `includes/Generators/Resources/` — a class extending `StoreSeeder\Generators\Generator`,
+1. `includes/Generation/Generators/` — a class extending `StoreSeeder\Generation\Generator`,
    implementing `build_entity()` with FakerPHP only. It must name no platform: no models, no
    table names, no platform status strings, no database reads.
 2. `includes/Platforms/Drivers/<Platform>/Writers/` — a class extending
    `StoreSeeder\Platforms\Writer` that persists the entity, plus an entry in that driver's
    `writer_classes()` and `capabilities()`
-3. `includes/Controllers/Resources/` — a REST controller extending
-   `StoreSeeder\Controllers\Controller`, exposing `storeseeder/v1/<resource>/generate` plus
+3. `includes/Rest/Controllers/` — a REST controller extending
+   `StoreSeeder\Rest\Controller`, exposing `storeseeder/v1/<resource>/generate` plus
    the preview route
 4. `includes/Platforms/Resource.php` — add the canonical resource name
 5. `src/lib/generators.ts` — registration so it appears in the admin, with its parameter

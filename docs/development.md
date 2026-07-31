@@ -115,7 +115,7 @@ Full rules in [`AGENTS.md`](../AGENTS.md). The ones people get wrong:
 
 ## 🔧 Adding a generator
 
-A resource needs five pieces. Copy the closest existing set rather than starting blank.
+A resource needs six pieces. Copy the closest existing set rather than starting blank.
 
 What trips people is not writing the two classes — it is the four places that have to *know*
 about them. Solid arrows are "references"; dashed are the registration edits that are easy to
@@ -125,42 +125,42 @@ forget:
 flowchart TD
     RES["Platforms/Resource.php<br/>canonical name constant"]
 
-    GEN["Generators/Resources/My_Thing.php<br/><code>build_entity()</code>"]
+    GEN["Generation/Generators/My_Thing.php<br/><code>build_entity()</code>"]
     WR["Platforms/Drivers/&lt;Platform&gt;/Writers/My_Thing.php<br/><code>write()</code>"]
 
     DRV["Platforms/Drivers/&lt;Platform&gt;/Platform.php<br/><code>capabilities()</code> + <code>writer_classes()</code>"]
-    CTRL["Controllers/Resources/My_Thing.php<br/>rest base + resource + label"]
-    BOOT["class-storeseeder.php<br/>the $controllers array"]
+    CTRL["Rest/Controllers/My_Thing.php<br/>rest base + resource + label"]
+    REG["Rest/Registry.php<br/><code>default_classes()</code>"]
     TS["src/lib/generators.ts<br/>route + resource + schema"]
 
     GEN -->|"get_resource_type()"| RES
     WR -->|"resource()"| RES
     CTRL -->|"get_generator_instance()"| GEN
     DRV -.->|"must list it"| WR
-    BOOT -.->|"must instantiate it"| CTRL
+    REG -.->|"must list it"| CTRL
     TS -.->|"route must match<br/>get_rest_base()"| CTRL
     TS -.->|"resource must match<br/>Resource constant"| RES
 
     style DRV stroke-width:2px
-    style BOOT stroke-width:2px
+    style REG stroke-width:2px
     style TS stroke-width:2px
 ```
 
 The three bold boxes are registries. Miss the driver one and the run fails with
-`storeseeder_missing_writer`; miss the bootstrap one and the REST routes never appear; miss the
+`storeseeder_missing_writer`; miss the REST registry and the routes never appear; miss the
 TypeScript one and the generator exists but is invisible in the admin.
 
 
 ### 1. The generator — shapes data, names no platform
 
-`includes/Generators/Resources/My_Thing.php`
+`includes/Generation/Generators/My_Thing.php`
 
 ```php
 <?php
 
-namespace StoreSeeder\Generators\Resources;
+namespace StoreSeeder\Generation\Generators;
 
-use StoreSeeder\Generators\Generator;
+use StoreSeeder\Generation\Generator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -243,16 +243,16 @@ Add a constant to `includes/Platforms/Resource.php` and include it in `all()`.
 
 ### 5. The controller and the admin entry
 
-`includes/Controllers/Resources/My_Thing.php`:
+`includes/Rest/Controllers/My_Thing.php`:
 
 ```php
 <?php
 
-namespace StoreSeeder\Controllers\Resources;
+namespace StoreSeeder\Rest\Controllers;
 
-use StoreSeeder\Controllers\Controller;
-use StoreSeeder\Generators\Generator;
-use StoreSeeder\Generators\Resources\My_Thing as My_Thing_Generator;
+use StoreSeeder\Rest\Controller;
+use StoreSeeder\Generation\Generator;
+use StoreSeeder\Generation\Generators\My_Thing as My_Thing_Generator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -276,7 +276,9 @@ class My_Thing extends Controller {
 }
 ```
 
-Then instantiate it in the `$controllers` array in `class-storeseeder.php`, and add an entry to
+Then list it in `Rest\Registry::default_classes()` — or add it from your own plugin through the
+`storeseeder_rest_controllers` filter, which is how a platform driver ships a resource of its
+own. Finally add an entry to
 `src/lib/generators.ts` with `route` (the REST base), `resource` (the canonical name), an icon
 from `src/lib/icons.tsx`, and the parameter schema.
 
@@ -297,11 +299,11 @@ class boots a real REST server, provides request helpers, and offers
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Resources\Product;
+use StoreSeeder\Generation\Generators\Product;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
- * @covers \StoreSeeder\Generators\Resources\Product
+ * @covers \StoreSeeder\Generation\Generators\Product
  */
 class ProductGeneratorTest extends StoreSeederUnitTestCase {
 
