@@ -80,12 +80,15 @@ final class Customer extends Writer {
 		try {
 			$customer->set_props(
 				array(
-					'email'      => $email,
-					'first_name' => $entity['first_name'],
-					'last_name'  => $entity['last_name'],
-					'username'   => $username,
-					'password'   => wp_generate_password( 16, true, true ),
-					'role'       => 'customer',
+					'email'        => $email,
+					'first_name'   => $entity['first_name'],
+					'last_name'    => $entity['last_name'],
+					'username'     => $username,
+					'password'     => wp_generate_password( 16, true, true ),
+					'role'         => 'customer',
+					// The account is as old as the customer. Left unset, a customer "since 2021"
+					// registered today, and every cohort report read the registration date.
+					'date_created' => (string) ( $entity['date_created'] ?? current_time( 'Y-m-d H:i:s' ) ),
 				)
 			);
 
@@ -103,14 +106,33 @@ final class Customer extends Writer {
 			return new WP_Error( 'customer_creation_failed', __( 'Failed to create the customer.', 'storeseeder' ) );
 		}
 
+		// `WC_Customer` accepts a `date_created` and does not carry it through to
+		// `wp_users.user_registered`, so every generated customer registered today however old
+		// their history said they were. Written directly, where WordPress does read it.
+		if ( ! empty( $entity['date_created'] ) ) {
+			wp_update_user(
+				array(
+					'ID'              => (int) $id,
+					'user_registered' => (string) $entity['date_created'],
+				)
+			);
+		}
+
 		// Purchase history is metadata, not orders. WooCommerce reads these two keys for the
 		// customer's lifetime value in reports, so writing them makes the generated history
-		// consistent with what the admin shows.
-		update_user_meta( (int) $id, '_money_spent', (float) $meta['total_spent'] );
+		// consistent with what the admin shows. `_money_spent` is a decimal, and the entity
+		// carries minor units.
+		update_user_meta( (int) $id, '_money_spent', $this->to_decimal( (int) $meta['total_spent'] ) );
 		update_user_meta( (int) $id, '_order_count', (int) $meta['total_orders'] );
 
 		if ( ! empty( $entity['notes'] ) ) {
 			update_user_meta( (int) $id, 'description', (string) $entity['notes'] );
+		}
+
+		// The demographic and loyalty fields, which WooCommerce has no columns for. Namespaced so
+		// they are identifiable, and so nothing collides with a real plugin's keys.
+		foreach ( $this->profile_meta( $meta ) as $key => $value ) {
+			update_user_meta( (int) $id, 'storeseeder_' . $key, $value );
 		}
 
 		$result = array(
@@ -122,8 +144,8 @@ final class Customer extends Writer {
 			'billing_city'    => $billing['city'] ?? '',
 			'billing_country' => $billing['country'] ?? '',
 			'total_orders'    => (int) $meta['total_orders'],
-			'total_spent'     => '$' . number_format( (float) $meta['total_spent'], 2 ),
-			'created_at'      => current_time( 'Y-m-d H:i:s' ),
+			'total_spent'     => '$' . $this->to_decimal( (int) $meta['total_spent'] ),
+			'created_at'      => (string) ( $entity['date_created'] ?? current_time( 'Y-m-d H:i:s' ) ),
 		);
 
 		return $this->filter_result( $result, (int) $id, $result );
@@ -180,16 +202,29 @@ final class Customer extends Writer {
 			return;
 		}
 
-		// The name arrives as one string; WooCommerce keeps two fields. Splitting on the
-		// first space is what the rest of the entity already assumes.
-		$name  = explode( ' ', (string) ( $address['name'] ?? '' ), 2 );
+		// Either shape. A customer address carries `first_name` and `last_name`; an order address
+		// carries one `name`. Reading only the second is why every generated WooCommerce customer
+		// had an empty billing name — the fields are on the profile screen and in the admin's
+		// customer list, so it was visible and still went unnoticed.
+		if ( isset( $address['first_name'] ) || isset( $address['last_name'] ) ) {
+			$first = (string) ( $address['first_name'] ?? '' );
+			$last  = (string) ( $address['last_name'] ?? '' );
+		} else {
+			// explode() always yields the first element; the second only when there was a space to
+			// split on, which a one-word name has not.
+			$name  = explode( ' ', (string) ( $address['name'] ?? '' ), 2 );
+			$first = $name[0];
+			$last  = $name[1] ?? '';
+		}
+
 		$props = array(
-			// explode() always yields the first element; the second only when there was a
-			// space to split on, which a one-word name has not.
-			$type . '_first_name' => $name[0],
-			$type . '_last_name'  => $name[1] ?? '',
+			$type . '_first_name' => $first,
+			$type . '_last_name'  => $last,
+			// Optional on the entity, and null where absent — cast so a null never reaches a
+			// setter typed for a string.
+			$type . '_company'    => (string) ( $address['company'] ?? '' ),
 			$type . '_address_1'  => $address['address_1'] ?? '',
-			$type . '_address_2'  => $address['address_2'] ?? '',
+			$type . '_address_2'  => (string) ( $address['address_2'] ?? '' ),
 			$type . '_city'       => $address['city'] ?? '',
 			$type . '_state'      => $address['state'] ?? '',
 			$type . '_postcode'   => $address['postcode'] ?? '',
@@ -198,7 +233,8 @@ final class Customer extends Writer {
 
 		// Only billing carries a phone and an email in WooCommerce.
 		if ( 'billing' === $type ) {
-			$props['billing_phone'] = $address['phone'] ?? '';
+			$props['billing_phone'] = (string) ( $address['phone'] ?? '' );
+			$props['billing_email'] = (string) ( $address['email'] ?? '' );
 		}
 
 		$customer->set_props( $props );

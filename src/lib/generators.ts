@@ -114,17 +114,23 @@ export const generators: Generator[] = [
     popular: true,
     parameterConfig: {
       customer_types: {
-        description: __("Types of customers to generate", "storeseeder"),
+        description: __("Customer segments to draw from", "storeseeder"),
         type: "array",
         items: { type: "string", enum: ["regular", "vip", "wholesale", "guest", "returning"] },
         default: ["regular", "returning"],
+      },
+      country_focus: {
+        description: __("Countries to draw addresses from", "storeseeder"),
+        type: "array",
+        items: { type: "string", enum: ["US", "CA", "GB", "AU", "DE", "FR", "IT", "ES", "NL", "JP", "IN", "BR"] },
+        default: [],
       },
       demographics: {
         description: __("Demographic distribution", "storeseeder"),
         type: "object",
         properties: {
           age_groups: {
-            description: __("Age group distribution", "storeseeder"),
+            description: __("Age groups to draw birth dates from", "storeseeder"),
             type: "array",
             items: { type: "string", enum: ["18-25", "26-35", "36-45", "46-55", "56-65", "65+"] },
             default: ["26-35", "36-45", "46-55"],
@@ -132,41 +138,22 @@ export const generators: Generator[] = [
         },
       },
       address_preferences: {
+        // `include_billing` used to be offered here. Every platform requires a billing address on
+        // a customer, so switching it off could only produce an unusable record.
         description: __("Address generation preferences", "storeseeder"),
         type: "object",
         properties: {
-          include_billing: {
-            description: __("Include billing addresses", "storeseeder"),
-            type: "boolean",
-            default: true,
-          },
           include_shipping: {
-            description: __("Include shipping addresses", "storeseeder"),
+            description: __("Generate a shipping address (off leaves it the same as billing)", "storeseeder"),
             type: "boolean",
             default: true,
           },
           different_addresses_ratio: {
-            description: __("Percentage with different billing/shipping (0–100)", "storeseeder"),
+            description: __("Percentage whose shipping address differs from billing (0–100)", "storeseeder"),
             type: "integer",
             minimum: 0,
             maximum: 100,
             default: 30,
-          },
-        },
-      },
-      purchase_history: {
-        description: __("Purchase history simulation", "storeseeder"),
-        type: "object",
-        properties: {
-          simulate_history: {
-            description: __("Generate purchase history metadata", "storeseeder"),
-            type: "boolean",
-            default: true,
-          },
-          loyalty_tiers: {
-            description: __("Include loyalty tier assignments", "storeseeder"),
-            type: "boolean",
-            default: true,
           },
         },
       },
@@ -184,9 +171,26 @@ export const generators: Generator[] = [
             type: "integer",
             minimum: 0,
             maximum: 100,
-            default: 65,
+            default: 60,
           },
         },
+      },
+      include_history: {
+        description: __("Generate purchase-history metadata (lifetime totals, not orders)", "storeseeder"),
+        type: "boolean",
+        default: true,
+      },
+      loyalty_tier_focus: {
+        description: __("Loyalty tiers to draw from, instead of deriving the tier from spend", "storeseeder"),
+        type: "array",
+        items: { type: "string", enum: ["bronze", "silver", "gold", "platinum"] },
+        default: [],
+      },
+      account_status: {
+        description: __("Account status for generated customers", "storeseeder"),
+        type: "string",
+        enum: ["active", "inactive", "pending", "mixed"],
+        default: "mixed",
       },
     },
   },

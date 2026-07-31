@@ -44,38 +44,68 @@ class Generate_Customers extends Ability {
 		return array(
 			'customer_types'            => array(
 				'type'        => 'array',
-				'description' => __( 'Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: ["regular","returning"].', 'storeseeder' ),
-				'items'       => array( 'type' => 'string' ),
+				'description' => __( 'Customer segments to mix. Allowed: regular, vip, wholesale, guest, returning. A guest holds no account, a wholesale buyer always carries a company, a returning customer has definitely bought something. Default: ["regular","returning"].', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'regular', 'vip', 'wholesale', 'guest', 'returning' ),
+				),
 				'default'     => array( 'regular', 'returning' ),
 			),
-			'include_billing'           => array(
-				'type'        => 'boolean',
-				'description' => __( 'Generate billing addresses. Default: true.', 'storeseeder' ),
-				'default'     => true,
+			'countries'                 => array(
+				'type'        => 'array',
+				'description' => __( 'Two-letter country codes to draw addresses from. Default: the sample data\'s own spread.', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+			),
+			'age_groups'                => array(
+				'type'        => 'array',
+				'description' => __( 'Age groups to draw birth dates from. Allowed: 18-25, 26-35, 36-45, 46-55, 56-65, 65+. A third of customers give no birth date at all.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( '18-25', '26-35', '36-45', '46-55', '56-65', '65+' ),
+				),
 			),
 			'include_shipping'          => array(
 				'type'        => 'boolean',
-				'description' => __( 'Generate shipping addresses. Default: true.', 'storeseeder' ),
+				'description' => __( 'Generate a shipping address. False leaves it the same as billing. Default: true.', 'storeseeder' ),
 				'default'     => true,
 			),
 			'different_addresses_ratio' => array(
 				'type'        => 'integer',
-				'description' => __( 'Percentage of customers with a different shipping address (0–100). Default: 30.', 'storeseeder' ),
+				'description' => __( 'Percentage of customers whose shipping address differs from billing (0–100). Default: 30.', 'storeseeder' ),
 				'minimum'     => 0,
 				'maximum'     => 100,
 				'default'     => 30,
 			),
-			'simulate_purchase_history' => array(
+			'phone_numbers'             => array(
 				'type'        => 'boolean',
-				'description' => __( 'Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true.', 'storeseeder' ),
+				'description' => __( 'Include phone numbers. Default: true.', 'storeseeder' ),
 				'default'     => true,
 			),
 			'marketing_opt_in_ratio'    => array(
 				'type'        => 'integer',
-				'description' => __( 'Percentage of customers opted into marketing emails (0–100). Default: 65.', 'storeseeder' ),
+				'description' => __( 'Percentage of customers opted into marketing (0–100). Default: 60.', 'storeseeder' ),
 				'minimum'     => 0,
 				'maximum'     => 100,
-				'default'     => 65,
+				'default'     => 60,
+			),
+			'simulate_purchase_history' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Populate lifetime totals, loyalty tier and purchase dates. This is metadata, not orders — use generate-orders for those. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'loyalty_tier_focus'        => array(
+				'type'        => 'array',
+				'description' => __( 'Loyalty tiers to draw from. Where set, the tier is chosen from this list rather than derived from spend. Allowed: bronze, silver, gold, platinum.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'bronze', 'silver', 'gold', 'platinum' ),
+				),
+			),
+			'account_status'            => array(
+				'type'        => 'string',
+				'description' => __( 'Account status for generated customers. `mixed` spreads across all three. Default: mixed.', 'storeseeder' ),
+				'enum'        => array( 'active', 'inactive', 'pending', 'mixed' ),
+				'default'     => 'mixed',
 			),
 		);
 	}
@@ -116,25 +146,39 @@ class Generate_Customers extends Ability {
 			$payload['seed'] = (int) $input['seed'];
 		}
 
-		if ( isset( $input['customer_types'] ) ) {
-			$payload['customer_types'] = (array) $input['customer_types'];
+		foreach ( array( 'customer_types', 'loyalty_tier_focus' ) as $list ) {
+			if ( isset( $input[ $list ] ) ) {
+				$payload[ $list ] = (array) $input[ $list ];
+			}
 		}
 
+		// Flattened for the client, nested for the generator: `countries` and `age_groups` are what
+		// a caller thinks in, and the nesting is an artefact of the admin form's grouping.
+		if ( isset( $input['countries'] ) ) {
+			$payload['country_focus'] = (array) $input['countries'];
+		}
+
+		if ( isset( $input['age_groups'] ) ) {
+			$payload['demographics'] = array( 'age_groups' => (array) $input['age_groups'] );
+		}
+
+		// `include_billing` is gone: every platform requires a billing address on a customer, so
+		// switching it off could only produce a record nothing could use.
 		$payload['address_preferences'] = array(
-			'include_billing'           => $input['include_billing'] ?? true,
 			'include_shipping'          => $input['include_shipping'] ?? true,
 			'different_addresses_ratio' => $input['different_addresses_ratio'] ?? 30,
 		);
 
-		$payload['purchase_history'] = array(
-			'simulate_history' => $input['simulate_purchase_history'] ?? true,
-			'loyalty_tiers'    => $input['loyalty_tiers'] ?? true,
+		$payload['contact_preferences'] = array(
+			'phone_numbers'          => $input['phone_numbers'] ?? true,
+			'marketing_opt_in_ratio' => $input['marketing_opt_in_ratio'] ?? 60,
 		);
 
-		$payload['contact_preferences'] = array(
-			'phone_numbers'          => true,
-			'marketing_opt_in_ratio' => $input['marketing_opt_in_ratio'] ?? 65,
-		);
+		$payload['include_history'] = $input['simulate_purchase_history'] ?? true;
+
+		if ( isset( $input['account_status'] ) ) {
+			$payload['account_status'] = (string) $input['account_status'];
+		}
 
 		return $payload;
 	}

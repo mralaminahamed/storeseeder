@@ -140,12 +140,33 @@ Fluent Cart's compare-at price, and WooCommerce's cost of goods is Fluent Cart's
 
 ### Customers
 
-- `customer_types` — any of `regular`, `vip`, `wholesale`, `guest`, `returning`
-- `demographics` — `age_groups` (`18-25` … `65+`)
-- `address_preferences`
-- `purchase_history` — `simulate_history` writes purchase-history **metadata**; it does not
-  create orders. Use the Orders generator for that.
-- `contact_preferences`
+- `customer_types` — any of `regular`, `vip`, `wholesale`, `guest`, `returning`. A guest holds no
+  account, a wholesale buyer always carries a company, a VIP is flagged as one, and a returning
+  customer has definitely bought something
+- `country_focus` — two-letter codes to draw addresses from
+- `demographics` — `age_groups` (`18-25` … `65+`), which set the birth date. A third of customers
+  give none, which is the realistic case
+- `address_preferences` — `include_shipping`, `different_addresses_ratio`
+- `contact_preferences` — `phone_numbers`, `marketing_opt_in_ratio`
+- `include_history` — writes lifetime **metadata**; it does not create orders. Use the Orders
+  generator for that
+- `loyalty_tier_focus` — where set, the tier is chosen from this list rather than derived from spend
+- `account_status` — `active`, `inactive`, `pending`, or `mixed`
+
+Customers were the worst case of the three surfaces disagreeing. The endpoint declared
+`customer_type` — singular, enumerating `individual`/`business`/`mixed` — while the admin and the
+MCP ability declared `customer_types` with five entirely different values, and nothing read either.
+`include_billing` is gone: every platform requires a billing address on a customer, so switching it
+off could only produce a record nothing could use.
+
+A customer now carries `date_created`, equal to `customer_since`, so an account "since 2021" is
+registered in 2021 rather than today. Lifetime spend is an integer in minor units like every other
+amount.
+
+The demographic and loyalty fields — birth date, gender, occupation, tier, points, VIP flag, source
+— have no native column on either platform, so they are stored under `storeseeder_`-prefixed keys:
+WordPress user meta on WooCommerce, `fct_customer_meta` on Fluent Cart. A parameter whose result
+nobody can read afterwards is the same broken promise as one nothing reads at all.
 
 ### Orders
 
