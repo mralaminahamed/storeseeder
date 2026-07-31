@@ -80,22 +80,53 @@ final class Product_Variation extends Writer {
 		// The value this variation is identified by, e.g. "L / Red". Registering it on the
 		// parent's attribute is what makes the variation selectable.
 		$value = (string) $entity['title'];
-		$this->register_option( $parent, $value );
 
-		$stock     = (int) $entity['stock'];
+		// One WooCommerce attribute per axis, which is what `variation_types` asks for: a
+		// size-and-colour variation belongs under a Size attribute and a Colour attribute, not
+		// under one called "Variant" holding "Large / Red" as a single option. Falls back to the
+		// old single axis for an entity that carries no map.
+		$axes = array_filter( (array) ( $entity['attributes'] ?? array() ), 'is_string' );
+
+		if ( array() === $axes ) {
+			$axes = array( self::ATTRIBUTE => $value );
+		}
+
+		$axes  = $this->align_axes( $parent, $axes );
+		$value = implode( ' / ', array_values( $axes ) );
+
+		$this->register_options( $parent, $axes );
+
+		$manage = ! isset( $entity['manage_stock'] ) || (bool) $entity['manage_stock'];
+		$stock  = $manage ? (int) $entity['stock'] : null;
+		$props  = array(
+			'status'        => 'publish',
+			'regular_price' => $this->to_decimal( $this->variation_price( $parent, $entity ) ),
+			'manage_stock'  => $manage,
+		);
+
+		if ( $manage ) {
+			$props['stock_quantity'] = $stock;
+			$props['stock_status']   = $stock > 0 ? 'instock' : 'outofstock';
+		} else {
+			// Unmanaged: no quantity at all, and in stock, which is what a variation with no
+			// inventory tracking means. A quantity of zero would read as sold out.
+			$props['stock_status'] = 'instock';
+		}
+
+		// Null asks for no SKU, and WooCommerce spells that as an empty string.
+		$props['sku'] = null === ( $entity['sku'] ?? null ) ? '' : $this->unique_sku( (string) $entity['sku'] );
+
 		$variation = new WC_Product_Variation();
 		$variation->set_parent_id( $parent->get_id() );
-		$variation->set_props(
-			array(
-				'status'         => 'publish',
-				'sku'            => $this->unique_sku( (string) $entity['sku'] ),
-				'regular_price'  => $this->to_decimal( (int) $entity['price'] ),
-				'manage_stock'   => true,
-				'stock_quantity' => $stock,
-				'stock_status'   => $stock > 0 ? 'instock' : 'outofstock',
-			)
-		);
-		$variation->set_attributes( array( sanitize_title( self::ATTRIBUTE ) => $value ) );
+		$variation->set_props( $props );
+
+		$attributes = array();
+
+		foreach ( $axes as $axis => $option ) {
+			$attributes[ sanitize_title( (string) $axis ) ] = (string) $option;
+		}
+
+		$variation->set_attributes( $attributes );
 
 		$id = $variation->save();
 
@@ -166,13 +197,38 @@ final class Product_Variation extends Writer {
 	 * @return WC_Product|WP_Error
 	 */
 	private function parent_product() {
-		$variable = $this->random_product( 'variable' );
+		// A requested product wins, so a run can build out one product's option matrix — the
+		// fixture a variable-product screen needs, which a random spread never produces.
+		$requested = (int) ( $this->params['product_id'] ?? 0 );
+
+		if ( $requested > 0 ) {
+			$product = wc_get_product( $requested );
+
+			if ( ! $product instanceof WC_Product ) {
+				return $this->missing_prerequisite(
+					'no_products',
+					__( 'The requested product was not found.', 'storeseeder' )
+				);
+			}
+
+			// Promoted where it is not already variable, since a simple product cannot hold one.
+			if ( 'variable' === $product->get_type() ) {
+				return $product;
+			}
+
+			$promoted = new WC_Product_Variable( $product->get_id() );
+			$promoted->save();
+
+			return $promoted;
+		}
+
+		$variable = $this->eligible_product( 'variable' );
 
 		if ( null !== $variable ) {
 			return $variable;
 		}
 
-		$simple = $this->random_product( 'simple' );
+		$simple = $this->eligible_product( 'simple' );
 
 		if ( null === $simple ) {
 			return $this->missing_prerequisite(
@@ -188,45 +244,175 @@ final class Product_Variation extends Writer {
 	}
 
 	/**
-	 * Make sure the parent's attribute exists and lists this value.
-	 *
-	 * WooCommerce matches a variation to its parent by attribute *name*, and shows the
-	 * dropdown from the parent's option list — so a value missing from that list produces a
-	 * variation the shop cannot select.
+	 * One product of a type, skipping any the run excluded.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param WC_Product $variable The variable product.
-	 * @param string     $value    The option this variation is identified by.
+	 * @param string $type WooCommerce product type.
+	 *
+	 * @return WC_Product|null
+	 */
+	private function eligible_product( string $type ): ?WC_Product {
+		$excluded = array_map( 'intval', (array) ( $this->params['exclude_product_ids'] ?? array() ) );
+
+		if ( array() === $excluded ) {
+			return $this->random_product( $type );
+		}
+
+		// Drawn from a wider set and filtered, rather than re-rolled until something sticks: a run
+		// excluding most of a small catalogue would otherwise loop.
+		foreach ( $this->product_ids( 50, $type ) as $id ) {
+			if ( in_array( (int) $id, $excluded, true ) ) {
+				continue;
+			}
+
+			$product = wc_get_product( (int) $id );
+
+			if ( $product instanceof WC_Product ) {
+				return $product;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Line this variation's axes up with the ones its parent already has.
+	 *
+	 * The first variation on a product establishes the axes; every later one fills the same set. An
+	 * unfilled axis is not an error in WooCommerce — it means "any size" — but a product whose
+	 * variations each specify a different subset shows a dropdown per axis with half the options
+	 * matching anything, which is a confusing fixture rather than a realistic one. A value for an
+	 * axis this variation did not bring is drawn from what the parent already offers, since
+	 * inventing one is the generator's job and not this writer's.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Product            $variable The variable product.
+	 * @param array<string, string> $axes     Axes the entity carried.
+	 *
+	 * @return array<string, string>
+	 */
+	private function align_axes( WC_Product $variable, array $axes ): array {
+		$existing = array();
+
+		foreach ( $variable->get_attributes() as $attribute ) {
+			if ( ! $attribute instanceof WC_Product_Attribute || ! $attribute->get_variation() ) {
+				continue;
+			}
+
+			$options = $attribute->get_options();
+
+			if ( array() !== $options ) {
+				$existing[ $attribute->get_name() ] = $options;
+			}
+		}
+
+		if ( array() === $existing ) {
+			return $axes;
+		}
+
+		$aligned = array();
+
+		foreach ( $existing as $name => $options ) {
+			$aligned[ $name ] = isset( $axes[ $name ] )
+				? (string) $axes[ $name ]
+				: (string) $options[ array_rand( $options ) ];
+		}
+
+		return $aligned;
+	}
+
+	/**
+	 * Make sure the parent carries each axis and lists this variation's value on it.
+	 *
+	 * WooCommerce matches a variation to its parent by attribute *name*, and shows the dropdown
+	 * from the parent's option list — so a value missing from that list produces a variation the
+	 * shop cannot select. One attribute per axis, so a size-and-colour variation gets a Size
+	 * dropdown and a Colour dropdown rather than one holding "Large / Red".
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Product            $variable The variable product.
+	 * @param array<string, string> $axes     Attribute name to the option this variation carries.
 	 *
 	 * @return void
 	 */
-	private function register_option( WC_Product $variable, string $value ): void {
+	private function register_options( WC_Product $variable, array $axes ): void {
 		$attributes = $variable->get_attributes();
-		$key        = sanitize_title( self::ATTRIBUTE );
-		$options    = array();
+		$changed    = false;
+		$position   = count( $attributes );
 
-		if ( isset( $attributes[ $key ] ) ) {
-			$options = $attributes[ $key ]->get_options();
+		foreach ( $axes as $name => $value ) {
+			$key     = sanitize_title( (string) $name );
+			$options = isset( $attributes[ $key ] ) ? $attributes[ $key ]->get_options() : array();
+
+			if ( in_array( (string) $value, $options, true ) ) {
+				continue;
+			}
+
+			$options[] = (string) $value;
+
+			$attribute = new WC_Product_Attribute();
+			$attribute->set_name( (string) $name );
+			$attribute->set_options( $options );
+			$attribute->set_position( isset( $attributes[ $key ] ) ? $attributes[ $key ]->get_position() : $position++ );
+			$attribute->set_visible( true );
+			$attribute->set_variation( true );
+
+			$attributes[ $key ] = $attribute;
+			$changed            = true;
 		}
 
-		if ( in_array( $value, $options, true ) ) {
+		// Saving the parent on every variation is a write per item for nothing; only a new option
+		// changes anything.
+		if ( ! $changed ) {
 			return;
 		}
 
-		$options[] = $value;
-
-		$attribute = new WC_Product_Attribute();
-		$attribute->set_name( self::ATTRIBUTE );
-		$attribute->set_options( $options );
-		$attribute->set_position( 0 );
-		$attribute->set_visible( true );
-		$attribute->set_variation( true );
-
-		$attributes[ $key ] = $attribute;
-
 		$variable->set_attributes( $attributes );
 		$variable->save();
+	}
+
+	/**
+	 * What this variation costs, in minor units.
+	 *
+	 * `price_variation_range` asks for a percentage of the *parent's* price, which only the platform
+	 * knows — so the entity carries the percentage and this applies it. A parent with no price of
+	 * its own leaves the variation on the generated fallback, since a percentage of nothing is
+	 * nothing and a free variation is not what was asked for.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Product           $variable The variable product this belongs to.
+	 * @param array<string, mixed> $entity   Canonical variation entity.
+	 *
+	 * @return int
+	 */
+	private function variation_price( WC_Product $variable, array $entity ): int {
+		// `$parent` is a reserved word to WPCS, which is why this reads `$variable` like the
+		// method above it.
+		$base = (string) $variable->get_regular_price();
+
+		// A variable product has no price of its own — its price *is* its variations, exactly as on
+		// Fluent Cart — so the base is the cheapest one already on it. Reading only
+		// `get_regular_price()` meant the percentage silently never applied, because promotion to
+		// variable happens before this and empties that field.
+		if ( ( '' === $base || (float) $base <= 0 ) && $variable instanceof WC_Product_Variable ) {
+			$base = (string) $variable->get_variation_regular_price( 'min' );
+		}
+
+		if ( '' === $base || (float) $base <= 0 ) {
+			return (int) $entity['price'];
+		}
+
+		$delta = (float) ( $entity['price_delta_percent'] ?? 0 );
+		$price = (int) round( (float) $base * 100 * ( 1 + $delta / 100 ) );
+
+		// A variation is never free, whatever percentage was asked for: WooCommerce treats a zero
+		// price as one, and a shop full of free variations is a broken fixture rather than a cheap
+		// one.
+		return max( 1, $price );
 	}
 
 	/**

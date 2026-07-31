@@ -304,6 +304,34 @@ an `ignored` key on the response.
 
 `storeseeder_platform_fields_{id}` is the seam for an extension that adds a column to its platform.
 
+### Product variations
+
+- `variation_types` — any of `size`, `color`, `material`, `style`, `flavor`, `weight`, `dimension`
+- `attributes_per_product` — `{ min, max }` axes per variation
+- `variations_per_attribute` — `{ min, max }` distinct values each axis draws from
+- `price_variation_range` — `{ min_percentage, max_percentage }` from the parent's price
+- `inventory` — `manage_stock`, `stock_range`
+- `generate_skus`
+- `product_id`, `exclude_product_ids` — which product a variation attaches to
+
+Variations declared roughly fourteen distinct parameter names across three surfaces and read none of
+them. The endpoint had `variation_types` and `include_inventory`, the admin `price_variance` and
+`stock_settings`, the MCP ability flat `stock_min` and `stock_max`. Every variation came out as a size
+and a colour at a price unrelated to the product it hung off.
+
+`inventory` is the name Products already uses, so both resources now spell the same idea the same way.
+`price_variation_range` is applied by the **writer**, because a percentage of the parent's price needs
+the parent — and neither platform stores a price on a variable product, so the base is the cheapest
+variation already on it. A variation is never priced at zero, whatever percentage is asked for.
+
+Each axis becomes its own attribute on WooCommerce, so a size-and-colour product gets a Size dropdown
+and a Colour dropdown rather than one called "Variant" holding `Large / Red` as a single option. The
+first variation on a product establishes the axes and every later one fills the same set: an unfilled
+axis means "any size" in WooCommerce, and a product whose variations each specify a different subset
+is a confusing fixture rather than a realistic one. Fluent Cart has no attribute model — the title
+*is* the option — so the axes are kept in its variation payload alongside everything else with no
+column.
+
 ### Supported, but not in full
 
 A platform can store a resource without storing everything a canonical entity carries, and the

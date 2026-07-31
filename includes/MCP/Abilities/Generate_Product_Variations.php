@@ -42,33 +42,71 @@ class Generate_Product_Variations extends Ability {
 	 */
 	protected static function input_properties(): array {
 		return array(
-			'specific_product_id' => array(
-				'type'        => 'integer',
-				'description' => __( 'Generate variations only for this product ID. Omit to pick a random eligible product.', 'storeseeder' ),
-				'minimum'     => 1,
-			),
-			'exclude_product_ids' => array(
+			'variation_types'          => array(
 				'type'        => 'array',
-				'description' => __( 'Array of product IDs to skip during generation.', 'storeseeder' ),
-				'items'       => array( 'type' => 'integer' ),
-				'default'     => array(),
+				'description' => __( 'Attribute axes to build variations from. Allowed: size, color, material, style, flavor, weight, dimension. Default: ["size","color"].', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'size', 'color', 'material', 'style', 'flavor', 'weight', 'dimension' ),
+				),
+				'default'     => array( 'size', 'color' ),
 			),
-			'manage_stock'        => array(
+			'attributes_per_product'   => array(
+				'type'        => 'object',
+				'description' => __( 'How many axes each variation carries, as a min and max. Default: 1 to 2.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'integer' ),
+					'max' => array( 'type' => 'integer' ),
+				),
+			),
+			'variations_per_attribute' => array(
+				'type'        => 'object',
+				'description' => __( 'How many distinct values each axis draws from, which is how wide a product\'s option list gets. Default: 3 to 8.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'integer' ),
+					'max' => array( 'type' => 'integer' ),
+				),
+			),
+			'price_variation_range'    => array(
+				'type'        => 'object',
+				'description' => __( 'How far a variation\'s price sits from its parent\'s, as a percentage. Default: -20 to 50. A variation is never priced at zero.', 'storeseeder' ),
+				'properties'  => array(
+					'min_percentage' => array( 'type' => 'number' ),
+					'max_percentage' => array( 'type' => 'number' ),
+				),
+			),
+			'manage_stock'             => array(
 				'type'        => 'boolean',
-				'description' => __( 'Enable inventory tracking for variations. Default: true.', 'storeseeder' ),
+				'description' => __( 'Track stock per variation. False leaves them in stock with no quantity. Default: true.', 'storeseeder' ),
 				'default'     => true,
 			),
-			'stock_min'           => array(
+			'stock_min'                => array(
 				'type'        => 'integer',
 				'description' => __( 'Minimum stock quantity per variation. Default: 0.', 'storeseeder' ),
 				'minimum'     => 0,
 				'default'     => 0,
 			),
-			'stock_max'           => array(
+			'stock_max'                => array(
 				'type'        => 'integer',
 				'description' => __( 'Maximum stock quantity per variation. Default: 100.', 'storeseeder' ),
-				'minimum'     => 1,
+				'minimum'     => 0,
 				'default'     => 100,
+			),
+			'generate_skus'            => array(
+				'type'        => 'boolean',
+				'description' => __( 'Give each variation a SKU. False generates variations identified only by their options, which is legal everywhere and worth testing. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'specific_product_id'      => array(
+				'type'        => 'integer',
+				'description' => __( 'Attach every variation to this product, to build out one option matrix. Omit to pick a random eligible product.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+			'exclude_product_ids'      => array(
+				'type'        => 'array',
+				'description' => __( 'Products to skip when choosing a parent.', 'storeseeder' ),
+				'items'       => array( 'type' => 'integer' ),
+				'default'     => array(),
 			),
 		);
 	}
@@ -109,15 +147,28 @@ class Generate_Product_Variations extends Ability {
 			$payload['seed'] = (int) $input['seed'];
 		}
 
+		foreach ( array( 'variation_types', 'exclude_product_ids' ) as $list ) {
+			if ( isset( $input[ $list ] ) ) {
+				$payload[ $list ] = (array) $input[ $list ];
+			}
+		}
+
+		foreach ( array( 'attributes_per_product', 'variations_per_attribute', 'price_variation_range' ) as $range ) {
+			if ( isset( $input[ $range ] ) ) {
+				$payload[ $range ] = (array) $input[ $range ];
+			}
+		}
+
 		if ( isset( $input['specific_product_id'] ) ) {
-			$payload['specific_product_id'] = (int) $input['specific_product_id'];
+			// One name for the writers, whichever surface asked.
+			$payload['product_id'] = (int) $input['specific_product_id'];
 		}
 
-		if ( ! empty( $input['exclude_product_ids'] ) ) {
-			$payload['exclude_products'] = array_map( 'intval', (array) $input['exclude_product_ids'] );
+		if ( isset( $input['generate_skus'] ) ) {
+			$payload['generate_skus'] = (bool) $input['generate_skus'];
 		}
 
-		$payload['stock_settings'] = array(
+		$payload['inventory'] = array(
 			'manage_stock' => $input['manage_stock'] ?? true,
 			'stock_range'  => array(
 				'min' => $input['stock_min'] ?? 0,

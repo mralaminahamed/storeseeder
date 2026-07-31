@@ -607,6 +607,215 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 	}
 
 	// -----------------------------------------------------------------------------------
+	// Product variations.
+	// -----------------------------------------------------------------------------------
+
+	/**
+	 * A canonical variation entity.
+	 *
+	 * @param array<string, mixed> $extra Fields merged over the defaults.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function variation_entity( array $extra = array() ): array {
+		return array_merge(
+			array(
+				'title'               => 'Large / Red',
+				'attributes'          => array(
+					'Size'  => 'Large',
+					'Color' => 'Red',
+				),
+				'stock'               => 12,
+				'manage_stock'        => true,
+				'sku'                 => 'VAR-00001',
+				'price'               => 5000,
+				'price_delta_percent' => 0.0,
+				'quantity'            => 1,
+			),
+			$extra
+		);
+	}
+
+	/**
+	 * One WooCommerce attribute per axis, which is what `variation_types` asks for. A single
+	 * attribute called "Variant" holding "Large / Red" as one option is not a variable product
+	 * anybody would recognise.
+	 */
+	public function test_each_axis_becomes_its_own_parent_attribute(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-PARENT' ) ) ) );
+
+		$result = $this->writer( Resource::PRODUCT_VARIATION )->write( $this->variation_entity() );
+		$this->assertNotWPError( $result );
+
+		$variation = wc_get_product( (int) $result['id'] );
+		$this->assertInstanceOf( 'WC_Product_Variation', $variation );
+
+		$this->assertSame(
+			array(
+				'size'  => 'Large',
+				'color' => 'Red',
+			),
+			$variation->get_attributes()
+		);
+
+		$parent = wc_get_product( $variation->get_parent_id() );
+		$this->assertInstanceOf( 'WC_Product_Variable', $parent );
+		$this->assertSame( array( 'size', 'color' ), array_keys( $parent->get_attributes() ) );
+	}
+
+	/**
+	 * The price is a percentage of the parent's, which is the only form the generator can express it
+	 * in — and a variable product's own `regular_price` is empty, so the base is the cheapest
+	 * variation already on it.
+	 */
+	public function test_the_price_is_a_percentage_of_the_parents(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-PRICE' ) ) ) );
+
+		$first = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity(
+				array(
+					'sku'   => 'VAR-PRICE-1',
+					'price' => 10000,
+				)
+			)
+		);
+		$this->assertNotWPError( $first );
+
+		$base = (float) wc_get_product( (int) $first['id'] )->get_regular_price();
+
+		$second = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity(
+				array(
+					'sku'                 => 'VAR-PRICE-2',
+					'attributes'          => array(
+						'Size'  => 'Medium',
+						'Color' => 'Blue',
+					),
+					'price'               => 1,
+					'price_delta_percent' => 50.0,
+				)
+			)
+		);
+		$this->assertNotWPError( $second );
+
+		// Fifty percent above the cheapest existing variation, not the entity's own 1 cent.
+		$this->assertSame(
+			round( $base * 1.5, 2 ),
+			round( (float) wc_get_product( (int) $second['id'] )->get_regular_price(), 2 )
+		);
+	}
+
+	public function test_a_variation_is_never_free_whatever_the_percentage(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-FREE' ) ) ) );
+
+		$result = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity(
+				array(
+					'sku'                 => 'VAR-FREE-1',
+					'price_delta_percent' => -100.0,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $result );
+		$this->assertGreaterThan( 0, (float) wc_get_product( (int) $result['id'] )->get_regular_price() );
+	}
+
+	public function test_a_variation_without_a_sku_carries_none(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-NOSKU' ) ) ) );
+
+		$result = $this->writer( Resource::PRODUCT_VARIATION )->write( $this->variation_entity( array( 'sku' => null ) ) );
+
+		$this->assertNotWPError( $result );
+
+		// Read from the object's own data rather than through get_sku(), which falls back to the
+		// parent's SKU when a variation has none.
+		$this->assertSame( '', get_post_meta( (int) $result['id'], '_sku', true ) );
+	}
+
+	/**
+	 * Unmanaged stock has no quantity and is in stock. A quantity of zero would read as sold out,
+	 * which is the opposite of "this variation does not track inventory".
+	 */
+	public function test_unmanaged_stock_is_in_stock_with_no_quantity(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-UNMANAGED' ) ) ) );
+
+		$result = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity(
+				array(
+					'sku'          => 'VAR-UNMANAGED-1',
+					'manage_stock' => false,
+					'stock'        => null,
+				)
+			)
+		);
+		$this->assertNotWPError( $result );
+
+		$variation = wc_get_product( (int) $result['id'] );
+
+		// `get_manage_stock()` on a variation answers WooCommerce's own way: `false`, or the string
+		// `'parent'` where the parent tracks inventory and the variation defers to it. Either is
+		// "this variation keeps no count of its own"; `true` is the thing that must not happen.
+		$this->assertContains( $variation->get_manage_stock(), array( false, 'parent' ) );
+		// Read from the row rather than through the getter, which — like `get_sku()` — answers with
+		// the parent's quantity when the variation keeps none of its own.
+		$this->assertSame( '', get_post_meta( (int) $result['id'], '_stock', true ) );
+		$this->assertSame( 'instock', $variation->get_stock_status() );
+	}
+
+	/**
+	 * The first variation on a product establishes the axes and every later one fills the same set:
+	 * an unfilled axis means "any size" in WooCommerce, and a product whose variations each specify a
+	 * different subset is a confusing fixture rather than a realistic one.
+	 */
+	public function test_a_later_variation_fills_the_axes_the_first_one_established(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-ALIGN' ) ) ) );
+
+		$first = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity( array( 'sku' => 'VAR-ALIGN-1' ) )
+		);
+		$this->assertNotWPError( $first );
+
+		$parent_id = wc_get_product( (int) $first['id'] )->get_parent_id();
+
+		// Only one of the two axes, and a third the parent has never seen.
+		$second = $this->writer( Resource::PRODUCT_VARIATION )->write(
+			$this->variation_entity(
+				array(
+					'sku'        => 'VAR-ALIGN-2',
+					'attributes' => array( 'Material' => 'Linen' ),
+				)
+			)
+		);
+		$this->assertNotWPError( $second );
+
+		$variation = wc_get_product( (int) $second['id'] );
+
+		if ( $variation->get_parent_id() !== $parent_id ) {
+			$this->markTestSkipped( 'The second variation landed on a different product.' );
+		}
+
+		$this->assertSame( array( 'size', 'color' ), array_keys( $variation->get_attributes() ) );
+
+		foreach ( $variation->get_attributes() as $value ) {
+			$this->assertNotSame( '', $value );
+		}
+	}
+
+	public function test_a_requested_parent_is_the_one_used(): void {
+		$product = $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'VAR-PINNED' ) ) );
+		$this->assertNotWPError( $product );
+
+		$writer = $this->writer( Resource::PRODUCT_VARIATION );
+		$writer->set_params( array( 'product_id' => (int) $product['id'] ) );
+
+		$result = $writer->write( $this->variation_entity( array( 'sku' => 'VAR-PINNED-1' ) ) );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( (int) $product['id'], wc_get_product( (int) $result['id'] )->get_parent_id() );
+	}
+
+	// -----------------------------------------------------------------------------------
 	// Coupons.
 	// -----------------------------------------------------------------------------------
 
