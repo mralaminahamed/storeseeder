@@ -46,7 +46,7 @@ export function StatCard({ iconName, label, value, empty, delta, spark, accentVa
           </span>
         ) : (
           <span className={`fp-stat-delta ${delta > 0 ? "up" : "flat"}`}>
-            {delta > 0 && <Icon name="chart" size={13} />}
+            {delta > 0 && <Icon name="trend" size={13} />}
             {delta > 0 ? `+${delta} this week` : __("steady", "storeseeder")}
           </span>
         )}

@@ -70,6 +70,13 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
 - `async`/`await` with `try/catch` for API calls.
 - No `console.log` in shipped code — ESLint has `no-console` at warn.
 - **Font weights are round hundreds only**: 400, 500, 600, 700. No 350/450/550.
+- **No literal px for padding, control height or font size in `components.css`** — read the
+  tokens in `styles.css` (`--pad-*`, `--ctl-h*`, `--fs-*`, `--gap-ctl`, `--badge-h`,
+  `--switch-*`). `[data-density="compact"]` overrides those tokens and nothing else, so a
+  hardcoded value is a component that ignores the density setting. One-off chrome — a 1px
+  rule, a dot, a knob offset — is fine.
+- **New icons go in `src/lib/icons.tsx` as Lucide path data**, and one concept gets one glyph.
+  A name with no entry silently renders `box`.
 
 ## Testing
 

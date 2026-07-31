@@ -84,7 +84,7 @@ export function ConfigColumn({
           sits above the fields rather than beside the Generate button. */}
       {needsTarget && (
         <div className="fp-dep fp-dep-warn" data-testid="target-prompt">
-          <Icon name="boxes" size={15} />
+          <Icon name="store" size={15} />
           <div>
             <div style={{ fontWeight: 500 }}>
               {__("Choose where to write", "storeseeder")}
@@ -116,7 +116,9 @@ export function ConfigColumn({
           one would, because a dimmed control that explains nothing is a dead end. */}
       {unsupported && (
         <div className="fp-dep fp-dep-warn" data-testid="unsupported-notice">
-          <Icon name="info" size={15} />
+          {/* `alert`, not `info`: this box is why a run cannot happen, and it sits in a
+              warn container. The neutral dependency note below keeps `info`. */}
+          <Icon name="alert" size={15} />
           <div>
             <div style={{ fontWeight: 500 }}>
               {__("Not available here", "storeseeder")}

@@ -10,10 +10,15 @@ declare global {
       adminColors?: Record<string, string>;
       colorScheme?: string;
       locale?: {
+        /** The site's WordPress locale narrowed to one we can generate in. */
         faker?: string;
+        /** Display label for `faker`. */
         label?: string;
         wordpress?: string;
+        /** Every generatable locale: code => label. Exactly what the REST API accepts. */
         allLocales?: Record<string, string>;
+        /** Fallback locale, when none is chosen or one cannot be matched. */
+        default?: string;
       };
       /**
        * Inlined by the server so the topbar knows its target on first paint.

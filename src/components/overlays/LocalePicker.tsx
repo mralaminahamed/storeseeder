@@ -1,23 +1,38 @@
 import React from "react";
-import { useEffect } from "@wordpress/element";
-import { __ } from "@wordpress/i18n";
+import { useEffect, useMemo, useRef, useState } from "@wordpress/element";
+import { __, sprintf } from "@wordpress/i18n";
 
 import { Icon } from "@/lib/icons";
+import { filterLocales, localeOptions, localePickerLabel } from "@/lib/locales";
 
 interface LocalePickerProps {
   onClose: () => void;
+  /** The currently selected locale **code**, e.g. `ja_JP`. */
   locale: string;
-  setLocale: (l: string) => void;
+  /** Receives a locale **code**, never a label. */
+  setLocale: (code: string) => void;
 }
 
+/**
+ * Picks the locale generated data is produced in.
+ *
+ * Two things here are deliberate. It works in codes, not labels — an earlier version
+ * stored the label, so the chosen value could never be sent to the API as-is. And it
+ * has a filter: the list is 75 locales now that the picker offers everything the API
+ * accepts, and a plain list that long is a scroll-hunt.
+ */
 export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) {
-  const all = window.storeseederApi?.locale?.allLocales ?? {};
-  // Sorted list of human labels; fall back to the current locale if none provided.
-  const labels = Object.values(all).filter(Boolean).sort();
-  const options = labels.length > 0 ? labels : [locale];
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Escape closes it. Previously the only way out was a click, which left keyboard
-  // users stuck in the overlay.
+  const options = useMemo(() => localeOptions(), []);
+  const shown = useMemo(() => filterLocales(options, query), [options, query]);
+
+  // Focus the filter on open, so typing narrows the list without a click first.
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ("Escape" === e.key) onClose();
@@ -42,39 +57,70 @@ export function LocalePicker({ onClose, locale, setLocale }: LocalePickerProps) 
     >
       <div
         className="fp-cmd-box"
-        style={{ width: "min(420px,92vw)" }}
+        style={{ width: "min(460px,92vw)" }}
         role="dialog"
         aria-modal="true"
-        aria-label={__("Default locale", "storeseeder")}
+        aria-label={localePickerLabel()}
       >
         <div className="fp-cmd-input-row">
           <Icon name="globe" size={18} />
-          <span style={{ fontWeight: 600 }}>
-            {__("Default locale", "storeseeder")}
-          </span>
+          <input
+            ref={inputRef}
+            type="search"
+            className="fp-cmd-input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={__("Search locales…", "storeseeder")}
+            aria-label={__("Search locales", "storeseeder")}
+            data-testid="locale-search"
+          />
         </div>
+
         <div className="fp-cmd-results">
-          {options.map((l) => (
+          {0 === shown.length && (
+            <p className="fp-cmd-empty" data-testid="locale-empty">
+              {sprintf(
+                /* translators: %s: the search term the user typed. */
+                __("No locale matches “%s”.", "storeseeder"),
+                query,
+              )}
+            </p>
+          )}
+
+          {shown.map((o) => (
             <button
-              key={l}
+              key={o.code}
               type="button"
-              className={`fp-cmd-item${l === locale ? " sel" : ""}`}
+              className={`fp-cmd-item${o.code === locale ? " sel" : ""}`}
               onClick={() => {
-                setLocale(l);
+                setLocale(o.code);
                 onClose();
               }}
+              data-testid={`locale-option-${o.code}`}
             >
               <Icon name="globe" size={16} className="fp-cmd-ic" />
-              <span>{l}</span>
-              {l === locale && (
-                <Icon
-                  name="check"
-                  size={16}
-                  style={{ marginLeft: "auto", color: "var(--accent)" }}
-                />
-              )}
+              <span>{o.label}</span>
+              <span className="fp-cmd-meta">
+                {/* The check reads before the code, left to right: the tick marks the
+                    row, the code identifies it. Reversed, the tick trailed the line and
+                    scanned as part of the code. */}
+                <span className="fp-cmd-check">
+                  {o.code === locale && <Icon name="check" size={16} />}
+                </span>
+                {/* The code is shown as well as the label: it is what goes over the
+                    API, and it is what a developer recognises. */}
+                <code className="fp-cmd-hint">{o.code}</code>
+              </span>
             </button>
           ))}
+        </div>
+
+        <div className="fp-cmd-foot">
+          {sprintf(
+            /* translators: %d: number of locales available. */
+            __("%d locales available", "storeseeder"),
+            options.length,
+          )}
         </div>
       </div>
     </div>

@@ -2,8 +2,8 @@ import React from "react";
 import { __ } from "@wordpress/i18n";
 
 import { useTheme, type Accent, type Theme, type Density } from "@/theme/useTheme";
+import { Seg } from "@/components/ui/Seg";
 import { Icon } from "@/lib/icons";
-import type { IconName } from "@/lib/icons";
 
 interface TweaksPanelProps {
   onClose: () => void;
@@ -68,38 +68,6 @@ function resolveTokenHex(token: string, theme: string, accent: string): string {
   ctx.fillRect(0, 0, 1, 1);
   const px = ctx.getImageData(0, 0, 1, 1).data;
   return `#${HEX(px[0])}${HEX(px[1])}${HEX(px[2])}`;
-}
-
-interface SegOption<T> {
-  v: T;
-  label: string;
-  ic?: IconName;
-}
-
-function Seg<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T;
-  options: SegOption<T>[];
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div className="fp-seg">
-      {options.map((o) => (
-        <button
-          key={o.v}
-          type="button"
-          className={`fp-seg-btn${value === o.v ? " on" : ""}`}
-          onClick={() => onChange(o.v)}
-        >
-          {o.ic && <Icon name={o.ic} size={15} />}
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 export function TweaksPanel({ onClose }: TweaksPanelProps) {

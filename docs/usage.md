@@ -128,20 +128,26 @@ server-side background processing.
 
 **Settings** in the sidebar holds:
 
+- **Target platform** — where data is written, and what `Auto` currently resolves to. The same
+  site-wide option the topbar selector writes
 - **Generation defaults** — default count, faker locale, seed, and metadata toggle
 - **Run history** — how many recent runs to keep per generator
+- **Appearance** — theme and density. Accent and per-token colours stay in **Tweaks**, which the
+  card links to
 - **Sample data** — Sync now, Force re-sync, Revoke consent
 - **About** — version and links
 - **Danger zone** — clear run history and statistics, or reset settings
 
 > [!NOTE]
-> Generation defaults and run history live in your **browser**, not the database, so they are
-> per-person rather than per-site. The two things stored site-wide are the sample-data consent
-> decision and the target platform.
+> Generation defaults, appearance and run history live in your **browser**, not the database, so
+> they are per-person rather than per-site. The two things stored site-wide are the sample-data
+> consent decision and the target platform — which is why changing the platform in Settings
+> changes it for everyone.
 
 ## REST API
 
-All routes require the `manage_options` capability and a REST nonce.
+All routes require the `manage_options` capability — or whatever `storeseeder_capability`
+returns, which the admin menu and the MCP abilities honour too — and a REST nonce.
 
 ### Endpoints
 
@@ -187,7 +193,7 @@ POST /wp-json/storeseeder/v1/download-sample/consent { "granted": true }
 | Parameter | Type | Notes |
 |---|---|---|
 | `count` | integer | **Required.** 1–100. |
-| `locale` | string | `en_US`, `fr_FR`, `de_DE`, `es_ES`, `it_IT`, `pt_BR`. Anything else falls back to `en_US`. |
+| `locale` | string | One of 75 codes. `OPTIONS /wp-json/storeseeder/v1/products` returns the enum, and the Settings picker offers the same list — both come from `StoreSeeder\Platforms\Locale`. An unknown locale falls back to the same language if a variant exists, otherwise `en_US`. |
 | `seed` | integer | Reproducible output |
 | `platform` | string | Platform id, or `auto` (default) |
 | `status` | string | Status filter for generated items |

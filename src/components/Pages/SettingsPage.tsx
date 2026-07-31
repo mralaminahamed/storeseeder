@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "@wordpress/element";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
+import { Seg } from "@/components/ui/Seg";
 import { Toggle } from "@/components/generator/fields/Toggle";
 import { NumberField } from "@/components/generator/fields/NumberField";
 import { TextField } from "@/components/generator/fields/TextField";
@@ -18,8 +19,13 @@ import {
 } from "@/lib/consent";
 import type { SampleDataStatus } from "@/lib/consent";
 import { getSettings, saveSettings } from "@/lib/settings";
+import { requestTweaksPanel } from "@/lib/events";
+import { DEFAULT_LOCALE, localeLabel, localeOptions } from "@/lib/locales";
+import { AUTO } from "@/lib/platform";
+import { usePlatform } from "@/providers/PlatformProvider";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
+import { useTheme, type Density, type Theme } from "@/theme/useTheme";
 
 // Localized from STORESEEDER_VERSION; the fallback only shows if the script
 // data is missing, which would mean the admin app failed to enqueue properly.
@@ -87,6 +93,14 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const { clearStats } = useStats();
   const { toast } = useToast();
+  const { theme, setTheme, density, setDensity } = useTheme();
+  const {
+    state: platformState,
+    selected: platformSelected,
+    active: activePlatformList,
+    ambiguous: platformAmbiguous,
+    setTarget: setPlatformTarget,
+  } = usePlatform();
 
   // Sample data sync state
   const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
@@ -99,13 +113,9 @@ export default function SettingsPage() {
 
   const nonce = window.storeseederApi?.restNonce ?? "";
   const restUrl = window.storeseederApi?.restUrl ?? "";
-  const allLocales = window.storeseederApi?.locale?.allLocales ?? {};
-
-  // Map between faker code (stored) and human label (displayed).
-  const codeToLabel = (code: string) => allLocales[code] ?? code;
-  const labelToCode = (label: string) =>
-    Object.keys(allLocales).find((c) => allLocales[c] === label) ?? label;
-  const localeLabels = Object.values(allLocales).filter(Boolean);
+  // Locales come from the server, which lists exactly what the REST API accepts.
+  // Options carry the code so the label never has to be mapped back to one.
+  const locales = localeOptions();
 
   const set = <K extends keyof typeof settings>(
     key: K,
@@ -305,6 +315,75 @@ export default function SettingsPage() {
     [restUrl, nonce],
   );
 
+  // Auto first, then whatever is actually loaded. A target stored for a platform that
+  // has since been deactivated is kept as an option, labelled as such — dropping it
+  // would silently show "Auto" while the site option still says otherwise.
+  const platformOptions = [
+    { id: AUTO, label: __("Auto — whichever platform is active", "storeseeder") },
+    ...activePlatformList.map((p) => ({ id: p.id, label: p.label })),
+  ];
+
+  if (
+    platformSelected !== AUTO &&
+    !platformOptions.some((o) => o.id === platformSelected)
+  ) {
+    platformOptions.push({
+      id: platformSelected,
+      label: sprintf(
+        /* translators: %s: platform id stored in the site option. */
+        __("%s (not active)", "storeseeder"),
+        platformSelected,
+      ),
+    });
+  }
+
+  const platformLabel = (id: string) =>
+    platformOptions.find((o) => o.id === id)?.label ?? id;
+
+  const handlePlatformChange = (label: string) => {
+    const next = platformOptions.find((o) => o.label === label);
+    if (!next || next.id === platformSelected) return;
+
+    void setPlatformTarget(next.id).then(() =>
+      toast(
+        AUTO === next.id
+          ? __("Target platform set to Auto", "storeseeder")
+          : sprintf(
+              /* translators: %s: platform name. */
+              __("Target platform set to %s", "storeseeder"),
+              next.label,
+            ),
+      ),
+    );
+  };
+
+  const resolvedPlatformLabel = platformState.resolved
+    ? (activePlatformList.find((p) => p.id === platformState.resolved)?.label ??
+      platformState.resolved)
+    : null;
+
+  const platformHint = () => {
+    if (platformAmbiguous) {
+      return __(
+        "More than one platform is active, so Auto cannot decide. Pick one here, or you will be asked on each generator page.",
+        "storeseeder",
+      );
+    }
+
+    if (!resolvedPlatformLabel) {
+      return __(
+        "No supported platform is active yet. Activate one and it appears here.",
+        "storeseeder",
+      );
+    }
+
+    return sprintf(
+      /* translators: %s: platform name Auto currently resolves to. */
+      __("Auto currently resolves to %s.", "storeseeder"),
+      resolvedPlatformLabel,
+    );
+  };
+
   const handleClearData = () => {
     clearStats();
     toast(__("Run history cleared", "storeseeder"));
@@ -351,6 +430,49 @@ export default function SettingsPage() {
       </div>
 
       <div className="fp-settings-col">
+        {/* Target platform. Site-wide, stored server-side, and the same option the
+            topbar selector writes — it belongs where someone configuring the plugin
+            will look for it, not only behind a dropdown in the header. */}
+        {/* `boxes`, matching the topbar platform selector — the same concept should not
+            wear two icons — and leaving `database` to mean stored data, which is what the
+            Sample data card below uses it for. */}
+        <SetCard
+          icon="store"
+          title={__("Target platform", "storeseeder")}
+          desc={__(
+            "Where generated data is written. Applies to every user on this site.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-target-platform">
+                {__("Platform", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">{platformHint()}</p>
+              <FieldSelect
+                id="ss-target-platform"
+                value={platformLabel(platformSelected)}
+                options={platformOptions.map((o) => o.label)}
+                width={320}
+                onChange={handlePlatformChange}
+              />
+            </div>
+
+            {activePlatformList.length > 0 && (
+              <p className="fp-set-hint mb-0">
+                {sprintf(
+                  /* translators: %s: comma-separated platform names with versions. */
+                  __("Active: %s", "storeseeder"),
+                  activePlatformList
+                    .map((p) => (p.version ? `${p.label} ${p.version}` : p.label))
+                    .join(", "),
+                )}
+              </p>
+            )}
+          </div>
+        </SetCard>
+
         {/* Generation defaults */}
         <SetCard
           icon="sliders"
@@ -386,17 +508,27 @@ export default function SettingsPage() {
                 {__("Default locale", "storeseeder")}
               </label>
               <p className="fp-set-hint">
-                {__(
-                  "Faker locale used when generating data.",
-                  "storeseeder",
+                {sprintf(
+                  /* translators: %d: number of available locales. */
+                  __(
+                    "Locale used when generating data — %d available, all accepted by the REST API.",
+                    "storeseeder",
+                  ),
+                  locales.length,
                 )}
               </p>
               <FieldSelect
                 id="ss-default-locale"
-                value={codeToLabel(settings.defaultLocale)}
-                options={localeLabels}
+                value={localeLabel(settings.defaultLocale)}
+                options={locales.map((l) => l.label)}
                 width={320}
-                onChange={(label) => set("defaultLocale", labelToCode(label))}
+                onChange={(label) =>
+                  set(
+                    "defaultLocale",
+                    locales.find((l) => l.label === label)?.code ??
+                      DEFAULT_LOCALE,
+                  )
+                }
               />
             </div>
 
@@ -483,6 +615,70 @@ export default function SettingsPage() {
           </div>
         </SetCard>
 
+        {/* Appearance. Theme and density only — accent and per-token colors stay in
+            Tweaks, which is linked below rather than reproduced here. Both read the
+            same ThemeProvider, so a change made in one shows in the other. */}
+        <SetCard
+          icon="palette"
+          title={__("Appearance", "storeseeder")}
+          desc={__(
+            "How the admin looks. Saved in this browser, per user.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Theme", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Independent of the WordPress admin colour scheme.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Theme>
+                value={theme}
+                onChange={setTheme}
+                ariaLabel={__("Theme", "storeseeder")}
+                options={[
+                  { v: "light", label: __("Light", "storeseeder"), ic: "sun" },
+                  { v: "dark", label: __("Dark", "storeseeder"), ic: "moon" },
+                ]}
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Density", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Compact tightens row heights and padding across every page.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Density>
+                value={density}
+                onChange={setDensity}
+                ariaLabel={__("Density", "storeseeder")}
+                options={[
+                  {
+                    v: "comfortable",
+                    label: __("Comfortable", "storeseeder"),
+                  },
+                  { v: "compact", label: __("Compact", "storeseeder") },
+                ]}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              icon="sliders"
+              onClick={requestTweaksPanel}
+            >
+              {__("Accent & custom colours…", "storeseeder")}
+            </Button>
+          </div>
+        </SetCard>
+
         {/* Sample data */}
         <SetCard
           icon="database"
@@ -550,8 +746,10 @@ export default function SettingsPage() {
             </div>
 
             <div style={{ marginTop: 14 }}>
+              {/* The server reports the repository, which storeseeder_sample_data_source
+                  can change; the constant is only a fallback for a failed status call. */}
               <a
-                href={SAMPLE_DATA_REPO_URL}
+                href={syncStatus?.repo_url || SAMPLE_DATA_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -619,7 +817,7 @@ export default function SettingsPage() {
                 )}
               </p>
             </div>
-            <div className="fp-danger-act">
+            <div className="fp-danger-act mb-0">
               <div>
                 <Button
                   variant="danger"
@@ -632,7 +830,7 @@ export default function SettingsPage() {
                   )}
                 </Button>
               </div>
-              <p className="fp-set-hint" style={{ marginTop: 7 }}>
+              <p className="fp-set-hint mb-0" style={{ marginTop: 7 }}>
                 {__(
                   "Resets all settings to their default values.",
                   "storeseeder",

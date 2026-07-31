@@ -27,7 +27,7 @@ export function PlatformSelect() {
       <label htmlFor={id} className="screen-reader-text">
         {__("Target platform", "storeseeder")}
       </label>
-      <Icon name="boxes" size={14} aria-hidden="true" />
+      <Icon name="store" size={14} aria-hidden="true" />
       <select
         id={id}
         className="fp-platform-select-control fp-focusable"
