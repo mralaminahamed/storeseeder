@@ -14,26 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use StoreSeeder\Rest\Controllers\Product;
-use StoreSeeder\Rest\Controllers\Customer;
-use StoreSeeder\Rest\Controllers\Order;
-use StoreSeeder\Rest\Controllers\Coupon;
-use StoreSeeder\Rest\Controllers\Product_Variation;
-use StoreSeeder\Rest\Controllers\Shipping_Plan;
-use StoreSeeder\Rest\Controllers\Tax_Class;
-use StoreSeeder\Rest\Controllers\Transaction;
-use StoreSeeder\Rest\Controllers\Cart_Session;
-use StoreSeeder\Rest\Controllers\Attribute;
-use StoreSeeder\Rest\Controllers\Refund;
-use StoreSeeder\Rest\Controllers\Log;
-use StoreSeeder\Rest\Controllers\Shipping_Class;
-use StoreSeeder\Rest\Controllers\Label;
-use StoreSeeder\Rest\Controllers\Order_Tax_Rate;
-use StoreSeeder\Rest\Controllers\Product_Download;
-use StoreSeeder\Rest\Controllers\Subscription;
 use StoreSeeder\MCP\MCP_Server;
-use StoreSeeder\Platforms\Registry;
-use StoreSeeder\Platforms\Resolver;
+use StoreSeeder\Platforms\Registry as Platform_Registry;
+use StoreSeeder\Platforms\Resolver as Platform_Resolver;
+use StoreSeeder\Rest\Registry as Rest_Registry;
 
 /**
  * Main Plugin Class for StoreSeeder
@@ -566,32 +550,10 @@ class StoreSeeder {
 			return;
 		}
 
-		$controllers = array(
-			// Core generators.
-			new Product(),
-			new Customer(),
-			new Coupon(),
-
-			// Enhanced generators.
-			new Cart_Session(),
-			new Shipping_Plan(),
-			new Tax_Class(),
-			new Order(),
-			new Product_Variation(),
-			new Transaction(),
-			new Attribute(),
-			new Refund(),
-			new Log(),
-			new Shipping_Class(),
-			new Label(),
-			new Order_Tax_Rate(),
-			new Product_Download(),
-			new Subscription(),
-		);
-
-		foreach ( $controllers as $controller ) {
-			$controller->register_routes();
-		}
+		// The controllers come from the registry rather than a list here, so a
+		// third-party platform can expose a resource of its own through the
+		// storeseeder_rest_controllers filter without patching this file.
+		Rest_Registry::instance()->register_routes();
 
 		// Register the sample-data download endpoint.
 		register_rest_route(
@@ -1332,10 +1294,10 @@ class StoreSeeder {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @return Registry
+	 * @return Platform_Registry
 	 */
-	public function platforms(): Registry {
-		return Registry::instance();
+	public function platforms(): Platform_Registry {
+		return Platform_Registry::instance();
 	}
 
 	/**
@@ -1343,10 +1305,10 @@ class StoreSeeder {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @return Resolver
+	 * @return Platform_Resolver
 	 */
-	public function platform_resolver(): Resolver {
-		return new Resolver( $this->platforms() );
+	public function platform_resolver(): Platform_Resolver {
+		return new Platform_Resolver( $this->platforms() );
 	}
 
 	/**

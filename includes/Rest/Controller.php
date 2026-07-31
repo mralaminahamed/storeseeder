@@ -108,17 +108,18 @@ abstract class Controller extends WP_REST_Controller {
 	abstract protected function get_resource_type_label(): string;
 
 	/**
-	 * Constructor
+	 * The REST base this controller serves
+	 *
+	 * Public counterpart to get_rest_base(), which is protected so subclasses declare
+	 * it without it becoming API. The registry needs to key controllers by base
+	 * without reaching into them.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->init();
-	}
-
-	/**
-	 * Initialize the controller
-	 */
-	protected function init(): void {
-		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+	public function rest_base(): string {
+		return $this->get_rest_base();
 	}
 
 	/**

@@ -57,29 +57,10 @@ class RestPreviewRouteTest extends StoreSeederUnitTestCase {
 	 * @return void
 	 */
 	private function register_controllers(): void {
-		$controllers = array(
-			new \StoreSeeder\Rest\Controllers\Product(),
-			new \StoreSeeder\Rest\Controllers\Customer(),
-			new \StoreSeeder\Rest\Controllers\Order(),
-			new \StoreSeeder\Rest\Controllers\Coupon(),
-			new \StoreSeeder\Rest\Controllers\Product_Variation(),
-			new \StoreSeeder\Rest\Controllers\Shipping_Plan(),
-			new \StoreSeeder\Rest\Controllers\Tax_Class(),
-			new \StoreSeeder\Rest\Controllers\Transaction(),
-			new \StoreSeeder\Rest\Controllers\Cart_Session(),
-			new \StoreSeeder\Rest\Controllers\Attribute(),
-			new \StoreSeeder\Rest\Controllers\Refund(),
-			new \StoreSeeder\Rest\Controllers\Log(),
-			new \StoreSeeder\Rest\Controllers\Shipping_Class(),
-			new \StoreSeeder\Rest\Controllers\Label(),
-			new \StoreSeeder\Rest\Controllers\Order_Tax_Rate(),
-			new \StoreSeeder\Rest\Controllers\Product_Download(),
-			new \StoreSeeder\Rest\Controllers\Subscription(),
-		);
-
-		foreach ( $controllers as $controller ) {
-			$controller->register_routes();
-		}
+		// Through the registry, so this test also proves the registry registers every
+		// controller -- and so there is no second hardcoded list of seventeen here to
+		// drift from the real one.
+		\StoreSeeder\Rest\Registry::instance()->register_routes();
 	}
 
 	public function test_every_generator_registers_a_preview_route(): void {
