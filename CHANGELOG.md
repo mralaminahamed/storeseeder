@@ -38,6 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `storeseeder_rest_params` apply to all seventeen resources and run before their specific
   counterparts. Plus `storeseeder_locales`, `storeseeder_mcp_ability_definition`,
   `storeseeder_admin_payload` and `storeseeder_sample_data_source`.
+- The products preview gains a **Type** column, and it reads the run's own `product_type`
+  parameter rather than rolling a fresh value — choose `digital` and every previewed row says
+  digital, which is the question the control beside it just asked. `mixed` is the only setting
+  that varies per row, which is what mixed means.
 - **Fluent Cart Pro support, and a licence generator.** The driver now detects Pro, reports it
   as an extension of the platform — `[{ slug, label, active, version }]`, a new
   `Platform_Driver::extensions()` seam that WooCommerce Subscriptions will use the same way —
@@ -109,6 +113,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the source.
 - `jest.config.js` would have shipped in the release zip; `.distignore` had not been revisited
   since Jest arrived.
+- The WordPress.org screenshots and banners were regenerated, and three pieces of copy in them
+  had gone stale: the frame caption and banner both said "for Fluent Cart" on a plugin that is
+  no longer Fluent-Cart-only, and the banner advertised 17 generators. The banner now names
+  WP-CLI, which is new. The Settings screenshot needed more than a re-shoot: the page grew from
+  four cards to eight across three sections, so the old whole-page capture clipped a card in
+  half — it now captures a frame-shaped viewport with the sidebar collapsed, which is what the
+  settings column wants, and the frames carry the product tagline under the wordmark.
 - The recorded test baselines in CLAUDE.md and AGENTS.md were two and five commits stale, which
   makes them useless for the one thing they are for — noticing that a refactor changed the
   count.

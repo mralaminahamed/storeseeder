@@ -146,16 +146,16 @@ function banner(scale: number): string {
 <body>
   <div class="stage">
     <div class="copy">
-      <div class="kicker">For Fluent Cart</div>
+      <div class="kicker">For WordPress e-commerce</div>
       <div class="lockup">
         ${markSvg(46)}
         <div class="word">StoreSeeder</div>
       </div>
-      <div class="sub">Realistic products, orders and customers &mdash;<br>seeded into your Fluent Cart store in seconds.</div>
+      <div class="sub">Realistic products, orders and customers &mdash;<br>seeded into your store in seconds.</div>
       <div class="pills">
-        <span class="pill">17 generators</span>
+        <span class="pill">18 generators</span>
         <span class="pill">Live preview</span>
-        <span class="pill">Seeded</span>
+        <span class="pill">WP-CLI</span>
       </div>
     </div>
 

@@ -190,7 +190,7 @@ class RestPreviewRouteTest extends StoreSeederUnitTestCase {
 		$this->register_controllers();
 
 		$expected = array(
-			'products'  => array( 'name', 'sku', 'price', 'stock', 'status' ),
+			'products'  => array( 'name', 'sku', 'type', 'price', 'stock', 'status' ),
 			'customers' => array( 'name', 'email', 'city', 'country', 'orders' ),
 			'orders'    => array( 'number', 'customer', 'items', 'total', 'status' ),
 			'coupons'   => array( 'code', 'type', 'amount', 'limit', 'status' ),

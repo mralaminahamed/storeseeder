@@ -103,6 +103,10 @@ class Product extends Generator {
 				'label' => __( 'SKU', 'storeseeder' ),
 			),
 			array(
+				'key'   => 'type',
+				'label' => __( 'Type', 'storeseeder' ),
+			),
+			array(
 				'key'   => 'price',
 				'label' => __( 'Price', 'storeseeder' ),
 			),
@@ -115,6 +119,28 @@ class Product extends Generator {
 				'label' => __( 'Status', 'storeseeder' ),
 			),
 		);
+	}
+
+	/**
+	 * The product type a previewed row would be created as.
+	 *
+	 * Reads the run's own `product_type` parameter rather than rolling a fresh value, so the
+	 * preview answers the question the control next to it just asked: choose `digital` and
+	 * every row says digital. `mixed` is the only case that varies per row, which is what
+	 * mixed means.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	private function preview_product_type(): string {
+		$requested = $this->generation_params['product_type'] ?? 'mixed';
+
+		if ( 'physical' === $requested || 'digital' === $requested ) {
+			return $requested;
+		}
+
+		return $this->get_faker()->randomElement( array( 'physical', 'digital' ) );
 	}
 
 	/**
@@ -137,6 +163,10 @@ class Product extends Generator {
 			'sku'    => array(
 				'v'    => 'SKU-' . $faker->numberBetween( 1000, 9999 ),
 				'kind' => 'mono',
+			),
+			'type'   => array(
+				'v'    => $this->preview_product_type(),
+				'kind' => 'text',
 			),
 			'price'  => array(
 				'v'    => '$' . number_format( $faker->randomFloat( 2, 5, 500 ), 2 ),

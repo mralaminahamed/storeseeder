@@ -96,10 +96,14 @@ test.describe('Settings', () => {
 
     test('a scope badge says which is which', async ({ page }) => {
       await expect(
-        page.getByTestId('settings-target-platform').getByText('Site-wide'),
+        page
+          .getByTestId('settings-target-platform')
+          .getByText('Site-wide', { exact: true }),
       ).toBeVisible();
       await expect(
-        page.getByTestId('settings-appearance').getByText('This browser'),
+        page
+          .getByTestId('settings-appearance')
+          .getByText('This browser', { exact: true }),
       ).toBeVisible();
     });
 
