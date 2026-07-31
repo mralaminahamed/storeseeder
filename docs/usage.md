@@ -216,6 +216,7 @@ The REST base is not always the resource name:
 | Cart Sessions | `cart-sessions` | `cart_session` |
 | Attributes | `attributes` | `attribute` |
 | Brands | `brands` | `brand` |
+| Product Categories | `product_categories` | `product_category` |
 | Refunds | `refunds` | `refund` |
 | Logs | `logs` | `log` |
 | Shipping Classes | `shipping_classes` | `shipping_class` |
