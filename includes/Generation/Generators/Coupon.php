@@ -63,30 +63,175 @@ class Coupon extends Generator {
 	 * @return array<string, mixed>
 	 */
 	protected function build_entity() {
-		// buy_x_get_y is omitted because it needs buy/get product lists.
-		$types = array( 'percentage', 'fixed', 'free_shipping' );
-		$type  = $this->get_faker()->randomElement( $types );
-
-		$code = strtoupper( $this->get_faker()->bothify( 'SAVE####' ) );
-
-		$discount = 0;
-		if ( 'percentage' === $type ) {
-			$discount = $this->get_faker()->numberBetween( 5, 50 );
-		} elseif ( 'fixed' === $type ) {
-			// Integer minor units. Storing major units here turns "$50 off" into
-			// fifty cents off on any platform that compares against a cents subtotal.
-			$discount = (int) round( $this->get_faker()->randomFloat( 2, 5, 100 ) * 100 );
-		}
+		$type      = $this->type();
+		$days      = $this->validity_days();
+		$starts_in = $this->get_faker()->boolean( 20 ) ? $this->get_faker()->numberBetween( 1, 14 ) : 0;
+		$limits    = (array) ( $this->generation_params['usage_limits'] ?? array() );
+		$limited   = ! isset( $limits['set_usage_limits'] ) || (bool) $limits['set_usage_limits'];
+		// Drawn once, because the per-customer cap is compared against this exact number — drawing
+		// again would cap against a limit the coupon does not have.
+		$uses = $limited ? $this->max_uses( $limits ) : null;
 
 		return array(
-			'code'        => $code,
-			'discount'    => $discount,
-			'type'        => $type,
-			'description' => $this->get_faker()->sentence( 8 ),
-			'usage_limit' => $this->get_faker()->numberBetween( 10, 1000 ),
-			'status'      => 'active',
-			'expires_at'  => $this->get_faker()->dateTimeBetween( '+1 week', '+6 months' )->format( 'Y-m-d H:i:s' ),
+			'code'                 => strtoupper( $this->get_faker()->bothify( 'SAVE####' ) ),
+			'discount'             => $this->discount( $type ),
+			'type'                 => $type,
+			'description'          => $this->get_faker()->sentence( 8 ),
+			// Null is an unlimited coupon, which is a different fixture from one limited to a
+			// large number: the validation path that rejects an exhausted coupon never runs.
+			'usage_limit'          => $uses,
+			'usage_limit_per_user' => null === $uses ? null : $this->max_uses_per_user( $limits, $uses ),
+			'status'               => 'active',
+			// A coupon that has not started yet is the case a checkout test needs and no fixture
+			// had. Null is one valid from the moment it exists.
+			'starts_at'            => $starts_in > 0
+				? gmdate( 'Y-m-d H:i:s', time() + $starts_in * DAY_IN_SECONDS )
+				: null,
+			'expires_at'           => gmdate( 'Y-m-d H:i:s', time() + ( $starts_in + $days ) * DAY_IN_SECONDS ),
+			// Cart thresholds in minor units, like every other amount. Null is no threshold at
+			// all rather than a threshold of zero, which reads as "any cart" and is the same
+			// thing only until somebody sorts on the column.
+			'minimum_amount'       => $this->restriction( 'minimum_spend', true )
+				? (int) round( $this->get_faker()->numberBetween( 20, 200 ) ) * 100
+				: null,
+			'maximum_amount'       => $this->restriction( 'maximum_spend', false )
+				? (int) round( $this->get_faker()->numberBetween( 300, 1000 ) ) * 100
+				: null,
+			'exclude_sale_items'   => $this->restriction( 'exclude_sale_items', false ),
+			// Most coupons combine; some do not. A store where every coupon stacks cannot be used
+			// to test the case where one refuses to.
+			'stackable'            => $this->get_faker()->boolean( 70 ),
+			// How many products to restrict the coupon to. Which products is the writer's
+			// business, since only the platform knows what exists.
+			'product_count'        => $this->restriction( 'product_restrictions', true )
+				? $this->get_faker()->numberBetween( 1, 3 )
+				: 0,
 		);
+	}
+
+	/**
+	 * The discount type for this coupon.
+	 *
+	 * `discount_types` was declared on all three surfaces and read by none, so asking for
+	 * percentage coupons got a spread across three types. The two lists also disagreed on the
+	 * spelling of a fixed discount and offered `buy_x_get_y` and `products`, neither of which
+	 * anything generates.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	private function type(): string {
+		$known     = array( 'percentage', 'fixed', 'free_shipping' );
+		$requested = (array) ( $this->generation_params['discount_types'] ?? array() );
+		$allowed   = array_values( array_intersect( array_filter( $requested, 'is_string' ), $known ) );
+
+		if ( array() === $allowed ) {
+			$allowed = $known;
+		}
+
+		return (string) $this->get_faker()->randomElement( $allowed );
+	}
+
+	/**
+	 * What this coupon takes off, in percent or in minor units.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $type Discount type.
+	 *
+	 * @return int
+	 */
+	private function discount( string $type ): int {
+		$range = (array) ( $this->generation_params['discount_range'] ?? array() );
+
+		if ( 'percentage' === $type ) {
+			$min = isset( $range['min_percentage'] ) ? (int) $range['min_percentage'] : 5;
+			$max = isset( $range['max_percentage'] ) ? (int) $range['max_percentage'] : 50;
+
+			return $this->get_faker()->numberBetween( min( $min, $max ), max( $min, $max ) );
+		}
+
+		if ( 'fixed' === $type ) {
+			$min = isset( $range['min_fixed'] ) ? (float) $range['min_fixed'] : 5.0;
+			$max = isset( $range['max_fixed'] ) ? (float) $range['max_fixed'] : 100.0;
+
+			// Integer minor units. Storing major units here turns "$50 off" into fifty cents off
+			// on any platform that compares against a cents subtotal.
+			return (int) round( $this->get_faker()->randomFloat( 2, min( $min, $max ), max( $min, $max ) ) * 100 );
+		}
+
+		// Free shipping carries no amount.
+		return 0;
+	}
+
+	/**
+	 * How long this coupon is valid for, in days.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return int
+	 */
+	private function validity_days(): int {
+		$period = (array) ( $this->generation_params['validity_period'] ?? array() );
+		$min    = isset( $period['min_days'] ) ? (int) $period['min_days'] : 7;
+		$max    = isset( $period['max_days'] ) ? (int) $period['max_days'] : 180;
+
+		return $this->get_faker()->numberBetween( max( 1, min( $min, $max ) ), max( 1, $min, $max ) );
+	}
+
+	/**
+	 * The total use limit.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $limits The `usage_limits` parameter.
+	 *
+	 * @return int
+	 */
+	private function max_uses( array $limits ): int {
+		$max = isset( $limits['max_uses'] ) ? (int) $limits['max_uses'] : 100;
+
+		return $this->get_faker()->numberBetween( max( 1, (int) ceil( $max / 10 ) ), max( 1, $max ) );
+	}
+
+	/**
+	 * The per-customer use limit, which can never exceed the total.
+	 *
+	 * Fluent Cart rejects a coupon whose per-customer limit is above its total limit, and it is a
+	 * nonsense either way — so the generator does not produce one.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $limits The `usage_limits` parameter.
+	 * @param int                  $uses   The total limit this coupon carries.
+	 *
+	 * @return int
+	 */
+	private function max_uses_per_user( array $limits, int $uses ): int {
+		$per_user = isset( $limits['max_uses_per_user'] ) ? (int) $limits['max_uses_per_user'] : 1;
+
+		return max( 1, min( $per_user, $uses ) );
+	}
+
+	/**
+	 * Read one `restrictions` switch.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $name     Switch name.
+	 * @param bool   $fallback Value when the caller sent none.
+	 *
+	 * @return bool
+	 */
+	private function restriction( string $name, bool $fallback ): bool {
+		$restrictions = (array) ( $this->generation_params['restrictions'] ?? array() );
+
+		if ( ! isset( $restrictions[ $name ] ) ) {
+			return $fallback;
+		}
+
+		return (bool) $restrictions[ $name ];
 	}
 
 	/**
