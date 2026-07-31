@@ -92,12 +92,15 @@ final class Order extends Writer {
 			);
 		}
 
-		$customer_id = $this->random_customer_id();
+		// A guest order is one nobody asked for a customer on. `fct_orders.customer_id` is
+		// nullable, so Fluent Cart stores one — it is simply absent from the customer view, which
+		// is what a guest checkout looks like there too.
+		$wants_customer = ! isset( $entity['with_customer'] ) || (bool) $entity['with_customer'];
+		$customer_id    = $wants_customer ? $this->customer_id() : null;
 
-		// Fluent Cart orders always belong to a customer; one without is
-		// invisible in the admin customer view and breaks lifetime-value
-		// reporting.
-		if ( null === $customer_id ) {
+		// Asked for a customer and the store has none: say what to generate first rather than
+		// silently producing the guest order that was not requested.
+		if ( $wants_customer && null === $customer_id ) {
 			return new WP_Error(
 				'no_customers',
 				__( 'No customers were found. Generate customers before generating orders.', 'storeseeder' )
@@ -117,6 +120,16 @@ final class Order extends Writer {
 		$coupon   = $entity['use_coupon'] ? $this->random_applicable_coupon() : null;
 		$discount = $this->coupon_discount( $coupon, $subtotal );
 
+		$manual_discount = (int) ( $entity['discount_total'] ?? 0 );
+		// `fct_orders.shipping_total` is NOT NULL, so an order that was never shipped and one
+		// shipped for free are the same row here. Reported through the capability rather than
+		// pretending otherwise.
+		$shipping = (int) ( $entity['shipping_total'] ?? 0 );
+		$total    = max( 0, $subtotal + $tax_total + $shipping - $discount - $manual_discount );
+		// An order that was never paid has nothing recorded against it, which is what makes a
+		// pending order distinguishable from a completed one in every report.
+		$paid = ! empty( $entity['paid_at'] );
+
 		$order_data = array(
 			'parent_id'             => 0,
 			'invoice_no'            => 'FC-' . $entity['invoice_no'],
@@ -128,13 +141,19 @@ final class Order extends Writer {
 			'currency'              => $entity['currency'],
 			'subtotal'              => $subtotal,
 			'shipping_tax'          => 0,
+			'shipping_total'        => $shipping,
 			'fulfillment_type'      => 'physical',
 			'tax_total'             => $tax_total,
-			'manual_discount_total' => 0,
+			// The entity's own discount, on top of whatever a coupon contributed: Fluent Cart
+			// keeps the two apart, and reporting reads them separately.
+			'manual_discount_total' => $manual_discount,
 			'coupon_discount_total' => $discount,
-			'total_amount'          => max( 0, $subtotal + $tax_total - $discount ),
-			'total_paid'            => max( 0, $subtotal + $tax_total - $discount ),
+			'total_amount'          => $total,
+			'total_paid'            => $paid ? $total : 0,
 			'status'                => self::ORDER_STATUS[ $entity['status'] ] ?? 'completed',
+			'note'                  => (string) ( $entity['customer_note'] ?? '' ),
+			'ip_address'            => (string) ( $entity['ip_address'] ?? '' ),
+			'completed_at'          => $entity['completed_at'] ?? null,
 			'created_at'            => $entity['created_at'],
 		);
 
@@ -235,8 +254,16 @@ final class Order extends Writer {
 			// Every money column on fct_order_items is BIGINT holding integer
 			// cents, which is what the canonical entity already carries. Storing
 			// dollars makes a $456.78 line render as $4.57.
-			$unit_price = (int) $shape['unit_price'];
-			$quantity   = (int) $shape['quantity'];
+			//
+			// The variation's own price wins over the generated one. An order line at $412 for a
+			// product the catalogue sells at $19 is what this writer used to produce, and it makes
+			// every revenue figure disagree with the store it came from.
+			$unit_price = (int) ( $variation->item_price ?? 0 );
+
+			if ( $unit_price <= 0 ) {
+				$unit_price = (int) $shape['unit_price'];
+			}
+			$quantity = (int) $shape['quantity'];
 
 			$items[] = array(
 				'post_id'    => (int) $variation->post_id,
@@ -256,13 +283,25 @@ final class Order extends Writer {
 	}
 
 	/**
-	 * Draw a real customer ID.
+	 * The customer this order belongs to.
+	 *
+	 * A requested one wins, so a run can build an order history for a single account — which is
+	 * the fixture a lifetime-value or repeat-purchase screen needs and a random spread never
+	 * produces. An ID that does not exist is not substituted for silently.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return int|null Customer ID, or null when the store has no customers yet.
 	 */
-	private function random_customer_id(): ?int {
+	private function customer_id(): ?int {
+		$requested = (int) ( $this->params['customer_id'] ?? 0 );
+
+		if ( $requested > 0 ) {
+			$customer = CustomerModel::query()->find( $requested );
+
+			return $customer ? (int) $customer->id : null;
+		}
+
 		$customer = CustomerModel::query()->inRandomOrder()->first();
 
 		return $customer ? (int) $customer->id : null;

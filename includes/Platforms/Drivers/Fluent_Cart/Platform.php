@@ -179,6 +179,16 @@ final class Platform extends Platform_Driver {
 		// becomes a plain yes. Reported rather than silently flattened.
 		$matrix[ Resource::PRODUCT ] = Capability::supported_except( array( 'backorders' ) );
 
+		// `fct_order_addresses` has no company column — name, two street lines, city, state,
+		// postcode, country and a meta blob. A company name could be buried in the meta, but
+		// nothing in Fluent Cart reads it there, so it would be stored and invisible.
+		//
+		// Not listed, deliberately: `shipping_total` is NOT NULL here, so an order that was never
+		// shipped and one shipped for free are the same row. The *request* is still honoured —
+		// switching shipping off charges nothing — and reporting a field as ignored when the
+		// caller got what they asked for is a false alarm, which is worse than the lost nuance.
+		$matrix[ Resource::ORDER ] = Capability::supported_except( array( 'company' ) );
+
 		if ( ! $this->is_pro_active() ) {
 			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
 				self::PRO_SLUG,

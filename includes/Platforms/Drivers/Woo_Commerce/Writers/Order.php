@@ -87,7 +87,9 @@ final class Order extends Writer {
 		$this->set_address( $order, 'billing', (array) ( $addresses['billing'] ?? array() ) );
 		$this->set_address( $order, 'shipping', (array) ( $addresses['shipping'] ?? array() ) );
 
-		$customer_id = $this->random_customer_id();
+		// Zero is WooCommerce's guest customer, and a guest order is a real one every store takes.
+		$wants_customer = ! isset( $entity['with_customer'] ) || (bool) $entity['with_customer'];
+		$customer_id    = $wants_customer ? $this->order_customer_id() : 0;
 
 		if ( $customer_id > 0 ) {
 			$order->set_customer_id( $customer_id );
@@ -97,10 +99,44 @@ final class Order extends Writer {
 		$order->set_payment_method( (string) $entity['payment_method'] );
 		$order->set_date_created( (string) $entity['created_at'] );
 
+		// The fields every store's packing slip and analytics read, and that nothing generated
+		// until now.
+		$order->set_customer_note( (string) ( $entity['customer_note'] ?? '' ) );
+		$order->set_customer_ip_address( (string) ( $entity['ip_address'] ?? '' ) );
+		$order->set_customer_user_agent( (string) ( $entity['user_agent'] ?? '' ) );
+
+		// Shipping is a *line item* in WooCommerce, not a total: `calculate_totals()` sums the
+		// items and would overwrite anything set directly, which is why setting the total first
+		// left every generated order shipping-free. Null carries no line at all — an order that
+		// was never shipped, rather than one shipped for nothing.
+		if ( null !== ( $entity['shipping_total'] ?? null ) ) {
+			$this->add_shipping( $order, (int) $entity['shipping_total'] );
+		}
+
 		// Totals before the status: setting a paid status recalculates and stamps date_paid,
 		// and it should do so against the finished order rather than an empty one.
 		$order->calculate_totals( true );
 		$order->set_status( $this->map_order_status( (string) $entity['status'] ) );
+
+		// Discount after the totals, for the same reason as the dates below: `calculate_totals()`
+		// derives it from applied coupons, so a generated discount has to be written over the
+		// result rather than into the input.
+		if ( ! empty( $entity['discount_total'] ) ) {
+			$discount = $this->to_decimal( (int) $entity['discount_total'] );
+
+			$order->set_discount_total( $discount );
+			$order->set_total( (string) wc_format_decimal( max( 0, (float) $order->get_total() - (float) $discount ) ) );
+		}
+
+		// After the status, which is what stamps these itself for a paid order — setting them
+		// first would have WooCommerce overwrite them with "now".
+		if ( ! empty( $entity['paid_at'] ) ) {
+			$order->set_date_paid( (string) $entity['paid_at'] );
+		}
+
+		if ( ! empty( $entity['completed_at'] ) ) {
+			$order->set_date_completed( (string) $entity['completed_at'] );
+		}
 
 		$id = $order->save();
 
@@ -119,6 +155,8 @@ final class Order extends Writer {
 		$result = array(
 			'id'             => (int) $id,
 			'number'         => $order->get_order_number(),
+			'discount'       => $order->get_discount_total(),
+			'shipping'       => $order->get_shipping_total(),
 			'status'         => $order->get_status(),
 			'customer'       => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
 			'items'          => $items,
@@ -192,6 +230,53 @@ final class Order extends Writer {
 	}
 
 	/**
+	 * The customer this order belongs to.
+	 *
+	 * A requested one wins, so a run can build an order history for a single account — the fixture
+	 * a lifetime-value or repeat-purchase screen needs, which a random spread never produces. An ID
+	 * belonging to nobody falls back to a guest rather than attaching the order to a stranger.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return int Customer ID, or 0 for a guest.
+	 */
+	private function order_customer_id(): int {
+		$requested = (int) ( $this->params['customer_id'] ?? 0 );
+
+		if ( $requested > 0 ) {
+			return get_userdata( $requested ) ? $requested : 0;
+		}
+
+		return $this->random_customer_id();
+	}
+
+	/**
+	 * Add a shipping line, which is how WooCommerce models a shipping charge.
+	 *
+	 * Zero is a real value and gets a line of its own: an order with free shipping and an order
+	 * with no shipping method at all display differently, and the first is the case worth having.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WC_Order $order The order being built.
+	 * @param int      $total Shipping cost in minor units.
+	 *
+	 * @return void
+	 */
+	private function add_shipping( WC_Order $order, int $total ): void {
+		if ( ! class_exists( 'WC_Order_Item_Shipping' ) ) {
+			return;
+		}
+
+		$item = new \WC_Order_Item_Shipping();
+		$item->set_method_title( 0 === $total ? __( 'Free shipping', 'storeseeder' ) : __( 'Flat rate', 'storeseeder' ) );
+		$item->set_method_id( 0 === $total ? 'free_shipping' : 'flat_rate' );
+		$item->set_total( $this->to_decimal( $total ) );
+
+		$order->add_item( $item );
+	}
+
+	/**
 	 * Copy the customer's billing email onto the order.
 	 *
 	 * An order with no email is one no notification can reach, and testing emails is a
@@ -246,6 +331,7 @@ final class Order extends Writer {
 			// space to split on.
 			'first_name' => $name[0],
 			'last_name'  => $name[1] ?? '',
+			'company'    => $address['company'] ?? '',
 			'address_1'  => $address['address_1'] ?? '',
 			'address_2'  => $address['address_2'] ?? '',
 			'city'       => $address['city'] ?? '',
