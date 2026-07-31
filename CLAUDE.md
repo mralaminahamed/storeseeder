@@ -52,7 +52,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baseline: 301 tests, 1707 assertions.** For any refactor claiming no behaviour
+**Current baseline: 303 tests, 1711 assertions.** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
 

@@ -47,16 +47,21 @@ function SetCard({
   title,
   desc,
   danger,
+  testId,
   children,
 }: {
   icon: IconName;
   title: string;
   desc: string;
   danger?: boolean;
+  testId?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className={`fp-card fp-set-card${danger ? " fp-danger-card" : ""}`}>
+    <div
+      className={`fp-card fp-set-card${danger ? " fp-danger-card" : ""}`}
+      data-testid={testId}
+    >
       <div className="fp-set-card-head">
         <span
           className="fp-set-card-ic"
@@ -438,6 +443,7 @@ export default function SettingsPage() {
             Sample data card below uses it for. */}
         <SetCard
           icon="store"
+          testId="settings-target-platform"
           title={__("Target platform", "storeseeder")}
           desc={__(
             "Where generated data is written. Applies to every user on this site.",
@@ -620,6 +626,7 @@ export default function SettingsPage() {
             same ThemeProvider, so a change made in one shows in the other. */}
         <SetCard
           icon="palette"
+          testId="settings-appearance"
           title={__("Appearance", "storeseeder")}
           desc={__(
             "How the admin looks. Saved in this browser, per user.",

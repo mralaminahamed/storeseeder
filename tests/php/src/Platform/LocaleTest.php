@@ -113,6 +113,26 @@ class LocaleTest extends StoreSeederUnitTestCase {
 		$this->assertStringStartsWith( 'es_', Locale::resolve( 'es_MX' ) );
 	}
 
+	/**
+	 * Within a language, the language's own country wins.
+	 *
+	 * Scanning the list in order gave de_LU Austrian German, because at_AT and de_AT both
+	 * sort before de_DE. Nobody setting a German site expects Austria.
+	 */
+	public function test_language_fallback_prefers_the_languages_own_country(): void {
+		$this->assertSame( 'de_DE', Locale::resolve( 'de_LU' ) );
+		$this->assertSame( 'fr_FR', Locale::resolve( 'fr_MC' ) );
+		$this->assertSame( 'es_ES', Locale::resolve( 'es_MX' ) );
+	}
+
+	/**
+	 * A language with no same-named country still resolves within itself rather than
+	 * falling all the way back to English — there is no en_EN, and no ar_AR either.
+	 */
+	public function test_language_fallback_without_a_matching_country(): void {
+		$this->assertStringStartsWith( 'ar_', Locale::resolve( 'ar_MA' ) );
+	}
+
 	public function test_resolve_falls_back_to_the_default_when_nothing_matches(): void {
 		$this->assertSame( Locale::DEFAULT_LOCALE, Locale::resolve( 'xx_XX' ) );
 	}

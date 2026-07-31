@@ -61,7 +61,12 @@ export function Topbar({
 
         <PlatformSelect />
 
-        <button className="fp-locale-pill fp-focusable" onClick={onOpenLocale}>
+        <button
+          className="fp-locale-pill fp-focusable"
+          onClick={onOpenLocale}
+          data-testid="locale-pill"
+          title={locale}
+        >
           <Icon name="globe" size={14} />
           {locale.split(" (")[0]}
         </button>

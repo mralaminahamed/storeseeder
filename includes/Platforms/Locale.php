@@ -218,7 +218,16 @@ final class Locale {
 			return $requested;
 		}
 
-		$language = substr( $requested, 0, 2 );
+		$language = strtolower( substr( $requested, 0, 2 ) );
+
+		// The language's own country first. Scanning the list in order instead handed a
+		// de_LU site de_AT, because Austria sorts before Germany — Austrian German for a
+		// Luxembourgish site is not wrong exactly, but de_DE is the answer anyone expects.
+		$home = $language . '_' . strtoupper( $language );
+
+		if ( self::is_supported( $home ) ) {
+			return $home;
+		}
 
 		foreach ( self::codes() as $code ) {
 			if ( 0 === strpos( $code, $language . '_' ) ) {
