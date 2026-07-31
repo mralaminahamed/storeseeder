@@ -34,6 +34,7 @@ final class Resource {
 	const ORDER             = 'order';
 	const ORDER_TAX_RATE    = 'order_tax_rate';
 	const PRODUCT           = 'product';
+	const PRODUCT_CATEGORY  = 'product_category';
 	const PRODUCT_DOWNLOAD  = 'product_download';
 	const PRODUCT_VARIATION = 'product_variation';
 	const REFUND            = 'refund';
@@ -53,8 +54,9 @@ final class Resource {
 	public static function all(): array {
 		return array(
 			// Before products, because this list is generation order and the cleanup walks it
-			// backwards: a brand has to outlive the products carrying it, or the term is gone
-			// before the products that reference it are.
+			// backwards: a term has to outlive the products carrying it, or it is gone before
+			// the products that reference it are.
+			self::PRODUCT_CATEGORY,
 			self::BRAND,
 			self::PRODUCT,
 			self::PRODUCT_VARIATION,

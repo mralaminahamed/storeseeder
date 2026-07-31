@@ -91,6 +91,7 @@ final class Registry {
 			Abilities\Generate_Cart_Sessions::class,
 			Abilities\Generate_Attributes::class,
 			Abilities\Generate_Brands::class,
+			Abilities\Generate_Product_Categories::class,
 			Abilities\Generate_Refunds::class,
 			Abilities\Generate_Logs::class,
 			Abilities\Generate_Shipping_Classes::class,

@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce brand writer
+ * WooCommerce category writer
  *
  * @since   1.1.0
  * @package StoreSeeder\Platforms\Drivers\Woo_Commerce\Writers
@@ -15,22 +15,21 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Persists a canonical brand into WooCommerce's `product_brand` taxonomy.
+ * Persists a canonical product category into WooCommerce's `product_cat` taxonomy.
  *
- * Brands are core in WooCommerce 9.6 and later. Before that they came from the Brands extension,
- * which used the same taxonomy name — so the check that matters is whether the taxonomy is
- * registered, not which WooCommerce version is installed.
+ * `product_cat`, not `product_category`: WooCommerce shortened it, and the full name belongs to
+ * nothing — a writer using it would create terms in a taxonomy no WooCommerce screen reads.
  *
  * @since 1.1.0
  */
-final class Brand extends Writer {
+final class Product_Category extends Writer {
 	/**
-	 * The taxonomy WooCommerce keeps brands in.
+	 * The taxonomy WooCommerce keeps product categories in.
 	 *
 	 * @since 1.1.0
 	 * @var string
 	 */
-	const TAXONOMY = 'product_brand';
+	const TAXONOMY = 'product_cat';
 
 	/**
 	 * The resource this writer persists.
@@ -40,11 +39,11 @@ final class Brand extends Writer {
 	 * @return string
 	 */
 	public function resource(): string {
-		return Resource::BRAND;
+		return Resource::PRODUCT_CATEGORY;
 	}
 
 	/**
-	 * Create a WooCommerce brand and attach it to products.
+	 * Create a WooCommerce product category and attach it to products.
 	 *
 	 * @since 1.1.0
 	 *
@@ -55,8 +54,8 @@ final class Brand extends Writer {
 	public function write( array $entity ) {
 		if ( ! taxonomy_exists( self::TAXONOMY ) ) {
 			return new WP_Error(
-				'missing_woocommerce_brands',
-				__( 'WooCommerce does not have brands registered on this site. They are core in WooCommerce 9.6 and later.', 'storeseeder' )
+				'missing_woocommerce',
+				__( 'WooCommerce is not active on this site, so its product category taxonomy is not registered.', 'storeseeder' )
 			);
 		}
 
@@ -68,10 +67,10 @@ final class Brand extends Writer {
 	}
 
 	/**
-	 * Remove a generated brand.
+	 * Remove a generated category.
 	 *
-	 * The products keep existing; only the term relationship goes, which is what deleting a
-	 * brand means on every platform that has them.
+	 * The products keep existing; only the term relationship goes. WordPress reassigns anything
+	 * left uncategorised on its own, so nothing is orphaned.
 	 *
 	 * @since 1.1.0
 	 *
