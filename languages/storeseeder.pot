@@ -9,17 +9,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T13:52:05+00:00\n"
+"POT-Creation-Date: 2026-07-31T14:46:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:218
 #: class-storeseeder.php:219
-#: includes/MCP/MCP_Server.php:87
-#: includes/MCP/MCP_Server.php:144
+#: class-storeseeder.php:220
+#: includes/MCP/MCP_Server.php:89
+#: includes/MCP/MCP_Server.php:156
 #: build/admin-app.js:13
 msgid "StoreSeeder"
 msgstr ""
@@ -44,44 +44,44 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:246
+#: class-storeseeder.php:247
 msgid "Generate Data"
 msgstr ""
 
-#: class-storeseeder.php:251
+#: class-storeseeder.php:252
 #: build/admin-app.js:16
 #: build/admin-app.js:23
 msgid "Settings"
 msgstr ""
 
-#: class-storeseeder.php:277
-#: build/admin-app.js:32
+#: class-storeseeder.php:278
+#: build/admin-app.js:35
 msgid "Documentation"
 msgstr ""
 
-#: class-storeseeder.php:282
-#: build/admin-app.js:32
+#: class-storeseeder.php:283
+#: build/admin-app.js:35
 msgid "Support"
 msgstr ""
 
-#: class-storeseeder.php:287
-#: build/admin-app.js:32
+#: class-storeseeder.php:288
+#: build/admin-app.js:35
 msgid "GitHub"
 msgstr ""
 
 #. translators: %s: comma-separated list of supported e-commerce platforms.
-#: class-storeseeder.php:1381
+#: class-storeseeder.php:1457
 #, php-format
 msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1401
+#: class-storeseeder.php:1477
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:1479
+#: class-storeseeder.php:1555
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -913,31 +913,53 @@ msgstr ""
 msgid "Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type."
 msgstr ""
 
-#: includes/MCP/Ability.php:169
+#: includes/MCP/Ability.php:186
 msgid "Number of items to generate (1–100). Required."
 msgstr ""
 
-#: includes/MCP/Ability.php:178
+#: includes/MCP/Ability.php:195
 msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
 msgstr ""
 
-#: includes/MCP/Ability.php:184
+#: includes/MCP/Ability.php:201
 msgid "Optional integer seed for reproducible data generation. Omit for random output."
 msgstr ""
 
-#: includes/MCP/Ability.php:212
+#: includes/MCP/Ability.php:229
 msgid "Human-readable summary of the generation result."
 msgstr ""
 
-#: includes/MCP/Ability.php:276
+#. translators: %s: the generate tool's label, e.g. "Generate Products".
+#: includes/MCP/Ability.php:297
+#, php-format
+msgid "Preview: %s"
+msgstr ""
+
+#. translators: %s: the resource's own tool description.
+#: includes/MCP/Ability.php:302
+#, php-format
+msgid "Read-only. Shows the rows this generator would create, without writing anything — use it to check a set of parameters before generating. %s"
+msgstr ""
+
+#: includes/MCP/Ability.php:312
+msgid "Column definitions, each with a key and a label."
+msgstr ""
+
+#. translators: %s: the resource's row description.
+#: includes/MCP/Ability.php:319
+#, php-format
+msgid "Sample rows that would be created. %s"
+msgstr ""
+
+#: includes/MCP/Ability.php:399
 msgid "Unknown REST error."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:88
+#: includes/MCP/MCP_Server.php:90
 msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
 msgstr ""
 
-#: includes/MCP/MCP_Server.php:145
+#: includes/MCP/MCP_Server.php:157
 msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
 msgstr ""
 
@@ -2758,17 +2780,17 @@ msgid "Close"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Appearance"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Light"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Dark"
 msgstr ""
 
@@ -2777,17 +2799,17 @@ msgid "Accent color"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Density"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Comfortable"
 msgstr ""
 
 #: build/admin-app.js:19
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Compact"
 msgstr ""
 
@@ -2873,6 +2895,10 @@ msgstr ""
 #: build/admin-app.js:23
 #, js-format
 msgid "%s (not active)"
+msgstr ""
+
+#: build/admin-app.js:23
+msgid "Could not save the AI tool settings"
 msgstr ""
 
 #: build/admin-app.js:23
@@ -2980,207 +3006,277 @@ msgid "Code on this site also grants access through the %s capability, via the s
 msgstr ""
 
 #: build/admin-app.js:29
+msgid "AI tools (MCP)"
+msgstr ""
+
+#: build/admin-app.js:29
+msgid "Exposes the generators as tools an AI client can call, so test data can be asked for in words rather than clicked."
+msgstr ""
+
+#: build/admin-app.js:29
+msgid "On, but neither kind of tool is allowed — nothing is exposed"
+msgstr ""
+
+#. translators: 1: number of tools exposed, 2: number of generators.
+#: build/admin-app.js:30
+#, js-format
+msgid "Active — %1$d tools across %2$d generators"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Off — no tools are exposed"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Not available on this site"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Enable AI tools"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Serves the MCP endpoint. Off means no tools at all, and a client can no longer connect."
+msgstr ""
+
+#. translators: %d: number of generators.
+#: build/admin-app.js:31
+#, js-format
+msgid "Allow preview tools (%d)"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Read-only. Shows the rows a run would create, and writes nothing."
+msgstr ""
+
+#. translators: %d: number of generators.
+#: build/admin-app.js:32
+#, js-format
+msgid "Allow generating (%d, writes rows)"
+msgstr ""
+
+#: build/admin-app.js:32
+msgid "Lets an agent insert data into the store. Off leaves it able to preview only."
+msgstr ""
+
+#: build/admin-app.js:32
+msgid "Only administrators can change what an AI client may do."
+msgstr ""
+
+#: build/admin-app.js:32
+msgid "WordPress Abilities API — bundled with WordPress 6.9 and later, or installable as a plugin"
+msgstr ""
+
+#: build/admin-app.js:32
+msgid "The mcp-adapter plugin, which serves the tools to a client"
+msgstr ""
+
+#: build/admin-app.js:32
+msgid "Optional. Nothing else changes when it is absent — the admin, the REST API and WP-CLI all work the same. The same tools are also reachable through mcp-adapter's own default server, under whatever these switches allow."
+msgstr ""
+
+#: build/admin-app.js:32
 msgid "Sample data"
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:32
 msgid "Locale-specific reference data used by generators to produce realistic output."
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:32
 msgid "Checking status…"
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:32
 msgid "Sample data is synced"
 msgstr ""
 
 #. translators: %s: date string
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 #, js-format
 msgid "Last updated: %s"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Sample data not found"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Sync to download locale-specific reference data."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Automatic download is allowed. Revoke to stop downloading on visit."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Automatic download is declined. Sync now reopens the consent prompt so you can allow it."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Nothing has been downloaded yet. Sync now asks for your permission first."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Syncing…"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Sync now"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Force re-sync"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Revoke"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "View sample data repository"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Your preferences"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Stored in this browser, for you alone. Nothing here changes what anyone else sees."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Saved"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Generation defaults"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Pre-fill values on every generator page."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Default count"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Number of items pre-filled on every generator page."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:33
 msgid "Default locale"
 msgstr ""
 
 #. translators: %d: number of available locales.
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 #, js-format
 msgid "Locale used when generating data — %d available, all accepted by the REST API."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Default seed"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Fixed seed for reproducible runs. Leave blank for random output."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "random (leave blank)"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Include metadata by default"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Pre-check the Include Metadata toggle on every generator."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "How the admin looks. Saved in this browser, per user."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Theme"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Independent of the WordPress admin colour scheme."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Compact tightens row heights and padding across every page."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Accent & custom colours…"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Run history"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Control how much history is retained."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Max runs per generator"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "How many recent runs to store in history per generator type."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Plugin"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "Version, links, and the actions that cannot be undone."
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:34
 msgid "About"
 msgstr ""
 
 #. translators: %s: version number
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 #, js-format
 msgid "StoreSeeder · Version %s"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Danger zone"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "These actions cannot be undone."
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Run history cleared"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Clear run history & stats"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Removes locally stored generation stats and run history. Does not delete data in your database."
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Settings reset to defaults"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Reset settings to defaults"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:35
 msgid "Resets all settings to their default values."
 msgstr ""

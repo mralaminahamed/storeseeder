@@ -228,6 +228,8 @@ GET  /wp-json/storeseeder/v1/platforms
 POST /wp-json/storeseeder/v1/platforms/target        { "platform": "fluent-cart" }
 GET  /wp-json/storeseeder/v1/access                   # roles, capability, and whether you may change them
 POST /wp-json/storeseeder/v1/access                   { "roles": ["editor"] }   # manage_options only
+GET  /wp-json/storeseeder/v1/mcp                      # which AI tools are exposed, and whether you may change that
+POST /wp-json/storeseeder/v1/mcp                      { "generate": false }     # manage_options only; any of enabled/preview/generate
 GET  /wp-json/storeseeder/v1/download-sample
 POST /wp-json/storeseeder/v1/download-sample         { "force": false }
 POST /wp-json/storeseeder/v1/download-sample/consent { "granted": true }

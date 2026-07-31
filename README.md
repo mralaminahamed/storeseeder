@@ -129,7 +129,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | REST API | 18 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
 | WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data`, dispatching through the same REST controllers |
 | Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
-| MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
+| MCP integration | Optional — two AI tools per generator, one read-only and one that writes, with a Settings switch per risk class |
 | Hook system | Filters and actions across the generation lifecycle, plus one filter for the capability required to use the plugin |
 
 ## Documentation

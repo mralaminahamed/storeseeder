@@ -168,6 +168,7 @@ Filters and actions across the whole lifecycle, with the full table in
 - `storeseeder_rest_controllers` — add or remove a REST controller, so a driver can expose a
   resource of its own
 - `storeseeder_mcp_abilities` — add or remove an MCP ability
+- `storeseeder_mcp_settings` — decide the three MCP switches in code rather than in the database
 - `storeseeder_canonical_{resource}` — change generated data before it is written, for every
   platform at once
 - `storeseeder_locales` — narrow or extend the offered locales; the admin, REST enum and MCP
@@ -181,9 +182,50 @@ Filters and actions across the whole lifecycle, with the full table in
 
 ## Model Context Protocol (MCP)
 
-Optional. Every generator is exposed as an MCP tool so an AI client — Claude Desktop, an IDE
-assistant — can create test data conversationally. Requires the WordPress Abilities API
-(bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin.
+Optional. Each generator is exposed as **two** MCP tools so an AI client — Claude Desktop, an
+IDE assistant — can work with test data conversationally:
+
+| Tool | What it does |
+|---|---|
+| `storeseeder/preview-<resource>` | Read-only. Returns the columns and rows a run would create, and writes nothing |
+| `storeseeder/generate-<resource>` | Creates the rows in the store |
+
+Two tools rather than one flag, because an AI client's permission model works on tools:
+"you may call preview, not generate" is enforceable, while "you may call generate with
+`dry_run: true`" is a promise. Each carries MCP annotations saying which it is, so a client
+can treat them differently without reading the description.
+
+Requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately)
+and the `mcp-adapter` plugin.
+
+### The three switches
+
+Settings → **AI tools (MCP)** has one switch per risk class, and each is a registration gate:
+a tool that is not registered cannot be called.
+
+| Switch | Off means |
+|---|---|
+| Enable AI tools | No MCP server at all — `/wp-json/storeseeder-mcp/mcp` stops existing and a client cannot connect |
+| Allow preview tools | The read-only tools are withdrawn |
+| Allow generating | An agent can preview but cannot write rows into the store |
+
+All three default to on. Only administrators can change them, like the access roles they sit
+beside, and `storeseeder_mcp_settings` decides them in code where policy should not be an
+administrator's choice.
+
+### Two endpoints, the same tools
+
+StoreSeeder registers its own server at `/wp-json/storeseeder-mcp/mcp`, where every tool is
+listed by name with its own JSON Schema — so a client validates parameters before it calls,
+and the model chooses from a typed list.
+
+The same tools are also reachable through mcp-adapter's default server at
+`/wp-json/mcp/mcp-adapter-default-server`, which exposes three generic tools
+(`discover-abilities`, `get-ability-info`, `execute-ability`) an agent uses to find and run
+any ability on the site. That route works because StoreSeeder marks its abilities
+`mcp.public`, and it honours the same three switches. It is the right choice when a client is
+already configured for one site-wide endpoint; StoreSeeder's own server has the better
+ergonomics, since the tools arrive typed rather than behind a discovery call.
 
 It degrades gracefully: with either dependency absent, MCP does nothing and the rest of the
 plugin is unaffected. Abilities dispatch through the REST API rather than calling generators

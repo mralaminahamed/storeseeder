@@ -56,7 +56,9 @@ All data is created through the target platform's own models, so generated recor
 
 **Model Context Protocol (MCP) Integration**
 
-The plugin can optionally expose every generator as an MCP tool so AI clients (e.g. Claude Desktop, IDE assistants) can generate data with natural language. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
+The plugin can optionally expose each generator as two MCP tools so AI clients (e.g. Claude Desktop, IDE assistants) can work with test data in natural language: a read-only preview that shows the rows a run would create, and a generate tool that creates them. Settings has one switch per risk class — enable AI tools, allow preview tools, allow generating — and each is a registration gate, so a tool that is switched off is never offered to a client at all. Only administrators can change them.
+
+The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable through the `mcp-adapter` plugin's own default server for clients already configured against it. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
 
 == Installation ==
 
@@ -112,7 +114,7 @@ Use only in development or staging. Always back up your database before generati
 Yes. The plugin fires filters and actions across the generation lifecycle — modify parameters, transform generated items, and customize REST responses.
 
 = What is the MCP integration for? =
-It exposes generators as AI tools via the WordPress Abilities API, so an MCP-capable assistant can create test data conversationally. It is optional and off unless the Abilities API and `mcp-adapter` are present.
+It exposes the generators as AI tools via the WordPress Abilities API, so an MCP-capable assistant can create test data conversationally. Each generator gets two tools — a read-only preview and one that writes rows — and Settings decides which kinds are offered, so an assistant can be allowed to look without being allowed to fill the store. It is optional and does nothing unless the Abilities API and `mcp-adapter` are present.
 
 = In which languages can data be generated? =
 Seventy-five locales — every one FakerPHP ships a provider for. Names, addresses, phone numbers, company names, and postcodes follow the chosen locale. The picker offers exactly the set the REST API accepts, and is searchable by language name or locale code.

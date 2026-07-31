@@ -26,6 +26,7 @@ storeseeder/
 │   ├── MCP/                     # Model Context Protocol integration (optional)
 │   │   ├── MCP_Server.php       #   server + category registration
 │   │   ├── Registry.php         #   owns storeseeder_mcp_abilities
+│   │   ├── Settings.php        #   the three switches: AI surface, preview, generate
 │   │   ├── Ability.php          #   abstract base: dispatches through the REST API
 │   │   └── Abilities/           #   17 self-describing abilities, one per resource
 │   └── Platforms/               # Where data goes
@@ -361,6 +362,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_rest_controllers` | filter | Add or remove a REST controller, so a driver can expose a resource of its own |
 | `storeseeder_capability` | filter | The capability required to use StoreSeeder. Governs the admin menu, every REST route, every MCP ability and the AJAX handlers together, so access cannot be widened for one and not the others. An unusable return falls back to `manage_options` |
 | `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
+| `storeseeder_mcp_settings` | filter | Decide the three MCP switches — the AI surface, the preview tools, the generate tools — in code. Every gate reads through it, so `false` withdraws those tools wherever they are registered. A dropped key reads as off rather than as null |
 | `storeseeder_cli_commands` | filter | Add or remove a `wp storeseeder` subcommand |
 | `storeseeder_{resource}_generation_result` | filter | Inspect or reshape what one write reports — `storeseeder_product_generation_result` and so on, for all eighteen. The name is derived from the writer's resource by `Writer::filter_result()`, so it cannot drift from it |
 | `storeseeder_shipping_method_generation_result` | filter | **Deprecated in 1.1.0.** The shipping-plan writer's old hook, kept firing after the correctly named one so existing callbacks keep working. Use `storeseeder_shipping_plan_generation_result` |

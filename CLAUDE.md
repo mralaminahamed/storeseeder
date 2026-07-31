@@ -74,7 +74,8 @@ includes/
                   Registry.php               owns storeseeder_cli_commands
   MCP/            MCP_Server.php
                   Registry.php               owns storeseeder_mcp_abilities
-                  Ability.php (abstract)     + Abilities/*     18 abilities
+                  Settings.php               three switches, gate at registration
+                  Ability.php (abstract)     + Abilities/*     18 abilities, 36 tools
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php
                   Resource.php  Status.php  Locale.php
@@ -125,8 +126,17 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 `_after_write_`. Cross-cutting ones: `storeseeder_capability` (one gate for menu, REST, MCP and
 AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_rest_params` (the
 all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
-`storeseeder_mcp_ability_definition`, `storeseeder_admin_payload`,
+`storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`, `storeseeder_admin_payload`,
 `storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
+
+### Two MCP tools per generator, gated at registration
+
+`preview-<resource>` is read-only, `generate-<resource>` writes. `MCP\Settings` holds three
+switches (surface / preview / generate) and `Registry::tools()` applies them, so a withdrawn
+tool is never registered rather than registered-and-refusing — the strongest form the promise
+can take. Definitions carry `meta.mcp.public`, which is what makes them work through
+mcp-adapter's own default server as well as StoreSeeder's endpoint; dropping it silently
+breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
 
 ## Conventions that differ from what you would guess
 
