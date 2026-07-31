@@ -115,4 +115,20 @@ final class Refund extends Writer {
 
 		return $this->filter_result( $result, (int) $refund->id, $entity );
 	}
+
+	/**
+	 * Remove a generated refund.
+	 *
+	 * A refund is a transaction row; the charge it refunds is left untouched, since that is
+	 * the payment it was recorded against.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( OrderTransaction::class, $id );
+	}
 }

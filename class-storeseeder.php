@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use StoreSeeder\Access;
 use StoreSeeder\CLI\Registry as CLI_Registry;
+use StoreSeeder\Generation\Ledger;
+use StoreSeeder\Generation\Purge;
 use StoreSeeder\MCP\MCP_Server;
 use StoreSeeder\MCP\Settings as MCP_Settings;
 use StoreSeeder\Platforms\Locale;
@@ -120,6 +122,10 @@ class StoreSeeder {
 		register_deactivation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
 
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+		// The ledger's table, for sites updated by uploading a zip — that never fires the
+		// activation hook, and an absent table means generated rows stop being recorded and
+		// the cleanup silently has nothing to offer.
+		add_action( 'admin_init', array( Ledger::class, 'maybe_install' ) );
 
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
@@ -707,6 +713,48 @@ class StoreSeeder {
 			)
 		);
 
+		// Register the generated-data endpoints. Reading the ledger needs only the plugin's
+		// own gate; deleting is gated the same way, because it removes exactly the rows that
+		// gate allowed the user to create — and nothing else.
+		register_rest_route(
+			'storeseeder/v1',
+			'/generated',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_generated' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'rest_delete_generated' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+					'args'                => array(
+						'resource' => array(
+							// Canonical resource name, not a REST base: the ledger and the
+							// writers both speak in resources.
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'limit'    => array(
+							'type'    => 'integer',
+							'default' => 100,
+							'minimum' => 1,
+							'maximum' => 500,
+						),
+						// Drops the records without touching the store, for a ledger that no
+						// longer matches reality. Named for what it does, because forgetting
+						// and deleting are opposite mistakes to make.
+						'forget'   => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					),
+				),
+			)
+		);
+
 		// Register the MCP endpoints. Reading what the AI surface exposes needs only the
 		// plugin's own gate; changing what an agent may do to the store needs
 		// manage_options, like the access setting it sits beside.
@@ -828,6 +876,82 @@ class StoreSeeder {
 	}
 
 	/**
+	 * REST: what StoreSeeder has created on this site.
+	 *
+	 * Counts come from the plugin's own ledger, not from the store's tables, so this is a
+	 * report of what the cleanup would remove rather than of what the store contains.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response Ledger payload.
+	 */
+	public function rest_generated(): WP_REST_Response {
+		$counts    = Ledger::counts();
+		$resources = array();
+
+		// Ordered as they will be deleted, so the list the admin shows and the work it
+		// describes cannot disagree.
+		foreach ( Purge::order() as $resource_type ) {
+			if ( empty( $counts[ $resource_type ] ) ) {
+				continue;
+			}
+
+			$resources[] = array(
+				'resource' => $resource_type,
+				'count'    => (int) $counts[ $resource_type ],
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'total'     => array_sum( $counts ),
+				'resources' => $resources,
+				'platforms' => Ledger::platforms(),
+				'batch'     => Purge::BATCH,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: delete a batch of generated rows.
+	 *
+	 * Batched rather than all at once, and the response says what is left: deleting an order
+	 * takes several queries, so a site with thousands of recorded rows would otherwise time
+	 * out having reported nothing. The admin calls again until `remaining` is zero.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `resource`, `limit`, `forget`.
+	 *
+	 * @return WP_REST_Response What was deleted, and what is left.
+	 */
+	public function rest_delete_generated( WP_REST_Request $request ): WP_REST_Response {
+		$resource = (string) $request->get_param( 'resource' );
+
+		if ( $request->get_param( 'forget' ) ) {
+			$forgotten = Ledger::forget_all();
+
+			return new WP_REST_Response(
+				array(
+					'deleted'     => 0,
+					'forgotten'   => $forgotten,
+					'remaining'   => 0,
+					'by_resource' => array(),
+					'errors'      => array(),
+				),
+				200
+			);
+		}
+
+		$result = Purge::run( $resource, (int) $request->get_param( 'limit' ) );
+
+		$result['forgotten'] = 0;
+
+		return new WP_REST_Response( $result, 200 );
+	}
+
+	/**
 	 * REST: what the AI surface exposes, and whether it is on.
 	 *
 	 * The same payload the admin is handed inline at page load, so the card renders from
@@ -942,6 +1066,10 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function activate_plugin(): void {
+		// Before anything else: a run that happens before the table exists is a run the
+		// cleanup can never undo.
+		Ledger::install();
+
 		// Runs before the flush below, since changing the structure is what
 		// makes the rules stale in the first place.
 		$this->maybe_set_postname_permalinks();

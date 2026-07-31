@@ -167,4 +167,20 @@ final class Shipping_Plan extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated shipping method.
+	 *
+	 * The zone survives: the writer reuses an existing one where it can, so deleting it
+	 * would take out methods it never created.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( ShippingMethodModel::class, $id );
+	}
 }

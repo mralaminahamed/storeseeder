@@ -178,4 +178,21 @@ final class Product_Download extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated downloadable file, and the permissions granting access to it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			ProductDownloadModel::class,
+			$id,
+			array( OrderDownloadPermissionModel::class => 'download_id' )
+		);
+	}
 }

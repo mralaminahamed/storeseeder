@@ -159,4 +159,27 @@ final class Attribute extends Writer {
 
 		return $linked;
 	}
+
+	/**
+	 * Remove a generated attribute group.
+	 *
+	 * Relations first, then terms, then the group: a term whose group is gone is invisible
+	 * in the admin and impossible to clear from there.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			AttributeGroup::class,
+			$id,
+			array(
+				AttributeRelation::class => 'group_id',
+				AttributeTerm::class     => 'group_id',
+			)
+		);
+	}
 }

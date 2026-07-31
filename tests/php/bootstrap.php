@@ -85,7 +85,9 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
  */
 function storeseeder_truncate_table_data(): void {
 	$tables = array(
-		'storeseeder_generated_data',
+		// The ledger of generated rows. Named `storeseeder_generated_data` here until the
+		// table existed at all, which is why the truncate had been a no-op.
+		'storeseeder_generated',
 		// Add other tables as needed.
 	);
 

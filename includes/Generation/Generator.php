@@ -441,6 +441,13 @@ abstract class Generator {
 
 		$result = $writer->write( $entity );
 
+		// Recorded here rather than in each writer: the ledger is what lets the admin offer
+		// to delete generated data without touching the store's own rows, and eighteen
+		// writers each remembering to record would be eighteen chances to forget.
+		if ( ! is_wp_error( $result ) && isset( $result['id'] ) ) {
+			Ledger::record( $platform, $resource, $result['id'] );
+		}
+
 		/**
 		 * Fires after one entity has been written to a platform.
 		 *

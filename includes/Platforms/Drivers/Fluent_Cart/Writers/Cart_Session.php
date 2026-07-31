@@ -211,4 +211,20 @@ final class Cart_Session extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated cart session.
+	 *
+	 * Keyed by cart_hash, not id: fct_carts has no id column, which is why the writer
+	 * reported the hash in the first place.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( CartModel::class, $id, array(), 'cart_hash' );
+	}
 }

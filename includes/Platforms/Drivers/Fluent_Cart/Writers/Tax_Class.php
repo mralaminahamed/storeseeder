@@ -168,4 +168,21 @@ final class Tax_Class extends Writer {
 
 		return $tax_class->id;
 	}
+
+	/**
+	 * Remove a generated tax class and its rates.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			TaxClassModel::class,
+			$id,
+			array( TaxRateModel::class => 'class_id' )
+		);
+	}
 }

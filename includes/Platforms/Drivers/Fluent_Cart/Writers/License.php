@@ -278,4 +278,25 @@ final class License extends Writer {
 
 		return $written;
 	}
+
+	/**
+	 * Remove a generated licence and its activations.
+	 *
+	 * Resolved by name like the writer's create path, so this file stays loadable on a site
+	 * where Pro was deactivated after the licences were generated — the ledger still lists
+	 * them, and the answer has to be "Pro is not active" rather than a fatal.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The licence id.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			self::LICENSE_MODEL,
+			$id,
+			array( self::ACTIVATION_MODEL => 'license_id' )
+		);
+	}
 }

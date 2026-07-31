@@ -149,4 +149,20 @@ final class Coupon extends Writer {
 
 		return $coupon->id;
 	}
+
+	/**
+	 * Remove a generated coupon.
+	 *
+	 * Applied-coupon rows are left alone: they belong to the orders that used the coupon,
+	 * and removing an order's history because a coupon was cleaned up would rewrite it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( CouponModel::class, $id );
+	}
 }

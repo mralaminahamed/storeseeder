@@ -245,4 +245,25 @@ final class Customer extends Writer {
 			),
 		);
 	}
+
+	/**
+	 * Remove a generated customer, and the addresses that belong to them.
+	 *
+	 * The WordPress user a customer may be linked to is deliberately not touched — the
+	 * writer attaches to an existing user rather than creating one, so deleting it would
+	 * remove an account StoreSeeder never made.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			CustomerModel::class,
+			$id,
+			array( CustomerAddressModel::class => 'customer_id' )
+		);
+	}
 }

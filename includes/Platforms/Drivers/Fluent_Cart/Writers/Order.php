@@ -14,6 +14,10 @@ use FluentCart\App\Models\Customer as CustomerModel;
 use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\OrderAddress as OrderAddressModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
+use FluentCart\App\Models\OrderDownloadPermission as OrderDownloadPermissionModel;
+use FluentCart\App\Models\OrderItem as OrderItemModel;
+use FluentCart\App\Models\OrderTaxRate as OrderTaxRateModel;
+use FluentCart\App\Models\OrderTransaction as OrderTransactionModel;
 use StoreSeeder\Platforms\Writer;
 use StoreSeeder\Platforms\Resource;
 use StoreSeeder\Platforms\Status;
@@ -379,6 +383,34 @@ final class Order extends Writer {
 				'code'      => $coupon->code,
 				// Stored in integer cents, like every other order money column.
 				'amount'    => $discount,
+			)
+		);
+	}
+
+	/**
+	 * Remove a generated order and everything recorded against it.
+	 *
+	 * Line items, addresses, applied coupons, tax lines, transactions and download
+	 * permissions all key off the order and none of them cascade, so deleting the order
+	 * alone would leave six kinds of orphan that only show up as broken totals later.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			OrderModel::class,
+			$id,
+			array(
+				OrderItemModel::class               => 'order_id',
+				OrderAddressModel::class            => 'order_id',
+				AppliedCouponModel::class           => 'order_id',
+				OrderTaxRateModel::class            => 'order_id',
+				OrderTransactionModel::class        => 'order_id',
+				OrderDownloadPermissionModel::class => 'order_id',
 			)
 		);
 	}

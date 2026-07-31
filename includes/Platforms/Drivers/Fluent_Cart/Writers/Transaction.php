@@ -134,4 +134,20 @@ final class Transaction extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated transaction.
+	 *
+	 * The order it belongs to stays: a transaction is one payment attempt against it, and
+	 * the order is a separate resource with its own ledger entry.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( OrderTransactionModel::class, $id );
+	}
 }

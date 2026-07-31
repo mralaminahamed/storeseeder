@@ -207,4 +207,21 @@ final class Product_Variation extends Writer {
 			)
 		);
 	}
+
+	/**
+	 * Remove a generated product variation.
+	 *
+	 * The product keeps its own default-variation pointer; Fluent Cart tolerates a stale one
+	 * and repairs it on the next save, whereas guessing a replacement here could make a
+	 * variation the store never chose the default.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( ProductVariationModel::class, $id );
+	}
 }

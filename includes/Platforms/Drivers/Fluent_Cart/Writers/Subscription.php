@@ -143,4 +143,17 @@ final class Subscription extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated subscription.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( SubscriptionModel::class, $id );
+	}
 }

@@ -108,4 +108,17 @@ final class Log extends Writer {
 
 		return $this->filter_result( $result, (int) $activity->id, $entity );
 	}
+
+	/**
+	 * Remove a generated activity log entry.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( Activity::class, $id );
+	}
 }

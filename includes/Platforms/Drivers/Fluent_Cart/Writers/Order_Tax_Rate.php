@@ -128,4 +128,20 @@ final class Order_Tax_Rate extends Writer {
 			return null;
 		}
 	}
+
+	/**
+	 * Remove a generated order tax line.
+	 *
+	 * The tax rate it points at is a store setting the writer reused, not something it
+	 * created, so it stays.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model( OrderTaxRateModel::class, $id );
+	}
 }

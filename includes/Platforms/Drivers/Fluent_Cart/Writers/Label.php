@@ -184,4 +184,21 @@ final class Label extends Writer {
 
 		return $ids;
 	}
+
+	/**
+	 * Remove a generated label and its attachments.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The identifier reported when the row was created.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		return $this->delete_model(
+			LabelModel::class,
+			$id,
+			array( LabelRelationshipModel::class => 'label_id' )
+		);
+	}
 }

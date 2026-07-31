@@ -204,4 +204,67 @@ final class Product extends Writer {
 
 		return $product->ID;
 	}
+
+	/**
+	 * Remove a generated product.
+	 *
+	 * A Fluent Cart product is a WordPress post plus two rows of its own, and neither
+	 * cascades. `wp_delete_post()` rather than a model delete, because the post carries
+	 * meta, terms and an attachment relationship that only core knows how to unpick —
+	 * deleting the row directly would leave all of it behind.
+	 *
+	 * Force-deleted rather than trashed: a trashed test product still occupies its slug and
+	 * still shows in the admin's Trash, which is not what "delete the generated data" means.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int|string $id The product post id.
+	 *
+	 * @return true|WP_Error
+	 */
+	public function delete( $id ) {
+		$post_id = (int) $id;
+
+		if ( $post_id <= 0 ) {
+			return new WP_Error(
+				'storeseeder_delete_failed',
+				__( 'A generated product was recorded without a usable post id.', 'storeseeder' )
+			);
+		}
+
+		// Its own rows first: with the post gone, nothing in the admin can reach them.
+		$rows = $this->delete_model(
+			ProductDetailModel::class,
+			$post_id,
+			array( ProductVariationModel::class => 'post_id' ),
+			'post_id'
+		);
+
+		if ( is_wp_error( $rows ) ) {
+			return $rows;
+		}
+
+		$post = get_post( $post_id );
+
+		// Already gone is a success: the ledger can outlive the data it points at, and a
+		// permanent failure here would block the rest of the cleanup for ever.
+		if ( ! $post ) {
+			return true;
+		}
+
+		$deleted = wp_delete_post( $post_id, true );
+
+		if ( null === $deleted || false === $deleted ) {
+			return new WP_Error(
+				'storeseeder_delete_failed',
+				sprintf(
+					/* translators: %d: post id. */
+					__( 'Could not delete generated product %d.', 'storeseeder' ),
+					$post_id
+				)
+			);
+		}
+
+		return true;
+	}
 }
