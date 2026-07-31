@@ -328,6 +328,10 @@ of aborting the run. It also leaves room for a driver whose write is a remote HT
 Every seam is a filter, so a platform can be added from a separate plugin without patching
 this one.
 
+Two site options sit behind the filters: `storeseeder_target_platform` (the chosen driver)
+and `storeseeder_allowed_roles` (roles granted access from Settings, never including
+administrator). Both are written through REST rather than read from the admin directly.
+
 | Hook | Kind | Purpose |
 |---|---|---|
 | `storeseeder_platforms` | filter | Register a driver. The whole surface needed to add a platform. |

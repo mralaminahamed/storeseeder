@@ -122,7 +122,8 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Design-token UI | Light/dark themes, accent palettes, and comfortable/compact density — all scoped to the plugin, so WordPress chrome is never restyled |
 | Multi-platform | One driver per store plugin; the target is site-wide, and capabilities are resolved per request rather than declared once |
 | 75 locales | Every locale FakerPHP ships a provider for, searchable by name or code. The picker offers exactly what the REST API accepts |
-| Settings | Target platform, default count, locale, reproducible seed, metadata preference, run-history limit, appearance, and sample-data sync |
+| Settings | Grouped by scope — site-wide (target platform, who may generate, sample data) and per-browser (defaults, appearance, run history), saved as you change them |
+| Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
 | REST API | 17 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
 | MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
@@ -268,8 +269,10 @@ and what StoreSeeder deliberately does not do — in
 ## Security
 
 - Every REST endpoint, MCP ability and admin screen requires `manage_options` — or whatever
-  `storeseeder_capability` returns, which governs all of them together so access cannot be widened
-  for one surface and not another
+  `storeseeder_capability` returns, or a role allowed in Settings, all governed together so access
+  cannot be widened for one surface and not another
+- Granting access is itself restricted to `manage_options`, so a role allowed to generate cannot
+  allow further roles
 - Parameters are validated against JSON Schema before processing
 - Sample-data archives are validated entry by entry before extraction, rejecting absolute paths and
   `..` traversal segments (zip-slip)

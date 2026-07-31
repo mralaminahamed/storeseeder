@@ -116,7 +116,7 @@ It exposes generators as AI tools via the WordPress Abilities API, so an MCP-cap
 Seventy-five locales — every one FakerPHP ships a provider for. Names, addresses, phone numbers, company names, and postcodes follow the chosen locale. The picker offers exactly the set the REST API accepts, and is searchable by language name or locale code.
 
 = Who can generate data? =
-Administrators — the `manage_options` capability — for the admin screen, the REST routes, and the MCP tools alike. A single filter, `storeseeder_capability`, changes that for all of them at once, so access cannot be granted to the API and withheld from the page.
+Administrators, always. Other roles can be granted access from Settings — one switch per role, covering the admin screen, the REST routes, and the MCP tools alike. Only an administrator can change that setting, so a granted role cannot widen access further, and the Administrator role itself is not listed because it cannot be revoked. Developers can also set the required capability in code with the `storeseeder_capability` filter.
 
 = How do I remove generated data? =
 Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back up before removing.

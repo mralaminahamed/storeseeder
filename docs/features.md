@@ -193,6 +193,9 @@ platform, which an MCP client can set with the `platform` parameter.
 
 - One capability gate — `StoreSeeder\Access`, default `manage_options` — for the admin screen, every
   REST route, every MCP ability and the AJAX handlers
+- Roles can be granted access from Settings without writing code. Administrators are always
+  allowed and cannot be revoked, and only an administrator can change the setting, so it cannot
+  escalate itself
 - Parameters validated by the JSON Schema registered with each route, each with a
   `sanitize_callback`
 - Nonce-protected admin requests

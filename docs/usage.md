@@ -128,13 +128,27 @@ server-side background processing.
 
 **Settings** in the sidebar holds:
 
+Grouped by who a change affects — **This site**, **Your preferences**, then **Plugin**. Every
+card carries a scope badge, and the browser-stored ones save as you change them; there is no
+Save button.
+
+**This site**
+
 - **Target platform** — where data is written, and what `Auto` currently resolves to. The same
   site-wide option the topbar selector writes
+- **Who can generate data** — a switch per role. Administrators always can and are not listed;
+  only an administrator can change the setting, so a role granted here cannot grant more roles
+- **Sample data** — Sync now, Force re-sync, Revoke consent
+
+**Your preferences**
+
 - **Generation defaults** — default count, faker locale, seed, and metadata toggle
-- **Run history** — how many recent runs to keep per generator
 - **Appearance** — theme and density. Accent and per-token colours stay in **Tweaks**, which the
   card links to
-- **Sample data** — Sync now, Force re-sync, Revoke consent
+- **Run history** — how many recent runs to keep per generator
+
+**Plugin**
+
 - **About** — version and links
 - **Danger zone** — clear run history and statistics, or reset settings
 
@@ -147,7 +161,9 @@ server-side background processing.
 ## REST API
 
 All routes require the `manage_options` capability — or whatever `storeseeder_capability`
-returns, which the admin menu and the MCP abilities honour too — and a REST nonce.
+returns, or one of the roles allowed in Settings, all of which the admin menu and the MCP
+abilities honour too — and a REST nonce. The one exception is `POST /access`, which always
+requires `manage_options`: it decides who else gets in.
 
 ### Endpoints
 
@@ -183,6 +199,8 @@ Platform and sample-data routes:
 ```
 GET  /wp-json/storeseeder/v1/platforms
 POST /wp-json/storeseeder/v1/platforms/target        { "platform": "fluent-cart" }
+GET  /wp-json/storeseeder/v1/access                   # roles, capability, and whether you may change them
+POST /wp-json/storeseeder/v1/access                   { "roles": ["editor"] }   # manage_options only
 GET  /wp-json/storeseeder/v1/download-sample
 POST /wp-json/storeseeder/v1/download-sample         { "force": false }
 POST /wp-json/storeseeder/v1/download-sample/consent { "granted": true }
