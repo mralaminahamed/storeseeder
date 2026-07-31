@@ -36,6 +36,7 @@ final class Resource {
 	const PRODUCT           = 'product';
 	const PRODUCT_CATEGORY  = 'product_category';
 	const PRODUCT_DOWNLOAD  = 'product_download';
+	const PRODUCT_TAG       = 'product_tag';
 	const PRODUCT_VARIATION = 'product_variation';
 	const REFUND            = 'refund';
 	const SHIPPING_CLASS    = 'shipping_class';
@@ -57,6 +58,7 @@ final class Resource {
 			// backwards: a term has to outlive the products carrying it, or it is gone before
 			// the products that reference it are.
 			self::PRODUCT_CATEGORY,
+			self::PRODUCT_TAG,
 			self::BRAND,
 			self::PRODUCT,
 			self::PRODUCT_VARIATION,

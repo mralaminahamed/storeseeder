@@ -165,6 +165,15 @@ final class Platform extends Platform_Driver {
 			$matrix[ $resource_type ] = true;
 		}
 
+		// Fluent Cart registers `product-categories` and `product-brands` and no tag taxonomy at
+		// all. Its own Product model reads `product-tags` in three places, which resolves to
+		// nothing — so tags are not merely unimplemented here, they have nowhere to live.
+		// StoreSeeder could register the taxonomy itself and refuses to: the terms would be
+		// real, and unreachable from any Fluent Cart screen, which is worse than absent.
+		$matrix[ Resource::PRODUCT_TAG ] = Capability::unsupported(
+			__( 'Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to.', 'storeseeder' )
+		);
+
 		if ( ! $this->is_pro_active() ) {
 			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
 				self::PRO_SLUG,

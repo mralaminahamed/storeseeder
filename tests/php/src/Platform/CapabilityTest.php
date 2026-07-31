@@ -69,11 +69,15 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 		$platform = Registry::instance()->get( 'fluent-cart' );
 		$supports = $platform->supports();
 
+		// The two Fluent Cart cannot do, for different reasons — which is the distinction the
+		// Capability class exists to carry. Licences need Pro; tags have nowhere to go at all,
+		// because Fluent Cart registers no tag taxonomy.
+		$conditional = array( Resource::LICENSE, Resource::PRODUCT_TAG );
+
 		foreach ( Resource::all() as $resource_type ) {
 			$this->assertArrayHasKey( $resource_type, $supports );
 
-			// Licences are the one conditional resource: Pro owns their tables.
-			if ( Resource::LICENSE === $resource_type ) {
+			if ( in_array( $resource_type, $conditional, true ) ) {
 				continue;
 			}
 
@@ -192,7 +196,7 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 	}
 
 	public function test_resource_names_are_stable(): void {
-		$this->assertCount( 20, Resource::all() );
+		$this->assertCount( 21, Resource::all() );
 		$this->assertTrue( Resource::exists( 'license' ) );
 		$this->assertTrue( Resource::exists( 'product' ) );
 		$this->assertFalse( Resource::exists( 'products' ) );

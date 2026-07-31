@@ -32,8 +32,8 @@ const PREREQUISITES: Record<string, string[]> = {
 };
 
 describe("generators", () => {
-  it("ships twenty", () => {
-    expect(generators).toHaveLength(20);
+  it("ships twenty-one", () => {
+    expect(generators).toHaveLength(21);
   });
 
   it("has a unique route and resource per generator", () => {
@@ -144,7 +144,7 @@ describe("sortedGenerators", () => {
 
     const families = [
       // Brands sit with the other catalogue resources, between attributes and downloads.
-      ["product_variation", "attribute", "product_category", "brand", "product_download", "cart_session"],
+      ["product_variation", "attribute", "product_category", "brand", "product_tag", "product_download", "cart_session"],
       ["transaction", "refund", "subscription", "license", "label"],
       ["tax_class", "order_tax_rate"],
       ["shipping_plan", "shipping_class"],
@@ -167,7 +167,7 @@ describe("generatorsByCategory", () => {
     const groups = generatorsByCategory();
 
     expect(groups.map((g) => g.category)).toEqual(["Core", "Advanced"]);
-    expect(groups.flatMap((g) => g.items)).toHaveLength(20);
+    expect(groups.flatMap((g) => g.items)).toHaveLength(21);
   });
 
   it("labels each group for display", () => {

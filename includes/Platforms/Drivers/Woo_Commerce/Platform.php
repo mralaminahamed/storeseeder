@@ -231,6 +231,7 @@ final class Platform extends Platform_Driver {
 			Resource::ORDER_TAX_RATE    => Writers\Order_Tax_Rate::class,
 			Resource::PRODUCT           => Writers\Product::class,
 			Resource::PRODUCT_CATEGORY  => Writers\Product_Category::class,
+			Resource::PRODUCT_TAG       => Writers\Product_Tag::class,
 			Resource::PRODUCT_DOWNLOAD  => Writers\Product_Download::class,
 			Resource::PRODUCT_VARIATION => Writers\Product_Variation::class,
 			Resource::REFUND            => Writers\Refund::class,
