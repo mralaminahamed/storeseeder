@@ -126,6 +126,8 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
 | REST API | 17 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
+| WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data`, dispatching through the same REST controllers |
+| Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
 | MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
 | Hook system | Filters and actions across the generation lifecycle, plus one filter for the capability required to use the plugin |
 
@@ -197,6 +199,40 @@ includes/
 The admin app is React 18, React Router v7, Radix UI, and Tailwind CSS v4, entered at
 `src/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
 readable source lives in this repository.
+
+## Command line
+
+Every command goes through the same REST controllers the admin uses, so the two cannot
+disagree about what a parameter means or what is valid.
+
+```bash
+# Generate. Any parameter the resource's endpoint accepts works as a flag.
+wp storeseeder generate products --count=20 --locale=de_DE --user=1
+wp storeseeder generate products --count=5 --price_range='{"min":5,"max":500}' --user=1
+wp storeseeder generate orders --count=100 --seed=42 --payment_methods=stripe,paypal --user=1
+
+# Look before you write: same rows, nothing persisted, no target platform needed.
+wp storeseeder preview products --count=3 --format=json --user=1
+
+# Where data goes, and what can be generated in it.
+wp storeseeder platforms --user=1
+wp storeseeder platforms --set=fluent-cart --user=1
+wp storeseeder locales --search=german
+
+# Act on a consent decision already recorded; it never grants one.
+wp storeseeder sample-data --user=1
+wp storeseeder sample-data sync --force --user=1
+```
+
+`--user` is required for anything that writes. StoreSeeder writes rows into a live store, so
+the command verifies a real user's capability rather than treating shell access as consent to
+write to this particular site — and that keeps one answer to "who may generate?" across the
+admin, REST, MCP and the CLI. `wp storeseeder locales` needs no user, because it only reports
+what the plugin can do.
+
+Both spellings of a resource work: `cart-sessions` (the REST base) and `cart_session` (the
+canonical name). A typo lists the valid ones; an unknown flag lists the parameters that
+endpoint accepts.
 
 ## Development
 

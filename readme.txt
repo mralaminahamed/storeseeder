@@ -29,6 +29,8 @@ All data is created through the target platform's own models, so generated recor
 * **75 locales** — names, addresses, phone numbers, and postcodes in any locale FakerPHP ships a provider for. The picker offers exactly what the REST API accepts, searchable by name or code.
 * **Schema-driven configuration** — each generator renders its own fields from a parameter schema: nested options, ranges, toggles, and intelligent defaults.
 * **REST API** — every generator is exposed at `storeseeder/v1/<resource>/generate` for programmatic use.
+* **WP-CLI** — `wp storeseeder generate products --count=20 --locale=de_DE`, plus preview, platform and locale commands. The same controllers as the REST API, so nothing can drift.
+* **Translation-ready** — every string passes through gettext and the plugin's own `languages` directory is registered, so Loco Translate and WPML String Translation pick the admin up without configuration.
 * **Optional MCP integration** — expose generators as AI tools via the WordPress Abilities API (see below).
 * **Extensible** — filters and actions cover the full generation lifecycle, one filter registers a whole platform, and one filter sets the capability required to use the plugin.
 
@@ -117,6 +119,12 @@ Seventy-five locales — every one FakerPHP ships a provider for. Names, address
 
 = Who can generate data? =
 Administrators, always. Other roles can be granted access from Settings — one switch per role, covering the admin screen, the REST routes, and the MCP tools alike. Only an administrator can change that setting, so a granted role cannot widen access further, and the Administrator role itself is not listed because it cannot be revoked. Developers can also set the required capability in code with the `storeseeder_capability` filter.
+
+= Can I generate from the command line? =
+Yes, with WP-CLI: `wp storeseeder generate products --count=20 --locale=de_DE --user=1`. There are also `preview`, `platforms`, `locales` and `sample-data` commands. Every one dispatches through the same REST controller the admin uses, so the command line and the interface cannot disagree about what is valid. Commands that write require `--user` for someone with the plugin's capability, because generated rows land in a live store.
+
+= Is the plugin translatable? =
+Yes. All strings — PHP and the React admin — go through gettext, a `.pot` template ships in `languages/`, and that directory is registered for both PHP and JavaScript translations. Loco Translate can therefore translate it in place, and WPML String Translation picks the strings up once a language is active. Translating the plugin does not change the language of *generated data*; that is what the locale setting is for, and it offers 75 locales.
 
 = How do I remove generated data? =
 Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back up before removing.

@@ -38,6 +38,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `storeseeder_rest_params` apply to all seventeen resources and run before their specific
   counterparts. Plus `storeseeder_locales`, `storeseeder_mcp_ability_definition`,
   `storeseeder_admin_payload` and `storeseeder_sample_data_source`.
+- **WP-CLI.** `wp storeseeder generate <resource>` plus `preview`, `platforms`, `locales` and
+  `sample-data`, each dispatching through the same REST controller the admin uses — so
+  validation, platform resolution and the capability check are one implementation rather than
+  three. Any parameter the endpoint accepts works as a flag, including lists
+  (`--payment_methods=stripe,paypal`) and objects (`--price_range='{"min":5,"max":500}'`);
+  an unknown flag is rejected with the list of parameters that endpoint takes, because
+  `--lokale=de_DE` silently generating English is worse than an error. Commands that touch
+  store state require `--user`: shell access is not the same as consent to write to this
+  site's tables, and this keeps one answer to "who may generate?" across all four surfaces.
+- **Translations resolve from the plugin's own `languages/` directory**, for PHP and for the
+  React admin. `load_plugin_textdomain()` runs on `init`, and `wp_set_script_translations()`
+  now receives the path — without it core looked only in `wp-content/languages/plugins`, so a
+  bundled JSON translation, or one Loco Translate wrote beside the plugin, was ignored for
+  every admin string. Loco Translate and WPML String Translation both work without
+  configuration.
 - The plugin screen clears other plugins' admin notices — setup wizards, review nags, upgrade
   prompts — so the interface starts at the top of the page instead of below a stack of messages
   about the rest of the site. Only this screen is affected, and

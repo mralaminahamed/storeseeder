@@ -53,7 +53,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 319 PHP tests / 1746 assertions, and 198 Jest tests
+**Current baselines: 339 PHP tests / 1861 assertions, and 198 Jest tests
 (`yarn test:unit`).** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
@@ -70,6 +70,8 @@ includes/
   Generation/     Generator.php (abstract)   + Generators/*    17 generators
   Rest/           Controller.php (abstract)  + Controllers/*   17 controllers
                   Registry.php               owns storeseeder_rest_controllers
+  CLI/            Command.php (abstract)     + Commands/*       5 commands
+                  Registry.php               owns storeseeder_cli_commands
   MCP/            MCP_Server.php
                   Registry.php               owns storeseeder_mcp_abilities
                   Ability.php (abstract)     + Abilities/*     17 abilities
@@ -177,6 +179,13 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
   falls back to `en_US` in silence, the other 67 produced English with no error. Adding a locale
   means FakerPHP ships a provider for it; `LocaleTest::test_list_matches_fakerphp_exactly()`
   fails otherwise.
+- **A CLI command's flags are limited by its synopsis.** WP-CLI rejects anything not
+  declared, so resource-specific parameters need a `generic` synopsis entry — without it
+  `--product_type=digital` never reaches the plugin. And `WP_CLI::error()` exits without
+  PHPStan knowing, so each guard needs an explicit `return;`.
+- **`Controller::get_rest_base()` and `get_resource_type()` are protected.** Use the public
+  `rest_base()` / `resource_type()` counterparts from outside; calling the protected ones
+  fatals, and under WP-CLI that surfaces as an exit 255 with no message at all.
 - **Jest owns `*.test.ts(x)`, Playwright owns `*.spec.ts`.** Both would otherwise collect
   the other's files, and a Playwright spec under Jest fails with a confusing error about
   `test.describe`. Jest tests sit **beside their source** (`src/lib/locales.test.ts`), not

@@ -19,6 +19,10 @@ storeseeder/
 │   │   ├── Controller.php       #   abstract base: params, validation, platform resolution
 │   │   ├── Registry.php         #   owns storeseeder_rest_controllers
 │   │   └── Controllers/         #   17 controllers, one per resource
+│   ├── CLI/                     # WP-CLI surface (only registers when WP_CLI is present)
+│   │   ├── Command.php          #   abstract base: resource resolution, payload building
+│   │   ├── Registry.php         #   owns storeseeder_cli_commands
+│   │   └── Commands/            #   generate, preview, platforms, locales, sample-data
 │   ├── MCP/                     # Model Context Protocol integration (optional)
 │   │   ├── MCP_Server.php       #   server + category registration
 │   │   ├── Registry.php         #   owns storeseeder_mcp_abilities
@@ -72,6 +76,10 @@ governs, and its concrete children nest one level beneath it.
   for a request.
 - **`includes/MCP/`** — optional AI tooling; abilities dispatch through the REST API rather
   than calling generators directly.
+- **`includes/CLI/`** — the WP-CLI surface, dispatching through the REST API for the same
+  reason: three entry points, one set of rules about what a parameter means. The registry is
+  usable without the WP-CLI runtime present, which is what lets the command logic be tested
+  under PHPUnit.
 - **`src/`** — the React admin.
 - **`build/`** — compiled assets; the source in `src/` is not shipped in the plugin package.
 
@@ -338,6 +346,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_rest_controllers` | filter | Add or remove a REST controller, so a driver can expose a resource of its own |
 | `storeseeder_capability` | filter | The capability required to use StoreSeeder. Governs the admin menu, every REST route, every MCP ability and the AJAX handlers together, so access cannot be widened for one and not the others. An unusable return falls back to `manage_options` |
 | `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
+| `storeseeder_cli_commands` | filter | Add or remove a `wp storeseeder` subcommand |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
 | `storeseeder_canonical_entity` | filter | Mutate every neutral entity, whatever its resource. Runs before the per-resource filter, which therefore wins |

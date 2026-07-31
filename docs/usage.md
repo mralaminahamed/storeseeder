@@ -162,6 +162,29 @@ Save button.
 > consent decision and the target platform — which is why changing the platform in Settings
 > changes it for everyone.
 
+## WP-CLI
+
+```bash
+wp storeseeder generate <resource> [--count=<n>] [--locale=<code>] [--seed=<n>] [--platform=<id>] [--<param>=<value>] [--porcelain]
+wp storeseeder preview  <resource> [--count=<n>] [--locale=<code>] [--format=<table|json|csv|yaml>]
+wp storeseeder platforms [--set=<id|auto>] [--format=<...>]
+wp storeseeder locales [--search=<term>] [--format=<table|json|csv|yaml|ids>]
+wp storeseeder sample-data [status|sync] [--force]
+```
+
+Each command dispatches through the REST controller for that resource, so validation,
+platform resolution and the capability check are the same code the admin exercises. Anything
+the endpoint accepts can be passed as a flag — a list as `--payment_methods=stripe,paypal`,
+an object as `--price_range='{"min":5,"max":500}'`.
+
+| Detail | Behaviour |
+|---|---|
+| `--user` | Required for everything that writes or reads store state. WP-CLI has no user by default, and StoreSeeder writes to a live store, so it verifies a capability rather than assuming shell access implies consent. `locales` is the exception — it only lists what the plugin can do. |
+| Resource naming | Either spelling: `cart-sessions` or `cart_session`. A typo lists the valid ones. |
+| Unknown flags | Rejected with the list of parameters that endpoint accepts, so `--lokale=de_DE` fails loudly instead of quietly generating English. |
+| `--porcelain` | Prints only the number created, for scripting. |
+| Sample data | `sync` acts on a consent decision already recorded; it cannot grant consent, because only the admin-page prompt can. |
+
 ## REST API
 
 All routes require the `manage_options` capability — or whatever `storeseeder_capability`

@@ -125,6 +125,23 @@ abstract class Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * The canonical resource this controller generates
+	 *
+	 * Public counterpart to get_resource_type(), for the same reason as rest_base():
+	 * subclasses declare it protected so it does not become API, but callers outside the
+	 * controller legitimately need the mapping. The CLI accepts either spelling —
+	 * `cart-sessions` or `cart_session` — and needs this to relate the two.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	public function resource_type(): string {
+		return $this->get_resource_type();
+	}
+
+
+	/**
 	 * Register REST API routes
 	 */
 	public function register_routes(): void {

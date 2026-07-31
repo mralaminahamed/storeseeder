@@ -490,6 +490,29 @@ Separately, `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` 
 **without** a release. Worth remembering before editing it.
 
 
+### Adding a WP-CLI command
+
+1. `includes/CLI/Commands/` — extend `StoreSeeder\CLI\Command`, set `NAME`, implement
+   `shortdesc()`, `synopsis()` and `__invoke()`
+2. Add it to `CLI\Registry::default_classes()`, or append it through
+   `storeseeder_cli_commands` from another plugin
+3. Dispatch through `$this->dispatch()` rather than calling a generator — that is what keeps
+   the CLI, the REST API and the MCP tools agreeing about validation and capabilities
+4. Call `$this->require_access()` first if the command reads or writes store state
+
+Two things bite when writing one:
+
+- **WP-CLI rejects any flag the synopsis does not declare.** Resource-specific parameters
+  therefore need a `{'type' => 'generic'}` entry in the synopsis; `Command::build_payload()`
+  is what then validates them against the endpoint's own schema.
+- **`WP_CLI::error()` exits, but static analysis cannot know that.** Follow every one with an
+  explicit `return;` inside the guard, or PHPStan reads the whole rest of the method as
+  operating on a `WP_Error`.
+
+PHPStan needs `php-stubs/wp-cli-stubs` to see the `WP_CLI` class at all — it is in
+`scanFiles` in `phpstan.neon`, not `stubFiles`, because the class is not autoloadable from
+here.
+
 ### Release checklist
 
 - [ ] Version matches in all three places above
@@ -497,6 +520,7 @@ Separately, `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` 
 - [ ] `composer test` — the count matches the recorded baseline
 - [ ] `composer phpcs`, `composer phpstan`, `yarn lint:js`, `npx tsc --noEmit`
 - [ ] `yarn test:unit` — the Jest count matches the recorded baseline
+- [ ] `composer makepot` after the build, so `languages/storeseeder.pot` carries the new strings
 - [ ] `composer phpcs:plugin-review` for the WordPress.org ruleset
 - [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
 - [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)

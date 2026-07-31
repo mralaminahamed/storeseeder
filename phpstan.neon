@@ -37,6 +37,12 @@ parameters:
     stubFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
 
+    # WP_CLI comes from the WP-CLI runtime, not from WordPress, and it is not autoloadable
+    # from here — so it is scanned rather than stubbed. Without it the CLI layer analyses as
+    # 47 calls to an unknown class. Dev-only: the commands never run unless WP_CLI is real.
+    scanFiles:
+        - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+
     # WordPress constants
     dynamicConstantNames:
         - ABSPATH

@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use StoreSeeder\Access;
+use StoreSeeder\CLI\Registry as CLI_Registry;
 use StoreSeeder\MCP\MCP_Server;
 use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
@@ -117,6 +118,8 @@ class StoreSeeder {
 		register_activation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'activate_plugin' ) );
 		register_deactivation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
 
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -131,6 +134,46 @@ class StoreSeeder {
 		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
 
 		$this->init_mcp();
+		$this->init_cli();
+	}
+
+	/**
+	 * Load the plugin's translations.
+	 *
+	 * On `init` rather than `plugins_loaded`: loading a textdomain before `init` is what
+	 * WordPress 6.7 started warning about, and nothing here needs a translated string
+	 * earlier than that.
+	 *
+	 * WordPress finds translations in `wp-content/languages/plugins/` on its own. This call
+	 * is what additionally makes the plugin's *own* `languages/` directory work, which is
+	 * where Loco Translate writes by default when it is told to keep files with the plugin,
+	 * and where a bundled translation would live.
+	 *
+	 * @since 1.1.0
+	 * @hooked init
+	 *
+	 * @return void
+	 */
+	public function load_textdomain(): void {
+		load_plugin_textdomain(
+			'storeseeder',
+			false,
+			dirname( plugin_basename( STORESEEDER_PLUGIN_FILE ) ) . '/languages'
+		);
+	}
+
+	/**
+	 * Register the WP-CLI commands.
+	 *
+	 * The registry is inspectable without WP_CLI present — which is what lets the command
+	 * logic be tested in PHPUnit — so the guard lives inside it rather than here.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	private function init_cli(): void {
+		CLI_Registry::instance()->register_commands();
 	}
 
 	/**
@@ -546,7 +589,14 @@ class StoreSeeder {
 
 		wp_localize_script( 'storeseeder-admin', 'storeseederApi', $payload );
 
-		wp_set_script_translations( 'storeseeder-admin', 'storeseeder' );
+		// The third argument is the plugin's own languages directory. Without it core looks
+		// only in wp-content/languages/plugins, so a bundled JSON translation — or one Loco
+		// Translate wrote beside the plugin — would be ignored for every admin string.
+		wp_set_script_translations(
+			'storeseeder-admin',
+			'storeseeder',
+			STORESEEDER_PLUGIN_PATH . 'languages'
+		);
 	}
 
 	/**

@@ -2,26 +2,21 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StoreSeeder 1.0.0\n"
+"Project-Id-Version: StoreSeeder – eCommerce Test Data Generator for Fluent Cart 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/storeseeder\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-30T16:41:42+00:00\n"
+"POT-Creation-Date: 2026-07-31T11:23:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:187
-#: class-storeseeder.php:188
-#: includes/MCP/MCP_Server.php:87
-#: includes/MCP/MCP_Server.php:140
-#: build/admin-app.js:10
-msgid "StoreSeeder"
+msgid "StoreSeeder – eCommerce Test Data Generator for Fluent Cart"
 msgstr ""
 
 #. Plugin URI of the plugin
@@ -31,7 +26,7 @@ msgstr ""
 
 #. Description of the plugin
 #: storeseeder.php
-msgid "Create realistic test data for your Fluent Cart store in seconds! Generate products, customers, orders, coupons and more with our intuitive admin interface. Perfect for development, testing, and demos. Features smart defaults, real-time validation, and seamless WordPress integration."
+msgid "Realistic test data for WordPress e-commerce platforms. Seventeen generators — products, customers, orders, coupons and more — write through a platform driver, so the same data can seed any supported store. Fluent Cart ships; other platforms can register their own driver. For development, testing, and demos."
 msgstr ""
 
 #. Author of the plugin
@@ -44,55 +39,1143 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:215
-msgid "Generate Data"
-msgstr ""
-
-#: class-storeseeder.php:220
-#: build/admin-app.js:11
-#: build/admin-app.js:14
-msgid "Settings"
+#: class-storeseeder.php:218
+#: class-storeseeder.php:219
+#: includes/MCP/MCP_Server.php:87
+#: includes/MCP/MCP_Server.php:144
+#: build/admin-app.js:13
+msgid "StoreSeeder"
 msgstr ""
 
 #: class-storeseeder.php:246
-#: build/admin-app.js:16
-msgid "Documentation"
+msgid "Generate Data"
 msgstr ""
 
 #: class-storeseeder.php:251
 #: build/admin-app.js:16
+#: build/admin-app.js:23
+msgid "Settings"
+msgstr ""
+
+#: class-storeseeder.php:277
+#: build/admin-app.js:32
+msgid "Documentation"
+msgstr ""
+
+#: class-storeseeder.php:282
+#: build/admin-app.js:32
 msgid "Support"
 msgstr ""
 
-#: class-storeseeder.php:256
-#: build/admin-app.js:16
+#: class-storeseeder.php:287
+#: build/admin-app.js:32
 msgid "GitHub"
 msgstr ""
 
-#: class-storeseeder.php:1101
-msgid "StoreSeeder requires Fluent Cart plugin to be installed and active."
+#. translators: %s: comma-separated list of supported e-commerce platforms.
+#: class-storeseeder.php:1381
+#, php-format
+msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1118
+#: class-storeseeder.php:1401
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:1196
+#: class-storeseeder.php:1479
 msgid "You are not allowed to do that."
 msgstr ""
 
-#: includes/Abstracts/Ability.php:85
+#. translators: 1: resource as typed, 2: comma-separated list of valid resources.
+#: includes/CLI/Command.php:122
+#, php-format
+msgid "Unknown resource \"%1$s\". Available: %2$s"
+msgstr ""
+
+#. translators: 1: flag name, 2: endpoint, 3: comma-separated list of accepted parameters.
+#: includes/CLI/Command.php:178
+#, php-format
+msgid "\"%1$s\" is not a parameter of %2$s. Accepted: %3$s"
+msgstr ""
+
+#. translators: %s: capability name, e.g. manage_options.
+#: includes/CLI/Command.php:279
+#, php-format
+msgid "No user context, so the \"%s\" capability cannot be verified. Re-run with --user=<id|login|email> for a user who has it."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:31
+msgid "Generate test data for one resource."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:46
+#: includes/CLI/Commands/Preview.php:50
+msgid "Resource or REST base, e.g. products or cart_session."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:52
+msgid "How many items to create, 1-100."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:59
+msgid "Locale to generate in, e.g. de_DE. Run `wp storeseeder locales` for the list."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:65
+msgid "Integer seed, for a reproducible run."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:71
+msgid "Platform id to write to, or auto. Defaults to the site-wide target."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:81
+#: includes/CLI/Commands/Preview.php:81
+msgid "Any other parameter the resource accepts, e.g. --product_type=digital."
+msgstr ""
+
+#: includes/CLI/Commands/Generate.php:87
+msgid "Output only the number of items created."
+msgstr ""
+
+#. translators: 1: number of items, 2: resource name.
+#: includes/CLI/Commands/Generate.php:155
+#, php-format
+msgid "Generated %1$d %2$s."
+msgstr ""
+
+#: includes/CLI/Commands/Locales.php:35
+msgid "List the locales data can be generated in."
+msgstr ""
+
+#: includes/CLI/Commands/Locales.php:50
+msgid "Filter by language name or locale code."
+msgstr ""
+
+#: includes/CLI/Commands/Locales.php:56
+#: includes/CLI/Commands/Platforms.php:52
+#: includes/CLI/Commands/Preview.php:69
+msgid "Output format."
+msgstr ""
+
+#. translators: %s: the search term.
+#: includes/CLI/Commands/Locales.php:89
+#, php-format
+msgid "No locale matches \"%s\"."
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:31
+msgid "List platforms, or set the site-wide target."
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:46
+msgid "Platform id to write to from now on, or auto."
+msgstr ""
+
+#. translators: %s: platform id, or "auto".
+#: includes/CLI/Commands/Platforms.php:93
+#, php-format
+msgid "Target platform set to %s."
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:111
+msgid "No platform drivers are registered, so there is nowhere to write to."
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:127
+msgid "More than one platform is active and none is chosen, so a run will refuse rather than guess. Set one with --set=<id>."
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:171
+#: includes/CLI/Commands/Platforms.php:181
+#: includes/CLI/Commands/Sample_Data.php:166
+msgid "yes"
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:173
+msgid "auto"
+msgstr ""
+
+#: includes/CLI/Commands/Platforms.php:181
+#: includes/CLI/Commands/Sample_Data.php:166
+msgid "no"
+msgstr ""
+
+#: includes/CLI/Commands/Preview.php:35
+msgid "Preview rows a generator would create, without writing them."
+msgstr ""
+
+#: includes/CLI/Commands/Preview.php:56
+msgid "How many rows to preview."
+msgstr ""
+
+#: includes/CLI/Commands/Preview.php:63
+msgid "Locale to preview in."
+msgstr ""
+
+#: includes/CLI/Commands/Preview.php:130
+msgid "The preview returned no rows."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:37
+msgid "Report or sync the optional sample data."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:52
+msgid "status or sync."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:60
+msgid "Re-download even when the files are already present."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:125
+msgid "Sample data has not been consented to on this site. An administrator has to accept the prompt on the StoreSeeder admin page first; generators work from built-in defaults until then."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:138
+#: build/admin-app.js:22
+msgid "Sample data synced."
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:155
+msgid "granted"
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:157
+msgid "declined"
+msgstr ""
+
+#: includes/CLI/Commands/Sample_Data.php:159
+msgid "never asked"
+msgstr ""
+
+#. translators: %s: yes or no.
+#: includes/CLI/Commands/Sample_Data.php:165
+#, php-format
+msgid "Downloaded:  %s"
+msgstr ""
+
+#. translators: %s: granted, declined, or never asked.
+#: includes/CLI/Commands/Sample_Data.php:170
+#, php-format
+msgid "Consent:     %s"
+msgstr ""
+
+#. translators: %s: ISO 8601 date.
+#: includes/CLI/Commands/Sample_Data.php:178
+#, php-format
+msgid "Last synced: %s"
+msgstr ""
+
+#. translators: %s: repository URL.
+#: includes/CLI/Commands/Sample_Data.php:186
+#, php-format
+msgid "Source:      %s"
+msgstr ""
+
+#. translators: %s: Error message
+#: includes/Generation/Generator.php:356
+#, php-format
+msgid "Generation failed: %s"
+msgstr ""
+
+#: includes/Generation/Generator.php:491
+msgid "No target platform was set for this run."
+msgstr ""
+
+#. translators: 1: resource name, 2: platform display name.
+#: includes/Generation/Generator.php:502
+#, php-format
+msgid "%1$s cannot be generated for %2$s."
+msgstr ""
+
+#: includes/Generation/Generator.php:632
+msgid "ID"
+msgstr ""
+
+#: includes/Generation/Generator.php:636
+msgid "Value"
+msgstr ""
+
+#: includes/Generation/Generator.php:681
+msgid "Count must be a positive number."
+msgstr ""
+
+#. translators: %d: Maximum batch size
+#: includes/Generation/Generator.php:690
+#, php-format
+msgid "Count cannot exceed %d items per batch."
+msgstr ""
+
+#: includes/Generation/Generators/Attribute.php:47
+msgid "Product Attribute Groups with Terms"
+msgstr ""
+
+#: includes/Generation/Generators/Cart_Session.php:42
+#: build/admin-app.js:4
+msgid "Cart Sessions"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:40
+#: build/admin-app.js:4
+msgid "Coupons"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:103
+msgid "Code"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:107
+msgid "Type"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:111
+msgid "Amount"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:115
+msgid "Usage limit"
+msgstr ""
+
+#: includes/Generation/Generators/Coupon.php:119
+#: includes/Generation/Generators/Order.php:151
+#: includes/Generation/Generators/Product.php:115
+msgid "Status"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:73
+msgid "Customer Profiles with Addresses and Metadata"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:83
+msgid "Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing customer management systems."
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:631
+#: includes/Generation/Generators/Product.php:99
+msgid "Name"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:635
+msgid "Email"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:639
+msgid "City"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:643
+msgid "Country"
+msgstr ""
+
+#: includes/Generation/Generators/Customer.php:647
+#: includes/Generation/Generators/Order.php:45
+#: build/admin-app.js:4
+#: build/admin-app.js:14
+msgid "Orders"
+msgstr ""
+
+#: includes/Generation/Generators/Label.php:63
+#: build/admin-app.js:4
+msgid "Labels"
+msgstr ""
+
+#: includes/Generation/Generators/Log.php:80
+msgid "Info"
+msgstr ""
+
+#: includes/Generation/Generators/Log.php:81
+#: build/admin-app.js:19
+msgid "Warning"
+msgstr ""
+
+#: includes/Generation/Generators/Log.php:82
+#: build/admin-app.js:12
+msgid "Error"
+msgstr ""
+
+#: includes/Generation/Generators/Log.php:83
+#: build/admin-app.js:12
+#: build/admin-app.js:19
+msgid "Success"
+msgstr ""
+
+#: includes/Generation/Generators/Order.php:135
+#: includes/Rest/Controllers/Order.php:58
+msgid "Order"
+msgstr ""
+
+#: includes/Generation/Generators/Order.php:139
+#: includes/Rest/Controllers/Customer.php:58
+msgid "Customer"
+msgstr ""
+
+#: includes/Generation/Generators/Order.php:143
+msgid "Items"
+msgstr ""
+
+#: includes/Generation/Generators/Order.php:147
+#: build/admin-app.js:20
+msgid "Total"
+msgstr ""
+
+#: includes/Generation/Generators/Order_Tax_Rate.php:41
+#: build/admin-app.js:4
+msgid "Order Tax Lines"
+msgstr ""
+
+#: includes/Generation/Generators/Product.php:103
+msgid "SKU"
+msgstr ""
+
+#: includes/Generation/Generators/Product.php:107
+msgid "Price"
+msgstr ""
+
+#: includes/Generation/Generators/Product.php:111
+msgid "Stock"
+msgstr ""
+
+#: includes/Generation/Generators/Product_Download.php:41
+#: build/admin-app.js:4
+msgid "Product Downloads"
+msgstr ""
+
+#: includes/Generation/Generators/Product_Variation.php:43
+#: build/admin-app.js:4
+msgid "Product Variations"
+msgstr ""
+
+#: includes/Generation/Generators/Refund.php:50
+msgid "Full refund"
+msgstr ""
+
+#: includes/Generation/Generators/Refund.php:51
+msgid "Partial refund"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Class.php:58
+#: build/admin-app.js:4
+msgid "Shipping Classes"
+msgstr ""
+
+#: includes/Generation/Generators/Shipping_Plan.php:51
+#: build/admin-app.js:4
+msgid "Shipping Plans"
+msgstr ""
+
+#: includes/Generation/Generators/Subscription.php:63
+#: build/admin-app.js:4
+msgid "Subscriptions"
+msgstr ""
+
+#: includes/Generation/Generators/Tax_Class.php:40
+#: build/admin-app.js:4
+msgid "Tax Classes"
+msgstr ""
+
+#: includes/Generation/Generators/Transaction.php:42
+#: build/admin-app.js:4
+msgid "Transactions"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Attributes.php:30
+msgid "Generate Attributes"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Attributes.php:37
+msgid "Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Attributes.php:46
+msgid "Array of generated attribute objects with id, name, type, slug, and values array."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:30
+msgid "Generate Cart Sessions"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:37
+msgid "Generate realistic shopping cart sessions including pending, abandoned, completed, and cancelled states. Useful for testing abandoned-cart recovery workflows and marketing-automation integrations."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:47
+msgid "Cart owner type. Allowed: existing, new, mixed, specific, guest_only. Default: mixed."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:53
+msgid "Attach all carts to this customer ID. Requires customer_type=\"specific\"."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:58
+msgid "Percentage of guest (unauthenticated) carts when customer_type is \"mixed\" (0–100). Default: 40."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:65
+msgid "Percentage of carts with \"abandoned\" status (0–100). Default: 30."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:72
+msgid "Minimum cart value (USD). Default: 5."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:78
+msgid "Maximum cart value (USD). Default: 500."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:91
+msgid "Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:30
+msgid "Generate Coupons"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:37
+msgid "Generate realistic Fluent Cart discount coupons with various discount types, usage limits, validity periods, and product or customer restrictions."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:47
+msgid "Discount types to include. Allowed: percentage, fixed, free_shipping, products. Default: [\"percentage\",\"fixed\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:53
+msgid "Minimum percentage discount (5–95). Default: 10."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:60
+msgid "Maximum percentage discount (5–95). Default: 50."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:67
+msgid "Minimum fixed discount amount (USD). Default: 5."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:72
+msgid "Maximum fixed discount amount (USD). Default: 100."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:77
+msgid "Add usage-limit rules to coupons. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:82
+msgid "Maximum total uses per coupon when set_usage_limits is true (1–1000). Default: 100."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:89
+msgid "Minimum coupon validity period in days. Default: 7."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:95
+msgid "Maximum coupon validity period in days (1–365). Default: 90."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Coupons.php:109
+msgid "Array of generated coupon objects with id, code, type, offer, status, usage_limit, and validity dates."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:30
+msgid "Generate Customers"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:37
+msgid "Generate realistic WordPress customer accounts with billing/shipping addresses, demographic metadata, purchase history, and loyalty tier assignments."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:47
+msgid "Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: [\"regular\",\"returning\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:53
+msgid "Generate billing addresses. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:58
+msgid "Generate shipping addresses. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:63
+msgid "Percentage of customers with a different shipping address (0–100). Default: 30."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:70
+msgid "Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:75
+msgid "Percentage of customers opted into marketing emails (0–100). Default: 65."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:89
+msgid "Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Labels.php:30
+msgid "Generate Labels"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Labels.php:37
+msgid "Generate labels (tags) and attach them to existing orders and customers for testing Fluent Cart segmentation. Requires existing orders or customers to attach to."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Labels.php:46
+msgid "Array of generated label objects with id, value, and attached count."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Logs.php:30
+msgid "Generate Logs"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Logs.php:37
+msgid "Generate activity log entries for orders, products, customers, coupons, refunds, carts, transactions, and system events. Returns log IDs, object types, actions, and severity levels."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Logs.php:47
+msgid "Log severity types to generate. Default: all types."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Logs.php:63
+msgid "Array of generated log objects with id, object, action, type, note, and is_public."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:30
+msgid "Generate Orders"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:37
+msgid "Generate realistic Fluent Cart orders with line items, addresses, payment details, shipping calculations, tax breakdowns, and fulfilment status. Requires at least one product with variations and one customer to exist."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:47
+msgid "Status of generated orders. Allowed: pending, processing, completed, cancelled, on_hold, refunded, mixed. Default: mixed."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:53
+msgid "Whose customer accounts to attach. Allowed: existing, new, mixed, specific. Default: mixed."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:59
+msgid "WordPress user ID to attach all orders to. Only used when customer_type is \"specific\"."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:64
+msgid "Minimum order total (USD). Default: 10."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:69
+msgid "Maximum order total (USD). Default: 1000."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:74
+msgid "Minimum line items per order. Default: 1."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:80
+msgid "Maximum line items per order (1–20). Default: 5."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:87
+msgid "Payment methods to distribute across orders. Allowed: stripe, paypal, bank_transfer, cash_on_delivery, credit_card. Default: [\"stripe\",\"paypal\",\"bank_transfer\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Orders.php:100
+msgid "Array of generated order objects with id, order_number, status, total, payment_method, and item count."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Order_Tax_Rates.php:30
+msgid "Generate Order Tax Lines"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Order_Tax_Rates.php:37
+msgid "Generate per-order tax lines linking orders to tax rates with the tax amounts collected. Requires existing orders and tax rates."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Order_Tax_Rates.php:46
+msgid "Array of generated order tax line objects with id, order_id, tax_rate_id, and total_tax."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:30
+msgid "Generate Products"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:37
+msgid "Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:47
+msgid "Type of products to generate. Allowed: simple, variable, grouped, external, digital, mixed. Default: mixed."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:53
+msgid "Minimum product price (USD). Default: 10."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:58
+msgid "Maximum product price (USD). Default: 500."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:63
+msgid "Generate product attributes (size, colour, material). Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:68
+msgid "Number of variations per variable product (1–20). Default: 5."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:75
+msgid "Enable stock management and generate inventory levels. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:80
+msgid "Length of product descriptions. Allowed: short, medium, long. Default: medium."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Products.php:93
+msgid "Array of generated product objects with id, title, type, variations count, price_range, and stock_status."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Downloads.php:30
+msgid "Generate Product Downloads"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Downloads.php:37
+msgid "Generate downloadable files for products and grant download permissions on existing orders, for testing Fluent Cart digital fulfillment. Requires existing products."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Downloads.php:46
+msgid "Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:30
+msgid "Generate Product Variations"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:37
+msgid "Generate product variations (size/colour/storage combinations) for existing products. Creates variation records with unique SKUs, individual pricing, stock levels, and dimension metadata. Requires products to exist."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:47
+msgid "Generate variations only for this product ID. Omit to pick a random eligible product."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:52
+msgid "Array of product IDs to skip during generation."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:58
+msgid "Enable inventory tracking for variations. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:63
+msgid "Minimum stock quantity per variation. Default: 0."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:69
+msgid "Maximum stock quantity per variation. Default: 100."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:82
+msgid "Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Refunds.php:30
+msgid "Generate Refunds"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Refunds.php:37
+msgid "Generate refund records against existing Fluent Cart orders. Requires completed or processing orders to exist. Returns refund IDs, amounts, statuses, and gateway transaction IDs."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Refunds.php:46
+msgid "Array of generated refund objects with id, order_id, amount, status, and payment_gateway."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Classes.php:30
+msgid "Generate Shipping Classes"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Classes.php:37
+msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag, for a Fluent Cart store."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Classes.php:46
+msgid "Array of generated shipping class objects with id, name, cost, and per_item."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:30
+msgid "Generate Shipping Plans"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:37
+msgid "Generate realistic shipping plans with tiered pricing methods (price-based, weight-based, quantity-based), regional coverage, delivery timeframes, and taxability settings."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:47
+msgid "Shipping method types. Allowed: standard, express, overnight, pickup, free, weight_based, flat_rate. Default: [\"standard\",\"express\",\"free\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:53
+msgid "Minimum shipping cost (USD). Default: 0."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:59
+msgid "Maximum shipping cost (USD). Default: 50."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:65
+msgid "Geographic coverage. Allowed: domestic, international, regional, worldwide. Default: [\"domestic\",\"international\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Shipping_Plans.php:78
+msgid "Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Subscriptions.php:30
+msgid "Generate Subscriptions"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Subscriptions.php:37
+msgid "Generate subscription records against existing orders for testing Fluent Cart recurring-billing views. The subscriptions table ships in core, but active billing requires Fluent Cart Pro. Requires existing orders and products."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Subscriptions.php:46
+msgid "Array of generated subscription objects with id, uuid, customer_id, item_name, billing_interval, status, and recurring_total."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:30
+msgid "Generate Tax Classes"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:37
+msgid "Generate tax classes with country/state/city-level rate tables, compound tax configurations, and priority settings for a Fluent Cart store."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:47
+msgid "Tax class types to generate. Allowed: standard, reduced, zero, exempt, digital. Default: [\"standard\",\"reduced\",\"zero\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:53
+msgid "ISO-2 country codes to generate tax rates for. Default: [\"US\",\"CA\",\"GB\",\"AU\",\"DE\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:59
+msgid "Include compound tax rate configurations. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Tax_Classes.php:71
+msgid "Array of generated tax class objects with id, name, active status, rates array, and covered regions."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:30
+msgid "Generate Transactions"
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:37
+msgid "Generate realistic payment transaction records linked to existing orders. Creates transactions with gateway-specific IDs, amounts, statuses, and currency assignments. Requires orders to exist."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:47
+msgid "Filter orders by customer type. Allowed: all, specific, existing_customers_only, new_customers_only. Default: all."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:53
+msgid "Only create transactions for orders belonging to this customer ID. Requires customer_type=\"specific\"."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:58
+msgid "Transaction types to generate. Allowed: payment, refund, adjustment, fee, commission. Default: [\"payment\",\"refund\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:64
+msgid "Payment gateways to use. Allowed: stripe, paypal, square, authorize_net, braintree, razorpay, mollie. Default: [\"stripe\",\"paypal\",\"square\"]."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:77
+msgid "Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type."
+msgstr ""
+
+#: includes/MCP/Ability.php:169
+msgid "Number of items to generate (1–100). Required."
+msgstr ""
+
+#: includes/MCP/Ability.php:178
+msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
+msgstr ""
+
+#: includes/MCP/Ability.php:184
+msgid "Optional integer seed for reproducible data generation. Omit for random output."
+msgstr ""
+
+#: includes/MCP/Ability.php:212
+msgid "Human-readable summary of the generation result."
+msgstr ""
+
+#: includes/MCP/Ability.php:276
 msgid "Unknown REST error."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:229
+#: includes/MCP/MCP_Server.php:88
+msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
+msgstr ""
+
+#: includes/MCP/MCP_Server.php:145
+msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
+msgstr ""
+
+#. translators: %s: name of the plugin that would enable this generator.
+#: includes/Platforms/Capability.php:107
+#, php-format
+msgid "Requires %s."
+msgstr ""
+
+#: includes/Platforms/Capability.php:133
+#: includes/Rest/Controller.php:400
+#: build/admin-app.js:2
+msgid "Not supported by this platform."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:52
+msgid "Fluent Cart"
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Attribute.php:49
+msgid "Fluent Cart attribute models not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Attribute.php:66
+msgid "Failed to create attribute group."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:50
+msgid "Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:94
+msgid "Failed to create cart session."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:62
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:47
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:72
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:61
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:48
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:47
+msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:86
+msgid "Failed to create coupon."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:127
+msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:159
+msgid "Failed to create coupon using Fluent Cart model."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:51
+msgid "Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:58
+msgid "A user with this email address already exists."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:90
+msgid "Failed to create customer using Fluent Cart model."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Label.php:67
+msgid "Fluent Cart Label model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Label.php:73
+msgid "Failed to create label."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Log.php:64
+msgid "Fluent Cart Activity model not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#. translators: %s: canonical resource name.
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Log.php:75
+#, php-format
+msgid "Fluent Cart has no model for log module \"%s\"."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Log.php:97
+msgid "Failed to create activity log entry."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:76
+msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:87
+msgid "No published products with variations were found. Generate products before generating orders."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:99
+msgid "No customers were found. Generate customers before generating orders."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:141
+msgid "Failed to create order using Fluent Cart model."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:49
+msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:57
+msgid "No orders were found. Generate orders before generating order tax lines."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:66
+msgid "No tax rates were found. Generate tax classes before generating order tax lines."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:80
+msgid "The drawn order already carries this tax rate. Try again."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:95
+msgid "Failed to create order tax line."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:65
+msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:88
+msgid "Failed to create product."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Download.php:50
+msgid "Fluent Cart ProductDownload model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Download.php:60
+msgid "No product variations were found. Generate products before generating downloads."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Download.php:82
+msgid "Failed to create product download."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:62
+msgid "No products were found. Generate products before generating variations."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:100
+msgid "Failed to create product variation."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Refund.php:47
+msgid "Fluent Cart transaction model not found. Ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Refund.php:58
+msgid "No successful charge transactions found for refund generation. Generate orders/transactions first."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Refund.php:75
+msgid "Computed refund amount is zero; source transaction has no value."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Refund.php:102
+msgid "Failed to create refund transaction."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Class.php:47
+msgid "Fluent Cart ShippingClass model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Class.php:65
+msgid "Failed to create shipping class."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:64
+msgid "Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Shipping_Plan.php:85
+msgid "Failed to create shipping method."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:53
+msgid "Fluent Cart Subscription model not found. Please ensure Fluent Cart is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:63
+msgid "No orders were found. Generate orders before generating subscriptions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:74
+msgid "No product variations were found. Generate products before generating subscriptions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:107
+msgid "Failed to create subscription."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:65
+msgid "Failed to create tax class."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:154
+msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:178
+msgid "Failed to create tax class using Fluent Cart model."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:49
+msgid "Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:62
+msgid "No orders were found. Generate orders before generating transactions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:100
+msgid "Failed to create transaction."
+msgstr ""
+
+#. translators: %s: the platform identifier that was requested.
+#: includes/Platforms/Resolver.php:110
+#: includes/Platforms/Resolver.php:218
+#, php-format
+msgid "Unknown target platform: %s."
+msgstr ""
+
+#. translators: %s: platform display name.
+#: includes/Platforms/Resolver.php:122
+#, php-format
+msgid "%s is not active on this site."
+msgstr ""
+
+#: includes/Platforms/Resolver.php:157
+msgid "No supported e-commerce platform is active on this site."
+msgstr ""
+
+#: includes/Platforms/Resolver.php:164
+msgid "More than one supported platform is active. Choose which one to seed."
+msgstr ""
+
+#: includes/Rest/Controller.php:261
 msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Abstracts/Controller.php:277
+#: includes/Rest/Controller.php:314
 #, php-format
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
@@ -100,2522 +1183,1952 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of items that could not be created.
-#: includes/Abstracts/Controller.php:284
+#: includes/Rest/Controller.php:321
 #, php-format
 msgid "%s could not be created."
 msgid_plural "%s could not be created."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Abstracts/Controller.php:345
+#. translators: 1: resource label, 2: platform display name, 3: reason.
+#: includes/Rest/Controller.php:407
+#, php-format
+msgid "%1$s cannot be generated for %2$s. %3$s"
+msgstr ""
+
+#. translators: 1: platform display name, 2: resource name.
+#: includes/Rest/Controller.php:430
+#, php-format
+msgid "%1$s reports that it can generate %2$s but provides no writer for it. This is a fault in the platform driver."
+msgstr ""
+
+#: includes/Rest/Controller.php:489
 msgid "Sorry, you are not allowed to generate fake data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:368
+#: includes/Rest/Controller.php:512
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:377
-msgid "Locale for generated data (e.g., en_US, fr_FR, de_DE)."
+#: includes/Rest/Controller.php:524
+msgid "Locale for generated data (e.g., en_US, fr_FR, ja_JP)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:384
+#: includes/Rest/Controller.php:531
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:390
+#: includes/Rest/Controller.php:541
+msgid "Target e-commerce platform to seed. Defaults to the site setting, or the only active platform."
+msgstr ""
+
+#: includes/Rest/Controller.php:547
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:396
+#: includes/Rest/Controller.php:553
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:400
+#: includes/Rest/Controller.php:557
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:407
+#: includes/Rest/Controller.php:564
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:416
+#: includes/Rest/Controller.php:573
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:420
+#: includes/Rest/Controller.php:577
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:425
+#: includes/Rest/Controller.php:582
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:432
+#: includes/Rest/Controller.php:589
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:436
+#: includes/Rest/Controller.php:593
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:441
+#: includes/Rest/Controller.php:598
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:476
+#: includes/Rest/Controller.php:633
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Abstracts/Controller.php:502
+#: includes/Rest/Controller.php:659
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Abstracts/Controller.php:524
+#: includes/Rest/Controller.php:681
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Abstracts/Controller.php:528
+#: includes/Rest/Controller.php:685
 msgid "Number of items generated."
 msgstr ""
 
-#. translators: %s: Error message
-#: includes/Abstracts/Generator.php:343
-#, php-format
-msgid "Generation failed: %s"
-msgstr ""
-
-#: includes/Abstracts/Generator.php:455
-msgid "ID"
-msgstr ""
-
-#: includes/Abstracts/Generator.php:459
-msgid "Value"
-msgstr ""
-
-#: includes/Abstracts/Generator.php:504
-msgid "Count must be a positive number."
-msgstr ""
-
-#. translators: %d: Maximum batch size
-#: includes/Abstracts/Generator.php:513
-#, php-format
-msgid "Count cannot exceed %d items per batch."
-msgstr ""
-
-#: includes/Controllers/Attribute.php:35
+#: includes/Rest/Controllers/Attribute.php:35
 msgid "Attribute"
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:43
+#: includes/Rest/Controllers/Cart_Session.php:43
 msgid "Cart Session"
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:78
+#: includes/Rest/Controllers/Cart_Session.php:78
 msgid "Type of customers for cart sessions."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:85
+#: includes/Rest/Controllers/Cart_Session.php:85
 msgid "Specific customer ID for cart sessions (when customer_type is \"specific\")."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:91
+#: includes/Rest/Controllers/Cart_Session.php:91
 msgid "Percentage of guest carts (0-100) when customer_type is \"mixed\"."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:99
+#: includes/Rest/Controllers/Cart_Session.php:99
 msgid "Cart abandonment rate percentage (0-100)."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:107
+#: includes/Rest/Controllers/Cart_Session.php:107
 msgid "Custom cart status distribution."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:111
+#: includes/Rest/Controllers/Cart_Session.php:111
 msgid "Percentage of pending carts."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:117
+#: includes/Rest/Controllers/Cart_Session.php:117
 msgid "Percentage of abandoned carts."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:123
+#: includes/Rest/Controllers/Cart_Session.php:123
 msgid "Percentage of completed carts."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:129
+#: includes/Rest/Controllers/Cart_Session.php:129
 msgid "Percentage of cancelled carts."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:137
+#: includes/Rest/Controllers/Cart_Session.php:137
 msgid "Cart value range for generated sessions."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:141
+#: includes/Rest/Controllers/Cart_Session.php:141
 msgid "Minimum cart value."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:147
+#: includes/Rest/Controllers/Cart_Session.php:147
 msgid "Maximum cart value."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:155
+#: includes/Rest/Controllers/Cart_Session.php:155
 msgid "Number of items per cart session."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:159
+#: includes/Rest/Controllers/Cart_Session.php:159
 msgid "Minimum items per cart."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:165
+#: includes/Rest/Controllers/Cart_Session.php:165
 msgid "Maximum items per cart."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:174
+#: includes/Rest/Controllers/Cart_Session.php:174
 msgid "Abandonment tracking settings."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:178
+#: includes/Rest/Controllers/Cart_Session.php:178
 msgid "Generate abandoned cart reminders."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:183
+#: includes/Rest/Controllers/Cart_Session.php:183
 msgid "Maximum number of reminders to generate."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:190
+#: includes/Rest/Controllers/Cart_Session.php:190
 msgid "Cart recovery rate percentage (0-100)."
 msgstr ""
 
-#: includes/Controllers/Cart_Session.php:211
+#: includes/Rest/Controllers/Cart_Session.php:211
 msgid "Generated cart sessions with items and customer data."
 msgstr ""
 
-#: includes/Controllers/Coupon.php:43
+#: includes/Rest/Controllers/Coupon.php:43
 msgid "Coupon"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:78
-#: build/admin-app.js:3
+#: includes/Rest/Controllers/Coupon.php:78
+#: build/admin-app.js:4
 msgid "Types of discount coupons to generate"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:88
-#: build/admin-app.js:3
+#: includes/Rest/Controllers/Coupon.php:88
+#: build/admin-app.js:4
 msgid "Discount value range"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:116
-#: build/admin-app.js:3
+#: includes/Rest/Controllers/Coupon.php:116
+#: build/admin-app.js:4
 msgid "Usage limitation settings"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:138
-#: build/admin-app.js:3
+#: includes/Rest/Controllers/Coupon.php:138
+#: build/admin-app.js:4
 msgid "Coupon validity period configuration"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:156
-#: build/admin-app.js:3
+#: includes/Rest/Controllers/Coupon.php:156
+#: build/admin-app.js:4
 msgid "Coupon usage restrictions"
 msgstr ""
 
-#: includes/Controllers/Coupon.php:190
+#: includes/Rest/Controllers/Coupon.php:190
 msgid "Generated coupons data."
 msgstr ""
 
-#: includes/Controllers/Customer.php:58
-#: includes/Generators/Order.php:483
-msgid "Customer"
-msgstr ""
-
-#: includes/Controllers/Customer.php:96
+#: includes/Rest/Controllers/Customer.php:96
 msgid "Type of customers to generate."
 msgstr ""
 
-#: includes/Controllers/Customer.php:103
+#: includes/Rest/Controllers/Customer.php:103
 msgid "Focus generation on specific countries."
 msgstr ""
 
-#: includes/Controllers/Customer.php:111
+#: includes/Rest/Controllers/Customer.php:111
 msgid "Include purchase history and loyalty data."
 msgstr ""
 
-#: includes/Controllers/Customer.php:116
+#: includes/Rest/Controllers/Customer.php:116
 msgid "Focus on specific loyalty tiers."
 msgstr ""
 
-#: includes/Controllers/Customer.php:125
+#: includes/Rest/Controllers/Customer.php:125
 msgid "Account status for generated customers."
 msgstr ""
 
-#: includes/Controllers/Customer.php:143
+#: includes/Rest/Controllers/Customer.php:143
 msgid "Generated customers data."
 msgstr ""
 
-#: includes/Controllers/Label.php:39
+#: includes/Rest/Controllers/Label.php:39
 msgid "Label"
 msgstr ""
 
-#: includes/Controllers/Log.php:35
+#: includes/Rest/Controllers/Log.php:35
 msgid "Log"
 msgstr ""
 
-#: includes/Controllers/Log.php:58
+#: includes/Rest/Controllers/Log.php:58
 msgid "Severity types to generate."
 msgstr ""
 
-#: includes/Controllers/Order.php:58
-#: includes/Generators/Order.php:479
-msgid "Order"
-msgstr ""
-
-#: includes/Controllers/Order.php:96
+#: includes/Rest/Controllers/Order.php:96
 msgid "Order status for generated orders."
 msgstr ""
 
-#: includes/Controllers/Order.php:106
+#: includes/Rest/Controllers/Order.php:106
 msgid "Payment methods to use for orders."
 msgstr ""
 
-#: includes/Controllers/Order.php:115
+#: includes/Rest/Controllers/Order.php:115
 msgid "Order total value range."
 msgstr ""
 
-#: includes/Controllers/Order.php:119
+#: includes/Rest/Controllers/Order.php:119
 msgid "Minimum order value."
 msgstr ""
 
-#: includes/Controllers/Order.php:125
+#: includes/Rest/Controllers/Order.php:125
 msgid "Maximum order value."
 msgstr ""
 
-#: includes/Controllers/Order.php:133
+#: includes/Rest/Controllers/Order.php:133
 msgid "Include customer data with orders."
 msgstr ""
 
-#: includes/Controllers/Order.php:138
+#: includes/Rest/Controllers/Order.php:138
 msgid "Number of items per order range."
 msgstr ""
 
-#: includes/Controllers/Order.php:156
+#: includes/Rest/Controllers/Order.php:156
 msgid "Include shipping costs in orders."
 msgstr ""
 
-#: includes/Controllers/Order.php:161
+#: includes/Rest/Controllers/Order.php:161
 msgid "Include tax calculations in orders."
 msgstr ""
 
-#: includes/Controllers/Order.php:178
+#: includes/Rest/Controllers/Order.php:178
 msgid "Generated orders data."
 msgstr ""
 
-#: includes/Controllers/Order_Tax_Rate.php:39
+#: includes/Rest/Controllers/Order_Tax_Rate.php:39
 msgid "Order Tax Line"
 msgstr ""
 
-#: includes/Controllers/Product.php:58
+#: includes/Rest/Controllers/Product.php:58
 msgid "Product"
 msgstr ""
 
-#: includes/Controllers/Product.php:96
+#: includes/Rest/Controllers/Product.php:96
 msgid "Type of products to generate."
 msgstr ""
 
-#: includes/Controllers/Product.php:103
+#: includes/Rest/Controllers/Product.php:103
 msgid "Price range for generated products."
 msgstr ""
 
-#: includes/Controllers/Product.php:107
+#: includes/Rest/Controllers/Product.php:107
 msgid "Minimum price."
 msgstr ""
 
-#: includes/Controllers/Product.php:113
+#: includes/Rest/Controllers/Product.php:113
 msgid "Maximum price."
 msgstr ""
 
-#: includes/Controllers/Product.php:121
+#: includes/Rest/Controllers/Product.php:121
 msgid "Product categories configuration."
 msgstr ""
 
-#: includes/Controllers/Product.php:125
+#: includes/Rest/Controllers/Product.php:125
 msgid "Create new categories if needed."
 msgstr ""
 
-#: includes/Controllers/Product.php:130
+#: includes/Rest/Controllers/Product.php:130
 msgid "Maximum categories per product."
 msgstr ""
 
-#: includes/Controllers/Product.php:139
+#: includes/Rest/Controllers/Product.php:139
 msgid "Product attributes configuration."
 msgstr ""
 
-#: includes/Controllers/Product.php:143
+#: includes/Rest/Controllers/Product.php:143
 msgid "Include product attributes."
 msgstr ""
 
-#: includes/Controllers/Product.php:148
+#: includes/Rest/Controllers/Product.php:148
 msgid "Number of variations for variable products."
 msgstr ""
 
-#: includes/Controllers/Product.php:157
+#: includes/Rest/Controllers/Product.php:157
 msgid "Inventory settings for generated products."
 msgstr ""
 
-#: includes/Controllers/Product.php:161
+#: includes/Rest/Controllers/Product.php:161
 msgid "Enable stock management."
 msgstr ""
 
-#: includes/Controllers/Product.php:166
+#: includes/Rest/Controllers/Product.php:166
 msgid "Stock quantity range."
 msgstr ""
 
-#: includes/Controllers/Product.php:184
+#: includes/Rest/Controllers/Product.php:184
 msgid "Product content generation options."
 msgstr ""
 
-#: includes/Controllers/Product.php:188
+#: includes/Rest/Controllers/Product.php:188
 msgid "Generate product images."
 msgstr ""
 
-#: includes/Controllers/Product.php:193
+#: includes/Rest/Controllers/Product.php:193
 msgid "Product description length."
 msgstr ""
 
-#: includes/Controllers/Product.php:213
+#: includes/Rest/Controllers/Product.php:213
 msgid "Generated products data."
 msgstr ""
 
-#: includes/Controllers/Product_Download.php:39
+#: includes/Rest/Controllers/Product_Download.php:39
 msgid "Product Download"
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:58
+#: includes/Rest/Controllers/Product_Variation.php:58
 msgid "Product Variation"
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:96
+#: includes/Rest/Controllers/Product_Variation.php:96
 msgid "Types of product variations to generate."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:106
+#: includes/Rest/Controllers/Product_Variation.php:106
 msgid "Number of attributes per variable product."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:110
+#: includes/Rest/Controllers/Product_Variation.php:110
 msgid "Minimum attributes per product."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:117
+#: includes/Rest/Controllers/Product_Variation.php:117
 msgid "Maximum attributes per product."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:126
+#: includes/Rest/Controllers/Product_Variation.php:126
 msgid "Number of variations per attribute."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:130
+#: includes/Rest/Controllers/Product_Variation.php:130
 msgid "Minimum variations per attribute."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:137
+#: includes/Rest/Controllers/Product_Variation.php:137
 msgid "Maximum variations per attribute."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:146
+#: includes/Rest/Controllers/Product_Variation.php:146
 msgid "Price variation range as percentage of base price."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:150
+#: includes/Rest/Controllers/Product_Variation.php:150
 msgid "Minimum price variation percentage."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:157
+#: includes/Rest/Controllers/Product_Variation.php:157
 msgid "Maximum price variation percentage."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:166
+#: includes/Rest/Controllers/Product_Variation.php:166
 msgid "Include inventory management for variations."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:171
+#: includes/Rest/Controllers/Product_Variation.php:171
 msgid "Generate unique SKUs for each variation."
 msgstr ""
 
-#: includes/Controllers/Product_Variation.php:188
+#: includes/Rest/Controllers/Product_Variation.php:188
 msgid "Generated product variations with attributes and pricing."
 msgstr ""
 
-#: includes/Controllers/Refund.php:35
+#: includes/Rest/Controllers/Refund.php:35
 msgid "Refund"
 msgstr ""
 
-#: includes/Controllers/Shipping_Class.php:39
+#: includes/Rest/Controllers/Shipping_Class.php:39
 msgid "Shipping Class"
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:43
+#: includes/Rest/Controllers/Shipping_Plan.php:43
 msgid "Shipping Plan"
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:78
+#: includes/Rest/Controllers/Shipping_Plan.php:78
 msgid "Types of shipping methods to generate."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:96
+#: includes/Rest/Controllers/Shipping_Plan.php:96
 msgid "Shipping cost range."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:100
+#: includes/Rest/Controllers/Shipping_Plan.php:100
 msgid "Minimum shipping cost."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:106
+#: includes/Rest/Controllers/Shipping_Plan.php:106
 msgid "Maximum shipping cost."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:114
+#: includes/Rest/Controllers/Shipping_Plan.php:114
 msgid "Geographic coverage areas."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:124
+#: includes/Rest/Controllers/Shipping_Plan.php:124
 msgid "Shipping calculation methods."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:134
+#: includes/Rest/Controllers/Shipping_Plan.php:134
 msgid "Delivery time ranges."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:138
+#: includes/Rest/Controllers/Shipping_Plan.php:138
 msgid "Minimum delivery days."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:144
+#: includes/Rest/Controllers/Shipping_Plan.php:144
 msgid "Maximum delivery days."
 msgstr ""
 
-#: includes/Controllers/Shipping_Plan.php:164
+#: includes/Rest/Controllers/Shipping_Plan.php:164
 msgid "Generated shipping plans with methods and regions."
 msgstr ""
 
-#: includes/Controllers/Subscription.php:39
+#: includes/Rest/Controllers/Subscription.php:39
 msgid "Subscription"
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:43
+#: includes/Rest/Controllers/Tax_Class.php:43
 msgid "Tax Class"
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:78
+#: includes/Rest/Controllers/Tax_Class.php:78
 msgid "Types of tax classes to generate."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:88
+#: includes/Rest/Controllers/Tax_Class.php:88
 msgid "Tax jurisdictions to generate rates for."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:98
+#: includes/Rest/Controllers/Tax_Class.php:98
 msgid "Tax rate ranges by type."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:102
+#: includes/Rest/Controllers/Tax_Class.php:102
 msgid "Standard tax rate range."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:120
+#: includes/Rest/Controllers/Tax_Class.php:120
 msgid "Reduced tax rate range."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:140
+#: includes/Rest/Controllers/Tax_Class.php:140
 msgid "Geographic coverage for tax rates."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:144
+#: includes/Rest/Controllers/Tax_Class.php:144
 msgid "Countries to generate tax rates for."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:153
+#: includes/Rest/Controllers/Tax_Class.php:153
 msgid "Include compound tax rates."
 msgstr ""
 
-#: includes/Controllers/Tax_Class.php:172
+#: includes/Rest/Controllers/Tax_Class.php:172
 msgid "Generated tax classes with location-based rates."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:58
+#: includes/Rest/Controllers/Transaction.php:58
 msgid "Transaction"
 msgstr ""
 
-#: includes/Controllers/Transaction.php:96
+#: includes/Rest/Controllers/Transaction.php:96
 msgid "Payment methods to generate transactions for."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:106
+#: includes/Rest/Controllers/Transaction.php:106
 msgid "Transaction statuses to generate."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:116
+#: includes/Rest/Controllers/Transaction.php:116
 msgid "Transaction amount range."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:120
+#: includes/Rest/Controllers/Transaction.php:120
 msgid "Minimum transaction amount."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:126
+#: includes/Rest/Controllers/Transaction.php:126
 msgid "Maximum transaction amount."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:134
+#: includes/Rest/Controllers/Transaction.php:134
 msgid "Include refund transactions."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:139
+#: includes/Rest/Controllers/Transaction.php:139
 msgid "Percentage of transactions that should be refunds."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:146
+#: includes/Rest/Controllers/Transaction.php:146
 msgid "Include payment gateway-specific metadata."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:151
+#: includes/Rest/Controllers/Transaction.php:151
 msgid "Associate transactions with existing orders."
 msgstr ""
 
-#: includes/Controllers/Transaction.php:168
+#: includes/Rest/Controllers/Transaction.php:168
 msgid "Generated transactions with payment details and metadata."
 msgstr ""
 
-#: includes/Generators/Attribute.php:52
-msgid "Product Attribute Groups with Terms"
+#. translators: %s: name of the platform that Auto resolved to.
+#: build/admin-app.js:2
+#, js-format
+msgid "Auto · %s"
 msgstr ""
 
-#: includes/Generators/Attribute.php:67
-msgid "Fluent Cart attribute models not found. Ensure Fluent Cart is active."
+#: build/admin-app.js:2
+msgid "Auto"
 msgstr ""
 
-#: includes/Generators/Attribute.php:86
-msgid "Failed to create attribute group."
-msgstr ""
-
-#: includes/Generators/Cart_Session.php:65
-msgid "Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Cart_Session.php:72
-msgid "Failed to create cart session."
-msgstr ""
-
-#: includes/Generators/Coupon.php:63
-#: includes/Generators/Customer.php:94
-#: includes/Generators/Order.php:68
-#: includes/Generators/Product.php:65
-#: includes/Generators/Product_Variation.php:64
-#: includes/Generators/Tax_Class.php:64
-msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Coupon.php:74
-msgid "Failed to create coupon."
-msgstr ""
-
-#: includes/Generators/Coupon.php:150
-msgid "Fluent Cart Coupon model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Coupon.php:182
-msgid "Failed to create coupon using Fluent Cart model."
-msgstr ""
-
-#: includes/Generators/Coupon.php:199
-msgid "Code"
-msgstr ""
-
-#: includes/Generators/Coupon.php:203
-msgid "Type"
-msgstr ""
-
-#: includes/Generators/Coupon.php:207
-msgid "Amount"
-msgstr ""
-
-#: includes/Generators/Coupon.php:211
-msgid "Usage limit"
-msgstr ""
-
-#: includes/Generators/Coupon.php:215
-#: includes/Generators/Order.php:495
-#: includes/Generators/Product.php:260
-msgid "Status"
-msgstr ""
-
-#: includes/Generators/Customer.php:71
-msgid "Customer Profiles with Addresses and Metadata"
-msgstr ""
-
-#: includes/Generators/Customer.php:81
-msgid "Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing Fluent Cart customer management systems."
-msgstr ""
-
-#: includes/Generators/Customer.php:152
-msgid "A user with this email address already exists."
-msgstr ""
-
-#: includes/Generators/Customer.php:174
-msgid "Failed to create customer using Fluent Cart."
-msgstr ""
-
-#: includes/Generators/Customer.php:238
-msgid "Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Customer.php:261
-msgid "Failed to create customer using Fluent Cart model."
-msgstr ""
-
-#: includes/Generators/Customer.php:854
-#: includes/Generators/Product.php:244
-msgid "Name"
-msgstr ""
-
-#: includes/Generators/Customer.php:858
-msgid "Email"
-msgstr ""
-
-#: includes/Generators/Customer.php:862
-msgid "City"
-msgstr ""
-
-#: includes/Generators/Customer.php:866
-msgid "Country"
-msgstr ""
-
-#: includes/Generators/Customer.php:870
-#: build/admin-app.js:3
-#: build/admin-app.js:10
-msgid "Orders"
-msgstr ""
-
-#: includes/Generators/Label.php:86
-msgid "Fluent Cart Label model not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Label.php:92
-msgid "Failed to create label."
-msgstr ""
-
-#: includes/Generators/Log.php:77
-msgid "Info"
-msgstr ""
-
-#: includes/Generators/Log.php:78
+#: build/admin-app.js:2
 #: build/admin-app.js:11
-msgid "Warning"
-msgstr ""
-
-#: includes/Generators/Log.php:79
-#: build/admin-app.js:10
-msgid "Error"
-msgstr ""
-
-#: includes/Generators/Log.php:80
-#: build/admin-app.js:10
-#: build/admin-app.js:11
-msgid "Success"
-msgstr ""
-
-#: includes/Generators/Log.php:96
-msgid "Fluent Cart Activity model not found. Ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Log.php:125
-msgid "Failed to create activity log entry."
-msgstr ""
-
-#: includes/Generators/Order.php:79
-msgid "No published products with variations were found. Generate products before generating orders."
-msgstr ""
-
-#: includes/Generators/Order.php:89
-msgid "No customers were found. Generate customers before generating orders."
-msgstr ""
-
-#: includes/Generators/Order.php:100
-msgid "Failed to create order."
-msgstr ""
-
-#: includes/Generators/Order.php:273
-msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Order.php:302
-msgid "Failed to create order using Fluent Cart model."
-msgstr ""
-
-#: includes/Generators/Order.php:487
-msgid "Items"
-msgstr ""
-
-#: includes/Generators/Order.php:491
-#: build/admin-app.js:12
-msgid "Total"
-msgstr ""
-
-#: includes/Generators/Order_Tax_Rate.php:65
-msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Order_Tax_Rate.php:73
-msgid "No orders were found. Generate orders before generating order tax lines."
-msgstr ""
-
-#: includes/Generators/Order_Tax_Rate.php:82
-msgid "No tax rates were found. Generate tax classes before generating order tax lines."
-msgstr ""
-
-#: includes/Generators/Order_Tax_Rate.php:96
-msgid "The drawn order already carries this tax rate. Try again."
-msgstr ""
-
-#: includes/Generators/Order_Tax_Rate.php:104
-msgid "Failed to create order tax line."
-msgstr ""
-
-#: includes/Generators/Product.php:76
-msgid "Failed to create product."
-msgstr ""
-
-#: includes/Generators/Product.php:163
-msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Product.php:248
-msgid "SKU"
-msgstr ""
-
-#: includes/Generators/Product.php:252
-msgid "Price"
-msgstr ""
-
-#: includes/Generators/Product.php:256
-msgid "Stock"
-msgstr ""
-
-#: includes/Generators/Product_Download.php:66
-msgid "Fluent Cart ProductDownload model not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Product_Download.php:76
-msgid "No product variations were found. Generate products before generating downloads."
-msgstr ""
-
-#: includes/Generators/Product_Download.php:84
-msgid "Failed to create product download."
-msgstr ""
-
-#: includes/Generators/Product_Variation.php:76
-msgid "No products were found. Generate products before generating variations."
-msgstr ""
-
-#: includes/Generators/Product_Variation.php:84
-msgid "Failed to create product variation."
-msgstr ""
-
-#: includes/Generators/Refund.php:53
-msgid "Full refund"
-msgstr ""
-
-#: includes/Generators/Refund.php:54
-msgid "Partial refund"
-msgstr ""
-
-#: includes/Generators/Refund.php:70
-msgid "Fluent Cart transaction model not found. Ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Refund.php:81
-msgid "No successful charge transactions found for refund generation. Generate orders/transactions first."
-msgstr ""
-
-#: includes/Generators/Refund.php:95
-msgid "Computed refund amount is zero; source transaction has no value."
-msgstr ""
-
-#: includes/Generators/Refund.php:122
-msgid "Failed to create refund transaction."
-msgstr ""
-
-#: includes/Generators/Shipping_Class.php:81
-msgid "Fluent Cart ShippingClass model not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Shipping_Class.php:89
-msgid "Failed to create shipping class."
-msgstr ""
-
-#: includes/Generators/Shipping_Plan.php:64
-msgid "Fluent Cart ShippingMethod model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Shipping_Plan.php:71
-msgid "Failed to create shipping method."
-msgstr ""
-
-#: includes/Generators/Subscription.php:81
-msgid "Fluent Cart Subscription model not found. Please ensure Fluent Cart is active."
-msgstr ""
-
-#: includes/Generators/Subscription.php:91
-msgid "No orders were found. Generate orders before generating subscriptions."
-msgstr ""
-
-#: includes/Generators/Subscription.php:102
-msgid "No product variations were found. Generate products before generating subscriptions."
-msgstr ""
-
-#: includes/Generators/Subscription.php:110
-msgid "Failed to create subscription."
-msgstr ""
-
-#: includes/Generators/Tax_Class.php:75
-msgid "Failed to create tax class."
-msgstr ""
-
-#: includes/Generators/Tax_Class.php:195
-msgid "Fluent Cart TaxClass model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Tax_Class.php:219
-msgid "Failed to create tax class using Fluent Cart model."
-msgstr ""
-
-#: includes/Generators/Transaction.php:64
-msgid "Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active."
-msgstr ""
-
-#: includes/Generators/Transaction.php:74
-msgid "No orders were found. Generate orders before generating transactions."
-msgstr ""
-
-#: includes/Generators/Transaction.php:82
-msgid "Failed to create transaction."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:88
-msgid "Generate realistic test data for Fluent Cart stores: products, customers, orders, coupons, variations, shipping plans, tax classes, transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:141
-msgid "Generate realistic test data for Fluent Cart stores. Supports products, customers, orders, coupons, product variations, shipping plans, tax classes, payment transactions, cart sessions, product attributes, shipping classes, labels, order tax lines, product downloads, and subscriptions."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:167
-msgid "Generate Products"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:168
-msgid "Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:174
-msgid "Type of products to generate. Allowed: simple, variable, grouped, external, digital, mixed. Default: mixed."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:180
-msgid "Minimum product price (USD). Default: 10."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:185
-msgid "Maximum product price (USD). Default: 500."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:190
-msgid "Generate product attributes (size, colour, material). Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:195
-msgid "Number of variations per variable product (1–20). Default: 5."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:202
-msgid "Enable stock management and generate inventory levels. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:207
-msgid "Length of product descriptions. Allowed: short, medium, long. Default: medium."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:213
-msgid "Array of generated product objects with id, title, type, variations count, price_range, and stock_status."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:219
-msgid "Generate Customers"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:220
-msgid "Generate realistic WordPress customer accounts with billing/shipping addresses, demographic metadata, purchase history, and loyalty tier assignments."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:226
-msgid "Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: [\"regular\",\"returning\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:232
-msgid "Generate billing addresses. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:237
-msgid "Generate shipping addresses. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:242
-msgid "Percentage of customers with a different shipping address (0–100). Default: 30."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:249
-msgid "Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:254
-msgid "Percentage of customers opted into marketing emails (0–100). Default: 65."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:261
-msgid "Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:267
-msgid "Generate Orders"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:268
-msgid "Generate realistic Fluent Cart orders with line items, addresses, payment details, shipping calculations, tax breakdowns, and fulfilment status. Requires at least one product with variations and one customer to exist."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:274
-msgid "Status of generated orders. Allowed: pending, processing, completed, cancelled, on_hold, refunded, mixed. Default: mixed."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:280
-msgid "Whose customer accounts to attach. Allowed: existing, new, mixed, specific. Default: mixed."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:286
-msgid "WordPress user ID to attach all orders to. Only used when customer_type is \"specific\"."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:291
-msgid "Minimum order total (USD). Default: 10."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:296
-msgid "Maximum order total (USD). Default: 1000."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:301
-msgid "Minimum line items per order. Default: 1."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:307
-msgid "Maximum line items per order (1–20). Default: 5."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:314
-msgid "Payment methods to distribute across orders. Allowed: stripe, paypal, bank_transfer, cash_on_delivery, credit_card. Default: [\"stripe\",\"paypal\",\"bank_transfer\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:320
-msgid "Array of generated order objects with id, order_number, status, total, payment_method, and item count."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:326
-msgid "Generate Coupons"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:327
-msgid "Generate realistic Fluent Cart discount coupons with various discount types, usage limits, validity periods, and product or customer restrictions."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:333
-msgid "Discount types to include. Allowed: percentage, fixed, free_shipping, products. Default: [\"percentage\",\"fixed\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:339
-msgid "Minimum percentage discount (5–95). Default: 10."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:346
-msgid "Maximum percentage discount (5–95). Default: 50."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:353
-msgid "Minimum fixed discount amount (USD). Default: 5."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:358
-msgid "Maximum fixed discount amount (USD). Default: 100."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:363
-msgid "Add usage-limit rules to coupons. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:368
-msgid "Maximum total uses per coupon when set_usage_limits is true (1–1000). Default: 100."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:375
-msgid "Minimum coupon validity period in days. Default: 7."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:381
-msgid "Maximum coupon validity period in days (1–365). Default: 90."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:388
-msgid "Array of generated coupon objects with id, code, type, offer, status, usage_limit, and validity dates."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:394
-msgid "Generate Product Variations"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:395
-msgid "Generate product variations (size/colour/storage combinations) for existing products. Creates variation records with unique SKUs, individual pricing, stock levels, and dimension metadata. Requires products to exist."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:401
-msgid "Generate variations only for this product ID. Omit to pick a random eligible product."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:406
-msgid "Array of product IDs to skip during generation."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:412
-msgid "Enable inventory tracking for variations. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:417
-msgid "Minimum stock quantity per variation. Default: 0."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:423
-msgid "Maximum stock quantity per variation. Default: 100."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:429
-msgid "Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:435
-msgid "Generate Shipping Plans"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:436
-msgid "Generate realistic shipping plans with tiered pricing methods (price-based, weight-based, quantity-based), regional coverage, delivery timeframes, and taxability settings."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:442
-msgid "Shipping method types. Allowed: standard, express, overnight, pickup, free, weight_based, flat_rate. Default: [\"standard\",\"express\",\"free\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:448
-msgid "Minimum shipping cost (USD). Default: 0."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:454
-msgid "Maximum shipping cost (USD). Default: 50."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:460
-msgid "Geographic coverage. Allowed: domestic, international, regional, worldwide. Default: [\"domestic\",\"international\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:466
-msgid "Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:472
-msgid "Generate Tax Classes"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:473
-msgid "Generate tax classes with country/state/city-level rate tables, compound tax configurations, and priority settings for a Fluent Cart store."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:479
-msgid "Tax class types to generate. Allowed: standard, reduced, zero, exempt, digital. Default: [\"standard\",\"reduced\",\"zero\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:485
-msgid "ISO-2 country codes to generate tax rates for. Default: [\"US\",\"CA\",\"GB\",\"AU\",\"DE\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:491
-msgid "Include compound tax rate configurations. Default: true."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:496
-msgid "Array of generated tax class objects with id, name, active status, rates array, and covered regions."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:502
-msgid "Generate Transactions"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:503
-msgid "Generate realistic payment transaction records linked to existing orders. Creates transactions with gateway-specific IDs, amounts, statuses, and currency assignments. Requires orders to exist."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:509
-msgid "Filter orders by customer type. Allowed: all, specific, existing_customers_only, new_customers_only. Default: all."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:515
-msgid "Only create transactions for orders belonging to this customer ID. Requires customer_type=\"specific\"."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:520
-msgid "Transaction types to generate. Allowed: payment, refund, adjustment, fee, commission. Default: [\"payment\",\"refund\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:526
-msgid "Payment gateways to use. Allowed: stripe, paypal, square, authorize_net, braintree, razorpay, mollie. Default: [\"stripe\",\"paypal\",\"square\"]."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:532
-msgid "Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:538
-msgid "Generate Cart Sessions"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:539
-msgid "Generate realistic shopping cart sessions including pending, abandoned, completed, and cancelled states. Useful for testing abandoned-cart recovery workflows and marketing-automation integrations."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:545
-msgid "Cart owner type. Allowed: existing, new, mixed, specific, guest_only. Default: mixed."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:551
-msgid "Attach all carts to this customer ID. Requires customer_type=\"specific\"."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:556
-msgid "Percentage of guest (unauthenticated) carts when customer_type is \"mixed\" (0–100). Default: 40."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:563
-msgid "Percentage of carts with \"abandoned\" status (0–100). Default: 30."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:570
-msgid "Minimum cart value (USD). Default: 5."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:576
-msgid "Maximum cart value (USD). Default: 500."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:582
-msgid "Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:588
-msgid "Generate Attributes"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:589
-msgid "Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:592
-msgid "Array of generated attribute objects with id, name, type, slug, and values array."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:598
-msgid "Generate Refunds"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:599
-msgid "Generate refund records against existing Fluent Cart orders. Requires completed or processing orders to exist. Returns refund IDs, amounts, statuses, and gateway transaction IDs."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:602
-msgid "Array of generated refund objects with id, order_id, amount, status, and payment_gateway."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:608
-msgid "Generate Logs"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:609
-msgid "Generate activity log entries for orders, products, customers, coupons, refunds, carts, transactions, and system events. Returns log IDs, object types, actions, and severity levels."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:615
-msgid "Log severity types to generate. Default: all types."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:624
-msgid "Array of generated log objects with id, object, action, type, note, and is_public."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:630
-msgid "Generate Shipping Classes"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:631
-msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag, for a Fluent Cart store."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:634
-msgid "Array of generated shipping class objects with id, name, cost, and per_item."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:640
-msgid "Generate Labels"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:641
-msgid "Generate labels (tags) and attach them to existing orders and customers for testing Fluent Cart segmentation. Requires existing orders or customers to attach to."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:644
-msgid "Array of generated label objects with id, value, and attached count."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:650
-msgid "Generate Order Tax Lines"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:651
-msgid "Generate per-order tax lines linking orders to tax rates with the tax amounts collected. Requires existing orders and tax rates."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:654
-msgid "Array of generated order tax line objects with id, order_id, tax_rate_id, and total_tax."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:660
-msgid "Generate Product Downloads"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:661
-msgid "Generate downloadable files for products and grant download permissions on existing orders, for testing Fluent Cart digital fulfillment. Requires existing products."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:664
-msgid "Array of generated product download objects with id, post_id, title, download_identifier, and permission_granted."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:670
-msgid "Generate Subscriptions"
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:671
-msgid "Generate subscription records against existing orders for testing Fluent Cart recurring-billing views. The subscriptions table ships in core, but active billing requires Fluent Cart Pro. Requires existing orders and products."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:674
-msgid "Array of generated subscription objects with id, uuid, customer_id, item_name, billing_interval, status, and recurring_total."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:695
-msgid "Number of items to generate (1–100). Required."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:701
-msgid "Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:706
-msgid "Optional integer seed for reproducible data generation. Omit for random output."
-msgstr ""
-
-#: includes/MCP/MCP_Server.php:735
-msgid "Human-readable summary of the generation result."
-msgstr ""
-
-#: build/admin-app.js:1
-#: build/admin-app.js:9
 msgid "An error occurred."
 msgstr ""
 
 #. translators: %1$s: total items, %2$s: number of generators
-#: build/admin-app.js:2
+#: build/admin-app.js:3
 #, js-format
 msgid "Batch complete · %1$s items"
 msgstr ""
 
 #. translators: %s: number of generators run
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 #, js-format
 msgid "%s generator run"
 msgid_plural "%s generators run"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Batch failed"
 msgstr ""
 
-#: build/admin-app.js:3
-#: build/admin-app.js:10
+#: build/admin-app.js:4
+#: build/admin-app.js:14
 msgid "Products"
 msgstr ""
 
-#: build/admin-app.js:3
-#: build/admin-app.js:10
-msgid "Core"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create realistic products with prices, categories, inventory, and variations. Perfect for testing your store catalog and product pages."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, theme developers, plugin testers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Type of products to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Price range for generated products"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Product categories configuration"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create new categories if needed"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum categories per product"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Product attributes configuration"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include product attributes"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Number of variations for variable products"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Inventory settings for generated products"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Enable stock management"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Stock quantity range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Product content generation options"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Length of product descriptions"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include placeholder images"
 msgstr ""
 
-#: build/admin-app.js:3
-#: build/admin-app.js:10
+#: build/admin-app.js:4
+#: build/admin-app.js:14
 msgid "Customers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate customer profiles with addresses, purchase history, and loyalty data. Essential for testing user accounts and customer management."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, CRM developers, membership site testers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Types of customers to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Demographic distribution"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Age group distribution"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Address generation preferences"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include billing addresses"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include shipping addresses"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Percentage with different billing/shipping (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Purchase history simulation"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate purchase history metadata"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include loyalty tier assignments"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Contact and communication preferences"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include phone numbers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Percentage opted in for marketing (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create complete order histories with payments, shipping, and tax calculations. Test your checkout flow and order management system."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, payment gateway developers, shipping testers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Order status distribution"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Type of customers for orders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Specific customer ID (when customer_type is 'specific')"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Customer type distribution for mixed mode"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Percentage of existing customers (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Percentage of new customers (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Number of items per order"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum items"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum items"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Payment methods to use"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Geographic distribution of orders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Countries to generate orders from"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Coupons"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate discount codes with various rules and restrictions. Perfect for testing promotional campaigns and discount logic."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, marketing teams, discount plugin developers"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Product Variations"
-msgstr ""
-
-#: build/admin-app.js:3
-#: build/admin-app.js:10
-msgid "Advanced"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create complex product variations with size, color, and material options. Essential for testing variable product functionality."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "E-commerce developers, product catalog managers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Specific product ID to generate variations for"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Product types to consider for variation generation"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Price variance settings for variations"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum variance %"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum variance %"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Stock management settings for variations"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Attribute generation settings"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create missing attributes if needed"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum attributes per variation"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Shipping Plans"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, shipping plugin developers, logistics teams"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Types of shipping methods to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Shipping cost range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum cost"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum cost"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Geographic coverage areas"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Shipping calculation methods"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Delivery time ranges"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum delivery days"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum delivery days"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Tax Classes"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners, accountants, tax plugin developers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Types of tax classes to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Tax jurisdictions to generate rates for"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Tax rate ranges by type"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Standard tax rate range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Reduced tax rate range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Geographic coverage for tax rates"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Countries to generate tax rates for"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Include compound tax rates"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Transactions"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Payment gateway developers, accountants, financial analysts"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Type of customers for transactions"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Filter orders by status"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Types of transactions to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Payment gateways to use for transactions"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Transaction amount range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Transaction status distribution"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Cart Sessions"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Marketing teams, cart recovery plugin developers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Type of customers for cart sessions"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Percentage of guest carts (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Cart abandonment rate percentage (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Cart value range"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum cart value"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum cart value"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Number of items per cart session"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Minimum items per cart"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum items per cart"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Abandonment tracking settings"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate abandoned cart reminders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Maximum number of reminders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Cart recovery rate percentage (0–100)"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Attributes"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate product attributes such as Text, Color, and Image types. Attributes can be used to define product variations and filtering options."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Types of attributes to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Refunds"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners testing refund workflows, payment gateway developers"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Order statuses eligible for refund generation"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Payment gateways for transaction IDs"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Logs"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Developers testing audit logs, admin panel log views"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Log severity types to generate"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Object types to generate log entries for"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Shipping Classes"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Store owners configuring shipping rate groups"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Labels"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Teams segmenting orders and customers with tags"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Order Tax Lines"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Developers testing tax reports and collected-tax views"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Product Downloads"
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Developers testing digital-product fulfillment"
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Subscriptions"
+#: build/admin-app.js:4
+msgid "Generate subscription records against existing orders. Records seed as fixtures; charging them is your platform's job and may need a paid add-on. Requires existing orders and products."
 msgstr ""
 
-#: build/admin-app.js:3
-msgid "Generate subscription records against existing orders. The table ships in core; active billing requires Fluent Cart Pro. Requires existing orders and products."
-msgstr ""
-
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Developers testing recurring-billing views and reports"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
+msgid "Core"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Advanced"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Enhanced"
+msgstr ""
+
+#: build/admin-app.js:4
 msgid "Targets existing completed / processing orders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Applied to existing variable products"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Generated against existing orders"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Uses your existing products & customers"
 msgstr ""
 
-#: build/admin-app.js:3
-#: build/admin-app.js:10
+#: build/admin-app.js:4
+#: build/admin-app.js:13
 msgid "Popular"
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
+msgid "Choose where to write"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "More than one e-commerce platform is active, so there is no safe default."
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Not available here"
+msgstr ""
+
+#: build/admin-app.js:4
 msgid "No extra options — just set a count and generate."
 msgstr ""
 
-#: build/admin-app.js:3
+#: build/admin-app.js:4
 msgid "Could not load preview."
 msgstr ""
 
-#: build/admin-app.js:3
-#: build/admin-app.js:7
+#: build/admin-app.js:4
+#: build/admin-app.js:8
 msgid "Metadata"
 msgstr ""
 
 #. translators: %s: seed value
-#: build/admin-app.js:4
+#: build/admin-app.js:5
 #, js-format
 msgid "seed: %s"
 msgstr ""
 
-#: build/admin-app.js:4
+#: build/admin-app.js:5
 msgid "seed: random"
 msgstr ""
 
-#: build/admin-app.js:4
+#: build/admin-app.js:5
 msgid "Loading preview…"
 msgstr ""
 
-#: build/admin-app.js:4
+#: build/admin-app.js:5
 msgid "No preview available."
 msgstr ""
 
 #. translators: %1$s: visible row count, %2$s: total count
-#: build/admin-app.js:5
+#: build/admin-app.js:6
 #, js-format
 msgid "Live preview · showing %1$s of %2$s"
 msgstr ""
 
 #. translators: %s: formatted number
-#: build/admin-app.js:6
+#: build/admin-app.js:7
 #, js-format
 msgid "Generate %s item"
 msgstr ""
 
 #. translators: %s: formatted number
-#: build/admin-app.js:7
+#: build/admin-app.js:8
 #, js-format
 msgid "Generate %s items"
 msgstr ""
 
-#: build/admin-app.js:7
+#: build/admin-app.js:8
 msgid "Count"
 msgstr ""
 
-#: build/admin-app.js:7
+#: build/admin-app.js:8
 msgid "Seed"
 msgstr ""
 
-#: build/admin-app.js:7
+#: build/admin-app.js:8
 msgid "Add to batch"
 msgstr ""
 
-#: build/admin-app.js:7
+#. translators: %s: e-commerce platform name.
+#: build/admin-app.js:9
+#, js-format
+msgid "Added to your %s store"
+msgstr ""
+
+#: build/admin-app.js:9
+msgid "Added to your store"
+msgstr ""
+
+#: build/admin-app.js:9
 msgid "Live preview"
 msgstr ""
 
-#: build/admin-app.js:7
+#: build/admin-app.js:9
 msgid "Shuffle"
 msgstr ""
 
-#: build/admin-app.js:7
+#: build/admin-app.js:9
 msgid "Sample of what this run will create — updates as you change the settings."
 msgstr ""
 
 #. translators: %1$s: count, %2$s: generator name
-#: build/admin-app.js:8
+#: build/admin-app.js:10
 #, js-format
 msgid "Generating %1$s %2$s…"
 msgstr ""
 
 #. translators: %1$s: count, %2$s: generator name
-#: build/admin-app.js:9
+#: build/admin-app.js:11
 #, js-format
 msgid "Generated %1$s %2$s"
 msgstr ""
 
-#: build/admin-app.js:9
-msgid "Added to your Fluent Cart store"
-msgstr ""
-
-#: build/admin-app.js:9
+#: build/admin-app.js:11
 msgid "Generation failed"
 msgstr ""
 
 #. translators: %1$s: count, %2$s: generator name
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 #, js-format
 msgid "Added %1$s %2$s to batch"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "Nothing generated yet"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "steady"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "just now"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "No runs yet — generate something to see it here."
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "seed"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "random seed"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:12
 msgid "Generated"
 msgstr ""
 
-#: build/admin-app.js:10
-msgid "Enhanced"
+#. translators: %s: category name, e.g. Core.
+#: build/admin-app.js:13
+#: build/admin-app.js:16
+#, js-format
+msgid "%s generators"
 msgstr ""
 
-#: build/admin-app.js:10
-msgid "generators"
-msgstr ""
-
-#: build/admin-app.js:10
+#: build/admin-app.js:13
 msgid "generated"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:13
 msgid "Not run yet"
 msgstr ""
 
-#: build/admin-app.js:10
-msgid "Generate realistic test data for your Fluent Cart store."
+#: build/admin-app.js:13
+msgid "Unavailable here"
 msgstr ""
 
-#: build/admin-app.js:10
+#. translators: %s: e-commerce platform name.
+#: build/admin-app.js:14
+#, js-format
+msgid "Generate realistic test data for your %s store."
+msgstr ""
+
+#: build/admin-app.js:14
+msgid "Generate realistic test data for your store."
+msgstr ""
+
+#: build/admin-app.js:14
 msgid "New generation"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:14
 msgid "Total Generated"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:14
 msgid "Recent activity"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:14
 msgid "Could not load plugins. Check your internet connection."
 msgstr ""
 
-#: build/admin-app.js:10
-#: build/admin-app.js:11
+#: build/admin-app.js:14
+#: build/admin-app.js:16
 msgid "Our Plugins"
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:14
 msgid "Other plugins by the same author on WordPress.org."
 msgstr ""
 
-#: build/admin-app.js:10
+#: build/admin-app.js:14
+msgid "Loading plugins…"
+msgstr ""
+
+#: build/admin-app.js:14
 msgid "No plugins found."
 msgstr ""
 
 #. translators: %s: formatted install count
-#: build/admin-app.js:11
+#: build/admin-app.js:15
 #, js-format
 msgid "%s+ active"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:15
 msgid "View on WordPress.org"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:15
+msgid "Where generated data is written"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "Choose a target"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "No platform active"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "No target chosen"
+msgstr ""
+
+#: build/admin-app.js:16
+#: build/admin-app.js:23
+msgid "Target platform"
+msgstr ""
+
+#: build/admin-app.js:16
+msgid "Which store generated data is written to"
+msgstr ""
+
+#: build/admin-app.js:16
 msgid "Dismiss"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Sample data downloaded"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Download failed — you can retry from Settings."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Could not save your choice — please try again."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Download sample data?"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "StoreSeeder can download locale-specific reference data (product names, addresses and customer tags for 75+ locales) from GitHub to make generated content more realistic. No data about your site is sent."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "You can decline and still generate data using built-in defaults, or change this later in Settings."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "View the sample data repository"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Not now"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Downloading…"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Allow & download"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Overview"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:16
 msgid "Pages"
 msgstr ""
 
-#: build/admin-app.js:11
-msgid "generator"
+#. translators: %s: category name, e.g. Core.
+#: build/admin-app.js:17
+#, js-format
+msgid "%s generator"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
 msgid "Command palette"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
 msgid "Search generators and pages…"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
 msgid "No matches"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
 msgid "navigate"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
 msgid "open"
 msgstr ""
 
-#: build/admin-app.js:11
-#: build/admin-app.js:14
-msgid "Default locale"
+#: build/admin-app.js:17
+msgid "Generation locale"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:17
+msgid "Search locales…"
+msgstr ""
+
+#: build/admin-app.js:17
+msgid "Search locales"
+msgstr ""
+
+#. translators: %s: the search term the user typed.
+#: build/admin-app.js:18
+#, js-format
+msgid "No locale matches “%s”."
+msgstr ""
+
+#. translators: %d: number of locales available.
+#: build/admin-app.js:19
+#, js-format
+msgid "%d locales available"
+msgstr ""
+
+#: build/admin-app.js:19
 msgid "Accent"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Background"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Surface"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Text"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Border"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Danger"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Tweaks"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Close"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Appearance"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Light"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Dark"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Accent color"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Density"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Comfortable"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
+#: build/admin-app.js:31
 msgid "Compact"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Custom colors"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Reset"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Revert"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "These controls preview how the StoreSeeder admin would adapt to store-owner theme preferences."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Batch queue"
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Queue is empty."
 msgstr ""
 
-#: build/admin-app.js:11
+#: build/admin-app.js:19
 msgid "Add generators with “Add to batch” to run them together."
 msgstr ""
 
 #. translators: %s: item count
 #. translators: %s: total item count
-#: build/admin-app.js:12
-#: build/admin-app.js:13
+#: build/admin-app.js:20
+#: build/admin-app.js:21
 #, js-format
 msgid "%s items"
 msgstr ""
 
-#: build/admin-app.js:12
+#: build/admin-app.js:20
 msgid "Remove"
 msgstr ""
 
-#: build/admin-app.js:13
+#: build/admin-app.js:21
 msgid "Generating…"
 msgstr ""
 
 #. translators: %s: number of queued generators
-#: build/admin-app.js:14
+#: build/admin-app.js:22
 #, js-format
 msgid "Run batch (%s)"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Sample data synced."
+#: build/admin-app.js:22
+msgid "Site-wide"
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:22
+msgid "This browser"
+msgstr ""
+
+#: build/admin-app.js:22
 msgid "Sync failed."
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:22
 msgid "Automatic download allowed."
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:22
 msgid "Automatic download declined."
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:22
 msgid "Update failed."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Configure default behaviour for data generation."
+#: build/admin-app.js:22
+msgid "Auto — whichever platform is active"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Generation defaults"
+#. translators: %s: platform id stored in the site option.
+#: build/admin-app.js:23
+#, js-format
+msgid "%s (not active)"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Pre-fill values on every generator page."
+#: build/admin-app.js:23
+msgid "What StoreSeeder writes, who may write it, and how this admin looks."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Default count"
+#: build/admin-app.js:23
+msgid "This site"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Number of items pre-filled on every generator page."
+#: build/admin-app.js:23
+msgid "Stored on the server and shared by everyone who uses StoreSeeder here."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Faker locale used when generating data."
+#: build/admin-app.js:23
+msgid "Where generated data is written. Applies to every user on this site."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Default seed"
+#: build/admin-app.js:23
+msgid "Platform"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Fixed seed for reproducible runs. Leave blank for random output."
+#: build/admin-app.js:23
+msgid "More than one platform is active, so Auto cannot decide. Pick one here, or you will be asked on each generator page."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "random (leave blank)"
+#. translators: %s: platform name Auto currently resolves to.
+#: build/admin-app.js:24
+#, js-format
+msgid "Auto currently resolves to %s."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Include metadata by default"
+#: build/admin-app.js:24
+msgid "No supported platform is active yet. Activate one and it appears here."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Pre-check the Include Metadata toggle on every generator."
+#: build/admin-app.js:24
+msgid "Target platform set to Auto"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Saved!"
+#. translators: %s: platform name.
+#: build/admin-app.js:25
+#, js-format
+msgid "Target platform set to %s"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Save settings"
+#. translators: %s: comma-separated platform names with versions.
+#: build/admin-app.js:26
+#, js-format
+msgid "Active: %s"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Run history"
+#: build/admin-app.js:26
+msgid "Who can generate data"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Control how much history is retained."
+#: build/admin-app.js:26
+msgid "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools."
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "Max runs per generator"
+#: build/admin-app.js:26
+msgid "Loading roles…"
 msgstr ""
 
-#: build/admin-app.js:14
-msgid "How many recent runs to store in history per generator type."
+#: build/admin-app.js:26
+msgid "Could not load who has access. Reload the page to try again."
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:26
+msgid "This site defines no roles other than Administrator."
+msgstr ""
+
+#. translators: %s: role name.
+#: build/admin-app.js:27
+#, js-format
+msgid "%s can now generate data"
+msgstr ""
+
+#. translators: %s: role name.
+#: build/admin-app.js:28
+#, js-format
+msgid "%s can no longer generate data"
+msgstr ""
+
+#: build/admin-app.js:28
+msgid "Could not save who has access"
+msgstr ""
+
+#: build/admin-app.js:28
+msgid "Can generate data, and can write it into the live store."
+msgstr ""
+
+#: build/admin-app.js:28
+msgid "No access."
+msgstr ""
+
+#: build/admin-app.js:28
+msgid "Only administrators can change who has access, so that a role granted here cannot widen it further."
+msgstr ""
+
+#. translators: %s: capability name, e.g. edit_shop_orders.
+#: build/admin-app.js:29
+#, js-format
+msgid "Code on this site also grants access through the %s capability, via the storeseeder_capability filter."
+msgstr ""
+
+#: build/admin-app.js:29
 msgid "Sample data"
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:29
 msgid "Locale-specific reference data used by generators to produce realistic output."
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:29
 msgid "Checking status…"
 msgstr ""
 
-#: build/admin-app.js:14
+#: build/admin-app.js:29
 msgid "Sample data is synced"
 msgstr ""
 
 #. translators: %s: date string
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 #, js-format
 msgid "Last updated: %s"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Sample data not found"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Sync to download locale-specific reference data."
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Automatic download is allowed. Revoke to stop downloading on visit."
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Automatic download is declined. Sync now reopens the consent prompt so you can allow it."
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Nothing has been downloaded yet. Sync now asks for your permission first."
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Syncing…"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Sync now"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Force re-sync"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "Revoke"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
 msgid "View sample data repository"
 msgstr ""
 
-#: build/admin-app.js:15
+#: build/admin-app.js:30
+msgid "Your preferences"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Stored in this browser, for you alone. Nothing here changes what anyone else sees."
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Saved"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Generation defaults"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Pre-fill values on every generator page."
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Default count"
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Number of items pre-filled on every generator page."
+msgstr ""
+
+#: build/admin-app.js:30
+msgid "Default locale"
+msgstr ""
+
+#. translators: %d: number of available locales.
+#: build/admin-app.js:31
+#, js-format
+msgid "Locale used when generating data — %d available, all accepted by the REST API."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Default seed"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Fixed seed for reproducible runs. Leave blank for random output."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "random (leave blank)"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Include metadata by default"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Pre-check the Include Metadata toggle on every generator."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "How the admin looks. Saved in this browser, per user."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Theme"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Independent of the WordPress admin colour scheme."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Compact tightens row heights and padding across every page."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Accent & custom colours…"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Run history"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Control how much history is retained."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Max runs per generator"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "How many recent runs to store in history per generator type."
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Plugin"
+msgstr ""
+
+#: build/admin-app.js:31
+msgid "Version, links, and the actions that cannot be undone."
+msgstr ""
+
+#: build/admin-app.js:31
 msgid "About"
 msgstr ""
 
 #. translators: %s: version number
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 #, js-format
 msgid "StoreSeeder · Version %s"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Danger zone"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "These actions cannot be undone."
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Run history cleared"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Clear run history & stats"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Removes locally stored generation stats and run history. Does not delete data in your database."
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Settings reset to defaults"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Reset settings to defaults"
 msgstr ""
 
-#: build/admin-app.js:16
+#: build/admin-app.js:32
 msgid "Resets all settings to their default values."
 msgstr ""
