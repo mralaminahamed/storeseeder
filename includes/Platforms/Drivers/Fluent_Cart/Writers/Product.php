@@ -25,6 +25,17 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Product extends Writer {
 	/**
+	 * The taxonomy Fluent Cart files products under.
+	 *
+	 * Hyphenated and plural, unlike WooCommerce's `product_cat` — the same difference the category
+	 * writer absorbs, and the reason this constant exists rather than a literal at the call site.
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const CATEGORY_TAXONOMY = 'product-categories';
+
+	/**
 	 * Canonical publication status to WordPress post status.
 	 *
 	 * @since 1.1.0
@@ -65,17 +76,37 @@ final class Product extends Writer {
 			return new WP_Error( 'missing_model', __( 'Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
+		$manage_stock = ! isset( $entity['manage_stock'] ) || (bool) $entity['manage_stock'];
+
 		$data = array(
-			'title'            => $entity['title'],
-			'description'      => $entity['description'],
+			'title'             => $entity['title'],
+			'slug'              => (string) ( $entity['slug'] ?? '' ),
+			'description'       => $entity['description'],
+			'short_description' => (string) ( $entity['short_description'] ?? '' ),
 			// item_price is integer cents, despite the column being a double —
 			// PricingTableRenderer reads it back through Helper::toDecimal().
-			'price'            => (int) $entity['price'],
+			'price'             => (int) $entity['price'],
+			// Fluent Cart's compare_price is a "was" price rather than a sale price: the higher
+			// of the two, shown struck through. So the canonical sale price becomes the item
+			// price and the regular one becomes what it is compared against — the same discount
+			// a shopper sees on WooCommerce, expressed the way this platform expresses it.
+			'compare_price'     => isset( $entity['sale_price'] ) ? (int) $entity['price'] : null,
+			'sale_price'        => isset( $entity['sale_price'] ) ? (int) $entity['sale_price'] : null,
+			'cost'              => isset( $entity['cost'] ) ? (int) $entity['cost'] : null,
 			// 'publish' is the WordPress post status; 'published' is not one.
-			'status'           => self::POST_STATUS[ $entity['status'] ] ?? 'publish',
-			'sku'              => $this->unique_sku( (string) $entity['sku'] ),
-			'stock'            => (int) $entity['stock'],
-			'fulfillment_type' => $entity['fulfillment_type'],
+			'status'            => self::POST_STATUS[ $entity['status'] ] ?? 'publish',
+			'sku'               => $this->unique_sku( (string) $entity['sku'] ),
+			'manage_stock'      => $manage_stock,
+			'stock'             => $manage_stock ? (int) $entity['stock'] : 0,
+			// Fluent Cart's column is TINYINT(1), not an enum: it stores whether backorders are
+			// allowed, with no equivalent of WooCommerce's "allow, but notify". Passing the
+			// canonical string would silently become 0 — 'notify' and 'yes' both reading as "no"
+			// — so the two allowing values collapse to 1 here and the distinction is reported as
+			// ignored rather than lost.
+			'backorders'        => 'no' === (string) ( $entity['backorders'] ?? 'no' ) ? 0 : 1,
+			'sold_individually' => (bool) ( $entity['sold_individually'] ?? false ),
+			'fulfillment_type'  => $entity['fulfillment_type'],
+			'category_count'    => (int) ( $entity['category_count'] ?? 0 ),
 		);
 
 		$product_id = $this->create_product( $data );
@@ -88,9 +119,12 @@ final class Product extends Writer {
 			return new WP_Error( 'product_creation_failed', __( 'Failed to create product.', 'storeseeder' ) );
 		}
 
+		$categories = $this->attach_categories( (int) $product_id, $data['category_count'] );
+
 		$result = array(
 			'id'         => $product_id,
 			'title'      => $data['title'],
+			'categories' => $categories,
 			// Stored in cents; reported in major units so the UI shows 45.67
 			// rather than 4567.
 			'price'      => round( $data['price'] / 100, 2 ),
@@ -116,6 +150,47 @@ final class Product extends Writer {
 		$requested = isset( $this->params['payment_type'] ) ? (string) $this->params['payment_type'] : 'onetime';
 
 		return in_array( $requested, array( 'onetime', 'subscription' ), true ) ? $requested : 'onetime';
+	}
+
+	/**
+	 * File the product under existing Fluent Cart categories.
+	 *
+	 * Existing ones only, for the same reason as the WooCommerce writer: creating them here would
+	 * duplicate the Product Categories generator and leave two places inventing names. A store
+	 * with none gets uncategorised products, which is what an empty taxonomy means.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $product_id The product post id.
+	 * @param int $count      How many categories to file it under.
+	 *
+	 * @return int How many were attached.
+	 */
+	private function attach_categories( int $product_id, int $count ): int {
+		if ( $count < 1 || ! taxonomy_exists( self::CATEGORY_TAXONOMY ) ) {
+			return 0;
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => self::CATEGORY_TAXONOMY,
+				'hide_empty' => false,
+				'number'     => 50,
+				'fields'     => 'ids',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || array() === (array) $terms ) {
+			return 0;
+		}
+
+		$pick = (array) $terms;
+		shuffle( $pick );
+		$pick = array_slice( $pick, 0, $count );
+
+		$set = wp_set_object_terms( $product_id, array_map( 'intval', $pick ), self::CATEGORY_TAXONOMY );
+
+		return is_wp_error( $set ) ? 0 : count( $pick );
 	}
 
 	/**
@@ -156,7 +231,8 @@ final class Product extends Writer {
 		// naming it here keeps the intent readable.
 		$product_data = array(
 			'post_title'   => $data['title'],
-			'post_name'    => sanitize_title( $data['title'] ),
+			'post_name'    => '' !== $data['slug'] ? $data['slug'] : sanitize_title( $data['title'] ),
+			'post_excerpt' => $data['short_description'],
 			'post_content' => $data['description'],
 			'post_status'  => $data['status'],
 			'post_type'    => 'fluent-products',
@@ -168,7 +244,8 @@ final class Product extends Writer {
 			return null;
 		}
 
-		$stock_status = $data['stock'] > 0 ? 'in-stock' : 'out-of-stock';
+		// Unmanaged stock reads as available, which is what a product without stock tracking is.
+		$stock_status = ! $data['manage_stock'] || $data['stock'] > 0 ? 'in-stock' : 'out-of-stock';
 
 		// A product Fluent Cart can actually sell needs three rows, not one:
 		// the post, a fct_product_details row, and at least one variation.
@@ -182,26 +259,38 @@ final class Product extends Writer {
 				'variation_type'     => 'simple',
 				'min_price'          => $data['price'],
 				'max_price'          => $data['price'],
-				'manage_stock'       => 1,
+				'manage_stock'       => $data['manage_stock'] ? 1 : 0,
 				'stock_availability' => $stock_status,
 			)
 		);
 
 		$variation = ProductVariationModel::query()->create(
 			array(
-				'post_id'          => $product->ID,
-				'serial_index'     => 1,
-				'variation_title'  => $data['title'],
-				'sku'              => $data['sku'],
-				'item_price'       => $data['price'],
-				'manage_stock'     => 1,
-				'stock_status'     => $stock_status,
-				'total_stock'      => $data['stock'],
-				'available'        => $data['stock'],
-				'payment_type'     => $this->payment_type(),
-				'fulfillment_type' => $data['fulfillment_type'],
-				'item_status'      => 'active',
-				'other_info'       => array(
+				'post_id'           => $product->ID,
+				'serial_index'      => 1,
+				'variation_title'   => $data['title'],
+				'sku'               => $data['sku'],
+				// The lower of the two prices is what the shopper pays, so a discounted product
+				// sells at its sale price and shows the regular one struck through.
+				'item_price'        => $data['sale_price'] ?? $data['price'],
+				'compare_price'     => $data['compare_price'],
+				// `item_cost` is NOT NULL with a zero default, and `manage_cost` is what Fluent
+				// Cart reads to decide whether the figure means anything — so an untracked cost
+				// is zero-and-unmanaged rather than null, which fails the insert outright. Only
+				// the non-default path was exercised when this was written, which is why the
+				// default one was broken.
+				'item_cost'         => (int) ( $data['cost'] ?? 0 ),
+				'manage_cost'       => null === $data['cost'] ? 0 : 1,
+				'manage_stock'      => $data['manage_stock'] ? 1 : 0,
+				'stock_status'      => $stock_status,
+				'total_stock'       => $data['stock'],
+				'available'         => $data['stock'],
+				'backorders'        => $data['backorders'],
+				'sold_individually' => $data['sold_individually'] ? 1 : 0,
+				'payment_type'      => $this->payment_type(),
+				'fulfillment_type'  => $data['fulfillment_type'],
+				'item_status'       => 'active',
+				'other_info'        => array(
 					'description'  => '',
 					'payment_type' => $this->payment_type(),
 					'tax_class'    => 'standard',

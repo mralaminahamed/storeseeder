@@ -174,6 +174,11 @@ final class Platform extends Platform_Driver {
 			__( 'Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to.', 'storeseeder' )
 		);
 
+		// Supported, minus one field. Fluent Cart's `backorders` is a boolean where the canonical
+		// vocabulary has three values, so "allow but notify the customer" cannot be stored — it
+		// becomes a plain yes. Reported rather than silently flattened.
+		$matrix[ Resource::PRODUCT ] = Capability::supported_except( array( 'backorders' ) );
+
 		if ( ! $this->is_pro_active() ) {
 			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
 				self::PRO_SLUG,

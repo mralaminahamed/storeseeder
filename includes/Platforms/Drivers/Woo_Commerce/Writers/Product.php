@@ -54,27 +54,36 @@ final class Product extends Writer {
 			);
 		}
 
-		$price   = $this->to_decimal( (int) $entity['price'] );
-		$virtual = 'digital' === ( $entity['fulfillment_type'] ?? 'physical' );
-		$stock   = (int) $entity['stock'];
+		$price        = $this->to_decimal( (int) $entity['price'] );
+		$virtual      = 'digital' === ( $entity['fulfillment_type'] ?? 'physical' );
+		$manage_stock = ! isset( $entity['manage_stock'] ) || (bool) $entity['manage_stock'];
+		$stock        = $manage_stock ? (int) $entity['stock'] : null;
 
 		$product = new WC_Product_Simple();
 		$product->set_props(
 			array(
 				'name'               => $entity['title'],
+				'slug'               => (string) ( $entity['slug'] ?? '' ),
 				'status'             => $this->map_post_status( (string) $entity['status'] ),
 				'description'        => $entity['description'],
-				'short_description'  => wp_trim_words( (string) $entity['description'], 24 ),
+				'short_description'  => (string) ( $entity['short_description'] ?? '' ),
 				'sku'                => $this->unique_sku( (string) $entity['sku'] ),
 				'regular_price'      => $price,
+				// Null means no sale, and WooCommerce reads an empty string for that rather
+				// than a zero — which would be a product given away.
+				'sale_price'         => isset( $entity['sale_price'] ) ? $this->to_decimal( (int) $entity['sale_price'] ) : '',
+				'backorders'         => $this->backorders( $entity ),
+				'sold_individually'  => (bool) ( $entity['sold_individually'] ?? false ),
 				'virtual'            => $virtual,
 				// A digital product is downloadable only once it has a file, which is the
 				// Product Downloads generator's job. Marking it downloadable with no file
 				// produces a product WooCommerce refuses to let anyone buy.
 				'downloadable'       => false,
-				'manage_stock'       => true,
+				'manage_stock'       => $manage_stock,
 				'stock_quantity'     => $stock,
-				'stock_status'       => $stock > 0 ? 'instock' : 'outofstock',
+				// Without stock management there is no quantity to compare, and WooCommerce
+				// treats the product as available — which is what an unmanaged product means.
+				'stock_status'       => ! $manage_stock || $stock > 0 ? 'instock' : 'outofstock',
 				// Platform fields, declared by the driver and read from the run's parameters.
 				// See Platform::platform_fields(): these are WooCommerce properties no canonical
 				// entity carries, because no other platform has them.
@@ -93,6 +102,12 @@ final class Product extends Writer {
 			return new WP_Error( 'product_creation_failed', __( 'Failed to create the product.', 'storeseeder' ) );
 		}
 
+		// Cost of goods is a WooCommerce 10 feature that is off on most stores, and setting it
+		// while disabled throws rather than being ignored.
+		$this->maybe_set_cost( $product, $entity );
+
+		$categories = $this->attach_categories( (int) $id, (int) ( $entity['category_count'] ?? 0 ) );
+
 		$data = array(
 			'id'     => (int) $id,
 			'name'   => $product->get_name(),
@@ -105,12 +120,103 @@ final class Product extends Writer {
 			'id'         => (int) $id,
 			'title'      => $product->get_name(),
 			'price'      => $price,
+			'sale_price' => $product->get_sale_price(),
 			'status'     => $product->get_status(),
 			'type'       => $virtual ? 'virtual' : 'simple',
+			'categories' => $categories,
 			'created_at' => current_time( 'Y-m-d H:i:s' ),
 		);
 
 		return $this->filter_result( $result, (int) $id, $data );
+	}
+
+	/**
+	 * The canonical backorder setting, in WooCommerce's spelling.
+	 *
+	 * The three values happen to coincide. Mapped anyway, so a platform that renames one does not
+	 * silently store something WooCommerce reads as "no".
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $entity Canonical product entity.
+	 *
+	 * @return string
+	 */
+	private function backorders( array $entity ): string {
+		$value = (string) ( $entity['backorders'] ?? 'no' );
+
+		return in_array( $value, array( 'no', 'notify', 'yes' ), true ) ? $value : 'no';
+	}
+
+	/**
+	 * Record cost of goods, when this WooCommerce has the feature switched on.
+	 *
+	 * Wrapped because `cogs_value` is a WooCommerce 10 feature that is disabled by default, and
+	 * the setter throws on a store where it is off rather than ignoring the call. The method
+	 * itself always exists in the versions this supports — it is the feature flag that varies.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param \WC_Product          $product The saved product.
+	 * @param array<string, mixed> $entity  Canonical product entity.
+	 *
+	 * @return void
+	 */
+	private function maybe_set_cost( \WC_Product $product, array $entity ): void {
+		if ( ! isset( $entity['cost'] ) ) {
+			return;
+		}
+
+		try {
+			$product->set_cogs_value( (float) $this->to_decimal( (int) $entity['cost'] ) );
+			$product->save();
+		} catch ( \Exception $e ) {
+			// The feature is off on this store. A missing cost is not worth failing a product
+			// that is otherwise complete.
+			return;
+		}
+	}
+
+	/**
+	 * File the product under existing categories.
+	 *
+	 * Existing ones only. Creating them here would duplicate the Product Categories generator and
+	 * leave two places inventing category names; a store with none simply gets uncategorised
+	 * products, which is what an empty catalogue taxonomy means.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int $product_id The saved product.
+	 * @param int $count      How many categories to file it under.
+	 *
+	 * @return int How many were attached.
+	 */
+	private function attach_categories( int $product_id, int $count ): int {
+		if ( $count < 1 ) {
+			return 0;
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+				'number'     => 50,
+				'fields'     => 'ids',
+				'exclude'    => array( (int) get_option( 'default_product_cat', 0 ) ),
+			)
+		);
+
+		if ( is_wp_error( $terms ) || array() === (array) $terms ) {
+			return 0;
+		}
+
+		$pick = (array) $terms;
+		shuffle( $pick );
+		$pick = array_slice( $pick, 0, $count );
+
+		$set = wp_set_object_terms( $product_id, array_map( 'intval', $pick ), 'product_cat' );
+
+		return is_wp_error( $set ) ? 0 : count( $pick );
 	}
 
 	/**
