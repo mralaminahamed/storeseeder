@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use StoreSeeder\Access;
 use StoreSeeder\CLI\Registry as CLI_Registry;
 use StoreSeeder\MCP\MCP_Server;
+use StoreSeeder\MCP\Settings as MCP_Settings;
 use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver as Platform_Resolver;
@@ -570,6 +571,9 @@ class StoreSeeder {
 			// Inlined so the topbar renders its target on first paint. Fetching it
 			// would flash "Auto" with no platform beside it, then correct itself.
 			'platforms'   => $this->rest_platforms()->get_data(),
+			// Inlined for the same reason, and because it cannot change while the page is
+			// open: MCP availability depends on which plugins are active.
+			'mcp'         => MCP_Server::status(),
 		);
 
 		/**
@@ -703,6 +707,39 @@ class StoreSeeder {
 			)
 		);
 
+		// Register the MCP endpoints. Reading what the AI surface exposes needs only the
+		// plugin's own gate; changing what an agent may do to the store needs
+		// manage_options, like the access setting it sits beside.
+		register_rest_route(
+			'storeseeder/v1',
+			'/mcp',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_mcp' ),
+					'permission_callback' => array( $this, 'rest_access_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_set_mcp' ),
+					'permission_callback' => array( $this, 'rest_manage_access_permission_check' ),
+					'args'                => array(
+						// All three optional: the admin saves the switch that moved, and an
+						// absent key leaves that toggle alone rather than clearing it.
+						'enabled'  => array(
+							'type' => 'boolean',
+						),
+						'preview'  => array(
+							'type' => 'boolean',
+						),
+						'generate' => array(
+							'type' => 'boolean',
+						),
+					),
+				),
+			)
+		);
+
 		register_rest_route(
 			'storeseeder/v1',
 			'/platforms/target',
@@ -788,6 +825,45 @@ class StoreSeeder {
 	 */
 	public function rest_manage_access_permission_check(): bool {
 		return Access::current_user_can_manage();
+	}
+
+	/**
+	 * REST: what the AI surface exposes, and whether it is on.
+	 *
+	 * The same payload the admin is handed inline at page load, so the card renders from
+	 * one shape whether it was inlined or fetched after a save.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response MCP status payload.
+	 */
+	public function rest_mcp(): WP_REST_Response {
+		return new WP_REST_Response( MCP_Server::status(), 200 );
+	}
+
+	/**
+	 * REST: turn the AI surface, previews or generation on or off.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; any of `enabled`, `preview`, `generate`.
+	 *
+	 * @return WP_REST_Response The MCP status after the change.
+	 */
+	public function rest_set_mcp( WP_REST_Request $request ): WP_REST_Response {
+		$changes = array();
+
+		foreach ( array( 'enabled', 'preview', 'generate' ) as $toggle ) {
+			// A null check rather than has_param(): `false` is a change the client meant,
+			// and a parameter it never sent must not read as false.
+			if ( null !== $request->get_param( $toggle ) ) {
+				$changes[ $toggle ] = (bool) $request->get_param( $toggle );
+			}
+		}
+
+		MCP_Settings::update( $changes );
+
+		return $this->rest_mcp();
 	}
 
 	/**

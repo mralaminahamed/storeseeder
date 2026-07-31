@@ -186,4 +186,69 @@ final class Registry {
 
 		return $definitions;
 	}
+
+	/**
+	 * Every ability's read-only definition, keyed by its preview id.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public function preview_definitions(): array {
+		$definitions = array();
+
+		foreach ( $this->all() as $ability ) {
+			$definitions[ $ability::preview_ability_id() ] = $ability::preview_definition();
+		}
+
+		return $definitions;
+	}
+
+	/**
+	 * The tools this site actually exposes, keyed by tool id.
+	 *
+	 * Two tools per generator — one that shows what a run would create and one that
+	 * creates it — and the settings decide which of the two kinds are offered. This is the
+	 * gate: a tool that is not registered cannot be called, which is a stronger promise
+	 * than a tool that checks a flag once it has been.
+	 *
+	 * Preview comes first per resource, so a client listing tools meets the harmless one
+	 * before the one that writes.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public function tools(): array {
+		if ( ! Settings::enabled() ) {
+			return array();
+		}
+
+		$preview  = Settings::preview_enabled();
+		$generate = Settings::generate_enabled();
+		$tools    = array();
+
+		foreach ( $this->all() as $id => $ability ) {
+			if ( $preview ) {
+				$tools[ $ability::preview_ability_id() ] = $ability::preview_definition();
+			}
+
+			if ( $generate ) {
+				$tools[ $id ] = $ability::definition();
+			}
+		}
+
+		return $tools;
+	}
+
+	/**
+	 * The ids of the tools this site exposes.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public function tool_ids(): array {
+		return array_keys( $this->tools() );
+	}
 }

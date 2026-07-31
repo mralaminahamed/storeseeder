@@ -192,6 +192,26 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		$this->assertSame( Locale::DEFAULT_LOCALE, $schema['properties']['locale']['default'] );
 	}
 
+	/**
+	 * The admin reports MCP's two dependencies separately, because "install the Abilities
+	 * API" and "install mcp-adapter" are different instructions.
+	 */
+	public function test_status_reports_each_dependency_and_the_ability_count(): void {
+		$status = \StoreSeeder\MCP\MCP_Server::status();
+
+		foreach ( array( 'available', 'abilities_api', 'adapter', 'abilities', 'route' ) as $key ) {
+			$this->assertArrayHasKey( $key, $status );
+		}
+
+		$this->assertSame( count( Registry::instance()->ids() ), $status['abilities'] );
+		$this->assertSame(
+			$status['abilities_api'] && $status['adapter'],
+			$status['available'],
+			'available must mean both dependencies, not one of them'
+		);
+		$this->assertStringContainsString( 'storeseeder-mcp', $status['route'] );
+	}
+
 	public function test_malformed_entries_are_discarded(): void {
 		add_filter(
 			'storeseeder_mcp_abilities',

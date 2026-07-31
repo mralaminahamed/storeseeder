@@ -71,6 +71,22 @@ abstract class Ability {
 	}
 
 	/**
+	 * The id of this resource's read-only counterpart.
+	 *
+	 * Every generator has two tools: one that creates rows and one that only shows what it
+	 * would create. They are separate ids rather than a parameter because an AI client's
+	 * permission model works on tools — "you may call preview, not generate" is enforceable,
+	 * "you may call generate with dry_run: true" is a promise.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	public static function preview_ability_id(): string {
+		return 'storeseeder/preview-' . str_replace( '_', '-', static::REST_BASE );
+	}
+
+	/**
 	 * Human-readable name shown to MCP clients.
 	 *
 	 * @since 1.1.0
@@ -130,6 +146,7 @@ abstract class Ability {
 			'output_schema'       => static::output_schema( $output['key'], $output['description'] ),
 			'execute_callback'    => array( static::class, 'execute' ),
 			'permission_callback' => array( self::class, 'permission_callback' ),
+			'meta'                => self::meta( false ),
 		);
 
 		/**
@@ -248,15 +265,121 @@ abstract class Ability {
 	}
 
 	/**
+	 * Entry point for the read-only tool.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $input Validated input from the MCP client.
+	 *
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public static function execute_preview( array $input = array() ) {
+		return static::dispatch( $input, 'preview' );
+	}
+
+	/**
+	 * The read-only definition of this ability.
+	 *
+	 * Same inputs, different route and a different envelope: a preview answers with the
+	 * columns and rows a run would produce and writes nothing, so it needs no target
+	 * platform and cannot fail for want of one.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function preview_definition(): array {
+		$output = static::output();
+
+		$definition = array(
+			'label'               => sprintf(
+				/* translators: %s: the generate tool's label, e.g. "Generate Products". */
+				__( 'Preview: %s', 'storeseeder' ),
+				static::label()
+			),
+			'description'         => sprintf(
+				/* translators: %s: the resource's own tool description. */
+				__( 'Read-only. Shows the rows this generator would create, without writing anything — use it to check a set of parameters before generating. %s', 'storeseeder' ),
+				static::description()
+			),
+			'category'            => self::CATEGORY,
+			'input_schema'        => static::input_schema(),
+			'output_schema'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'columns' => array(
+						'type'        => 'array',
+						'description' => __( 'Column definitions, each with a key and a label.', 'storeseeder' ),
+						'items'       => array( 'type' => 'object' ),
+					),
+					'rows'    => array(
+						'type'        => 'array',
+						'description' => sprintf(
+							/* translators: %s: the resource's row description. */
+							__( 'Sample rows that would be created. %s', 'storeseeder' ),
+							$output['description']
+						),
+						'items'       => array( 'type' => 'object' ),
+					),
+				),
+			),
+			'execute_callback'    => array( static::class, 'execute_preview' ),
+			'permission_callback' => array( self::class, 'permission_callback' ),
+			'meta'                => self::meta( true ),
+		);
+
+		/** This filter documented in StoreSeeder\MCP\Ability::definition(). */
+		return (array) apply_filters(
+			'storeseeder_mcp_ability_definition',
+			$definition,
+			static::preview_ability_id(),
+			static::class
+		);
+	}
+
+	/**
+	 * The metadata the MCP layer reads off an ability.
+	 *
+	 * Two audiences. `mcp.public` is what mcp-adapter's **default** server checks before it
+	 * will run an ability through `execute-ability`, so setting it means these tools also
+	 * work for anyone already pointed at `/wp-json/mcp/mcp-adapter-default-server` instead
+	 * of StoreSeeder's own endpoint. `annotations` is what an AI client reads to decide how
+	 * carefully to treat a tool: a preview is read-only and repeatable, a generate run is
+	 * neither — it inserts rows, and calling it twice inserts twice as many.
+	 *
+	 * Nothing here is destructive: StoreSeeder only ever creates.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $read_only Whether this is the preview tool.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function meta( bool $read_only ): array {
+		return array(
+			'mcp'         => array(
+				'public' => true,
+				'type'   => 'tool',
+			),
+			'annotations' => array(
+				'readonly'    => $read_only,
+				'destructive' => false,
+				'idempotent'  => $read_only,
+			),
+		);
+	}
+
+	/**
 	 * Dispatch an internal REST request and return the decoded response body.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param array<string, mixed> $params Parameters to forward as JSON body.
+	 * @param string               $action Endpoint to call: 'generate' or 'preview'.
 	 * @return array<string, mixed>|WP_Error
 	 */
-	protected static function dispatch( array $params ) {
-		$route = '/' . static::REST_NAMESPACE . '/' . static::REST_BASE . '/generate';
+	protected static function dispatch( array $params, string $action = 'generate' ) {
+		$route = '/' . static::REST_NAMESPACE . '/' . static::REST_BASE . '/' . $action;
 
 		$request = new WP_REST_Request( 'POST', $route );
 		$request->set_header( 'Content-Type', 'application/json' );

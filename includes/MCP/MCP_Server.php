@@ -16,6 +16,8 @@
 
 namespace StoreSeeder\MCP;
 
+use StoreSeeder\Access;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -93,7 +95,8 @@ class MCP_Server {
 	/**
 	 * Register all StoreSeeder abilities with the Abilities API.
 	 *
-	 * Each ability maps 1-to-1 with an existing REST controller / generator pair. The
+	 * Each ability maps to one existing REST controller / generator pair — twice over,
+	 * since a generator has a read-only preview tool as well as the one that writes. The
 	 * definitions come from the abilities themselves, through the registry.
 	 *
 	 * @since 1.0.0
@@ -109,7 +112,9 @@ class MCP_Server {
 			return;
 		}
 
-		foreach ( Registry::instance()->definitions() as $id => $args ) {
+		// Which kinds of tool this site offers is a setting, and the registry applies it.
+		// Nothing is registered when the AI surface is off, so there is nothing to call.
+		foreach ( Registry::instance()->tools() as $id => $args ) {
 			$name = strtolower( $id );
 
 			// An empty name would register an unreachable ability. The registry already
@@ -135,7 +140,14 @@ class MCP_Server {
 			return;
 		}
 
-		$tool_ids = Registry::instance()->ids();
+		// No server at all when the AI surface is off, so /wp-json/storeseeder-mcp/mcp
+		// stops existing rather than answering with an empty tool list. A client then
+		// fails to connect, which is the honest signal.
+		if ( ! Settings::enabled() ) {
+			return;
+		}
+
+		$tool_ids = Registry::instance()->tool_ids();
 
 		$adapter->create_server(
 			self::SERVER_ID,
@@ -152,6 +164,47 @@ class MCP_Server {
 			$tool_ids, // abilities exposed as tools.
 			array(),   // resources (none).
 			array()    // prompts (none).
+		);
+	}
+
+	/**
+	 * What this site would need for MCP, and what it has.
+	 *
+	 * Reported rather than inferred in the admin: MCP depends on two plugins that are not
+	 * StoreSeeder's to install, and "it does not work" is a support ticket while "the
+	 * Abilities API is missing" is an afternoon's fix. Static because the admin asks before
+	 * any server is built.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array{available: bool, abilities_api: bool, adapter: bool, abilities: int, tools: int, enabled: bool, preview: bool, generate: bool, can_manage: bool, route: string}
+	 */
+	public static function status(): array {
+		$abilities_api = function_exists( 'wp_register_ability' );
+		// The adapter's own init action is the honest signal: the class list has moved
+		// between releases, and a missing class name would read as a missing plugin.
+		$adapter = did_action( 'mcp_adapter_init' ) > 0 || class_exists( '\WP\MCP\Core\McpAdapter' );
+
+		$settings = Settings::all();
+
+		return array_merge(
+			$settings,
+			array(
+				'available'     => $abilities_api && $adapter,
+				'abilities_api' => $abilities_api,
+				'adapter'       => $adapter,
+				// Generators, not tools: the number of things that can be generated does
+				// not change when a switch withdraws one kind of tool for them.
+				'abilities'     => count( Registry::instance()->ids() ),
+				// What an AI client would actually see listed, under these settings.
+				'tools'         => count( Registry::instance()->tool_ids() ),
+				// Changing what an agent may do to the store is an administrator's call,
+				// so the admin renders the switches read-only for everyone else rather
+				// than offering a control that would 403.
+				'can_manage'    => Access::current_user_can_manage(),
+				// Where an MCP client points once both are present.
+				'route'         => rest_url( self::REST_NAMESPACE . '/' . self::REST_ROUTE ),
+			)
 		);
 	}
 
