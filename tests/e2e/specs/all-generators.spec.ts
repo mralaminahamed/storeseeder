@@ -15,6 +15,7 @@ const GENERATORS = [
   { route: "attributes",           name: 'Product Attributes' },
   { route: "product_categories",   name: 'Product Categories' },
   { route: "brands",               name: 'Product Brands' },
+  { route: "product_tags",         name: 'Product Tags' },
   { route: "refunds",              name: 'Refunds' },
   { route: "logs",                 name: 'Logs' },
   { route: "shipping_classes",     name: 'Shipping Classes' },
