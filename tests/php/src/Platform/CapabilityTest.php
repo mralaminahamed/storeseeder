@@ -192,7 +192,7 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 	}
 
 	public function test_resource_names_are_stable(): void {
-		$this->assertCount( 18, Resource::all() );
+		$this->assertCount( 19, Resource::all() );
 		$this->assertTrue( Resource::exists( 'license' ) );
 		$this->assertTrue( Resource::exists( 'product' ) );
 		$this->assertFalse( Resource::exists( 'products' ) );

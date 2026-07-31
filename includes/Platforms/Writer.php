@@ -177,6 +177,162 @@ abstract class Writer {
 	}
 
 	/**
+	 * Create a brand term and attach it to products.
+	 *
+	 * Here rather than in each driver because a brand is a taxonomy term on every platform that
+	 * has one, and the only things that differ are the taxonomy's name and where the products
+	 * come from — both arguments, which keeps this class free of any platform's vocabulary, the
+	 * same way `delete_model()` takes a model class.
+	 *
+	 * The differences it does absorb are real: WooCommerce and EasyCommerce call the taxonomy
+	 * `product_brand`, Fluent Cart calls it `product-brands`, and a writer that hard-coded
+	 * either would silently create nothing on the other.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string               $taxonomy    Brand taxonomy name.
+	 * @param array<string, mixed> $entity      Canonical brand entity.
+	 * @param array<int, int>      $product_ids Products to attach it to.
+	 *
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	protected function create_brand_in( string $taxonomy, array $entity, array $product_ids ) {
+		$name   = $this->unique_term_name( $taxonomy, (string) $entity['name'] );
+		$parent = empty( $entity['nested'] ) ? 0 : $this->random_term_id( $taxonomy );
+
+		$term = wp_insert_term(
+			$name,
+			$taxonomy,
+			array(
+				'description' => (string) $entity['description'],
+				'slug'        => sanitize_title( $name ),
+				'parent'      => $parent,
+			)
+		);
+
+		if ( is_wp_error( $term ) ) {
+			return $term;
+		}
+
+		$id = (int) $term['term_id'];
+
+		// Attached to real products, because a brand on nothing is invisible outside the
+		// taxonomy screen — the same reason the attribute writer links its terms.
+		$wanted   = max( 0, (int) $entity['link_count'] );
+		$attached = 0;
+
+		foreach ( array_slice( $product_ids, 0, $wanted ) as $product_id ) {
+			$set = wp_set_object_terms( (int) $product_id, array( $id ), $taxonomy, true );
+
+			if ( ! is_wp_error( $set ) ) {
+				++$attached;
+			}
+		}
+
+		$result = array(
+			'id'          => $id,
+			'name'        => $name,
+			'slug'        => sanitize_title( $name ),
+			'description' => (string) $entity['description'],
+			'products'    => $attached,
+			'parent'      => $parent > 0 ? get_term_field( 'name', $parent, $taxonomy ) : '',
+			'created_at'  => current_time( 'Y-m-d H:i:s' ),
+		);
+
+		return $this->filter_result( $result, $id, $result );
+	}
+
+	/**
+	 * Remove a term this writer created.
+	 *
+	 * The objects it was attached to keep existing; only the relationship goes, which is what
+	 * deleting a brand or a class means rather than deleting the products carrying it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string     $taxonomy Taxonomy name.
+	 * @param int|string $id       Term id.
+	 *
+	 * @return true|\WP_Error
+	 */
+	protected function delete_term( string $taxonomy, $id ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return new \WP_Error(
+				'storeseeder_delete_unsupported',
+				sprintf(
+					/* translators: %s: canonical resource name, e.g. brand. */
+					__( 'The plugin that stores generated %s records is no longer active.', 'storeseeder' ),
+					$this->resource()
+				)
+			);
+		}
+
+		$deleted = wp_delete_term( (int) $id, $taxonomy );
+
+		if ( is_wp_error( $deleted ) ) {
+			return $deleted;
+		}
+
+		// A term that was already gone counts as deleted: the ledger can outlive what it
+		// points at, and failing here would block the rest of a cleanup for ever.
+		return true;
+	}
+
+	/**
+	 * A term name the taxonomy will accept.
+	 *
+	 * `wp_insert_term()` refuses a duplicate name at the same level, and a generator drawing
+	 * from a fixed pool collides by design — so without this, every item after the first few
+	 * fails.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $taxonomy Taxonomy name.
+	 * @param string $proposed Name the generator proposed.
+	 *
+	 * @return string
+	 */
+	protected function unique_term_name( string $taxonomy, string $proposed ): string {
+		$name = $proposed;
+
+		for ( $attempt = 2; $attempt <= 40; $attempt++ ) {
+			if ( ! term_exists( $name, $taxonomy ) ) {
+				return $name;
+			}
+
+			$name = $proposed . ' ' . $attempt;
+		}
+
+		return $proposed . ' ' . strtoupper( substr( md5( (string) wp_generate_uuid4() ), 0, 4 ) );
+	}
+
+	/**
+	 * The id of an existing term in one taxonomy, or 0 when it has none.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $taxonomy Taxonomy name.
+	 *
+	 * @return int
+	 */
+	protected function random_term_id( string $taxonomy ): int {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => $taxonomy,
+				'hide_empty' => false,
+				'number'     => 20,
+				'fields'     => 'ids',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || array() === (array) $terms ) {
+			return 0;
+		}
+
+		return (int) $this->faker()->randomElement( (array) $terms );
+	}
+
+	/**
 	 * Share the generator's FakerPHP instance.
 	 *
 	 * @since 1.1.0
