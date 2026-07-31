@@ -11,6 +11,14 @@
  * type-checks under the repository's own `tsc --noEmit` without an @types/jest dependency.
  */
 import { afterEach, beforeEach } from "@jest/globals";
+import { cleanup } from "@testing-library/react";
+
+// DOM matchers — toBeInTheDocument, toHaveAttribute, toHaveTextContent. The
+// `/jest-globals` entry point rather than the bare package: it both registers the matchers
+// and augments the types of `expect` **as imported from @jest/globals**, which is how these
+// tests import it. The bare entry only augments the ambient `jest.Matchers`, so
+// `tsc --noEmit` would reject every matcher while the tests themselves passed.
+import "@testing-library/jest-dom/jest-globals";
 
 /** A minimal, realistic payload: the shape `class-storeseeder.php` actually inlines. */
 export const TEST_LOCALES: Record<string, string> = {
@@ -39,5 +47,9 @@ beforeEach( () => {
 } );
 
 afterEach( () => {
+	// React 18 keeps mounted trees between tests otherwise, so a query in one test can
+	// find an element rendered by the previous one and match on nothing meaningful.
+	cleanup();
+
 	delete window.storeseederApi;
 } );

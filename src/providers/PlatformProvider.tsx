@@ -55,8 +55,15 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const next = await setTargetPlatform(platform);
-      setState(next);
-      setSelected(next.stored || AUTO);
+
+      // null when the body was not a platform state. Keeping the current state is the
+      // only safe move: assigning the body would leave `state.platforms` undefined, and
+      // everything reading it — the topbar, the sidebar, the capability checks — would
+      // throw on the next render.
+      if (next) {
+        setState(next);
+        setSelected(next.stored || AUTO);
+      }
     } catch {
       // Leave the optimistic selection in place. A failed write means the site
       // option is unchanged, which the next page load will reveal; discarding the

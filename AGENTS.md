@@ -91,9 +91,13 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
 - **TypeScript units: Jest**, colocated — `src/lib/locales.test.ts` sits beside
   `src/lib/locales.ts`, so a module and its tests move and get reviewed together, and an
   untested module shows up as a missing neighbour. Run with `yarn test:unit`.
-- **Browser: Playwright**, under `tests/e2e/`. There is no React Testing Library here; a
-  test that needs to render a component either gets one added deliberately or belongs in
-  Playwright.
+- **Components: React Testing Library**, in the same colocated Jest files
+  (`src/components/**/X.test.tsx`). Query by role and accessible name — `getByRole("switch",
+  { name: /Include metadata/ })` — not by class: a test that reads the DOM the way a user
+  does catches the accessibility regressions a snapshot never will. DOM matchers come from
+  `@testing-library/jest-dom/jest-globals`, which is the entry point that types `expect` as
+  imported from `@jest/globals`.
+- **Browser: Playwright**, under `tests/e2e/`, for whole flows against a real WordPress.
 - **File naming is load-bearing**: Jest collects `*.test.ts(x)`, Playwright collects
   `*.spec.ts`. Cross them and each runner tries to execute the other's files.
 - Jest transpiles through Babel and does **not** type-check. `npx tsc --noEmit` is the only
@@ -102,7 +106,7 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
   what keeps the tests type-checked without an `@types/jest` dependency.
 - `tests/e2e/setup.sh` resets the admin password. Never run it, or `yarn test:e2e`, against a
   site whose credentials matter without asking first.
-- Baselines: **319 PHP tests / 1746 assertions**, **137 Jest tests**. A refactor claiming no
+- Baselines: **319 PHP tests / 1746 assertions**, **198 Jest tests**. A refactor claiming no
   behaviour change must return those numbers identically, not merely pass.
 
 ## General

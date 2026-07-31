@@ -25,16 +25,45 @@ export function initialPlatformState(): PlatformState {
   return window.storeseederApi?.platforms ?? EMPTY;
 }
 
-export function fetchPlatforms(): Promise<PlatformState> {
-  return apiFetch({ path: "/storeseeder/v1/platforms" });
+/**
+ * Whether a REST body is really a platform state.
+ *
+ * Everything downstream reads `state.platforms` without checking, so a body missing it
+ * takes the whole admin down with a white screen. That is not hypothetical: a filtered
+ * response, an error envelope, or an older server all arrive here as "something else",
+ * and the same guard pattern is already used for the sample-data status and the access
+ * payload.
+ */
+export function isPlatformState(value: unknown): value is PlatformState {
+  if (null === value || "object" !== typeof value) return false;
+
+  const state = value as Record<string, unknown>;
+
+  return Array.isArray(state.platforms) && "string" === typeof state.stored;
 }
 
-export function setTargetPlatform(platform: string): Promise<PlatformState> {
+/**
+ * Narrow a REST body to a platform state, or return null when it is not one.
+ *
+ * Null rather than an empty state: the caller already has a usable state, and replacing it
+ * with an empty one would blank the topbar and claim no platform is installed.
+ */
+export function parsePlatformState(value: unknown): PlatformState | null {
+  return isPlatformState(value) ? value : null;
+}
+
+export function fetchPlatforms(): Promise<PlatformState | null> {
+  return apiFetch({ path: "/storeseeder/v1/platforms" }).then(parsePlatformState);
+}
+
+export function setTargetPlatform(
+  platform: string,
+): Promise<PlatformState | null> {
   return apiFetch({
     path: "/storeseeder/v1/platforms/target",
     method: "POST",
     data: { platform: platform === AUTO ? AUTO : platform },
-  });
+  }).then(parsePlatformState);
 }
 
 export function activePlatforms(state: PlatformState): PlatformInfo[] {

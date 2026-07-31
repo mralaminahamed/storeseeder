@@ -7,6 +7,8 @@ import {
   capabilityFor,
   findPlatform,
   initialPlatformState,
+  isPlatformState,
+  parsePlatformState,
   targetLabel,
 } from "./platform";
 
@@ -157,5 +159,43 @@ describe("capabilityFor", () => {
 
     expect(capabilityFor(s, "stub-cart", "product")?.supported).toBe(false);
     expect(capabilityFor(s, AUTO, "product")?.supported).toBe(true);
+  });
+});
+
+/**
+ * The guard exists because the provider used to assign a REST body straight into state.
+ * Everything downstream reads `state.platforms` unchecked, so a body without it produced a
+ * white screen from a request that looked successful.
+ */
+describe("isPlatformState", () => {
+  it("accepts a real state", () => {
+    expect(isPlatformState(state())).toBe(true);
+  });
+
+  it.each([
+    ["an empty object", {}],
+    ["an error envelope", { code: "rest_forbidden", message: "Sorry." }],
+    ["platforms of the wrong type", { platforms: "none", stored: "" }],
+    ["a missing stored value", { platforms: [] }],
+    ["null", null],
+    ["a string", "fluent-cart"],
+    ["undefined", undefined],
+  ])("rejects %s", (_name, value) => {
+    expect(isPlatformState(value)).toBe(false);
+  });
+});
+
+describe("parsePlatformState", () => {
+  it("passes a real state through", () => {
+    expect(parsePlatformState(state())?.resolved).toBe("fluent-cart");
+  });
+
+  /**
+   * Null rather than an empty state: the caller already holds a usable one, and replacing
+   * it with empty would blank the topbar and claim no platform is installed.
+   */
+  it("returns null for anything else", () => {
+    expect(parsePlatformState({})).toBeNull();
+    expect(parsePlatformState(undefined)).toBeNull();
   });
 });

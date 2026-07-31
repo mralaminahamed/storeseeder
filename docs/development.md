@@ -56,7 +56,12 @@ That is a deliberate choice over a parallel `tests/` tree. A module and its test
 rename and get reviewed together, and a module with no test is visible by the absence of a
 neighbour rather than by comparing two directory listings.
 
-Three things worth knowing before adding one:
+Component tests use React Testing Library in the same files (`src/components/**/X.test.tsx`)
+and query by role and accessible name rather than by class — which is how the Toggle tests
+assert that its caption is part of the control's accessible name, something a class-based
+query cannot see.
+
+Four things worth knowing before adding one:
 
 - **Naming decides the runner.** Jest collects `*.test.ts(x)`; Playwright collects
   `*.spec.ts`. Cross them and each tries to execute the other's files — a Playwright spec
@@ -68,8 +73,13 @@ Three things worth knowing before adding one:
 - **Import from `@jest/globals`** (`import { describe, it, expect } from "@jest/globals"`)
   rather than relying on ambient globals. That is what lets the tests type-check without an
   `@types/jest` dependency.
+- **DOM matchers come from `@testing-library/jest-dom/jest-globals`**, not the bare package.
+  The bare entry augments the ambient `jest.Matchers` only, so `toBeInTheDocument` would work
+  at runtime and fail `tsc --noEmit`.
 
-`src/test/setup.ts` runs before every file and resets the two browser globals the modules
+`src/test/setup.ts` also calls RTL's `cleanup()` after each test — React 18 leaves mounted
+trees in place otherwise, so a query in one test can match an element the previous test
+rendered. It runs before every file and resets the two browser globals the modules
 read — `window.storeseederApi`, which the server inlines in production, and `localStorage` —
 so one test cannot leak state into the next. That is the failure mode that makes a suite pass
 in one order and fail in another.
