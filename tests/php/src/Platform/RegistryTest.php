@@ -67,7 +67,9 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		$all = Registry::instance()->all();
 
 		$this->assertArrayHasKey( 'fluent-cart', $all );
-		$this->assertCount( 1, $all );
+		$this->assertArrayHasKey( 'woocommerce', $all );
+		// The two shipped drivers, and neither of the two junk entries.
+		$this->assertCount( 2, $all );
 	}
 
 	public function test_active_excludes_inactive_platforms(): void {

@@ -55,6 +55,15 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 		parent::setUp();
 		Monkey\setUp();
 
+		// Pin the target platform for the whole suite. With more than one shipped driver
+		// active in the environment — and a dev machine will have several — `Auto` is
+		// deliberately ambiguous, because guessing which store to write to is the one failure
+		// nobody notices afterwards. A test about a controller or a generator has to state the
+		// target, or it is testing resolution by accident and answering 409.
+		//
+		// Tests that *are* about resolution clear this in their own setUp; see ResolverTest.
+		add_filter( 'storeseeder_target_platform', array( $this, 'pinned_test_platform' ) );
+
 		if ( $this->is_unit_test ) {
 			return;
 		}
@@ -80,8 +89,36 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tear_down() {
+		remove_filter( 'storeseeder_target_platform', array( $this, 'pinned_test_platform' ) );
 		Monkey\tearDown();
 		parent::tear_down();
+	}
+
+	/**
+	 * The platform the suite writes to unless a test says otherwise.
+	 *
+	 * Fluent Cart for preference, since it is the driver every resource has a writer for; any
+	 * other active driver rather than nothing, so the suite still runs on a machine without it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string|null $requested What the caller asked for.
+	 *
+	 * @return string|null
+	 */
+	public function pinned_test_platform( $requested ) {
+		// An explicit request always wins — this only fills in for `Auto`.
+		if ( is_string( $requested ) && '' !== $requested && 'auto' !== $requested ) {
+			return $requested;
+		}
+
+		$active = Registry::instance()->active();
+
+		if ( array() === $active ) {
+			return $requested;
+		}
+
+		return isset( $active['fluent-cart'] ) ? 'fluent-cart' : (string) array_key_first( $active );
 	}
 
 	/**
