@@ -189,6 +189,12 @@ final class Platform extends Platform_Driver {
 		// caller got what they asked for is a false alarm, which is worse than the lost nuance.
 		$matrix[ Resource::ORDER ] = Capability::supported_except( array( 'company' ) );
 
+		// Two coupon restrictions with nowhere to go. Fluent Cart's conditions have
+		// `min_purchase_amount` and no maximum — `max_discount_amount` caps the discount, not the
+		// cart, so writing one there would enforce something different from what was asked. And
+		// nothing in its coupon validation knows about sale prices.
+		$matrix[ Resource::COUPON ] = Capability::supported_except( array( 'maximum_amount', 'exclude_sale_items' ) );
+
 		if ( ! $this->is_pro_active() ) {
 			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
 				self::PRO_SLUG,
