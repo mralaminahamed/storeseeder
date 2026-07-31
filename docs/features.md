@@ -358,6 +358,33 @@ states: a cancelled payment is a failed one, and a partial refund is a refund fo
 A transaction now carries its own date, clamped forward by the writer so it never predates the order
 it belongs to. Card details accompany a card payment that actually went through, and nothing else.
 
+### Cart sessions
+
+- `abandonment_rate` — the share left abandoned; the rest split between still-active and converted
+- `status_distribution` — stage weights, which win over the rate where given
+- `guest_cart_ratio` — the share belonging to a guest rather than an account
+- `items_per_cart` — `{ min, max }`
+- `customer_id` — attach every cart to one customer
+
+Seven of the endpoint's eight parameters were read by nothing: a run asking for a store full of
+abandoned carts got an even third of each stage, the guest share was fixed at 30% whatever was asked,
+and every cart carried one to five items regardless.
+
+Carts have canonical stages now — `active`, `abandoned`, `converted` — where the generator used to
+emit Fluent Cart's own words. Three, because three is what a platform can tell apart: Fluent Cart has
+no abandoned-cart concept at all, so an abandoned cart is one that reached checkout and never got an
+order, and that is what the stage maps to. A converted cart carries an order and a completion date;
+without them it is marked completed and appears in no revenue figure, which is the same as not
+converting.
+
+Three parameters are gone. `cart_value_range` cannot be honoured for the same reason
+`order_value_range` could not: a cart's value is the sum of the catalogue prices of the products in
+it, and the writer now prices cart lines from the variation each points at. `abandonment_tracking`
+described reminders and a recovery rate, and Fluent Cart stores neither — there is no reminder record
+to write. `customer_type` enumerated a new-versus-existing split no writer implemented; `customer_id`
+and `guest_cart_ratio` are what was useful in it, and `guest_only` is still accepted as a way of
+asking for a guest ratio of 100.
+
 ### Supported, but not in full
 
 A platform can store a resource without storing everything a canonical entity carries, and the

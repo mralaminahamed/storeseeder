@@ -79,6 +79,20 @@ final class Status {
 	const REFUND  = 'refund';
 	const DISPUTE = 'dispute';
 
+	/**
+	 * Cart stages.
+	 *
+	 * Three, because three is what a platform can tell apart. Fluent Cart spells them `draft`,
+	 * `intended` and `completed`; the canonical names say what they mean rather than where the cart
+	 * sits in one platform's funnel. A finer split — "entered checkout" apart from "gave up at
+	 * checkout" — is not stored anywhere, so it is not offered.
+	 *
+	 * @since 1.1.0
+	 */
+	const CART_ACTIVE    = 'active';
+	const CART_ABANDONED = 'abandoned';
+	const CART_CONVERTED = 'converted';
+
 	const IN_STOCK     = 'in_stock';
 	const OUT_OF_STOCK = 'out_of_stock';
 	const ON_BACKORDER = 'on_backorder';
@@ -136,6 +150,21 @@ final class Status {
 			self::CHARGE,
 			self::REFUND,
 			self::DISPUTE,
+		);
+	}
+
+	/**
+	 * Every cart stage.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public static function cart_stages(): array {
+		return array(
+			self::CART_ACTIVE,
+			self::CART_ABANDONED,
+			self::CART_CONVERTED,
 		);
 	}
 

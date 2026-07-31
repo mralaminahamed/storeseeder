@@ -74,84 +74,58 @@ class Cart_Session extends Controller {
 	 */
 	protected function get_resource_specific_params(): array {
 		return array(
-			'customer_type'        => array(
-				'description'       => __( 'Type of customers for cart sessions.', 'storeseeder' ),
-				'type'              => 'string',
-				'enum'              => array( 'existing', 'new', 'mixed', 'specific', 'guest_only' ),
-				'default'           => 'mixed',
-				'sanitize_callback' => 'sanitize_text_field',
+			// `customer_type` used to enumerate existing / new / mixed / specific / guest_only, and
+			// nothing read it. The new-versus-existing split no writer implemented is gone; what was
+			// useful survives as `customer_id` and `guest_cart_ratio`, and `guest_only` is still
+			// accepted as a way of asking for a ratio of 100.
+			'customer_id'         => array(
+				'description' => __( 'Attach every cart to this customer.', 'storeseeder' ),
+				'type'        => 'integer',
+				'minimum'     => 1,
 			),
-			'specific_customer_id' => array(
-				'description'       => __( 'Specific customer ID for cart sessions (when customer_type is "specific").', 'storeseeder' ),
-				'type'              => 'integer',
-				'minimum'           => 1,
-				'sanitize_callback' => 'absint',
-			),
-			'guest_cart_ratio'     => array(
-				'description'       => __( 'Percentage of guest carts (0-100) when customer_type is "mixed".', 'storeseeder' ),
-				'type'              => 'integer',
-				'minimum'           => 0,
-				'maximum'           => 100,
-				'default'           => 40,
-				'sanitize_callback' => 'absint',
-			),
-			'abandonment_rate'     => array(
-				'description'       => __( 'Cart abandonment rate percentage (0-100).', 'storeseeder' ),
+			'guest_cart_ratio'    => array(
+				'description'       => __( 'Percentage of carts belonging to a guest rather than an account.', 'storeseeder' ),
 				'type'              => 'integer',
 				'minimum'           => 0,
 				'maximum'           => 100,
 				'default'           => 30,
 				'sanitize_callback' => 'absint',
 			),
-			'status_distribution'  => array(
-				'description' => __( 'Custom cart status distribution.', 'storeseeder' ),
+			'abandonment_rate'    => array(
+				'description'       => __( 'Percentage of carts left abandoned. The rest split between still-active and converted.', 'storeseeder' ),
+				'type'              => 'integer',
+				'minimum'           => 0,
+				'maximum'           => 100,
+				'default'           => 30,
+				'sanitize_callback' => 'absint',
+			),
+			'status_distribution' => array(
+				// `cancelled` was offered here and is not a cart stage anywhere: a cart nobody came
+				// back to is abandoned, and one deliberately emptied leaves no row behind.
+				'description' => __( 'Cart stage weights, which win over abandonment_rate where given.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
 					'pending'   => array(
-						'description' => __( 'Percentage of pending carts.', 'storeseeder' ),
+						'description' => __( 'Weight for carts still being filled.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 					'abandoned' => array(
-						'description' => __( 'Percentage of abandoned carts.', 'storeseeder' ),
+						'description' => __( 'Weight for carts that reached checkout and stopped.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 					'completed' => array(
-						'description' => __( 'Percentage of completed carts.', 'storeseeder' ),
-						'type'        => 'integer',
-						'minimum'     => 0,
-						'maximum'     => 100,
-					),
-					'cancelled' => array(
-						'description' => __( 'Percentage of cancelled carts.', 'storeseeder' ),
+						'description' => __( 'Weight for carts that converted to an order.', 'storeseeder' ),
 						'type'        => 'integer',
 						'minimum'     => 0,
 						'maximum'     => 100,
 					),
 				),
 			),
-			'cart_value_range'     => array(
-				'description' => __( 'Cart value range for generated sessions.', 'storeseeder' ),
-				'type'        => 'object',
-				'properties'  => array(
-					'min' => array(
-						'description' => __( 'Minimum cart value.', 'storeseeder' ),
-						'type'        => 'number',
-						'minimum'     => 0,
-						'default'     => 5,
-					),
-					'max' => array(
-						'description' => __( 'Maximum cart value.', 'storeseeder' ),
-						'type'        => 'number',
-						'minimum'     => 1,
-						'default'     => 500,
-					),
-				),
-			),
-			'items_per_cart'       => array(
+			'items_per_cart'      => array(
 				'description' => __( 'Number of items per cart session.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
@@ -167,31 +141,6 @@ class Cart_Session extends Controller {
 						'minimum'     => 1,
 						'maximum'     => 15,
 						'default'     => 5,
-					),
-				),
-			),
-			'abandonment_tracking' => array(
-				'description' => __( 'Abandonment tracking settings.', 'storeseeder' ),
-				'type'        => 'object',
-				'properties'  => array(
-					'generate_reminders' => array(
-						'description' => __( 'Generate abandoned cart reminders.', 'storeseeder' ),
-						'type'        => 'boolean',
-						'default'     => true,
-					),
-					'reminder_count'     => array(
-						'description' => __( 'Maximum number of reminders to generate.', 'storeseeder' ),
-						'type'        => 'integer',
-						'minimum'     => 0,
-						'maximum'     => 10,
-						'default'     => 3,
-					),
-					'recovery_rate'      => array(
-						'description' => __( 'Cart recovery rate percentage (0-100).', 'storeseeder' ),
-						'type'        => 'integer',
-						'minimum'     => 0,
-						'maximum'     => 100,
-						'default'     => 15,
 					),
 				),
 			),

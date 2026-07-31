@@ -11,9 +11,11 @@ namespace StoreSeeder\Platforms\Drivers\Fluent_Cart\Writers;
 use Exception;
 use FluentCart\App\Models\Cart as CartModel;
 use FluentCart\App\Models\Customer as CustomerModel;
+use FluentCart\App\Models\Order as OrderModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
 use StoreSeeder\Platforms\Writer;
 use StoreSeeder\Platforms\Resource;
+use StoreSeeder\Platforms\Status as CanonicalStatus;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -24,6 +26,24 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.1.0
  */
 final class Cart_Session extends Writer {
+	/**
+	 * Canonical cart stage to Fluent Cart's spelling.
+	 *
+	 * Its `Cart` model treats anything that is not `completed` as an open cart, and its checkout
+	 * moves a cart to `intended` before converting it. Abandonment is not a stage there at all — an
+	 * abandoned cart is one that reached `intended` and never got an order — so that is what
+	 * `abandoned` maps to, and the writer leaves the order link empty for it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @var array<string, string>
+	 */
+	const CART_STAGE = array(
+		CanonicalStatus::CART_ACTIVE    => 'draft',
+		CanonicalStatus::CART_ABANDONED => 'intended',
+		CanonicalStatus::CART_CONVERTED => 'completed',
+	);
+
 	/**
 	 * The resource this writer persists.
 	 *
@@ -50,20 +70,44 @@ final class Cart_Session extends Writer {
 			return new WP_Error( 'missing_model', __( 'Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active.', 'storeseeder' ) );
 		}
 
-		$items   = (array) $entity['items'];
-		$user_id = $entity['logged_in'] ? $this->random_user_id() : null;
+		$items    = (array) $entity['items'];
+		$stage    = (string) $entity['stage'];
+		$customer = $this->requested_customer();
+		$user_id  = $entity['logged_in'] ? $this->cart_user_id( $customer ) : null;
 
 		$session_data = array(
-			'customer_id' => $user_id ? $this->random_customer_id() : null,
+			// A cart attached to a WordPress user belongs to that user's customer record, not to a
+			// random one: the two columns disagreeing is a cart that shows under one name in the
+			// admin and another in the customer's own account.
+			'customer_id' => $user_id ? $this->customer_id_for( $user_id, $customer ) : null,
 			'user_id'     => $user_id,
 			'cart_data'   => $this->build_cart_data( $items ),
-			'stage'       => $entity['stage'],
+			// Mapped, not passed through. An unrecognised stage is an open cart to Fluent Cart's own
+			// query scope, so a typo silently turns a converted cart into an abandoned one.
+			'stage'       => self::CART_STAGE[ $stage ] ?? 'draft',
 			// 'global' is the column default Fluent Cart uses; 'default' is not
 			// a group it ever reads.
 			'cart_group'  => 'global',
 			'user_agent'  => $entity['user_agent'],
 			'ip_address'  => $entity['ip_address'],
 		);
+
+		// Not passed to create(): `created_at` is absent from the Cart model's fillable list, so
+		// mass assignment drops it and Eloquent stamps today — the same trap that put every
+		// generated customer's registration date at today's date. Written after the insert.
+		$started_at = (string) ( $entity['created_at'] ?? current_time( 'Y-m-d H:i:s' ) );
+
+		// A converted cart has an order behind it and a completion date. Without them the cart is
+		// marked completed and appears in no revenue figure, which is the same as not converting.
+		if ( CanonicalStatus::CART_CONVERTED === $stage ) {
+			$order = $this->random_order( $customer );
+
+			if ( $order ) {
+				$session_data['order_id'] = (int) $order->id;
+			}
+
+			$session_data['completed_at'] = $started_at;
+		}
 
 		// A guest cart carries its own contact details. Also used when the entity
 		// asked for a logged-in cart but the site has no users to attach one to.
@@ -93,6 +137,10 @@ final class Cart_Session extends Writer {
 		if ( ! $cart ) {
 			return new WP_Error( 'cart_session_creation_failed', __( 'Failed to create cart session.', 'storeseeder' ) );
 		}
+
+		CartModel::query()
+			->where( 'cart_hash', $cart->cart_hash )
+			->update( array( 'created_at' => $started_at ) );
 
 		$result = array(
 			// fct_carts has no id column — the primary key is cart_hash, and
@@ -145,8 +193,12 @@ final class Cart_Session extends Writer {
 			$cart_items[] = array(
 				'object_id'   => (int) $variation->id,
 				'object_type' => 'product_variation',
-				// Cart money is in integer cents, same as order items.
-				'unit_price'  => (int) $item['unit_price'],
+				// Cart money is in integer cents, same as order items — and taken from the variation
+				// this line points at rather than the generated fallback, so a cart's value agrees
+				// with the catalogue it was filled from.
+				'unit_price'  => (int) ( $variation->item_price ?? 0 ) > 0
+					? (int) $variation->item_price
+					: (int) $item['unit_price'],
 				'quantity'    => (int) $item['quantity'],
 				'line_total'  => 0, // Will be calculated by Fluent Cart.
 				'other_info'  => array(),
@@ -159,16 +211,93 @@ final class Cart_Session extends Writer {
 	}
 
 	/**
-	 * Draw a real customer ID.
+	 * The customer this run was pinned to, if any.
+	 *
+	 * `customer_type` and `specific_customer_id` were declared on three surfaces and read by
+	 * nothing, so a run asked for one customer's carts got the whole store's.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @return int|null Customer ID, or null when the store has no customers.
+	 * @return CustomerModel|null
 	 */
-	private function random_customer_id(): ?int {
-		$customer = CustomerModel::query()->inRandomOrder()->first();
+	private function requested_customer(): ?CustomerModel {
+		$requested = (int) ( $this->params['customer_id'] ?? 0 );
 
-		return $customer ? (int) $customer->id : null;
+		if ( $requested < 1 ) {
+			return null;
+		}
+
+		$customer = CustomerModel::query()->find( $requested );
+
+		return $customer instanceof CustomerModel ? $customer : null;
+	}
+
+	/**
+	 * The WordPress user this cart belongs to.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param CustomerModel|null $customer The pinned customer, if the run named one.
+	 *
+	 * @return int|null
+	 */
+	private function cart_user_id( ?CustomerModel $customer ): ?int {
+		if ( $customer && $customer->user_id ) {
+			return (int) $customer->user_id;
+		}
+
+		return $this->random_user_id();
+	}
+
+	/**
+	 * The customer record for a cart's user.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int                $user_id  The WordPress user the cart belongs to.
+	 * @param CustomerModel|null $customer The pinned customer, if the run named one.
+	 *
+	 * @return int|null
+	 */
+	private function customer_id_for( int $user_id, ?CustomerModel $customer ): ?int {
+		if ( $customer ) {
+			return (int) $customer->id;
+		}
+
+		$match = CustomerModel::query()->where( 'user_id', $user_id )->first();
+
+		if ( $match instanceof CustomerModel ) {
+			return (int) $match->id;
+		}
+
+		// No customer record for this user yet, which is an ordinary state — a shopper who has an
+		// account but has never bought anything.
+		return null;
+	}
+
+	/**
+	 * An order for a converted cart to point at.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param CustomerModel|null $customer The pinned customer, if the run named one.
+	 *
+	 * @return OrderModel|null
+	 */
+	private function random_order( ?CustomerModel $customer ): ?OrderModel {
+		if ( ! class_exists( OrderModel::class ) ) {
+			return null;
+		}
+
+		$query = OrderModel::query();
+
+		if ( $customer ) {
+			$query->where( 'customer_id', $customer->id );
+		}
+
+		$order = $query->inRandomOrder()->first();
+
+		return $order instanceof OrderModel ? $order : null;
 	}
 
 	/**

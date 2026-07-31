@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T23:01:34+00:00\n"
+"POT-Creation-Date: 2026-07-31T23:13:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -409,7 +409,7 @@ msgstr ""
 msgid "Sub-brand"
 msgstr ""
 
-#: includes/Generation/Generators/Cart_Session.php:42
+#: includes/Generation/Generators/Cart_Session.php:43
 #: build/admin-app.js:4
 msgid "Cart Sessions"
 msgstr ""
@@ -650,30 +650,28 @@ msgid "Generate realistic shopping cart sessions including pending, abandoned, c
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Cart_Sessions.php:47
-msgid "Cart owner type. Allowed: existing, new, mixed, specific, guest_only. Default: mixed."
+msgid "Percentage of carts left abandoned — reached checkout and stopped. The rest split between still-active and converted. Default: 30."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Cart_Sessions.php:53
-msgid "Attach all carts to this customer ID. Requires customer_type=\"specific\"."
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:54
+#: includes/Rest/Controllers/Cart_Session.php:105
+msgid "Cart stage weights, which win over abandonment_rate where given."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Cart_Sessions.php:58
-msgid "Percentage of guest (unauthenticated) carts when customer_type is \"mixed\" (0–100). Default: 40."
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:63
+msgid "Percentage of carts belonging to a guest rather than an account (0–100). Default: 30."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Cart_Sessions.php:65
-msgid "Percentage of carts with \"abandoned\" status (0–100). Default: 30."
-msgstr ""
-
-#: includes/MCP/Abilities/Generate_Cart_Sessions.php:72
-msgid "Minimum cart value (USD). Default: 5."
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:70
+msgid "Lines per cart, as a min and max. Default: 1 to 5."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Cart_Sessions.php:78
-msgid "Maximum cart value (USD). Default: 500."
+#: includes/Rest/Controllers/Cart_Session.php:82
+msgid "Attach every cart to this customer."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Cart_Sessions.php:91
+#: includes/MCP/Abilities/Generate_Cart_Sessions.php:90
 msgid "Array of generated cart session objects with hash, user_id, status, items_count, total_amount, customer details, and timestamps."
 msgstr ""
 
@@ -1246,11 +1244,11 @@ msgstr ""
 msgid "Fluent Cart is not active on this site, so its brand taxonomy is not registered."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:50
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:70
 msgid "Fluent Cart Cart model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:94
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Cart_Session.php:138
 msgid "Failed to create cart session."
 msgstr ""
 
@@ -1832,83 +1830,39 @@ msgstr ""
 msgid "Cart Session"
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:78
-msgid "Type of customers for cart sessions."
+#: includes/Rest/Controllers/Cart_Session.php:87
+msgid "Percentage of carts belonging to a guest rather than an account."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:85
-msgid "Specific customer ID for cart sessions (when customer_type is \"specific\")."
+#: includes/Rest/Controllers/Cart_Session.php:95
+msgid "Percentage of carts left abandoned. The rest split between still-active and converted."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:91
-msgid "Percentage of guest carts (0-100) when customer_type is \"mixed\"."
+#: includes/Rest/Controllers/Cart_Session.php:109
+msgid "Weight for carts still being filled."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:99
-msgid "Cart abandonment rate percentage (0-100)."
+#: includes/Rest/Controllers/Cart_Session.php:115
+msgid "Weight for carts that reached checkout and stopped."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:107
-msgid "Custom cart status distribution."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:111
-msgid "Percentage of pending carts."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:117
-msgid "Percentage of abandoned carts."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:123
-msgid "Percentage of completed carts."
+#: includes/Rest/Controllers/Cart_Session.php:121
+msgid "Weight for carts that converted to an order."
 msgstr ""
 
 #: includes/Rest/Controllers/Cart_Session.php:129
-msgid "Percentage of cancelled carts."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:137
-msgid "Cart value range for generated sessions."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:141
-msgid "Minimum cart value."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:147
-msgid "Maximum cart value."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:155
 msgid "Number of items per cart session."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:159
+#: includes/Rest/Controllers/Cart_Session.php:133
 msgid "Minimum items per cart."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:165
+#: includes/Rest/Controllers/Cart_Session.php:139
 msgid "Maximum items per cart."
 msgstr ""
 
-#: includes/Rest/Controllers/Cart_Session.php:174
-msgid "Abandonment tracking settings."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:178
-msgid "Generate abandoned cart reminders."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:183
-msgid "Maximum number of reminders to generate."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:190
-msgid "Cart recovery rate percentage (0-100)."
-msgstr ""
-
-#: includes/Rest/Controllers/Cart_Session.php:211
+#: includes/Rest/Controllers/Cart_Session.php:160
 msgid "Generated cart sessions with items and customer data."
 msgstr ""
 
@@ -2749,31 +2703,31 @@ msgid "Marketing teams, cart recovery plugin developers"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Type of customers for cart sessions"
+msgid "Attach every cart to this customer"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Specific customer ID (when customer_type is 'specific')"
+msgid "Percentage of carts belonging to a guest rather than an account (0–100)"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Percentage of guest carts (0–100)"
+msgid "Percentage left abandoned — the rest split between active and converted"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Cart abandonment rate percentage (0–100)"
+msgid "Cart stage weights, which win over the abandonment rate"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Cart value range"
+msgid "Weight for carts still being filled"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Minimum cart value"
+msgid "Weight for carts that reached checkout and stopped"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Maximum cart value"
+msgid "Weight for carts that converted"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2786,22 +2740,6 @@ msgstr ""
 
 #: build/admin-app.js:4
 msgid "Maximum items per cart"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Abandonment tracking settings"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Generate abandoned cart reminders"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Maximum number of reminders"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Cart recovery rate percentage (0–100)"
 msgstr ""
 
 #: build/admin-app.js:4
