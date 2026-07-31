@@ -1,6 +1,6 @@
 === StoreSeeder ===
 Contributors: mralaminahamed
-Tags: test data, dummy data, sample data, demo content, faker
+Tags: test data, dummy data, demo content, ecommerce, faker
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
