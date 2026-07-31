@@ -103,8 +103,7 @@ final class Tax_Class extends Writer {
 			return 0;
 		}
 
-		$created  = 0;
-		$priority = 1;
+		$created = 0;
 
 		foreach ( $entity['rates'] as $row ) {
 			TaxRateModel::query()->create(
@@ -112,16 +111,25 @@ final class Tax_Class extends Writer {
 					'class_id'    => $class_id,
 					'country'     => $row['country'],
 					'state'       => $row['state'],
+					// The city and postcode columns Fluent Cart has had all along, and that a
+					// country-and-state-only rate left empty. `jurisdictions` decides how precise a
+					// row is, and this is where the precision lands.
+					'city'        => (string) ( $row['city'] ?? '' ),
+					'postcode'    => (string) ( $row['postcode'] ?? '' ),
 					'rate'        => (string) $row['rate'],
 					'name'        => $entity['name'] . ' - ' . $row['country'],
-					'priority'    => $priority,
-					'is_compound' => 0,
+					// A more precise rate has to outrank a broader one. The counter this replaces
+					// numbered the rows in the order they happened to be generated, which made the
+					// first region in the list win over every other regardless of precision.
+					'priority'    => max( 1, (int) ( $row['priority'] ?? 1 ) ),
+					// A compound rate stacks on top of the ones before it, which is how a state tax
+					// on top of a federal one is modelled. The column was always written as zero.
+					'is_compound' => ! empty( $row['compound'] ) ? 1 : 0,
 					'for_order'   => 1,
 				)
 			);
 
 			++$created;
-			++$priority;
 		}
 
 		return $created;
