@@ -185,7 +185,7 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 				'with_account'     => true,
 				'notes'            => 'A note.',
 				'meta'             => array(
-					'total_spent'  => 120.50,
+					'total_spent'  => 12050,
 					'total_orders' => 3,
 				),
 				'billing_address'  => array(
@@ -212,6 +212,140 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 		$this->assertSame( 'London', $customer->get_shipping_city() );
 		$this->assertSame( '01234 567890', $customer->get_billing_phone() );
 		$this->assertContains( 'customer', (array) $customer->get_role() ? array( $customer->get_role() ) : array() );
+	}
+
+	/**
+	 * A canonical customer entity, in the shape the generator now produces.
+	 *
+	 * @param array<string, mixed> $extra Fields merged over the defaults.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function customer_entity( array $extra = array() ): array {
+		return array_merge(
+			array(
+				'email'            => 'canon-customer@example.test',
+				'first_name'       => 'Grace',
+				'last_name'        => 'Hopper',
+				'full_name'        => 'Grace Hopper',
+				'username_base'    => 'grace',
+				'with_account'     => true,
+				'customer_type'    => 'regular',
+				'notes'            => 'A note.',
+				'date_created'     => '2021-03-04 09:00:00',
+				'currency'         => 'USD',
+				'meta'             => array(
+					'total_spent'         => 123456,
+					'average_order_value' => 41152,
+					'total_orders'        => 3,
+					'birth_date'          => '1960-12-09',
+					'loyalty_tier'        => 'gold',
+					'loyalty_points'      => 1234,
+					'vip_status'          => true,
+					'customer_since'      => '2021-03-04 09:00:00',
+					'account_status'      => 'active',
+					'first_order_date'    => '2021-04-01 10:00:00',
+					'last_order_date'     => '2026-01-05 10:00:00',
+				),
+				'billing_address'  => array(
+					'first_name' => 'Grace',
+					'last_name'  => 'Hopper',
+					'email'      => 'canon-customer@example.test',
+					'company'    => 'Compiler Works',
+					'address_1'  => '2 Test Street',
+					'address_2'  => null,
+					'city'       => 'Arlington',
+					'state'      => 'VA',
+					'postcode'   => '22201',
+					'country'    => 'US',
+					'phone'      => '555-0100',
+				),
+				'shipping_address' => array(),
+			),
+			$extra
+		);
+	}
+
+	/**
+	 * The address setter read a `name` key that a customer address has never carried — it has
+	 * `first_name` and `last_name` — so every generated WooCommerce customer had an empty billing
+	 * name, company and email on a screen the admin looks at.
+	 */
+	public function test_a_customer_address_carries_the_name_company_and_email(): void {
+		$result = $this->writer( Resource::CUSTOMER )->write( $this->customer_entity() );
+
+		$this->assertNotWPError( $result );
+
+		$customer = new \WC_Customer( $result['id'] );
+
+		$this->assertSame( 'Grace', $customer->get_billing_first_name() );
+		$this->assertSame( 'Hopper', $customer->get_billing_last_name() );
+		$this->assertSame( 'Compiler Works', $customer->get_billing_company() );
+		$this->assertSame( 'canon-customer@example.test', $customer->get_billing_email() );
+	}
+
+	/**
+	 * `_money_spent` is a decimal and the entity carries minor units, so $1,234.56 arrives as
+	 * 123456 and has to come back out as 1234.56 rather than as a million dollars.
+	 */
+	public function test_the_lifetime_spend_is_converted_from_minor_units(): void {
+		$result = $this->writer( Resource::CUSTOMER )->write(
+			$this->customer_entity( array( 'email' => 'spend@example.test' ) )
+		);
+
+		$this->assertNotWPError( $result );
+
+		$this->assertSame( '1234.56', get_user_meta( (int) $result['id'], '_money_spent', true ) );
+		$this->assertSame( '3', get_user_meta( (int) $result['id'], '_order_count', true ) );
+	}
+
+	/**
+	 * `WC_Customer` accepts a `date_created` and does not carry it through to `user_registered`, so
+	 * a customer "since 2021" registered today and every cohort report read the wrong date.
+	 */
+	public function test_the_account_is_as_old_as_the_customer(): void {
+		$result = $this->writer( Resource::CUSTOMER )->write(
+			$this->customer_entity( array( 'email' => 'registered@example.test' ) )
+		);
+
+		$this->assertNotWPError( $result );
+
+		$user = get_userdata( (int) $result['id'] );
+
+		$this->assertInstanceOf( 'WP_User', $user );
+		$this->assertStringStartsWith( '2021-03-04', (string) $user->user_registered );
+	}
+
+	/**
+	 * The demographic and loyalty fields have no WooCommerce columns, so they go into namespaced
+	 * user meta rather than being discarded — `demographics.age_groups` and `loyalty_tier_focus` are
+	 * parameters, and a parameter nobody can read the result of is the same broken promise as one
+	 * nothing reads at all.
+	 */
+	public function test_the_profile_fields_are_stored_under_a_namespaced_key(): void {
+		$result = $this->writer( Resource::CUSTOMER )->write(
+			$this->customer_entity( array( 'email' => 'profile@example.test' ) )
+		);
+
+		$this->assertNotWPError( $result );
+
+		$id = (int) $result['id'];
+
+		$this->assertSame( '1960-12-09', get_user_meta( $id, 'storeseeder_birth_date', true ) );
+		$this->assertSame( 'gold', get_user_meta( $id, 'storeseeder_loyalty_tier', true ) );
+		$this->assertSame( '1234', get_user_meta( $id, 'storeseeder_loyalty_points', true ) );
+		$this->assertSame( '1', get_user_meta( $id, 'storeseeder_vip_status', true ) );
+	}
+
+	public function test_a_missing_profile_field_is_not_stored_as_an_empty_one(): void {
+		$entity                       = $this->customer_entity( array( 'email' => 'nobirthday@example.test' ) );
+		$entity['meta']['birth_date'] = null;
+
+		$result = $this->writer( Resource::CUSTOMER )->write( $entity );
+
+		$this->assertNotWPError( $result );
+		$this->assertSame( '', get_user_meta( (int) $result['id'], 'storeseeder_birth_date', true ) );
+		$this->assertFalse( metadata_exists( 'user', (int) $result['id'], 'storeseeder_birth_date' ) );
 	}
 
 	public function test_a_duplicate_email_is_refused_rather_than_throwing(): void {
