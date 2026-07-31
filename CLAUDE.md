@@ -28,7 +28,7 @@ composer makepot              # requires build/admin-app.js to exist first
 # Frontend
 yarn build                    # webpack via @wordpress/scripts
 yarn lint:js                  # eslint (flat config)
-yarn test:unit                # Jest + RTL — 198 tests, colocated as src/**/*.test.ts(x)
+yarn test:unit                # Jest + RTL — 215 tests, colocated as src/**/*.test.ts(x)
 npx tsc --noEmit              # the only type-check the tests get; Jest uses Babel
 yarn test:e2e                 # Playwright — see the warning below
 ```
@@ -53,7 +53,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 345 PHP tests / 1927 assertions, and 198 Jest tests
+**Current baselines: 401 PHP tests / 2195 assertions, and 215 Jest tests
 (`yarn test:unit`).** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
@@ -68,9 +68,10 @@ React → REST → Controller → Generator → canonical entity → Writer → 
 includes/
   Access.php      one capability gate: menu, REST, MCP, AJAX
   Generation/     Generator.php (abstract)   + Generators/*    18 generators
+                  Ledger.php  Purge.php        what was created, and undoing it
   Rest/           Controller.php (abstract)  + Controllers/*   18 controllers
                   Registry.php               owns storeseeder_rest_controllers
-  CLI/            Command.php (abstract)     + Commands/*       5 commands
+  CLI/            Command.php (abstract)     + Commands/*       6 commands
                   Registry.php               owns storeseeder_cli_commands
   MCP/            MCP_Server.php
                   Registry.php               owns storeseeder_mcp_abilities
@@ -126,8 +127,20 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 `_after_write_`. Cross-cutting ones: `storeseeder_capability` (one gate for menu, REST, MCP and
 AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_rest_params` (the
 all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
-`storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`, `storeseeder_admin_payload`,
+`storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`, `storeseeder_purge_order`,
+`storeseeder_admin_payload`,
 `storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
+
+### Deleting generated data means the ledger, never a heuristic
+
+`Generation\Ledger` records `(platform, resource, object_id)` for every successful write — from
+`Generator::write_entity()`, once, rather than in eighteen writers that could each forget — and
+`Generation\Purge` walks it, handing each id to `Writer::delete()`. Nothing else is ever a
+candidate: matching on "looks like test data" would eventually delete a real catalogue on a
+staging site restored from production, and that is not a bug you can apologise your way out of.
+`Writer::delete()` is concrete and refuses by default, because making it abstract would break
+every third-party writer. A refusal keeps the ledger row — forgetting it would leave the row in
+the store with nothing left that knows StoreSeeder put it there.
 
 ### Two MCP tools per generator, gated at registration
 

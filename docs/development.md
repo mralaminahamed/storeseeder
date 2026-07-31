@@ -128,7 +128,7 @@ StoreSeeder ships a driver for. Tests needing an absent platform skip through
 `require_platform( $id )` rather than failing, so the suite runs with only the platforms you
 happen to have.
 
-**The suite is currently 256 tests / 1052 assertions.** For a change that claims no behaviour
+**The suite is currently 401 tests / 2195 assertions, alongside 215 Jest tests.** For a change that claims no behaviour
 difference, that number must come back identical, not merely green — a changed count means a
 reference was missed.
 
@@ -334,6 +334,31 @@ from `src/lib/icons.tsx`, and the parameter schema.
 
 **No React is needed.** Fields render from the parameter schema through
 `src/lib/fieldsFromSchema.ts`.
+
+### Make it deletable
+
+A writer inherits `delete( $id )` from `Platforms\Writer`, and the inherited version refuses —
+so a new resource is generated and reported, but the cleanup says it cannot be removed
+automatically. Override it, and use `delete_model()` for the common shape:
+
+```php
+public function delete( $id ) {
+    return $this->delete_model(
+        OrderModel::class,
+        $id,
+        array( OrderItemModel::class => 'order_id' )   // children first; none of them cascade
+    );
+}
+```
+
+Two things to get right. **The id must be the one `write()` reported** — the cleanup passes back
+whatever went into `$result['id']`, which for a Fluent Cart cart session is a hash rather than
+an integer, so pass the key column as `delete_model()`'s fourth argument where it is not `id`.
+And **only delete what the writer created**: a row it merely reused — the WordPress user a
+customer was linked to, a shipping zone an existing method already used — belongs to the store.
+
+If the resource has to be deleted before or after another, say so with `storeseeder_purge_order`
+rather than relying on the default (the reverse of `Resource::all()`).
 
 ### Optional: expose it to AI clients
 

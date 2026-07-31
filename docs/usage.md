@@ -170,6 +170,7 @@ wp storeseeder preview  <resource> [--count=<n>] [--locale=<code>] [--format=<ta
 wp storeseeder platforms [--set=<id|auto>] [--format=<...>]
 wp storeseeder locales [--search=<term>] [--format=<table|json|csv|yaml|ids>]
 wp storeseeder sample-data [status|sync] [--force]
+wp storeseeder cleanup [status|delete|forget] [--resource=<name>] [--limit=<n>] [--yes]
 ```
 
 Each command dispatches through the REST controller for that resource, so validation,
@@ -184,6 +185,7 @@ an object as `--price_range='{"min":5,"max":500}'`.
 | Unknown flags | Rejected with the list of parameters that endpoint accepts, so `--lokale=de_DE` fails loudly instead of quietly generating English. |
 | `--porcelain` | Prints only the number created, for scripting. |
 | Sample data | `sync` acts on a consent decision already recorded; it cannot grant consent, because only the admin-page prompt can. |
+| Cleanup | Deletes only rows StoreSeeder recorded creating, newest first, looping in batches until nothing is left. `forget` drops the records without touching the store, for a ledger that no longer matches reality. |
 
 ## REST API
 
@@ -228,6 +230,9 @@ GET  /wp-json/storeseeder/v1/platforms
 POST /wp-json/storeseeder/v1/platforms/target        { "platform": "fluent-cart" }
 GET  /wp-json/storeseeder/v1/access                   # roles, capability, and whether you may change them
 POST /wp-json/storeseeder/v1/access                   { "roles": ["editor"] }   # manage_options only
+GET    /wp-json/storeseeder/v1/generated              # what StoreSeeder created, per resource
+DELETE /wp-json/storeseeder/v1/generated              { "resource": "", "limit": 100 }   # a batch; the response says what is left
+DELETE /wp-json/storeseeder/v1/generated              { "forget": true }   # drop the records, leave the rows
 GET  /wp-json/storeseeder/v1/mcp                      # which AI tools are exposed, and whether you may change that
 POST /wp-json/storeseeder/v1/mcp                      { "generate": false }     # manage_options only; any of enabled/preview/generate
 GET  /wp-json/storeseeder/v1/download-sample

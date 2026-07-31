@@ -169,6 +169,7 @@ Filters and actions across the whole lifecycle, with the full table in
   resource of its own
 - `storeseeder_mcp_abilities` — add or remove an MCP ability
 - `storeseeder_mcp_settings` — decide the three MCP switches in code rather than in the database
+- `storeseeder_purge_order` — the order generated resources are deleted in; children first
 - `storeseeder_canonical_{resource}` — change generated data before it is written, for every
   platform at once
 - `storeseeder_locales` — narrow or extend the offered locales; the admin, REST enum and MCP
@@ -179,6 +180,36 @@ Filters and actions across the whole lifecycle, with the full table in
   adjust a run
 - `storeseeder_platform_supports_{id}` — override a capability, or declare that your extension
   satisfies a requirement
+
+## Deleting generated data
+
+Settings → **Danger zone** offers to delete what StoreSeeder created: the products, orders,
+customers and everything hanging off them, with a per-resource breakdown so the number is
+checkable before it is acted on. `wp storeseeder cleanup delete` does the same from the
+command line.
+
+**It deletes only rows the plugin recorded creating.** Every successful write goes into a
+ledger table (`{prefix}storeseeder_generated`), and the cleanup walks that list rather than
+the store's tables. Nothing is ever matched on for looking like test data — on a staging site
+restored from production, that guess eventually takes out a real catalogue.
+
+Consequences worth knowing:
+
+- Data generated before this feature existed is not in the ledger, so it is not offered. It
+  has to be removed by hand.
+- Children go first: an order's line items, addresses, applied coupons, tax lines,
+  transactions and download permissions are removed with it, because none of them cascade.
+- Things the writer *reused* rather than created stay — the WordPress user a generated
+  customer was linked to, a shipping zone an existing method already used, the tax rate an
+  order tax line points at.
+- A row that cannot be deleted keeps its record and the reason is reported once, not once per
+  row. If the rows are already gone, **Forget the remaining records** drops the records
+  without touching the store; it is a separate action because forgetting and deleting are
+  opposite mistakes to make.
+- Deletion is batched (100 rows per request) and the response says what is left, so a site
+  with thousands of recorded rows shows progress instead of timing out.
+- `storeseeder_purge_order` reorders deletion for a platform whose resources have their own
+  dependencies.
 
 ## Model Context Protocol (MCP)
 
@@ -226,6 +257,35 @@ any ability on the site. That route works because StoreSeeder marks its abilitie
 `mcp.public`, and it honours the same three switches. It is the right choice when a client is
 already configured for one site-wide endpoint; StoreSeeder's own server has the better
 ergonomics, since the tools arrive typed rather than behind a discovery call.
+
+### Connecting a client
+
+A desktop client talks to WordPress through
+[Automattic's `mcp-wordpress-remote` proxy](https://github.com/Automattic/mcp-wordpress-remote),
+which is where the connection details and the current config format are documented. Point it at
+either endpoint with an application password — never your login password:
+
+```json
+{
+  "mcpServers": {
+    "storeseeder": {
+      "command": "npx",
+      "args": ["-y", "@automattic/mcp-wordpress-remote@latest"],
+      "env": {
+        "WP_API_URL": "https://example.com/wp-json/storeseeder-mcp/mcp",
+        "WP_API_USERNAME": "admin",
+        "WP_API_PASSWORD": "application password, from Users → Profile"
+      }
+    }
+  }
+}
+```
+
+Swap `WP_API_URL` for `/wp-json/mcp/mcp-adapter-default-server` to go through the shared
+default server instead. On a local site over plain HTTP, add `--allow-http` to `args`.
+
+The user the application password belongs to needs StoreSeeder access — the same gate as the
+admin screen and the REST API, so an agent can never do more than the person who authorised it.
 
 It degrades gracefully: with either dependency absent, MCP does nothing and the rest of the
 plugin is unaffected. Abilities dispatch through the REST API rather than calling generators

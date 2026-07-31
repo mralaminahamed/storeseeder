@@ -31,6 +31,7 @@ All data is created through the target platform's own models, so generated recor
 * **REST API** — every generator is exposed at `storeseeder/v1/<resource>/generate` for programmatic use.
 * **WP-CLI** — `wp storeseeder generate products --count=20 --locale=de_DE`, plus preview, platform and locale commands. The same controllers as the REST API, so nothing can drift.
 * **Translation-ready** — every string passes through gettext and the plugin's own `languages` directory is registered, so Loco Translate and WPML String Translation pick the admin up without configuration.
+* **One-click cleanup** — delete the data StoreSeeder generated, tracked in its own ledger so your own rows are never matched on.
 * **Optional MCP integration** — expose generators as AI tools via the WordPress Abilities API (see below).
 * **Extensible** — filters and actions cover the full generation lifecycle, one filter registers a whole platform, and one filter sets the capability required to use the plugin.
 
@@ -54,11 +55,17 @@ All data is created through the target platform's own models, so generated recor
 * **Subscriptions** — subscription records against existing orders (on Fluent Cart, active billing requires Pro).
 * **Logs** — activity log entries across orders, products, customers, and system events.
 
+**Deleting generated data**
+
+Settings has a Danger zone action that deletes what StoreSeeder created — products, orders, customers and everything hanging off them — with a per-resource breakdown of what will go. `wp storeseeder cleanup delete` does the same from WP-CLI.
+
+It deletes only rows the plugin recorded creating, in its own ledger table. Nothing is ever matched on for resembling test data, so a staging site restored from production keeps its real catalogue. Data generated before this version was released is not in the ledger and is not offered.
+
 **Model Context Protocol (MCP) Integration**
 
 The plugin can optionally expose each generator as two MCP tools so AI clients (e.g. Claude Desktop, IDE assistants) can work with test data in natural language: a read-only preview that shows the rows a run would create, and a generate tool that creates them. Settings has one switch per risk class — enable AI tools, allow preview tools, allow generating — and each is a registration gate, so a tool that is switched off is never offered to a client at all. Only administrators can change them.
 
-The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable through the `mcp-adapter` plugin's own default server for clients already configured against it. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
+The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable through the `mcp-adapter` plugin's own default server for clients already configured against it. A desktop client connects through Automattic's `mcp-wordpress-remote` proxy (https://github.com/Automattic/mcp-wordpress-remote), using an application password for a user who has StoreSeeder access; that repository documents the setup and the current config format. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
 
 == Installation ==
 
@@ -118,6 +125,9 @@ It exposes the generators as AI tools via the WordPress Abilities API, so an MCP
 
 = In which languages can data be generated? =
 Seventy-five locales — every one FakerPHP ships a provider for. Names, addresses, phone numbers, company names, and postcodes follow the chosen locale. The picker offers exactly the set the REST API accepts, and is searchable by language name or locale code.
+
+= Can I remove the test data afterwards? =
+Yes. Settings has a Danger zone action that deletes what StoreSeeder created, and `wp storeseeder cleanup delete` does the same from the command line. It works from a ledger of rows the plugin recorded creating, so it never guesses which rows are test data — your own products and orders are not candidates. Anything generated before this feature existed is not in that ledger and has to be removed by hand.
 
 = Who can generate data? =
 Administrators, always. Other roles can be granted access from Settings — one switch per role, covering the admin screen, the REST routes, and the MCP tools alike. Only an administrator can change that setting, so a granted role cannot widen access further, and the Administrator role itself is not listed because it cannot be revoked. Developers can also set the required capability in code with the `storeseeder_capability` filter.

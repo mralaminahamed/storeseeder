@@ -126,10 +126,11 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Settings | Grouped by scope — site-wide (target platform, who may generate, sample data) and per-browser (defaults, appearance, run history), saved as you change them |
 | Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
+| Delete generated data | One action clears what StoreSeeder created — tracked in its own ledger, so your data is never matched on |
 | REST API | 18 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
-| WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data`, dispatching through the same REST controllers |
+| WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data\|cleanup`, dispatching through the same REST controllers |
 | Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
-| MCP integration | Optional — two AI tools per generator, one read-only and one that writes, with a Settings switch per risk class |
+| MCP integration | Optional — two AI tools per generator, one read-only and one that writes, with a Settings switch per risk class. Clients connect through [`mcp-wordpress-remote`](https://github.com/Automattic/mcp-wordpress-remote) |
 | Hook system | Filters and actions across the generation lifecycle, plus one filter for the capability required to use the plugin |
 
 ## Documentation
