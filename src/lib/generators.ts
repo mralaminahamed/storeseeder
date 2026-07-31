@@ -19,7 +19,7 @@ export type { Generator };
 export const generators: Generator[] = [
   {
     name: __("Products", "storeseeder"),
-    category: __("Core", "storeseeder"),
+    category: "Core",
     order: 1,
     iconName: "box",
     description: __(
@@ -121,7 +121,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Customers", "storeseeder"),
-    category: __("Core", "storeseeder"),
+    category: "Core",
     order: 2,
     iconName: "users",
     description: __(
@@ -212,7 +212,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Orders", "storeseeder"),
-    category: __("Core", "storeseeder"),
+    category: "Core",
     order: 3,
     iconName: "cart",
     description: __(
@@ -292,7 +292,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Coupons", "storeseeder"),
-    category: __("Core", "storeseeder"),
+    category: "Core",
     order: 4,
     iconName: "ticket",
     description: __(
@@ -350,7 +350,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Product Variations", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 1,
     iconName: "branch",
     description: __(
@@ -407,7 +407,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Shipping Plans", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 11,
     iconName: "truck",
     description: __(
@@ -456,7 +456,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Tax Classes", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 9,
     iconName: "landmark",
     description: __(
@@ -522,7 +522,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Transactions", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 5,
     iconName: "card",
     description: __(
@@ -584,7 +584,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Cart Sessions", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 4,
     iconName: "bag",
     description: __(
@@ -650,7 +650,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Attributes", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 2,
     iconName: "listtree",
     description: __(
@@ -671,7 +671,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Refunds", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 6,
     iconName: "coins",
     description: __(
@@ -698,7 +698,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Logs", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 13,
     iconName: "scroll",
     description: __(
@@ -725,7 +725,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Shipping Classes", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 12,
     iconName: "boxes",
     description: __(
@@ -739,7 +739,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Labels", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 8,
     iconName: "tags",
     description: __(
@@ -753,7 +753,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Order Tax Lines", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 10,
     iconName: "percent",
     description: __(
@@ -767,7 +767,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Product Downloads", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 3,
     iconName: "download",
     description: __(
@@ -781,7 +781,7 @@ export const generators: Generator[] = [
   },
   {
     name: __("Subscriptions", "storeseeder"),
-    category: __("Advanced", "storeseeder"),
+    category: "Advanced",
     order: 7,
     iconName: "repeat",
     description: __(
@@ -795,3 +795,70 @@ export const generators: Generator[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Ordering and labels
+// ---------------------------------------------------------------------------
+
+/**
+ * Categories, in the order every surface shows them.
+ *
+ * These are stable keys, never translated. `category` used to hold a translated string
+ * while the sidebar filtered on the literal `"Core"`, so on a translated site the
+ * comparison failed and the sidebar groups came out empty.
+ */
+export const CATEGORY_ORDER = ["Core", "Advanced", "Enhanced"] as const;
+
+export type Category = (typeof CATEGORY_ORDER)[number];
+
+/** The translated name of a category. Unknown keys pass through unchanged. */
+export function categoryLabel(category: string): string {
+  switch (category) {
+    case "Core":
+      return __("Core", "storeseeder");
+    case "Advanced":
+      return __("Advanced", "storeseeder");
+    case "Enhanced":
+      return __("Enhanced", "storeseeder");
+    default:
+      return category;
+  }
+}
+
+/** Categories that actually have generators, in CATEGORY_ORDER. */
+export function usedCategories(): string[] {
+  return CATEGORY_ORDER.filter((category) =>
+    generators.some((g) => g.category === category),
+  );
+}
+
+/**
+ * Every generator in display order: by category, then by `order` within it.
+ *
+ * The command palette listed them in declaration order instead, so reordering the
+ * sidebar left the palette showing the previous sequence — the two disagreed about what
+ * comes after Product Variations.
+ */
+export function sortedGenerators(): Generator[] {
+  const rank = (category: string) => {
+    const i = CATEGORY_ORDER.indexOf(category as Category);
+    // An unknown category sorts last rather than first, which is what -1 would do.
+    return -1 === i ? CATEGORY_ORDER.length : i;
+  };
+
+  return [...generators].sort(
+    (a, b) => rank(a.category) - rank(b.category) || a.order - b.order,
+  );
+}
+
+/** Generators grouped for display: categories in order, each with its own sorted list. */
+export function generatorsByCategory(): Array<{
+  category: string;
+  label: string;
+  items: Generator[];
+}> {
+  return usedCategories().map((category) => ({
+    category,
+    label: categoryLabel(category),
+    items: sortedGenerators().filter((g) => g.category === category),
+  }));
+}

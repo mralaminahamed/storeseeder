@@ -1,41 +1,31 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { Icon } from "@/lib/icons";
 import { SectionLabel } from "@/components/ui/section-label";
-import { generators } from "@/lib/generators";
+import { generatorsByCategory } from "@/lib/generators";
 import { usePlatform } from "@/providers/PlatformProvider";
 
 interface GeneratorGridProps {
   counts: Record<string, number>;
 }
 
-const CATEGORY_ORDER = [
-  __("Core", "storeseeder"),
-  __("Advanced", "storeseeder"),
-  __("Enhanced", "storeseeder"),
-];
-
 export function GeneratorGrid({ counts }: GeneratorGridProps) {
   const navigate = useNavigate();
   const { capability } = usePlatform();
 
-  const categories = CATEGORY_ORDER.filter((cat) =>
-    generators.some((g) => g.category === cat),
-  );
-
   return (
     <div data-testid="generator-grid">
-      {categories.map((category) => {
-        const group = generators
-          .filter((g) => g.category === category)
-          .sort((a, b) => a.order - b.order);
-
+      {generatorsByCategory().map(({ category, label, items: group }) => {
         return (
           <div key={category}>
             <div className="fp-group-head">
               <SectionLabel>
-                {category} {__("generators", "storeseeder")}
+                {sprintf(
+                  /* translators: %s: category name, e.g. Core. */
+                  __("%s generators", "storeseeder"),
+                  label,
+                )}
               </SectionLabel>
               <div className="fp-group-line" />
             </div>

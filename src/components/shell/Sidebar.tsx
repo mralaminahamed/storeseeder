@@ -1,11 +1,11 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 
 import { Icon } from "@/lib/icons";
 import type { IconName } from "@/lib/icons";
 import { BrandIcon } from "@/components/ui/BrandIcon";
-import { generators } from "@/lib/generators";
+import { generatorsByCategory } from "@/lib/generators";
 import { usePlatform } from "@/providers/PlatformProvider";
 
 // ---------------------------------------------------------------------------
@@ -18,16 +18,6 @@ export interface SidebarProps {
   counts: Record<string, number>; // route → generated count
   openCmd: () => void;
 }
-
-// ---------------------------------------------------------------------------
-// Group definitions (ordered: Core → Advanced → Enhanced)
-// ---------------------------------------------------------------------------
-
-const GROUPS: Array<{ id: string; label: string }> = [
-  { id: "Core", label: "Core generators" },
-  { id: "Advanced", label: "Advanced generators" },
-  { id: "Enhanced", label: "Enhanced generators" },
-];
 
 // ---------------------------------------------------------------------------
 // NavItem helper
@@ -137,24 +127,23 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
           testId="nav-overview"
         />
 
-        {/* Groups */}
-        {GROUPS.map((grp) => {
-          const grpGenerators = generators
-            .filter((g) => g.category === grp.id)
-            .sort((a, b) => a.order - b.order);
-
-          if (grpGenerators.length === 0) return null;
-
+        {/* Groups. Order and grouping come from lib/generators, which the dashboard grid
+            and the command palette also read — they used to answer this three ways. */}
+        {generatorsByCategory().map((group) => {
           return (
-            <div key={grp.id}>
+            <div key={group.category}>
               <div className="fp-nav-group-label">
                 {collapsed ? (
                   <span className="fp-nav-group-rule" />
                 ) : (
-                  grp.label
+                  sprintf(
+                    /* translators: %s: category name, e.g. Core. */
+                    __("%s generators", "storeseeder"),
+                    group.label,
+                  )
                 )}
               </div>
-              {grpGenerators.map((g) => (
+              {group.items.map((g) => (
                 <NavItem
                   key={g.route}
                   to={`/generator/${g.route}`}
