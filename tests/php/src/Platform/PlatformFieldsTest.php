@@ -277,13 +277,16 @@ class PlatformFieldsTest extends StoreSeederUnitTestCase {
 	/**
 	 * And a resource whose target stores every canonical field says nothing at all, so the response
 	 * shape is unchanged for every existing caller.
+	 *
+	 * Categories rather than coupons: Fluent Cart coupons have since grown two fields it cannot
+	 * store, so they are no longer an example of the case this asserts.
 	 */
 	public function test_a_resource_with_nothing_ignored_reports_nothing(): void {
 		$this->require_platform( 'fluent-cart' );
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
-		$request = new WP_REST_Request( 'POST', '/storeseeder/v1/coupons/generate' );
+		$request = new WP_REST_Request( 'POST', '/storeseeder/v1/product-categories/generate' );
 		$request->set_header( 'content-type', 'application/json' );
 		$request->set_body(
 			(string) wp_json_encode(

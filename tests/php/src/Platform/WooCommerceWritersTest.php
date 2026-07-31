@@ -548,6 +548,137 @@ class WooCommerceWritersTest extends StoreSeederUnitTestCase {
 		$this->assertSame( 'fixed_cart', $coupon->get_discount_type() );
 	}
 
+	/**
+	 * A canonical coupon entity, with the restriction fields at their least surprising values.
+	 *
+	 * @param array<string, mixed> $extra Fields merged over the defaults.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function coupon_entity( array $extra = array() ): array {
+		return array_merge(
+			array(
+				'code'                 => 'CANON10',
+				'discount'             => 1000,
+				'type'                 => 'fixed',
+				'description'          => 'Ten off.',
+				'usage_limit'          => 5,
+				'usage_limit_per_user' => 1,
+				'status'               => 'active',
+				'starts_at'            => null,
+				'expires_at'           => '2027-01-01 00:00:00',
+				'minimum_amount'       => null,
+				'maximum_amount'       => null,
+				'exclude_sale_items'   => false,
+				'stackable'            => true,
+				'product_count'        => 0,
+			),
+			$extra
+		);
+	}
+
+	public function test_the_cart_thresholds_are_converted_from_minor_units(): void {
+		$result = $this->writer( Resource::COUPON )->write(
+			$this->coupon_entity(
+				array(
+					'code'           => 'THRESH',
+					'minimum_amount' => 5000,
+					'maximum_amount' => 25000,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $result );
+
+		$coupon = new \WC_Coupon( $result['id'] );
+
+		$this->assertSame( '50.00', $coupon->get_minimum_amount() );
+		$this->assertSame( '250.00', $coupon->get_maximum_amount() );
+	}
+
+	/**
+	 * Null is an unlimited coupon, and WooCommerce spells that as an empty limit. A limit of zero
+	 * would reject the coupon on its first use, which is the opposite of what was asked.
+	 */
+	public function test_an_unlimited_coupon_has_no_limit_rather_than_a_limit_of_zero(): void {
+		$result = $this->writer( Resource::COUPON )->write(
+			$this->coupon_entity(
+				array(
+					'code'                 => 'UNLIMITED',
+					'usage_limit'          => null,
+					'usage_limit_per_user' => null,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $result );
+
+		$coupon = new \WC_Coupon( $result['id'] );
+
+		$this->assertSame( 0, $coupon->get_usage_limit() );
+		$this->assertSame( 0, $coupon->get_usage_limit_per_user() );
+	}
+
+	/**
+	 * WooCommerce states the inverse of what the entity carries: a stackable coupon is one *not*
+	 * marked for individual use.
+	 */
+	public function test_stacking_is_stored_as_the_inverse_of_individual_use(): void {
+		$stacks = $this->writer( Resource::COUPON )->write( $this->coupon_entity( array( 'code' => 'STACKS' ) ) );
+		$alone  = $this->writer( Resource::COUPON )->write(
+			$this->coupon_entity(
+				array(
+					'code'      => 'ALONE',
+					'stackable' => false,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $stacks );
+		$this->assertNotWPError( $alone );
+
+		$this->assertFalse( ( new \WC_Coupon( $stacks['id'] ) )->get_individual_use() );
+		$this->assertTrue( ( new \WC_Coupon( $alone['id'] ) )->get_individual_use() );
+	}
+
+	public function test_sale_items_can_be_excluded(): void {
+		$result = $this->writer( Resource::COUPON )->write(
+			$this->coupon_entity(
+				array(
+					'code'               => 'NOSALE',
+					'exclude_sale_items' => true,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $result );
+		$this->assertTrue( ( new \WC_Coupon( $result['id'] ) )->get_exclude_sale_items() );
+	}
+
+	/**
+	 * The entity says how many products to restrict to and never which: only the platform knows
+	 * what exists, and a coupon pointing at an id that is not there restricts itself to nothing.
+	 */
+	public function test_a_product_restriction_draws_real_products(): void {
+		$this->assertNotWPError( $this->writer( Resource::PRODUCT )->write( $this->product_entity( array( 'sku' => 'COUPON-REST' ) ) ) );
+
+		$result = $this->writer( Resource::COUPON )->write(
+			$this->coupon_entity(
+				array(
+					'code'          => 'RESTRICTED',
+					'product_count' => 1,
+				)
+			)
+		);
+
+		$this->assertNotWPError( $result );
+
+		$ids = ( new \WC_Coupon( $result['id'] ) )->get_product_ids();
+
+		$this->assertCount( 1, $ids );
+		$this->assertInstanceOf( 'WC_Product', wc_get_product( (int) reset( $ids ) ) );
+	}
+
 	public function test_a_duplicate_coupon_code_is_resolved(): void {
 		$writer = $this->writer( Resource::COUPON );
 		$entity = array(
