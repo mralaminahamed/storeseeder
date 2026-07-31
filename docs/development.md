@@ -117,6 +117,40 @@ Full rules in [`AGENTS.md`](../AGENTS.md). The ones people get wrong:
 
 A resource needs five pieces. Copy the closest existing set rather than starting blank.
 
+What trips people is not writing the two classes — it is the four places that have to *know*
+about them. Solid arrows are "references"; dashed are the registration edits that are easy to
+forget:
+
+```mermaid
+flowchart TD
+    RES["Platforms/Resource.php<br/>canonical name constant"]
+
+    GEN["Generators/Resources/My_Thing.php<br/><code>build_entity()</code>"]
+    WR["Platforms/Drivers/&lt;Platform&gt;/Writers/My_Thing.php<br/><code>write()</code>"]
+
+    DRV["Platforms/Drivers/&lt;Platform&gt;/Platform.php<br/><code>capabilities()</code> + <code>writer_classes()</code>"]
+    CTRL["Controllers/Resources/My_Thing.php<br/>rest base + resource + label"]
+    BOOT["class-storeseeder.php<br/>the $controllers array"]
+    TS["src/lib/generators.ts<br/>route + resource + schema"]
+
+    GEN -->|"get_resource_type()"| RES
+    WR -->|"resource()"| RES
+    CTRL -->|"get_generator_instance()"| GEN
+    DRV -.->|"must list it"| WR
+    BOOT -.->|"must instantiate it"| CTRL
+    TS -.->|"route must match<br/>get_rest_base()"| CTRL
+    TS -.->|"resource must match<br/>Resource constant"| RES
+
+    style DRV stroke-width:2px
+    style BOOT stroke-width:2px
+    style TS stroke-width:2px
+```
+
+The three bold boxes are registries. Miss the driver one and the run fails with
+`storeseeder_missing_writer`; miss the bootstrap one and the REST routes never appear; miss the
+TypeScript one and the generator exists but is invisible in the admin.
+
+
 ### 1. The generator — shapes data, names no platform
 
 `includes/Generators/Resources/My_Thing.php`
@@ -362,10 +396,43 @@ composer release        # lint, analyse, clean, build, makepot, prod install, zi
 
 ### WordPress.org deployment
 
-- `.github/workflows/svn-deploy.yml` runs on a tag push, and refuses to proceed if the tag
-  does not match the plugin header version
-- `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` and `.wordpress-org/`
-  assets on push to trunk, so a readme change reaches the public listing without a release
+`.github/workflows/svn-deploy.yml` runs on a tag push. Every job depends on `meta`, which
+refuses to proceed if the tag does not match the plugin header version — so a mismatched tag
+costs seconds rather than a bad release:
+
+```mermaid
+flowchart LR
+    TAG(["git push --tags"]) --> META["meta<br/>validate version"]
+
+    META --> LINT["lint<br/>PHPCS"]
+    META --> STAN["phpstan"]
+    META --> ASSETS["assets<br/>build bundles"]
+
+    ASSETS --> I18N["i18n<br/>translations"]
+    META --> I18N
+
+    ASSETS --> PKG["package<br/>assemble + zip"]
+    I18N --> PKG
+    META --> PKG
+
+    LINT --> DEPLOY["deploy<br/>WP.org SVN + GitHub release"]
+    STAN --> DEPLOY
+    PKG --> DEPLOY
+    META --> DEPLOY
+
+    DEPLOY --> OUT(["WordPress.org + GitHub release"])
+
+    style DEPLOY stroke-width:2px
+```
+
+Worth noticing: `package` does **not** wait on `lint` or `phpstan`. Packaging runs alongside the
+quality gates and `deploy` is the join, so a lint failure stops the release without having
+wasted time serialised behind it.
+
+Separately, `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` and
+`.wordpress-org/` assets on every push to trunk — so a readme change reaches the public listing
+**without** a release. Worth remembering before editing it.
+
 
 ### Release checklist
 
