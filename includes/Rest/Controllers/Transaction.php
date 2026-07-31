@@ -11,6 +11,8 @@
 
 namespace StoreSeeder\Rest\Controllers;
 
+use StoreSeeder\Platforms\Status;
+
 use StoreSeeder\Rest\Controller;
 use StoreSeeder\Generation\Generators\Transaction as TransactionGenerator;
 
@@ -103,11 +105,17 @@ class Transaction extends Controller {
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
 			),
 			'transaction_statuses'     => array(
-				'description'       => __( 'Transaction statuses to generate.', 'storeseeder' ),
+				// The canonical vocabulary. `cancelled` and `partially_refunded` were offered here
+				// and are not transaction states any gateway or platform models — a cancelled
+				// payment is a failed one, and a partial refund is a refund transaction for part of
+				// the amount. `refunded` and `disputed` are set by the *type*, so asking for them
+				// here does nothing; they are accepted and ignored rather than removed, because a
+				// caller listing every status should not get an error.
+				'description'       => __( 'Statuses to draw charges from. Refunds and disputes carry their own status.', 'storeseeder' ),
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
-					'enum' => array( 'completed', 'pending', 'failed', 'cancelled', 'refunded', 'partially_refunded' ),
+					'enum' => Status::transaction_statuses(),
 				),
 				'default'           => array( 'completed', 'pending', 'failed' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
@@ -130,8 +138,35 @@ class Transaction extends Controller {
 					),
 				),
 			),
+			'transaction_types'        => array(
+				// The three every gateway models. The admin and the MCP ability offered `payment`,
+				// `adjustment`, `fee` and `commission`, none of which is a type any platform stores
+				// — and `payment` is `charge` under another name.
+				'description'       => __( 'Transaction types to draw from.', 'storeseeder' ),
+				'type'              => 'array',
+				'items'             => array(
+					'type' => 'string',
+					'enum' => Status::transaction_types(),
+				),
+				'default'           => array( 'charge', 'refund' ),
+				'sanitize_callback' => array( $this, 'sanitize_array' ),
+			),
+			'customer_id'              => array(
+				'description' => __( 'Only draw parent orders belonging to this customer.', 'storeseeder' ),
+				'type'        => 'integer',
+				'minimum'     => 1,
+			),
+			'order_status_filter'      => array(
+				'description' => __( 'Only draw parent orders in these statuses.', 'storeseeder' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::order_statuses(),
+				),
+				'default'     => array(),
+			),
 			'include_refunds'          => array(
-				'description' => __( 'Include refund transactions.', 'storeseeder' ),
+				'description' => __( 'Include refund transactions. The older form of leaving `refund` out of transaction_types; both work.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),

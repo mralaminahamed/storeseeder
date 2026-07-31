@@ -332,6 +332,32 @@ is a confusing fixture rather than a realistic one. Fluent Cart has no attribute
 *is* the option — so the axes are kept in its variation payload alongside everything else with no
 column.
 
+### Transactions
+
+- `transaction_types` — any of `charge`, `refund`, `dispute`
+- `transaction_statuses` — `pending`, `authorized`, `completed`, `failed` for charges; a refund is
+  always `refunded` and a dispute always `disputed`
+- `payment_methods` (also accepted as `payment_gateways`)
+- `amount_range` — `{ min, max }` in major units
+- `refund_percentage` — the share of transactions that are refunds
+- `include_gateway_metadata` — payer email, card brand and last four
+- `customer_id`, `order_status_filter` — which orders a transaction may attach to
+
+Six of the endpoint's seven parameters were read by nothing, and the other two surfaces declared a
+different set again: `payment_gateways` for `payment_methods`, and a `transaction_types` enum of
+`payment`, `adjustment`, `fee` and `commission` — none of which is a type any platform stores, and
+`payment` is `charge` under another name. A third of every run came out as refunds however few were
+asked for.
+
+The canonical transaction vocabulary now lives in `Platforms\Status` beside the order statuses.
+Fluent Cart spells completed `succeeded` and disputed `dispute_lost`, and its writer maps both — an
+unmapped status is a string its own status filters never match, so the transaction exists and appears
+nowhere. `cancelled` and `partially_refunded` were offered by the endpoint and are not transaction
+states: a cancelled payment is a failed one, and a partial refund is a refund for part of the amount.
+
+A transaction now carries its own date, clamped forward by the writer so it never predates the order
+it belongs to. Card details accompany a card payment that actually went through, and nothing else.
+
 ### Supported, but not in full
 
 A platform can store a resource without storing everything a canonical entity carries, and the
@@ -344,6 +370,7 @@ capability says which fields it drops rather than the writer discarding them qui
 | WooCommerce | Coupons | `starts_at` | `WC_Coupon` has an expiry and no start date, so a coupon that becomes valid next week cannot be expressed |
 | Fluent Cart | Products | `backorders` | A boolean column where the canonical vocabulary has three values, so "allow, but notify" cannot be stored |
 | Fluent Cart | Orders | `company` | `fct_order_addresses` has no company column, and nothing reads one out of the meta blob |
+| Fluent Cart | Transactions | `associate_with_orders` | `fct_order_transactions.order_id` is a NOT NULL foreign key, so a transaction belonging to no order cannot exist |
 | Fluent Cart | Coupons | `maximum_amount`, `exclude_sale_items` | Its conditions have a minimum and no maximum — `max_discount_amount` caps the discount, not the cart — and its validation does not know about sale prices |
 
 The generator page prints those under the fields, so a setting that will not apply says so before

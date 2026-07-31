@@ -534,52 +534,56 @@ export const generators: Generator[] = [
     route: "transactions",
     resource: "transaction",
     parameterConfig: {
-      customer_type: {
-        description: __("Type of customers for transactions", "storeseeder"),
-        type: "string",
-        enum: ["all", "specific", "existing_customers_only", "new_customers_only"],
-        default: "all",
-      },
-      specific_customer_id: {
-        description: __("Specific customer ID (when customer_type is 'specific')", "storeseeder"),
-        type: "integer",
-        minimum: 1,
-        dependsOn: { customer_type: "specific" },
-      },
-      order_status_filter: {
-        description: __("Filter orders by status", "storeseeder"),
-        type: "array",
-        items: { type: "string", enum: ["pending", "processing", "completed", "cancelled", "on_hold", "refunded"] },
-        default: ["pending", "processing", "completed"],
-      },
       transaction_types: {
-        description: __("Types of transactions to generate", "storeseeder"),
+        // `payment`, `adjustment`, `fee` and `commission` were offered here and none of them is a
+        // type any platform stores — `payment` is `charge` under another name.
+        description: __("Transaction types to draw from", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["payment", "refund", "adjustment", "fee", "commission"] },
-        default: ["payment", "refund"],
+        items: { type: "string", enum: ["charge", "refund", "dispute"] },
+        default: ["charge", "refund"],
       },
-      payment_gateways: {
-        description: __("Payment gateways to use for transactions", "storeseeder"),
+      transaction_statuses: {
+        description: __("Statuses to draw charges from (a refund is always refunded)", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["stripe", "paypal", "square", "authorize_net", "braintree", "razorpay", "mollie"] },
-        default: ["stripe", "paypal", "square"],
+        items: { type: "string", enum: ["pending", "authorized", "completed", "failed", "refunded", "disputed"] },
+        default: ["completed", "pending", "failed"],
+      },
+      payment_methods: {
+        description: __("Payment methods to use for transactions", "storeseeder"),
+        type: "array",
+        items: { type: "string", enum: ["stripe", "paypal", "cod", "bank_transfer", "check", "credit_card", "debit_card"] },
+        default: ["stripe", "paypal", "cod"],
       },
       amount_range: {
         description: __("Transaction amount range", "storeseeder"),
         type: "object",
         properties: {
-          min: { type: "number", minimum: 0, default: 1 },
-          max: { type: "number", minimum: 1, default: 1000 },
+          min: { type: "number", minimum: 0.01, default: 10 },
+          max: { type: "number", minimum: 0.01, default: 1000 },
         },
       },
-      status_distribution: {
-        description: __("Transaction status distribution", "storeseeder"),
-        type: "object",
-        properties: {
-          success_rate: { type: "integer", minimum: 0, maximum: 100, default: 85 },
-          pending_rate: { type: "integer", minimum: 0, maximum: 100, default: 10 },
-          failed_rate: { type: "integer", minimum: 0, maximum: 100, default: 5 },
-        },
+      refund_percentage: {
+        description: __("Share of transactions that are refunds (0–100)", "storeseeder"),
+        type: "number",
+        minimum: 0,
+        maximum: 100,
+        default: 5,
+      },
+      include_gateway_metadata: {
+        description: __("Include payer email, card brand and last four", "storeseeder"),
+        type: "boolean",
+        default: true,
+      },
+      customer_id: {
+        description: __("Only draw parent orders belonging to this customer", "storeseeder"),
+        type: "integer",
+        minimum: 1,
+      },
+      order_status_filter: {
+        description: __("Only draw parent orders in these statuses", "storeseeder"),
+        type: "array",
+        items: { type: "string", enum: ["pending", "processing", "on_hold", "completed", "cancelled", "failed", "refunded"] },
+        default: [],
       },
     },
   },

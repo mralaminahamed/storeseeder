@@ -9,6 +9,7 @@
 namespace StoreSeeder\MCP\Abilities;
 
 use StoreSeeder\MCP\Ability;
+use StoreSeeder\Platforms\Status;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -42,28 +43,61 @@ class Generate_Transactions extends Ability {
 	 */
 	protected static function input_properties(): array {
 		return array(
-			'customer_type'        => array(
-				'type'        => 'string',
-				'description' => __( 'Filter orders by customer type. Allowed: all, specific, existing_customers_only, new_customers_only. Default: all.', 'storeseeder' ),
-				'enum'        => array( 'all', 'specific', 'existing_customers_only', 'new_customers_only' ),
-				'default'     => 'all',
-			),
-			'specific_customer_id' => array(
-				'type'        => 'integer',
-				'description' => __( 'Only create transactions for orders belonging to this customer ID. Requires customer_type="specific".', 'storeseeder' ),
-				'minimum'     => 1,
-			),
 			'transaction_types'    => array(
 				'type'        => 'array',
-				'description' => __( 'Transaction types to generate. Allowed: payment, refund, adjustment, fee, commission. Default: ["payment","refund"].', 'storeseeder' ),
-				'items'       => array( 'type' => 'string' ),
-				'default'     => array( 'payment', 'refund' ),
+				'description' => __( 'Transaction types to draw from. Allowed: charge, refund, dispute — the three every gateway models. Default: ["charge","refund"].', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::transaction_types(),
+				),
+				'default'     => array( 'charge', 'refund' ),
 			),
-			'payment_gateways'     => array(
+			'transaction_statuses' => array(
 				'type'        => 'array',
-				'description' => __( 'Payment gateways to use. Allowed: stripe, paypal, square, authorize_net, braintree, razorpay, mollie. Default: ["stripe","paypal","square"].', 'storeseeder' ),
+				'description' => __( 'Statuses to draw charges from. Allowed: pending, authorized, completed, failed. A refund is always refunded and a dispute always disputed, so those two are set by the type. Default: ["completed","pending","failed"].', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::transaction_statuses(),
+				),
+				'default'     => array( 'completed', 'pending', 'failed' ),
+			),
+			'payment_methods'      => array(
+				'type'        => 'array',
+				'description' => __( 'Payment methods to distribute across transactions. Default: ["stripe","paypal","bank_transfer","cod"].', 'storeseeder' ),
 				'items'       => array( 'type' => 'string' ),
-				'default'     => array( 'stripe', 'paypal', 'square' ),
+			),
+			'amount_range'         => array(
+				'type'        => 'object',
+				'description' => __( 'Transaction amount range in major units. Default: 10 to 1000.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'number' ),
+					'max' => array( 'type' => 'number' ),
+				),
+			),
+			'refund_percentage'    => array(
+				'type'        => 'number',
+				'description' => __( 'Share of transactions that are refunds, where refund is one of the types. Default: 5.', 'storeseeder' ),
+				'minimum'     => 0,
+				'maximum'     => 100,
+				'default'     => 5,
+			),
+			'gateway_metadata'     => array(
+				'type'        => 'boolean',
+				'description' => __( 'Include gateway detail — payer email, card brand and last four. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'customer_id'          => array(
+				'type'        => 'integer',
+				'description' => __( 'Only draw parent orders belonging to this customer.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+			'order_statuses'       => array(
+				'type'        => 'array',
+				'description' => __( 'Only draw parent orders in these statuses. Omit for any.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::order_statuses(),
+				),
 			),
 		);
 	}
@@ -104,20 +138,29 @@ class Generate_Transactions extends Ability {
 			$payload['seed'] = (int) $input['seed'];
 		}
 
-		if ( isset( $input['customer_type'] ) ) {
-			$payload['customer_type'] = $input['customer_type'];
+		foreach ( array( 'transaction_types', 'transaction_statuses', 'payment_methods', 'amount_range' ) as $key ) {
+			if ( isset( $input[ $key ] ) ) {
+				$payload[ $key ] = (array) $input[ $key ];
+			}
 		}
 
-		if ( isset( $input['specific_customer_id'] ) ) {
-			$payload['specific_customer_id'] = (int) $input['specific_customer_id'];
+		if ( isset( $input['refund_percentage'] ) ) {
+			$payload['refund_percentage'] = (float) $input['refund_percentage'];
 		}
 
-		if ( isset( $input['transaction_types'] ) ) {
-			$payload['transaction_types'] = (array) $input['transaction_types'];
+		if ( isset( $input['gateway_metadata'] ) ) {
+			$payload['include_gateway_metadata'] = (bool) $input['gateway_metadata'];
 		}
 
-		if ( isset( $input['payment_gateways'] ) ) {
-			$payload['payment_gateways'] = (array) $input['payment_gateways'];
+		if ( isset( $input['customer_id'] ) ) {
+			$payload['customer_id'] = (int) $input['customer_id'];
+		}
+
+		// One name for the writer, whichever surface asked: `customer_type` and
+		// `specific_customer_id` described a new-versus-existing split no writer implemented, the
+		// same pair the Orders ability dropped.
+		if ( isset( $input['order_statuses'] ) ) {
+			$payload['order_status_filter'] = (array) $input['order_statuses'];
 		}
 
 		return $payload;

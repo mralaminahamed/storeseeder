@@ -39,10 +39,14 @@ final class Order extends Writer {
 	 * status filter — which is why the canonical vocabulary is mapped rather than
 	 * passed through.
 	 *
+	 * Public because the Transaction writer filters its parent orders on the same mapping: a status
+	 * filter should speak the canonical vocabulary wherever it appears, and two copies of a table
+	 * like this one drift.
+	 *
 	 * @since 1.1.0
 	 * @var array<string, string>
 	 */
-	private const ORDER_STATUS = array(
+	public const ORDER_STATUS = array(
 		Status::COMPLETED  => 'completed',
 		Status::PROCESSING => 'processing',
 		Status::ON_HOLD    => 'on-hold',
