@@ -13,6 +13,7 @@ const GENERATORS = [
   { route: "transactions",         name: 'Transactions' },
   { route: "cart-sessions",        name: 'Cart Sessions' },
   { route: "attributes",           name: 'Product Attributes' },
+  { route: "product_categories",   name: 'Product Categories' },
   { route: "brands",               name: 'Product Brands' },
   { route: "refunds",              name: 'Refunds' },
   { route: "logs",                 name: 'Logs' },
