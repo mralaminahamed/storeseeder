@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T22:29:36+00:00\n"
+"POT-Creation-Date: 2026-07-31T22:49:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -978,26 +978,47 @@ msgid "Generate product variations (size/colour/storage combinations) for existi
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Product_Variations.php:47
-msgid "Generate variations only for this product ID. Omit to pick a random eligible product."
+msgid "Attribute axes to build variations from. Allowed: size, color, material, style, flavor, weight, dimension. Default: [\"size\",\"color\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Product_Variations.php:52
-msgid "Array of product IDs to skip during generation."
+#: includes/MCP/Abilities/Generate_Product_Variations.php:56
+msgid "How many axes each variation carries, as a min and max. Default: 1 to 2."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Product_Variations.php:58
-msgid "Enable inventory tracking for variations. Default: true."
+#: includes/MCP/Abilities/Generate_Product_Variations.php:64
+msgid "How many distinct values each axis draws from, which is how wide a product's option list gets. Default: 3 to 8."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Product_Variations.php:63
+#: includes/MCP/Abilities/Generate_Product_Variations.php:72
+msgid "How far a variation's price sits from its parent's, as a percentage. Default: -20 to 50. A variation is never priced at zero."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:80
+msgid "Track stock per variation. False leaves them in stock with no quantity. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:85
 msgid "Minimum stock quantity per variation. Default: 0."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Product_Variations.php:69
+#: includes/MCP/Abilities/Generate_Product_Variations.php:91
 msgid "Maximum stock quantity per variation. Default: 100."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Product_Variations.php:82
+#: includes/MCP/Abilities/Generate_Product_Variations.php:97
+msgid "Give each variation a SKU. False generates variations identified only by their options, which is legal everywhere and worth testing. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:102
+msgid "Attach every variation to this product, to build out one option matrix. Omit to pick a random eligible product."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:107
+#: includes/Rest/Controllers/Product_Variation.php:204
+msgid "Products to skip when choosing a parent."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Product_Variations.php:120
 msgid "Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes."
 msgstr ""
 
@@ -1365,11 +1386,11 @@ msgid "Failed to create product download."
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:62
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:180
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:236
 msgid "No products were found. Generate products before generating variations."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:100
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:115
 msgid "Failed to create product variation."
 msgstr ""
 
@@ -1583,8 +1604,12 @@ msgstr ""
 msgid "WooCommerce is not active on this site, so its product tag taxonomy is not registered."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:103
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:134
 msgid "Failed to create the product variation."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:210
+msgid "The requested product was not found."
 msgstr ""
 
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:65
@@ -2060,6 +2085,7 @@ msgid "Enable stock management."
 msgstr ""
 
 #: includes/Rest/Controllers/Product.php:150
+#: includes/Rest/Controllers/Product_Variation.php:181
 msgid "Stock quantity range."
 msgstr ""
 
@@ -2123,23 +2149,31 @@ msgstr ""
 msgid "Price variation range as percentage of base price."
 msgstr ""
 
-#: includes/Rest/Controllers/Product_Variation.php:150
+#: includes/Rest/Controllers/Product_Variation.php:153
 msgid "Minimum price variation percentage."
 msgstr ""
 
-#: includes/Rest/Controllers/Product_Variation.php:157
+#: includes/Rest/Controllers/Product_Variation.php:160
 msgid "Maximum price variation percentage."
 msgstr ""
 
-#: includes/Rest/Controllers/Product_Variation.php:166
-msgid "Include inventory management for variations."
+#: includes/Rest/Controllers/Product_Variation.php:172
+msgid "Inventory settings for variations."
 msgstr ""
 
-#: includes/Rest/Controllers/Product_Variation.php:171
+#: includes/Rest/Controllers/Product_Variation.php:176
+msgid "Track stock per variation. Off leaves them in stock with no quantity."
+msgstr ""
+
+#: includes/Rest/Controllers/Product_Variation.php:199
+msgid "Attach every variation to this product, to build out one option matrix."
+msgstr ""
+
+#: includes/Rest/Controllers/Product_Variation.php:210
 msgid "Generate unique SKUs for each variation."
 msgstr ""
 
-#: includes/Rest/Controllers/Product_Variation.php:188
+#: includes/Rest/Controllers/Product_Variation.php:227
 msgid "Generated product variations with attributes and pricing."
 msgstr ""
 
@@ -2498,15 +2532,35 @@ msgid "E-commerce developers, product catalog managers"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Specific product ID to generate variations for"
+msgid "Attribute axes to build variations from"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Product types to consider for variation generation"
+msgid "How many axes each variation carries"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Price variance settings for variations"
+msgid "Minimum axes"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Maximum axes"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "How many distinct values each axis draws from"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Minimum values"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Maximum values"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "How far a variation's price sits from its parent's, as a percentage"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2518,19 +2572,23 @@ msgid "Maximum variance %"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Stock management settings for variations"
+msgid "Inventory settings for variations"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Attribute generation settings"
+msgid "Track stock per variation"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Create missing attributes if needed"
+msgid "Give each variation a SKU"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Maximum attributes per variation"
+msgid "Attach every variation to this product, to build out one option matrix"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Products to skip when choosing a parent"
 msgstr ""
 
 #: build/admin-app.js:4
