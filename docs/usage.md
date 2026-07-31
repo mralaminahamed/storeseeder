@@ -217,6 +217,7 @@ The REST base is not always the resource name:
 | Attributes | `attributes` | `attribute` |
 | Brands | `brands` | `brand` |
 | Product Categories | `product_categories` | `product_category` |
+| Product Tags | `product_tags` | `product_tag` |
 | Refunds | `refunds` | `refund` |
 | Logs | `logs` | `log` |
 | Shipping Classes | `shipping_classes` | `shipping_class` |

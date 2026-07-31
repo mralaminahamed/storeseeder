@@ -8,13 +8,13 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic e-commerce test data with 20 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
+Generate realistic e-commerce test data with 21 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
 
 == Description ==
 
 StoreSeeder generates realistic test data for WordPress e-commerce platforms. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
-Where the data lands is decided by a **platform driver**, and the same twenty generators feed every driver. **Fluent Cart and WooCommerce are included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
+Where the data lands is decided by a **platform driver**, and the same twenty-one generators feed every driver. **Fluent Cart and WooCommerce are included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
 
 All data is created through the target platform's own models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with that platform's updates.
 
@@ -22,7 +22,7 @@ All data is created through the target platform's own models, so generated recor
 
 **Highlights**
 
-* **20 generators** — products, product variations, categories, brands, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
+* **21 generators** — products, product variations, categories, tags, brands, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
 * **One driver per platform** — the generators are platform-neutral, so the same fixed seed produces identical data wherever it is written. Fluent Cart and WooCommerce ship; the driver layer is public for the rest.
 * **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
 * **Live preview** — a read-only preview of real faker rows that refreshes as you change settings, without persisting anything.
@@ -50,6 +50,7 @@ All data is created through the target platform's own models, so generated recor
 * **Order Tax Lines** — per-order tax lines linking orders to tax rates.
 * **Attributes** — attribute groups and terms, linked to real product variations.
 * **Product Categories** — categories, nested where asked, with existing products filed under them. Needs a platform that has them: WooCommerce, EasyCommerce and Fluent Cart all do.
+* **Product Tags** — tags applied to existing products. WooCommerce and EasyCommerce have tags; Fluent Cart does not, and says so rather than inventing somewhere to put them.
 * **Brands** — product brands attached to existing products, optionally nested as sub-brands. Needs a platform that has brands: WooCommerce, EasyCommerce and Fluent Cart do.
 * **Cart Sessions** — abandoned and active cart sessions.
 * **Labels** — labels (tags) attached to existing orders and customers.
@@ -99,7 +100,7 @@ The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable t
 == Frequently Asked Questions ==
 
 = Which e-commerce platforms are supported? =
-Fluent Cart and WooCommerce today. Fluent Cart covers all 20 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. WooCommerce covers 17: subscriptions need WooCommerce Subscriptions, and transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent for them and no plugin changes that. Support is provided by a platform driver rather than wired into the generators, so more can be added. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
+Fluent Cart and WooCommerce today. Fluent Cart covers 20 of 21 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. WooCommerce covers 18: subscriptions need WooCommerce Subscriptions, and transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent for them and no plugin changes that. Support is provided by a platform driver rather than wired into the generators, so more can be added. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
 
 = How does platform integration work? =
 Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models for Fluent Cart, the CRUD objects (WC_Product, WC_Order, WC_Customer) for WooCommerce — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data, and so it stays valid across that platform's updates.
@@ -145,7 +146,7 @@ Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back u
 
 == Screenshots ==
 
-1. Dashboard — run totals, recent activity, and all 20 generators grouped by category.
+1. Dashboard — run totals, recent activity, and all 21 generators grouped by category.
 2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
 3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
 4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.

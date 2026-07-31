@@ -5,7 +5,7 @@
 # StoreSeeder
 
 **Realistic test data for WordPress e-commerce platforms.**
-20 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
+21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
 
 [![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
@@ -28,7 +28,7 @@ target platform's own models, so it respects the same schema, relationships, val
 handling as real data — and stays compatible across that platform's updates.
 
 Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
-that, and the same twenty generators feed every driver. Fluent Cart and WooCommerce ship today.
+that, and the same twenty-one generators feed every driver. Fluent Cart and WooCommerce ship today.
 
 Built for:
 
@@ -66,8 +66,8 @@ plugin header and [`readme.txt`](readme.txt) are the source of truth for these n
 
 | Platform | Status |
 |----------|--------|
-| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — all 20 resources; licences need Fluent Cart Pro |
-| [WooCommerce](https://wordpress.org/plugins/woocommerce/) | Shipped — 17 of 20 resources; subscriptions need WooCommerce Subscriptions. Transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent |
+| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — 20 of 21 resources; licences need Fluent Cart Pro, and it has no product tags |
+| [WooCommerce](https://wordpress.org/plugins/woocommerce/) | Shipped — 18 of 21 resources; subscriptions need WooCommerce Subscriptions. Transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent |
 | EasyCommerce, StoreEngine | Planned |
 | Anything else | A third party can register a driver from their own plugin, with no changes here |
 
@@ -84,7 +84,7 @@ nothing.
 
 ## Generators
 
-Twenty generators, grouped by category in the admin, all platform-neutral — a generator names no
+Twenty-one generators, grouped by category in the admin, all platform-neutral — a generator names no
 platform, which is what lets one of them feed every driver and lets a fixed seed produce identical
 data on all of them. Several build on others — orders need products and customers, refunds need charge
 transactions — and each one reports clearly when a prerequisite is missing.
@@ -98,6 +98,7 @@ transactions — and each one reports clearly when a prerequisite is missing.
 | Product Variations | Advanced | Additional priced variations attached to existing products, with unique SKUs |
 | Attributes | Advanced | Attribute groups and terms, linked to real product variations |
 | Product Categories | Advanced | Categories, nested where asked, with existing products filed under them. `product_cat` on WooCommerce, `product-categories` on Fluent Cart |
+| Product Tags | Advanced | Tags applied to existing products. WooCommerce only — Fluent Cart registers no tag taxonomy and reports the resource unsupported |
 | Brands | Advanced | Product brands attached to existing products, optionally nested as sub-brands. `product_brand` on WooCommerce, `product-brands` on Fluent Cart |
 | Product Downloads | Advanced | Downloadable files for products, with download permissions on existing orders |
 | Cart Sessions | Advanced | Abandoned and completed cart sessions with real product foreign keys |
@@ -130,7 +131,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
 | Delete generated data | One action clears what StoreSeeder created — tracked in its own ledger, so your data is never matched on |
-| REST API | 20 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
+| REST API | 21 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
 | WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data\|cleanup`, dispatching through the same REST controllers |
 | Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
 | MCP integration | Optional — two AI tools per generator, one read-only and one that writes, with a Settings switch per risk class. Clients connect through [`mcp-wordpress-remote`](https://github.com/Automattic/mcp-wordpress-remote) |
@@ -143,7 +144,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | [docs/](docs/README.md) | Documentation index |
 | [Installation](docs/installation.md) | Requirements, install paths, and choosing a target platform |
 | [Usage](docs/usage.md) | Running generators, live preview, batch queue, settings, run history |
-| [Features](docs/features.md) | The 20 generators, the platform matrix, locales, and what each generator writes |
+| [Features](docs/features.md) | The 21 generators, the platform matrix, locales, and what each generator writes |
 | [Architecture](docs/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
 | [Development](docs/development.md) | Local setup, build and test commands, adding a generator, release process |
 | [External Services](docs/external-services.md) | The two outbound requests, what they send, and how to opt out |
@@ -179,7 +180,7 @@ flowchart LR
 
 The entity in the middle is the whole point: a generator produces platform-neutral data, and a
 writer is the only thing that knows what store it is going into. That is what lets the same
-twenty generators seed any supported platform, and what lets a fixed seed produce identical
+twenty-one generators seed any supported platform, and what lets a fixed seed produce identical
 data on all of them.
 
 PHP lives under the PSR-4 namespace `StoreSeeder\`:
@@ -198,7 +199,7 @@ includes/
   Platforms/Locale.php               The 75 generatable locales
   Platforms/Writer.php               Base writer — persists one resource
   Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 20 writers
-  Platforms/Drivers/Woo_Commerce/    Driver: matrix + shared Writer base + 17 writers
+  Platforms/Drivers/Woo_Commerce/    Driver: matrix + shared Writer base + 18 writers
   MCP/                               MCP server + abilities
 ```
 
