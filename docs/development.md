@@ -335,6 +335,38 @@ from `src/lib/icons.tsx`, and the parameter schema.
 **No React is needed.** Fields render from the parameter schema through
 `src/lib/fieldsFromSchema.ts`.
 
+### Optional: a parameter only your platform has
+
+`Platform_Driver::fields( $resource )` returns JSON Schema fragments keyed by parameter name, and
+your writer reads them from `$this->params`:
+
+```php
+protected function platform_fields( string $resource_type ): array {
+    if ( Resource::PRODUCT !== $resource_type ) {
+        return array();
+    }
+
+    return array(
+        'tax_status' => array(
+            'description' => __( 'WooCommerce only. Whether products are taxable.', 'storeseeder' ),
+            'type'        => 'string',
+            'enum'        => array( 'taxable', 'shipping', 'none' ),
+            'default'     => 'taxable',
+        ),
+    );
+}
+```
+
+Three rules. **Name the platform in the description** — the endpoint accepts every driver's fields,
+so the reader needs to know whose is whose. **Validate in the writer too**, because a writer can be
+driven from WP-CLI, an MCP tool or a test, none of which pass through the REST schema. And **never
+declare a field the writer does not read**: that is exactly the `include_images` bug this seam was
+built to stop repeating.
+
+If your platform stores a resource but not all of a canonical entity's fields, say so with
+`Capability::supported_except( array( 'with_account' ) )` rather than dropping them in the writer.
+The admin prints the list, and the REST response reports it.
+
 ### Make it deletable
 
 A writer inherits `delete( $id )` from `Platforms\Writer`, and the inherited version refuses —
