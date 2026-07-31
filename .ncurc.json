@@ -1,11 +1,17 @@
 {
-  "dep": [
-    "patch",
-    "minor"
-  ],
-  "filter": [
-    "@wordpress/*",
+  "upgrade": true,
+  "peer": true,
+  "concurrency": 40,
+  "packageManager": "yarn",
+  "reject": [
     "react",
-    "react-dom"
+    "react-dom",
+    "@types/react",
+    "@types/react-dom",
+    "eslint",
+    "@babel/core",
+    "stylelint",
+    "stylelint-scss",
+    "typescript"
   ]
 }

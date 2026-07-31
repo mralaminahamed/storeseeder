@@ -138,6 +138,11 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
   `Platform_Driver.php`), a PSR-4/WPCS hybrid permitted by two sniff exclusions in
   `phpcs.xml`. Do not "fix" them to `class-*.php`.
 - **TypeScript indents with 2 spaces.**
+- **`tsconfig.json` targets ES2020 with `moduleResolution: "bundler"`.** TypeScript 6
+  deprecated `target: es5`, `moduleResolution: node` and `baseUrl`, and the old `lib: es6` had
+  been hiding that the code uses `Object.entries`, `Array.includes` and `flatMap` — Babel
+  transpiles without consulting those types, so only `tsc` ever knew. A side-effect CSS import
+  needs `src/types/css.d.ts`; `bundler` resolution no longer allows an untyped one.
 - **PHP floor is 7.4.** No union return types, `match`, enums, constructor promotion, or
   readonly. Document `array|WP_Error` in a docblock and omit the return type, as the existing
   abstracts do.
