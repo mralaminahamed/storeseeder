@@ -54,7 +54,7 @@ final class Product_Variation extends Writer {
 		// attached to no product, invisible everywhere. Selecting a fct_product_details
 		// row guarantees both a wp_posts product and the detail row whose price range
 		// has to be kept in sync.
-		$detail = ProductDetailModel::query()->inRandomOrder()->first();
+		$detail = $this->parent_detail();
 
 		if ( ! $detail ) {
 			return new WP_Error(
@@ -63,9 +63,14 @@ final class Product_Variation extends Writer {
 			);
 		}
 
-		$post_id      = (int) $detail->post_id;
-		$stock        = (int) $entity['stock'];
-		$stock_status = $stock > 0 ? 'in-stock' : 'out-of-stock';
+		$post_id = (int) $detail->post_id;
+		$manage  = ! isset( $entity['manage_stock'] ) || (bool) $entity['manage_stock'];
+		$stock   = $manage ? (int) $entity['stock'] : 0;
+
+		// Unmanaged stock is in stock: Fluent Cart's columns are NOT NULL, so a variation that
+		// tracks nothing has to say so through `manage_stock` rather than by holding no quantity,
+		// and a zero with management off must not read as sold out.
+		$stock_status = ( ! $manage || $stock > 0 ) ? 'in-stock' : 'out-of-stock';
 
 		$variation_data = array(
 			'post_id'          => $post_id,
@@ -73,11 +78,17 @@ final class Product_Variation extends Writer {
 			// existing one hides the new row behind it in the admin list.
 			'serial_index'     => $this->next_serial_index( $post_id ),
 			'variation_title'  => $entity['title'],
-			'sku'              => $this->unique_sku( (string) $entity['sku'] ),
+			// Null asks for no SKU, and here it has to stay null rather than becoming an empty
+			// string: `fct_product_variations` has a unique index on `sku`, so a second row with
+			// '' collides — "Duplicate entry '' for key sku_unique" — while MySQL allows any
+			// number of NULLs under a unique index.
+			'sku'              => null === ( $entity['sku'] ?? null ) ? null : $this->unique_sku( (string) $entity['sku'] ),
 			// item_price is integer cents, despite the column being a double —
-			// PricingTableRenderer reads it back through Helper::toDecimal().
-			'item_price'       => (int) $entity['price'],
-			'manage_stock'     => 1,
+			// PricingTableRenderer reads it back through Helper::toDecimal(). Priced from the
+			// parent where the parent has a price, since `price_variation_range` asks for a
+			// percentage of it and only this side knows what it is.
+			'item_price'       => $this->variation_price( $detail, $entity ),
+			'manage_stock'     => $manage ? 1 : 0,
 			'stock_status'     => $stock_status,
 			'total_stock'      => $stock,
 			'available'        => $stock,
@@ -91,6 +102,10 @@ final class Product_Variation extends Writer {
 				'payment_type' => 'onetime',
 				'tax_class'    => 'standard',
 				'tax_exempt'   => 'no',
+				// The axes this variation is identified by. Fluent Cart has no attribute model of
+				// its own — the title is the option — so they are kept here, where its own
+				// variation payloads keep everything else that has no column.
+				'attributes'   => array_filter( (array) ( $entity['attributes'] ?? array() ), 'is_string' ),
 			),
 		);
 
@@ -223,5 +238,67 @@ final class Product_Variation extends Writer {
 	 */
 	public function delete( $id ) {
 		return $this->delete_model( ProductVariationModel::class, $id );
+	}
+
+	/**
+	 * What this variation costs, in integer cents.
+	 *
+	 * `price_variation_range` asks for a percentage of the parent's price, which only the platform
+	 * knows. A Fluent Cart product has no price of its own — its price *is* its variations — so the
+	 * base is the cheapest one already on the product, read through ProductDetail's `min_price`
+	 * accessor, which is `min('item_price')` in cents. A product with no variations yet leaves this
+	 * variation on the generated fallback: a percentage of nothing is nothing, and a free variation
+	 * is not what was asked for.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param ProductDetailModel   $detail The parent product's detail row.
+	 * @param array<string, mixed> $entity Canonical variation entity.
+	 *
+	 * @return int
+	 */
+	private function variation_price( ProductDetailModel $detail, array $entity ): int {
+		$base = (int) ( $detail->min_price ?? 0 );
+
+		if ( $base <= 0 ) {
+			return (int) $entity['price'];
+		}
+
+		$delta = (float) ( $entity['price_delta_percent'] ?? 0 );
+
+		// Never free: Fluent Cart treats a zero-priced variation as one, and a catalogue of them is
+		// a broken fixture rather than a cheap one.
+		return max( 1, (int) round( $base * ( 1 + $delta / 100 ) ) );
+	}
+
+	/**
+	 * The product this variation attaches to.
+	 *
+	 * A requested one wins, so a run can build out a single product's option matrix rather than
+	 * scattering variations across the catalogue. Excluded ids are skipped.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return ProductDetailModel|null
+	 */
+	private function parent_detail(): ?ProductDetailModel {
+		$requested = (int) ( $this->params['product_id'] ?? 0 );
+
+		if ( $requested > 0 ) {
+			$detail = ProductDetailModel::query()->where( 'post_id', $requested )->first();
+
+			return $detail instanceof ProductDetailModel ? $detail : null;
+		}
+
+		$query    = ProductDetailModel::query();
+		$excluded = array_map( 'intval', (array) ( $this->params['exclude_product_ids'] ?? array() ) );
+
+		if ( array() !== $excluded ) {
+			$query->whereNotIn( 'post_id', $excluded );
+		}
+
+		$detail = $query->inRandomOrder()->first();
+
+		return $detail instanceof ProductDetailModel ? $detail : null;
 	}
 }
