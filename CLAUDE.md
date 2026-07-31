@@ -53,10 +53,14 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 640 PHP tests / 7610 assertions, and 215 Jest tests
-(`yarn test:unit`).** For any refactor claiming no behaviour
-change, that number must come back *identical*, not merely green. A changed count means a
-reference was missed.
+**Current baselines: 640 PHP tests and 215 Jest tests (`yarn test:unit`).** For any refactor
+claiming no behaviour change, the *test* count must come back identical, not merely green — a changed
+count means a reference was missed.
+
+The assertion count is deliberately not a baseline. Several generator tests assert once per generated
+item, and how many items an entity carries is drawn at random, so the total moves between runs on
+unchanged code: three consecutive runs of `tests/php/src/Generators` gave 5126, 5153 and 5165. Quoting
+an assertion figure invites chasing a difference that means nothing.
 
 The PHP figure is the sum of per-directory runs — `vendor/bin/phpunit tests/php/src/<dir>` for
 each of `Generators`, `Rest`, `Platform`, `MCP`, `CLI`, `Generation`, `Controllers`, plus the
