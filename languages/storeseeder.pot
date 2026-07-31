@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T22:49:05+00:00\n"
+"POT-Creation-Date: 2026-07-31T23:01:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -600,7 +600,7 @@ msgstr ""
 msgid "Tax Classes"
 msgstr ""
 
-#: includes/Generation/Generators/Transaction.php:42
+#: includes/Generation/Generators/Transaction.php:43
 #: build/admin-app.js:4
 msgid "Transactions"
 msgstr ""
@@ -1110,31 +1110,48 @@ msgstr ""
 msgid "Array of generated tax class objects with id, name, active status, rates array, and covered regions."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:30
+#: includes/MCP/Abilities/Generate_Transactions.php:31
 msgid "Generate Transactions"
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:37
+#: includes/MCP/Abilities/Generate_Transactions.php:38
 msgid "Generate realistic payment transaction records linked to existing orders. Creates transactions with gateway-specific IDs, amounts, statuses, and currency assignments. Requires orders to exist."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:47
-msgid "Filter orders by customer type. Allowed: all, specific, existing_customers_only, new_customers_only. Default: all."
+#: includes/MCP/Abilities/Generate_Transactions.php:48
+msgid "Transaction types to draw from. Allowed: charge, refund, dispute — the three every gateway models. Default: [\"charge\",\"refund\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:53
-msgid "Only create transactions for orders belonging to this customer ID. Requires customer_type=\"specific\"."
+#: includes/MCP/Abilities/Generate_Transactions.php:57
+msgid "Statuses to draw charges from. Allowed: pending, authorized, completed, failed. A refund is always refunded and a dispute always disputed, so those two are set by the type. Default: [\"completed\",\"pending\",\"failed\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:58
-msgid "Transaction types to generate. Allowed: payment, refund, adjustment, fee, commission. Default: [\"payment\",\"refund\"]."
+#: includes/MCP/Abilities/Generate_Transactions.php:66
+msgid "Payment methods to distribute across transactions. Default: [\"stripe\",\"paypal\",\"bank_transfer\",\"cod\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:64
-msgid "Payment gateways to use. Allowed: stripe, paypal, square, authorize_net, braintree, razorpay, mollie. Default: [\"stripe\",\"paypal\",\"square\"]."
+#: includes/MCP/Abilities/Generate_Transactions.php:71
+msgid "Transaction amount range in major units. Default: 10 to 1000."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Transactions.php:77
+#: includes/MCP/Abilities/Generate_Transactions.php:79
+msgid "Share of transactions that are refunds, where refund is one of the types. Default: 5."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:86
+msgid "Include gateway detail — payer email, card brand and last four. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:91
+#: includes/Rest/Controllers/Transaction.php:155
+msgid "Only draw parent orders belonging to this customer."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:96
+msgid "Only draw parent orders in these statuses. Omit for any."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Transactions.php:111
 msgid "Array of generated transaction objects with id, order_id, transaction_id, payment_gateway, amount, currency, status, and type."
 msgstr ""
 
@@ -1205,7 +1222,7 @@ msgid "Fluent Cart"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Platform.php:137
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:201
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:206
 msgid "Fluent Cart Pro"
 msgstr ""
 
@@ -1213,7 +1230,7 @@ msgstr ""
 msgid "Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:229
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:234
 msgid "Fluent Cart only. Whether generated variations are bought once or on a subscription."
 msgstr ""
 
@@ -1239,7 +1256,7 @@ msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:63
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:47
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:76
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:80
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:72
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:48
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:47
@@ -1313,19 +1330,19 @@ msgstr ""
 msgid "Failed to create activity log entry."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:80
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:84
 msgid "Fluent Cart Order model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:91
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:95
 msgid "No published products with variations were found. Generate products before generating orders."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:106
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:110
 msgid "No customers were found. Generate customers before generating orders."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:164
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:168
 msgid "Failed to create order using Fluent Cart model."
 msgstr ""
 
@@ -1455,15 +1472,15 @@ msgstr ""
 msgid "Failed to create tax class using Fluent Cart model."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:49
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:70
 msgid "Fluent Cart OrderTransaction model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:62
-msgid "No orders were found. Generate orders before generating transactions."
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:83
+msgid "No orders were found matching the request. Generate orders before generating transactions."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:100
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:123
 msgid "Failed to create transaction."
 msgstr ""
 
@@ -2273,47 +2290,55 @@ msgstr ""
 msgid "Generated tax classes with location-based rates."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:58
+#: includes/Rest/Controllers/Transaction.php:60
 msgid "Transaction"
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:96
+#: includes/Rest/Controllers/Transaction.php:98
 msgid "Payment methods to generate transactions for."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:106
-msgid "Transaction statuses to generate."
+#: includes/Rest/Controllers/Transaction.php:114
+msgid "Statuses to draw charges from. Refunds and disputes carry their own status."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:116
+#: includes/Rest/Controllers/Transaction.php:124
 msgid "Transaction amount range."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:120
+#: includes/Rest/Controllers/Transaction.php:128
 msgid "Minimum transaction amount."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:126
+#: includes/Rest/Controllers/Transaction.php:134
 msgid "Maximum transaction amount."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:134
-msgid "Include refund transactions."
+#: includes/Rest/Controllers/Transaction.php:145
+msgid "Transaction types to draw from."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:139
+#: includes/Rest/Controllers/Transaction.php:160
+msgid "Only draw parent orders in these statuses."
+msgstr ""
+
+#: includes/Rest/Controllers/Transaction.php:169
+msgid "Include refund transactions. The older form of leaving `refund` out of transaction_types; both work."
+msgstr ""
+
+#: includes/Rest/Controllers/Transaction.php:174
 msgid "Percentage of transactions that should be refunds."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:146
+#: includes/Rest/Controllers/Transaction.php:181
 msgid "Include payment gateway-specific metadata."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:151
+#: includes/Rest/Controllers/Transaction.php:186
 msgid "Associate transactions with existing orders."
 msgstr ""
 
-#: includes/Rest/Controllers/Transaction.php:168
+#: includes/Rest/Controllers/Transaction.php:203
 msgid "Generated transactions with payment details and metadata."
 msgstr ""
 
@@ -2684,23 +2709,15 @@ msgid "Payment gateway developers, accountants, financial analysts"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Type of customers for transactions"
+msgid "Transaction types to draw from"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Specific customer ID (when customer_type is 'specific')"
+msgid "Statuses to draw charges from (a refund is always refunded)"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Filter orders by status"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Types of transactions to generate"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Payment gateways to use for transactions"
+msgid "Payment methods to use for transactions"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2708,7 +2725,19 @@ msgid "Transaction amount range"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Transaction status distribution"
+msgid "Share of transactions that are refunds (0–100)"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Include payer email, card brand and last four"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Only draw parent orders belonging to this customer"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Only draw parent orders in these statuses"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2721,6 +2750,10 @@ msgstr ""
 
 #: build/admin-app.js:4
 msgid "Type of customers for cart sessions"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Specific customer ID (when customer_type is 'specific')"
 msgstr ""
 
 #: build/admin-app.js:4
