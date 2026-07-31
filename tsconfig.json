@@ -30,7 +30,9 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  // jest.setup.ts is named explicitly: it sits at the root rather than under src/, and
+  // this run is the only type-check it gets.
+  "include": ["src", "jest.setup.ts"],
   // Tests live beside their sources under src/, so they are type-checked by the same
   // `npx tsc --noEmit` run as the code. That is deliberate: it is the only type-check
   // the tests get, since Jest transpiles through Babel and does not type-check.

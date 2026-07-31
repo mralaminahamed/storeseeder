@@ -43,7 +43,9 @@ module.exports = {
 		'^@/(.*)$': '<rootDir>/src/$1',
 	},
 
-	setupFilesAfterEnv: [ '<rootDir>/src/test/setup.ts' ],
+	// At the root beside this config, not under src/: it is test harness, not a module the
+	// admin app can import, and nothing in src/ should be able to reach for it by accident.
+	setupFilesAfterEnv: [ '<rootDir>/jest.setup.ts' ],
 
 	clearMocks: true,
 	restoreMocks: true,
@@ -51,7 +53,6 @@ module.exports = {
 	collectCoverageFrom: [
 		'src/**/*.{ts,tsx}',
 		'!src/**/*.test.{ts,tsx}',
-		'!src/test/**',
 		'!src/types/**',
 	],
 };

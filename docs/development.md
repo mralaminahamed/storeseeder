@@ -82,7 +82,8 @@ nothing else, so no module under test ever pulls one in. If a future test does i
 stylesheet, Jest fails loudly with "Cannot find module" and the fix is a `moduleNameMapper`
 entry pointing `\\.(css|scss)$` at a stub that exports an empty object.
 
-`src/test/setup.ts` also calls RTL's `cleanup()` after each test — React 18 leaves mounted
+`jest.setup.ts` — at the repository root, beside the config that loads it, since it is
+harness rather than a module the admin app could import — also calls RTL's `cleanup()` after each test — React 18 leaves mounted
 trees in place otherwise, so a query in one test can match an element the previous test
 rendered. It runs before every file and resets the two browser globals the modules
 read — `window.storeseederApi`, which the server inlines in production, and `localStorage` —

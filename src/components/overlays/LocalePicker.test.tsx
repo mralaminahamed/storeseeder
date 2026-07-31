@@ -10,7 +10,7 @@ import { LocalePicker } from "./LocalePicker";
  * **label**, so the chosen value could never be sent to the REST API as-is. Every assertion
  * about `setLocale` here is aimed at that.
  *
- * The five locales come from src/test/setup.ts, which mirrors what the server inlines.
+ * The five locales come from jest.setup.ts, which mirrors what the server inlines.
  */
 describe("LocalePicker", () => {
   const open = (locale = "en_US") => {
