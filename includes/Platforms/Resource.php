@@ -28,6 +28,7 @@ final class Resource {
 	const COUPON            = 'coupon';
 	const CUSTOMER          = 'customer';
 	const LABEL             = 'label';
+	const LICENSE           = 'license';
 	const LOG               = 'log';
 	const ORDER             = 'order';
 	const ORDER_TAX_RATE    = 'order_tax_rate';
@@ -66,6 +67,7 @@ final class Resource {
 			self::CART_SESSION,
 			self::LABEL,
 			self::SUBSCRIPTION,
+			self::LICENSE,
 			self::LOG,
 		);
 	}

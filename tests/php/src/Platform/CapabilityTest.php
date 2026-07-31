@@ -65,14 +65,59 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 		$this->assertSame( $capability, Capability::from( $capability ) );
 	}
 
-	public function test_fluent_cart_supports_every_resource(): void {
+	public function test_fluent_cart_supports_every_core_resource(): void {
 		$platform = Registry::instance()->get( 'fluent-cart' );
 		$supports = $platform->supports();
 
 		foreach ( Resource::all() as $resource_type ) {
 			$this->assertArrayHasKey( $resource_type, $supports );
+
+			// Licences are the one conditional resource: Pro owns their tables.
+			if ( Resource::LICENSE === $resource_type ) {
+				continue;
+			}
+
 			$this->assertTrue( $supports[ $resource_type ]->is_supported(), $resource_type );
 		}
+	}
+
+	/**
+	 * Licences depend on Fluent Cart Pro, and the answer has to name it.
+	 *
+	 * A bare "unsupported" would leave the user guessing at what to install, which is the
+	 * whole reason a capability carries a reason and an extension slug rather than a bool.
+	 * Which branch runs depends on whether Pro is present in the test environment, so both
+	 * are asserted rather than assuming one.
+	 */
+	public function test_licences_depend_on_fluent_cart_pro(): void {
+		$platform = Registry::instance()->get( 'fluent-cart' );
+		$this->assertNotNull( $platform );
+
+		$licence = $platform->supports()[ Resource::LICENSE ];
+
+		if ( $platform->is_pro_active() ) {
+			$this->assertTrue( $licence->is_supported() );
+
+			return;
+		}
+
+		$this->assertFalse( $licence->is_supported() );
+		$this->assertSame( 'fluent-cart-pro', $licence->get_extension() );
+		$this->assertStringContainsString( 'Fluent Cart Pro', $licence->get_reason() );
+	}
+
+	/**
+	 * The driver reports what is installed beside it, which is a different question from
+	 * what it can generate — "Pro 1.5.3" is a fact, "licences unavailable" is a consequence.
+	 */
+	public function test_fluent_cart_reports_pro_as_an_extension(): void {
+		$platform   = Registry::instance()->get( 'fluent-cart' );
+		$extensions = $platform->extensions();
+
+		$this->assertCount( 1, $extensions );
+		$this->assertSame( 'fluent-cart-pro', $extensions[0]['slug'] );
+		$this->assertSame( 'Fluent Cart Pro', $extensions[0]['label'] );
+		$this->assertSame( $platform->is_pro_active(), $extensions[0]['active'] );
 	}
 
 	/**
@@ -147,7 +192,8 @@ class CapabilityTest extends StoreSeederUnitTestCase {
 	}
 
 	public function test_resource_names_are_stable(): void {
-		$this->assertCount( 17, Resource::all() );
+		$this->assertCount( 18, Resource::all() );
+		$this->assertTrue( Resource::exists( 'license' ) );
 		$this->assertTrue( Resource::exists( 'product' ) );
 		$this->assertFalse( Resource::exists( 'products' ) );
 	}

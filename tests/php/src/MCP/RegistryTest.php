@@ -36,8 +36,8 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		parent::tearDown();
 	}
 
-	public function test_all_seventeen_abilities_are_registered(): void {
-		$this->assertCount( 17, Registry::instance()->all() );
+	public function test_all_eighteen_abilities_are_registered(): void {
+		$this->assertCount( 18, Registry::instance()->all() );
 	}
 
 	public function test_abilities_are_keyed_by_ability_id(): void {
@@ -129,7 +129,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		$all = Registry::instance()->all();
 
 		$this->assertArrayHasKey( 'storeseeder/generate-stub-things', $all );
-		$this->assertCount( 18, $all );
+		$this->assertCount( 19, $all );
 	}
 
 	public function test_filter_can_remove_an_ability(): void {
@@ -148,7 +148,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		);
 
 		$this->assertNotContains( 'storeseeder/generate-subscriptions', Registry::instance()->ids() );
-		$this->assertCount( 16, Registry::instance()->all() );
+		$this->assertCount( 17, Registry::instance()->all() );
 	}
 
 	/**
@@ -205,6 +205,6 @@ class RegistryTest extends StoreSeederUnitTestCase {
 			}
 		);
 
-		$this->assertCount( 17, Registry::instance()->all() );
+		$this->assertCount( 18, Registry::instance()->all() );
 	}
 }

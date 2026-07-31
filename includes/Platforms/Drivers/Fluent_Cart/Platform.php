@@ -8,6 +8,7 @@
 
 namespace StoreSeeder\Platforms\Drivers\Fluent_Cart;
 
+use StoreSeeder\Platforms\Capability;
 use StoreSeeder\Platforms\Platform_Driver;
 use StoreSeeder\Platforms\Resource;
 
@@ -29,6 +30,25 @@ final class Platform extends Platform_Driver {
 	 * @var string
 	 */
 	const BASENAME = 'fluent-cart/fluent-cart.php';
+
+	/**
+	 * Fluent Cart Pro's basename, for the same check.
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const PRO_BASENAME = 'fluent-cart-pro/fluent-cart-pro.php';
+
+	/**
+	 * Pro's WordPress.org-style slug, as reported to the admin.
+	 *
+	 * Not a directory listing: it is what the UI names when it has to say "this needs
+	 * Fluent Cart Pro".
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const PRO_SLUG = 'fluent-cart-pro';
 
 	/**
 	 * Machine identifier.
@@ -79,22 +99,77 @@ final class Platform extends Platform_Driver {
 	}
 
 	/**
-	 * Capability matrix.
-	 *
-	 * Everything is supported. Subscriptions are worth a note: the table ships in
-	 * Fluent Cart core, so records generate without Pro — it is *billing* them that
-	 * needs Pro, which is not something a seeder does. So this is a genuine yes, not a
-	 * conditional one.
+	 * Whether Fluent Cart Pro is present.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @return array<string, bool>
+	 * @return bool
+	 */
+	public function is_pro_active(): bool {
+		return defined( 'FLUENTCART_PRO_PLUGIN_VERSION' )
+			|| $this->is_plugin_active( self::PRO_BASENAME );
+	}
+
+	/**
+	 * Pro's version, or null when it is not installed.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string|null
+	 */
+	public function pro_version(): ?string {
+		return defined( 'FLUENTCART_PRO_PLUGIN_VERSION' )
+			? (string) FLUENTCART_PRO_PLUGIN_VERSION
+			: null;
+	}
+
+	/**
+	 * What this site has installed alongside Fluent Cart.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, array{slug: string, label: string, active: bool, version: string|null}>
+	 */
+	public function extensions(): array {
+		return array(
+			array(
+				'slug'    => self::PRO_SLUG,
+				'label'   => __( 'Fluent Cart Pro', 'storeseeder' ),
+				'active'  => $this->is_pro_active(),
+				'version' => $this->pro_version(),
+			),
+		);
+	}
+
+	/**
+	 * Capability matrix.
+	 *
+	 * Every core resource is supported. Subscriptions are worth a note: the table ships
+	 * in Fluent Cart core, so records generate without Pro — it is *billing* them that
+	 * needs Pro, and billing is not something a seeder does. So that one is a genuine
+	 * yes, not a conditional one.
+	 *
+	 * Licences are the conditional case. The `fct_licenses` table is created by Pro's own
+	 * migrator, so without Pro there is nowhere to write them — and reporting that as a
+	 * flat "unsupported" would leave the user guessing. Naming the plugin lets the admin
+	 * say "install Fluent Cart Pro" and the REST API answer with the same reason.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, Capability|bool>
 	 */
 	protected function capabilities(): array {
 		$matrix = array();
 
 		foreach ( Resource::all() as $resource_type ) {
 			$matrix[ $resource_type ] = true;
+		}
+
+		if ( ! $this->is_pro_active() ) {
+			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
+				self::PRO_SLUG,
+				__( 'Fluent Cart Pro', 'storeseeder' )
+			);
 		}
 
 		return $matrix;
@@ -114,6 +189,7 @@ final class Platform extends Platform_Driver {
 			Resource::COUPON            => Writers\Coupon::class,
 			Resource::CUSTOMER          => Writers\Customer::class,
 			Resource::LABEL             => Writers\Label::class,
+			Resource::LICENSE           => Writers\License::class,
 			Resource::LOG               => Writers\Log::class,
 			Resource::ORDER             => Writers\Order::class,
 			Resource::ORDER_TAX_RATE    => Writers\Order_Tax_Rate::class,

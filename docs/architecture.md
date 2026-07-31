@@ -18,7 +18,7 @@ storeseeder/
 │   ├── Rest/                    # REST surface
 │   │   ├── Controller.php       #   abstract base: params, validation, platform resolution
 │   │   ├── Registry.php         #   owns storeseeder_rest_controllers
-│   │   └── Controllers/         #   17 controllers, one per resource
+│   │   └── Controllers/         #   18 controllers, one per resource
 │   ├── CLI/                     # WP-CLI surface (only registers when WP_CLI is present)
 │   │   ├── Command.php          #   abstract base: resource resolution, payload building
 │   │   ├── Registry.php         #   owns storeseeder_cli_commands
@@ -35,13 +35,13 @@ storeseeder/
 │       ├── Registry.php            # holds drivers; owns storeseeder_platforms
 │       ├── Resolver.php            # auto | explicit → one target platform
 │       ├── Capability.php          # can this platform do this, and why not
-│       ├── Resource.php            # the 17 canonical resource names
+│       ├── Resource.php            # the 18 canonical resource names
 │       ├── Status.php              # canonical status vocabulary
 │       ├── Locale.php              # the 75 generatable locales; owns storeseeder_locales
 │       └── Drivers/
 │           └── Fluent_Cart/
 │               ├── Platform.php    # capability matrix + writer map
-│               └── Writers/        # 17 writers, one per resource
+│               └── Writers/        # 18 writers, one per resource
 ├── src/                         # React admin (TypeScript)
 │   ├── index.tsx                # entry point, mounts into #storeseeder-root
 │   ├── components/              # App.tsx, Pages/, shell/, generator/, home/,
@@ -219,6 +219,21 @@ it and re-rolls.
 What a writer must never do is invent a name, address, date or quantity. Those arrive on the
 entity, already localised by FakerPHP.
 
+### Extensions are reported, not inferred
+
+`Platform_Driver::extensions()` lists what a site has installed beside the platform —
+`[{ slug, label, active, version }]`. It answers a different question from the capability
+matrix: "Fluent Cart 1.6.0, Pro 1.5.3" is a fact, "licences unavailable" is a consequence of
+it, and a support conversation starts with the first. Empty by default, so a driver with no
+add-ons says nothing rather than inventing a shape.
+
+It lives on `Platform_Driver` rather than `Platform_Interface`, deliberately: adding a method
+to the interface would break every third-party driver that implements it directly, which is a
+documented extension point. Callers use it through `instanceof Platform_Driver`.
+
+Fluent Cart reports Fluent Cart Pro, and gates the licence resource on it. WooCommerce will
+report WooCommerce Subscriptions the same way.
+
 ### Capabilities are computed, never cached
 
 `supports()` runs per request. Support is conditional: WooCommerce core has no subscriptions
@@ -347,6 +362,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_capability` | filter | The capability required to use StoreSeeder. Governs the admin menu, every REST route, every MCP ability and the AJAX handlers together, so access cannot be widened for one and not the others. An unusable return falls back to `manage_options` |
 | `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
 | `storeseeder_cli_commands` | filter | Add or remove a `wp storeseeder` subcommand |
+| `storeseeder_license_generation_result` | filter | Inspect or reshape a generated licence, as every writer offers for its own resource |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
 | `storeseeder_canonical_entity` | filter | Mutate every neutral entity, whatever its resource. Runs before the per-resource filter, which therefore wins |
@@ -361,7 +377,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_before_generate_single_item_{type}` | action | |
 | `storeseeder_after_generate_single_item_{type}` | action | |
 | `storeseeder_after_batch_generate_{type}` | action | Cache clearing, index updates |
-| `storeseeder_rest_params` | filter | Alter the parameter schema of all seventeen endpoints; receives the REST base as its second argument. Runs before the per-endpoint filter |
+| `storeseeder_rest_params` | filter | Alter the parameter schema of every generation endpoint; receives the REST base as its second argument. Runs before the per-endpoint filter |
 | `storeseeder_rest_params_{base}` | filter | Alter one endpoint's parameter schema |
 | `storeseeder_mcp_ability_definition` | filter | Amend one ability's definition — label, description, input schema, callbacks — without replacing the class |
 | `storeseeder_admin_payload` | filter | Add to the data inlined as `window.storeseederApi`, so a driver's own configuration is there on first paint |

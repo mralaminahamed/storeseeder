@@ -77,7 +77,7 @@ class ParamsFilterTest extends StoreSeederUnitTestCase {
 			$this->assertArrayHasKey( 'dry_run', $handlers[0]['args'], $route );
 		}
 
-		$this->assertSame( 17, $seen );
+		$this->assertSame( 18, $seen );
 	}
 
 	public function test_general_filter_receives_the_rest_base(): void {
@@ -97,7 +97,7 @@ class ParamsFilterTest extends StoreSeederUnitTestCase {
 
 		$this->assertContains( 'products', $bases );
 		$this->assertContains( 'cart-sessions', $bases );
-		$this->assertCount( 17, array_unique( $bases ) );
+		$this->assertCount( 18, array_unique( $bases ) );
 	}
 
 	/**

@@ -5,7 +5,7 @@
 # StoreSeeder
 
 **Realistic test data for WordPress e-commerce platforms.**
-17 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
+18 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
 
 [![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
@@ -28,7 +28,7 @@ target platform's own models, so it respects the same schema, relationships, val
 handling as real data — and stays compatible across that platform's updates.
 
 Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
-that, and the same seventeen generators feed every driver. Fluent Cart is the driver shipped today.
+that, and the same eighteen generators feed every driver. Fluent Cart is the driver shipped today.
 
 Built for:
 
@@ -66,7 +66,7 @@ plugin header and [`readme.txt`](readme.txt) are the source of truth for these n
 
 | Platform | Status |
 |----------|--------|
-| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — all 17 resources |
+| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — all 18 resources; licences need Fluent Cart Pro |
 | EasyCommerce, WooCommerce, StoreEngine | Planned |
 | Anything else | A third party can register a driver from their own plugin, with no changes here |
 
@@ -101,6 +101,7 @@ transactions — and each one reports clearly when a prerequisite is missing.
 | Transactions | Advanced | Payment transactions tied to real orders, with gateways and statuses |
 | Refunds | Advanced | Full and partial refunds against existing charge transactions |
 | Subscriptions | Advanced | Subscription records against existing orders (on Fluent Cart, active billing requires Pro) |
+| Licenses | Advanced | Software licences against existing orders — keys, site limits, activation counts and expiry. Requires Fluent Cart Pro, which owns the licensing tables |
 | Labels | Advanced | Labels (tags) attached to existing orders and customers |
 | Tax Classes | Advanced | Tax classes with the geographic rate rows the platform applies to orders |
 | Order Tax Lines | Advanced | Per-order tax lines linking orders to tax rates with collected tax |
@@ -125,7 +126,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | Settings | Grouped by scope — site-wide (target platform, who may generate, sample data) and per-browser (defaults, appearance, run history), saved as you change them |
 | Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
 | Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
-| REST API | 17 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
+| REST API | 18 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
 | WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data`, dispatching through the same REST controllers |
 | Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
 | MCP integration | Optional — expose every generator as an AI tool via the WordPress Abilities API |
@@ -138,7 +139,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | [docs/](docs/README.md) | Documentation index |
 | [Installation](docs/installation.md) | Requirements, install paths, and choosing a target platform |
 | [Usage](docs/usage.md) | Running generators, live preview, batch queue, settings, run history |
-| [Features](docs/features.md) | The 17 generators, the platform matrix, locales, and what each generator writes |
+| [Features](docs/features.md) | The 18 generators, the platform matrix, locales, and what each generator writes |
 | [Architecture](docs/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
 | [Development](docs/development.md) | Local setup, build and test commands, adding a generator, release process |
 | [External Services](docs/external-services.md) | The two outbound requests, what they send, and how to opt out |
@@ -174,7 +175,7 @@ flowchart LR
 
 The entity in the middle is the whole point: a generator produces platform-neutral data, and a
 writer is the only thing that knows what store it is going into. That is what lets the same
-seventeen generators seed any supported platform, and what lets a fixed seed produce identical
+eighteen generators seed any supported platform, and what lets a fixed seed produce identical
 data on all of them.
 
 PHP lives under the PSR-4 namespace `StoreSeeder\`:
@@ -192,7 +193,7 @@ includes/
   Platforms/                         Platform layer: registry, resolver, capabilities
   Platforms/Locale.php               The 75 generatable locales
   Platforms/Writer.php               Base writer — persists one resource
-  Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 17 writers
+  Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 18 writers
   MCP/                               MCP server + abilities
 ```
 

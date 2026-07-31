@@ -8,13 +8,13 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic e-commerce test data with 17 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
+Generate realistic e-commerce test data with 18 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
 
 == Description ==
 
 StoreSeeder generates realistic test data for WordPress e-commerce platforms. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
-Where the data lands is decided by a **platform driver**, and the same seventeen generators feed every driver. **Fluent Cart is the driver included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
+Where the data lands is decided by a **platform driver**, and the same eighteen generators feed every driver. **Fluent Cart is the driver included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
 
 All data is created through the target platform's own models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with that platform's updates.
 
@@ -22,7 +22,7 @@ All data is created through the target platform's own models, so generated recor
 
 **Highlights**
 
-* **17 generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs.
+* **18 generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
 * **One driver per platform** — the generators are platform-neutral, so the same fixed seed produces identical data wherever it is written. Fluent Cart ships; the driver layer is public for the rest.
 * **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
 * **Live preview** — a read-only preview of real faker rows that refreshes as you change settings, without persisting anything.
@@ -88,7 +88,7 @@ The plugin can optionally expose every generator as an MCP tool so AI clients (e
 == Frequently Asked Questions ==
 
 = Which e-commerce platforms are supported? =
-Fluent Cart, today, for all 17 resources. Support is provided by a platform driver rather than wired into the generators, so more can be added — drivers for other platforms are planned. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
+Fluent Cart, today, for all 18 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. Support is provided by a platform driver rather than wired into the generators, so more can be added — drivers for other platforms are planned. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
 
 = How does platform integration work? =
 Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models, in Fluent Cart's case — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data.
@@ -131,7 +131,7 @@ Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back u
 
 == Screenshots ==
 
-1. Dashboard — run totals, recent activity, and all 17 generators grouped by category.
+1. Dashboard — run totals, recent activity, and all 18 generators grouped by category.
 2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
 3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
 4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.

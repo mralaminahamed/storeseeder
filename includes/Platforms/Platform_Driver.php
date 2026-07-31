@@ -97,6 +97,26 @@ abstract class Platform_Driver implements Platform_Interface {
 	}
 
 	/**
+	 * Extensions of this platform that are installed, and what they are.
+	 *
+	 * Capabilities already say *whether* a resource can be generated; this says what the
+	 * site actually has, which is a different question and the one a support conversation
+	 * starts with — "Fluent Cart 1.6.0, Pro 1.5.3" is a fact, "subscriptions unavailable"
+	 * is a consequence. Reported per platform because every platform has its own add-ons:
+	 * WooCommerce Subscriptions, StoreEngine's addons, Fluent Cart Pro.
+	 *
+	 * Empty by default, so a driver that has none says nothing rather than inventing a
+	 * shape.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, array{slug: string, label: string, active: bool, version: string|null}>
+	 */
+	public function extensions(): array {
+		return array();
+	}
+
+	/**
 	 * The writer for one resource.
 	 *
 	 * @since 1.1.0

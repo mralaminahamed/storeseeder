@@ -43,6 +43,20 @@ final class Status {
 	/**
 	 * Stock availability.
 	 */
+	/**
+	 * Licence states.
+	 *
+	 * A licence is not an order: it is issued, it may lapse, and it may be withdrawn. The
+	 * three read differently to a support person looking at a record, so they are distinct
+	 * rather than folded into the order vocabulary.
+	 *
+	 * @since 1.1.0
+	 * @var string
+	 */
+	const ACTIVE   = 'active';
+	const EXPIRED  = 'expired';
+	const DISABLED = 'disabled';
+
 	const IN_STOCK     = 'in_stock';
 	const OUT_OF_STOCK = 'out_of_stock';
 	const ON_BACKORDER = 'on_backorder';
@@ -63,6 +77,21 @@ final class Status {
 			self::CANCELLED,
 			self::FAILED,
 			self::REFUNDED,
+		);
+	}
+
+	/**
+	 * Every licence state.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public static function license_statuses(): array {
+		return array(
+			self::ACTIVE,
+			self::EXPIRED,
+			self::DISABLED,
 		);
 	}
 

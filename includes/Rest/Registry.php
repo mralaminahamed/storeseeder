@@ -106,6 +106,7 @@ final class Registry {
 			Controllers\Order_Tax_Rate::class,
 			Controllers\Product_Download::class,
 			Controllers\Subscription::class,
+			Controllers\License::class,
 		);
 	}
 

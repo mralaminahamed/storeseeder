@@ -38,6 +38,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `storeseeder_rest_params` apply to all seventeen resources and run before their specific
   counterparts. Plus `storeseeder_locales`, `storeseeder_mcp_ability_definition`,
   `storeseeder_admin_payload` and `storeseeder_sample_data_source`.
+- **Fluent Cart Pro support, and a licence generator.** The driver now detects Pro, reports it
+  as an extension of the platform — `[{ slug, label, active, version }]`, a new
+  `Platform_Driver::extensions()` seam that WooCommerce Subscriptions will use the same way —
+  and gates the new **licences** resource on it. Pro owns `fct_licenses`, so without Pro there
+  is nowhere to write one; the capability reports the plugin by name, so the admin can say
+  "install Fluent Cart Pro" and the REST API answers with the same reason instead of failing
+  once per item.
+  The generator makes licences worth testing against: unlimited and limited tiers, some at
+  their activation limit, some expired in the past, some withdrawn while still dated, and
+  activation rows for the sites a licence is live on. Eighteen generators now.
 - **WP-CLI.** `wp storeseeder generate <resource>` plus `preview`, `platforms`, `locales` and
   `sample-data`, each dispatching through the same REST controller the admin uses — so
   validation, platform resolution and the capability check are one implementation rather than
@@ -60,6 +70,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- PHPStan analyses `storeseeder.php` as well, and its `ignoreErrors` list went from 42 patterns
+  to 9. Twenty-four were WordPress functions that the WordPress stubs have covered all along,
+  and eighteen more suppressed nothing at all — each one a standing offer to swallow the first
+  future error that happened to match its wording. `reportUnmatchedIgnoredErrors` is on now, so
+  a pattern has to keep earning its place; the three that mask genuinely unreachable branches
+  are labelled as findings to revisit rather than left looking like noise.
 - The REST API, MCP schemas and admin picker all enumerate locales from one list, so what is
   offered is exactly what generates.
 - `includes/` is laid out so the directories state the class hierarchy: each abstract sits at the

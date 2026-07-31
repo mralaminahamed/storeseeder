@@ -26,8 +26,8 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		parent::tearDown();
 	}
 
-	public function test_all_seventeen_controllers_are_registered(): void {
-		$this->assertCount( 17, Registry::instance()->all() );
+	public function test_all_eighteen_controllers_are_registered(): void {
+		$this->assertCount( 18, Registry::instance()->all() );
 	}
 
 	/**
@@ -81,7 +81,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		$all = Registry::instance()->all();
 
 		$this->assertArrayHasKey( 'stub-things', $all );
-		$this->assertCount( 18, $all );
+		$this->assertCount( 19, $all );
 	}
 
 	public function test_filter_can_remove_a_controller(): void {
@@ -100,7 +100,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		);
 
 		$this->assertNull( Registry::instance()->get( 'subscriptions' ) );
-		$this->assertCount( 16, Registry::instance()->all() );
+		$this->assertCount( 17, Registry::instance()->all() );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 			}
 		);
 
-		$this->assertCount( 17, Registry::instance()->all() );
+		$this->assertCount( 18, Registry::instance()->all() );
 	}
 
 	/**

@@ -97,6 +97,7 @@ final class Registry {
 			Abilities\Generate_Order_Tax_Rates::class,
 			Abilities\Generate_Product_Downloads::class,
 			Abilities\Generate_Subscriptions::class,
+			Abilities\Generate_Licenses::class,
 		);
 	}
 

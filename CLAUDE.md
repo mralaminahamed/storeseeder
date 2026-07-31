@@ -67,18 +67,18 @@ React → REST → Controller → Generator → canonical entity → Writer → 
 ```
 includes/
   Access.php      one capability gate: menu, REST, MCP, AJAX
-  Generation/     Generator.php (abstract)   + Generators/*    17 generators
-  Rest/           Controller.php (abstract)  + Controllers/*   17 controllers
+  Generation/     Generator.php (abstract)   + Generators/*    18 generators
+  Rest/           Controller.php (abstract)  + Controllers/*   18 controllers
                   Registry.php               owns storeseeder_rest_controllers
   CLI/            Command.php (abstract)     + Commands/*       5 commands
                   Registry.php               owns storeseeder_cli_commands
   MCP/            MCP_Server.php
                   Registry.php               owns storeseeder_mcp_abilities
-                  Ability.php (abstract)     + Abilities/*     17 abilities
+                  Ability.php (abstract)     + Abilities/*     18 abilities
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php
                   Resource.php  Status.php  Locale.php
-                  Drivers/Fluent_Cart/Platform.php + Writers/*      17 writers
+                  Drivers/Fluent_Cart/Platform.php + Writers/*      18 writers
 ```
 
 Directories are named for the layer, not for what is inside them: each abstract sits at the

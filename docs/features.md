@@ -3,7 +3,7 @@
 What StoreSeeder does. Everything listed here exists in the shipped code — where a capability is
 planned rather than present, it says so.
 
-## The 17 generators
+## The 18 generators
 
 Grouped as the admin groups them. Each writes through the target platform's own models, so
 generated records carry the same validation, relationships and money handling as real ones.
@@ -28,6 +28,7 @@ generated records carry the same validation, relationships and money handling as
 | **Transactions** | Payment transactions against real orders | Orders |
 | **Refunds** | Full and partial refunds against existing successful charges | Transactions |
 | **Subscriptions** | Subscription records against existing orders | Orders, Products |
+| **Licenses** | Software licences against existing orders — keys, site limits, activation counts, expiry, and activation rows for the sites in use | Orders, Products, **Fluent Cart Pro** |
 | **Labels** | Labels (tags) attached to existing orders and customers | Orders, Customers |
 | **Tax Classes** | A tax class plus the geographic rate rows that make it applicable | — |
 | **Order Tax Lines** | Per-order tax lines linking an order to a tax rate | Orders, Tax Classes |
@@ -43,7 +44,7 @@ first rather than failing opaquely.
 StoreSeeder writes through a **platform driver**, so the same generators can seed different
 e-commerce plugins.
 
-- **Fluent Cart** — shipped, all 17 resources
+- **Fluent Cart** — shipped, all 18 resources. Licences are conditional: the tables belong to Fluent Cart Pro, so without it the resource reports that plugin by name
 - **EasyCommerce, WooCommerce, StoreEngine** — planned
 - **Anything else** — a third party can register a driver from their own plugin through the
   `storeseeder_platforms` filter, with no changes here
@@ -155,7 +156,7 @@ POST /wp-json/storeseeder/v1/download-sample/consent
 ```
 
 The REST base is not always the resource name — `cart_session` is served at `cart-sessions`,
-`tax_class` at `tax_classes`. [Usage](usage.md#rest-api) lists all seventeen with the response
+`tax_class` at `tax_classes`. [Usage](usage.md#rest-api) lists all eighteen with the response
 shape.
 
 ## Extensibility

@@ -408,7 +408,7 @@ export const generators: Generator[] = [
   {
     name: __("Shipping Plans", "storeseeder"),
     category: "Advanced",
-    order: 11,
+    order: 12,
     iconName: "truck",
     description: __(
       "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows.",
@@ -457,7 +457,7 @@ export const generators: Generator[] = [
   {
     name: __("Tax Classes", "storeseeder"),
     category: "Advanced",
-    order: 9,
+    order: 10,
     iconName: "landmark",
     description: __(
       "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance.",
@@ -699,7 +699,7 @@ export const generators: Generator[] = [
   {
     name: __("Logs", "storeseeder"),
     category: "Advanced",
-    order: 13,
+    order: 14,
     iconName: "scroll",
     description: __(
       "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails.",
@@ -726,7 +726,7 @@ export const generators: Generator[] = [
   {
     name: __("Shipping Classes", "storeseeder"),
     category: "Advanced",
-    order: 12,
+    order: 13,
     iconName: "boxes",
     description: __(
       "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag.",
@@ -740,7 +740,7 @@ export const generators: Generator[] = [
   {
     name: __("Labels", "storeseeder"),
     category: "Advanced",
-    order: 8,
+    order: 9,
     iconName: "tags",
     description: __(
       "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to.",
@@ -754,7 +754,7 @@ export const generators: Generator[] = [
   {
     name: __("Order Tax Lines", "storeseeder"),
     category: "Advanced",
-    order: 10,
+    order: 11,
     iconName: "percent",
     description: __(
       "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates.",
@@ -791,6 +791,23 @@ export const generators: Generator[] = [
     useCase: __("Developers testing recurring-billing views and reports", "storeseeder"),
     route: "subscriptions",
     resource: "subscription",
+    parameterConfig: {},
+  },
+  {
+    name: __("Licenses", "storeseeder"),
+    category: "Advanced",
+    order: 8,
+    iconName: "key",
+    description: __(
+      "Create software licences against existing orders — keys, site limits, activation counts and expiry dates, including licences already at their limit and some long expired. Requires Fluent Cart Pro, which owns the licensing tables.",
+      "storeseeder",
+    ),
+    useCase: __(
+      "Developers testing licence validation, activation limits and renewal notices",
+      "storeseeder",
+    ),
+    route: "licenses",
+    resource: "license",
     parameterConfig: {},
   },
 ];
