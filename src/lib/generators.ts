@@ -45,39 +45,24 @@ export const generators: Generator[] = [
           max: { type: "number", minimum: 1, default: 500 },
         },
       },
+      track_cost: {
+        description: __("Record what the shop paid, for margin reporting", "storeseeder"),
+        type: "boolean",
+        default: false,
+      },
       categories: {
-        description: __("Product categories configuration", "storeseeder"),
+        description: __("How generated products are filed", "storeseeder"),
         type: "object",
         properties: {
-          create_new: {
-            description: __("Create new categories if needed", "storeseeder"),
-            type: "boolean",
-            default: true,
-          },
           max_per_product: {
-            description: __("Maximum categories per product", "storeseeder"),
+            description: __(
+              "Maximum existing categories to file each product under",
+              "storeseeder",
+            ),
             type: "integer",
-            minimum: 1,
+            minimum: 0,
             maximum: 10,
             default: 3,
-          },
-        },
-      },
-      attributes: {
-        description: __("Product attributes configuration", "storeseeder"),
-        type: "object",
-        properties: {
-          include_attributes: {
-            description: __("Include product attributes", "storeseeder"),
-            type: "boolean",
-            default: true,
-          },
-          variation_count: {
-            description: __("Number of variations for variable products", "storeseeder"),
-            type: "integer",
-            minimum: 1,
-            maximum: 20,
-            default: 5,
           },
         },
       },
@@ -109,11 +94,6 @@ export const generators: Generator[] = [
             type: "string",
             enum: ["short", "medium", "long"],
             default: "medium",
-          },
-          include_images: {
-            description: __("Include placeholder images", "storeseeder"),
-            type: "boolean",
-            default: true,
           },
         },
       },

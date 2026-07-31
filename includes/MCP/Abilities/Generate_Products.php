@@ -58,17 +58,10 @@ class Generate_Products extends Ability {
 				'description' => __( 'Maximum product price (USD). Default: 500.', 'storeseeder' ),
 				'default'     => 500,
 			),
-			'include_attributes' => array(
+			'track_cost'         => array(
 				'type'        => 'boolean',
-				'description' => __( 'Generate product attributes (size, colour, material). Default: true.', 'storeseeder' ),
-				'default'     => true,
-			),
-			'variation_count'    => array(
-				'type'        => 'integer',
-				'description' => __( 'Number of variations per variable product (1–20). Default: 5.', 'storeseeder' ),
-				'minimum'     => 1,
-				'maximum'     => 20,
-				'default'     => 5,
+				'description' => __( 'Record what the shop paid for each product, for margin reporting. Default: false.', 'storeseeder' ),
+				'default'     => false,
 			),
 			'manage_stock'       => array(
 				'type'        => 'boolean',
@@ -132,12 +125,6 @@ class Generate_Products extends Ability {
 			);
 		}
 
-		// Nest attributes options.
-		$payload['attributes'] = array(
-			'include_attributes' => $input['include_attributes'] ?? true,
-			'variation_count'    => $input['variation_count'] ?? 5,
-		);
-
 		// Nest inventory options including optional stock_range.
 		$inventory = array(
 			'manage_stock' => $input['manage_stock'] ?? true,
@@ -150,22 +137,17 @@ class Generate_Products extends Ability {
 		}
 		$payload['inventory'] = $inventory;
 
-		// Nest categories options.
-		if ( isset( $input['categories_create_new'] ) || isset( $input['categories_max_per_product'] ) ) {
+		// Nest categories options. Existing categories only — creating them is the Product
+		// Categories generator's job, and two places inventing category names is one too many.
+		if ( isset( $input['categories_max_per_product'] ) ) {
 			$payload['categories'] = array(
-				'create_new'      => $input['categories_create_new'] ?? true,
-				'max_per_product' => $input['categories_max_per_product'] ?? 3,
+				'max_per_product' => $input['categories_max_per_product'],
 			);
 		}
 
-		// Nest content options including optional include_images.
-		$content_options = array(
+		$payload['content_options'] = array(
 			'description_length' => $input['description_length'] ?? 'medium',
 		);
-		if ( isset( $input['include_images'] ) ) {
-			$content_options['include_images'] = (bool) $input['include_images'];
-		}
-		$payload['content_options'] = $content_options;
 
 		return $payload;
 	}
