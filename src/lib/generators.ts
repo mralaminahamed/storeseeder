@@ -600,38 +600,35 @@ export const generators: Generator[] = [
     route: "cart-sessions",
     resource: "cart_session",
     parameterConfig: {
-      customer_type: {
-        description: __("Type of customers for cart sessions", "storeseeder"),
-        type: "string",
-        enum: ["existing", "new", "mixed", "specific", "guest_only"],
-        default: "mixed",
-      },
-      specific_customer_id: {
-        description: __("Specific customer ID (when customer_type is 'specific')", "storeseeder"),
+      // `customer_type` enumerated existing / new / mixed / specific / guest_only here, and nothing
+      // read it. The new-versus-existing split no writer implemented is gone; `customer_id` and
+      // `guest_cart_ratio` are what was useful in it.
+      customer_id: {
+        description: __("Attach every cart to this customer", "storeseeder"),
         type: "integer",
         minimum: 1,
-        dependsOn: { customer_type: "specific" },
       },
       guest_cart_ratio: {
-        description: __("Percentage of guest carts (0–100)", "storeseeder"),
-        type: "integer",
-        minimum: 0,
-        maximum: 100,
-        default: 40,
-      },
-      abandonment_rate: {
-        description: __("Cart abandonment rate percentage (0–100)", "storeseeder"),
+        description: __("Percentage of carts belonging to a guest rather than an account (0–100)", "storeseeder"),
         type: "integer",
         minimum: 0,
         maximum: 100,
         default: 30,
       },
-      cart_value_range: {
-        description: __("Cart value range", "storeseeder"),
+      abandonment_rate: {
+        description: __("Percentage left abandoned — the rest split between active and converted", "storeseeder"),
+        type: "integer",
+        minimum: 0,
+        maximum: 100,
+        default: 30,
+      },
+      status_distribution: {
+        description: __("Cart stage weights, which win over the abandonment rate", "storeseeder"),
         type: "object",
         properties: {
-          min: { description: __("Minimum cart value", "storeseeder"), type: "number", minimum: 0, default: 5 },
-          max: { description: __("Maximum cart value", "storeseeder"), type: "number", minimum: 1, default: 500 },
+          pending: { description: __("Weight for carts still being filled", "storeseeder"), type: "integer", minimum: 0, maximum: 100 },
+          abandoned: { description: __("Weight for carts that reached checkout and stopped", "storeseeder"), type: "integer", minimum: 0, maximum: 100 },
+          completed: { description: __("Weight for carts that converted", "storeseeder"), type: "integer", minimum: 0, maximum: 100 },
         },
       },
       items_per_cart: {
@@ -640,15 +637,6 @@ export const generators: Generator[] = [
         properties: {
           min: { description: __("Minimum items per cart", "storeseeder"), type: "integer", minimum: 1, default: 1 },
           max: { description: __("Maximum items per cart", "storeseeder"), type: "integer", minimum: 1, maximum: 15, default: 5 },
-        },
-      },
-      abandonment_tracking: {
-        description: __("Abandonment tracking settings", "storeseeder"),
-        type: "object",
-        properties: {
-          generate_reminders: { description: __("Generate abandoned cart reminders", "storeseeder"), type: "boolean", default: true },
-          reminder_count: { description: __("Maximum number of reminders", "storeseeder"), type: "integer", minimum: 0, maximum: 10, default: 3 },
-          recovery_rate: { description: __("Cart recovery rate percentage (0–100)", "storeseeder"), type: "integer", minimum: 0, maximum: 100, default: 15 },
         },
       },
     },

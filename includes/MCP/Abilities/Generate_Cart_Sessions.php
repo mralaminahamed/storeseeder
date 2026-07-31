@@ -42,42 +42,41 @@ class Generate_Cart_Sessions extends Ability {
 	 */
 	protected static function input_properties(): array {
 		return array(
-			'customer_type'        => array(
-				'type'        => 'string',
-				'description' => __( 'Cart owner type. Allowed: existing, new, mixed, specific, guest_only. Default: mixed.', 'storeseeder' ),
-				'enum'        => array( 'existing', 'new', 'mixed', 'specific', 'guest_only' ),
-				'default'     => 'mixed',
-			),
-			'specific_customer_id' => array(
+			'abandonment_rate' => array(
 				'type'        => 'integer',
-				'description' => __( 'Attach all carts to this customer ID. Requires customer_type="specific".', 'storeseeder' ),
-				'minimum'     => 1,
-			),
-			'guest_cart_ratio'     => array(
-				'type'        => 'integer',
-				'description' => __( 'Percentage of guest (unauthenticated) carts when customer_type is "mixed" (0–100). Default: 40.', 'storeseeder' ),
-				'minimum'     => 0,
-				'maximum'     => 100,
-				'default'     => 40,
-			),
-			'abandonment_rate'     => array(
-				'type'        => 'integer',
-				'description' => __( 'Percentage of carts with "abandoned" status (0–100). Default: 30.', 'storeseeder' ),
+				'description' => __( 'Percentage of carts left abandoned — reached checkout and stopped. The rest split between still-active and converted. Default: 30.', 'storeseeder' ),
 				'minimum'     => 0,
 				'maximum'     => 100,
 				'default'     => 30,
 			),
-			'cart_value_min'       => array(
-				'type'        => 'number',
-				'description' => __( 'Minimum cart value (USD). Default: 5.', 'storeseeder' ),
-				'minimum'     => 0,
-				'default'     => 5,
+			'stage_weights'    => array(
+				'type'        => 'object',
+				'description' => __( 'Cart stage weights, which win over abandonment_rate where given.', 'storeseeder' ),
+				'properties'  => array(
+					'active'    => array( 'type' => 'integer' ),
+					'abandoned' => array( 'type' => 'integer' ),
+					'converted' => array( 'type' => 'integer' ),
+				),
 			),
-			'cart_value_max'       => array(
-				'type'        => 'number',
-				'description' => __( 'Maximum cart value (USD). Default: 500.', 'storeseeder' ),
+			'guest_cart_ratio' => array(
+				'type'        => 'integer',
+				'description' => __( 'Percentage of carts belonging to a guest rather than an account (0–100). Default: 30.', 'storeseeder' ),
+				'minimum'     => 0,
+				'maximum'     => 100,
+				'default'     => 30,
+			),
+			'items_per_cart'   => array(
+				'type'        => 'object',
+				'description' => __( 'Lines per cart, as a min and max. Default: 1 to 5.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'integer' ),
+					'max' => array( 'type' => 'integer' ),
+				),
+			),
+			'customer_id'      => array(
+				'type'        => 'integer',
+				'description' => __( 'Attach every cart to this customer.', 'storeseeder' ),
 				'minimum'     => 1,
-				'default'     => 500,
 			),
 		);
 	}
@@ -118,26 +117,22 @@ class Generate_Cart_Sessions extends Ability {
 			$payload['seed'] = (int) $input['seed'];
 		}
 
-		if ( isset( $input['customer_type'] ) ) {
-			$payload['customer_type'] = $input['customer_type'];
+		foreach ( array( 'abandonment_rate', 'guest_cart_ratio', 'customer_id' ) as $key ) {
+			if ( isset( $input[ $key ] ) ) {
+				$payload[ $key ] = (int) $input[ $key ];
+			}
 		}
 
-		if ( isset( $input['specific_customer_id'] ) ) {
-			$payload['specific_customer_id'] = (int) $input['specific_customer_id'];
+		if ( isset( $input['items_per_cart'] ) ) {
+			$payload['items_per_cart'] = (array) $input['items_per_cart'];
 		}
 
-		if ( isset( $input['guest_cart_ratio'] ) ) {
-			$payload['guest_cart_ratio'] = (int) $input['guest_cart_ratio'];
+		// `stage_weights` for a client, `status_distribution` for the generator, which is the name
+		// the admin form and the endpoint both use. The generator accepts the canonical stage names
+		// as keys, so no translation is needed beyond the wrapper.
+		if ( isset( $input['stage_weights'] ) ) {
+			$payload['status_distribution'] = (array) $input['stage_weights'];
 		}
-
-		if ( isset( $input['abandonment_rate'] ) ) {
-			$payload['abandonment_rate'] = (int) $input['abandonment_rate'];
-		}
-
-		$payload['cart_value_range'] = array(
-			'min' => $input['cart_value_min'] ?? 5,
-			'max' => $input['cart_value_max'] ?? 500,
-		);
 
 		return $payload;
 	}
