@@ -62,10 +62,11 @@ This plugin is based on and maintains compatibility with the following reference
 
 ### Generator System
 
-- **PHP Generators**: Located in `includes/Generators/` - Handle data creation logic
-- **Controllers**: Located in `includes/Controllers/` - REST API endpoints for generators
-- **React Components**: Located in `src/components/` - Frontend UI for generators
-- **Data Flow**: React components → REST API → Controllers → Generators → Fluent Cart models
+- **PHP Generators**: `includes/Generators/Resources/` - shape data; name no platform
+- **Controllers**: `includes/Controllers/Resources/` - REST endpoints, resolve the target platform
+- **Platform drivers**: `includes/Platforms/Drivers/<Platform>/` - writers that persist data
+- **React Components**: `src/components/` - Frontend UI
+- **Data Flow**: React → REST → Controller → Generator (canonical entity) → Writer → platform models
 
 ### Key Patterns Established
 

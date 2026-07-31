@@ -4,80 +4,73 @@ Welcome to the comprehensive architecture guide for StoreSeeder. This document p
 
 ## 🏗️ Modern Plugin Structure
 
-StoreSeeder follows a clean, modular architecture that separates concerns while maintaining tight integration with WordPress and Fluent Cart standards.
+StoreSeeder follows a clean, modular architecture that separates concerns while maintaining tight integration with WordPress standards and a driver layer for each supported e-commerce platform.
 
 ```
 storeseeder/
-├── 📄 storeseeder.php           # Main plugin file with WordPress headers
-├── 📄 class-storeseeder.php     # Main plugin class with admin integration
-├── 📁 includes/                            # PHP backend code
-│   ├── 📁 Abstracts/                       # Abstract base classes for consistency
-│   │   ├── 📄 Controller.php               # Base REST controller with validation
-│   │   └── 📄 Generator.php                # Base generator with parameter handling
-│   ├── 📁 Generators/                      # 10 Specialized data generators
-│   │   ├── 📄 Cart_Session.php             # Cart session generation
-│   │   ├── 📄 Coupon.php                   # Coupon generation with rules
-│   │   ├── 📄 Customer.php                 # Customer profile generation
-│   │   ├── 📄 Location.php                 # Geographic location generation
-│   │   ├── 📄 Order.php                    # Order generation with metadata
-│   │   ├── 📄 Product.php                  # Product generation with attributes & variations
-│   │   ├── 📄 Product_Variation.php        # Product variation generation
-│   │   ├── 📄 Shipping_Plan.php            # Shipping plan generation
-│   │   ├── 📄 Tax_Class.php                # Tax class generation
-│   │   └── 📄 Transaction.php              # Transaction history generation
-│   └── 📁 Controllers/                     # REST API controllers
-│       ├── 📄 Cart_Sessions.php            # Cart session REST controller
-│       ├── 📄 Coupons.php                  # Coupon REST controller
-│       ├── 📄 Customers.php                # Customer REST controller
-│       ├── 📄 Locations.php                # Location REST controller
-│       ├── 📄 Orders.php                   # Order REST controller
-│       ├── 📄 Product_Variations.php       # Product variation REST controller
-│       ├── 📄 Products.php                 # Product REST controller
-│       ├── 📄 Shipping_Plans.php           # Shipping plan REST controller
-│       ├── 📄 Tax_Classes.php              # Tax class REST controller
-│       └── 📄 Transactions.php             # Transaction REST controller
-├── 📁 src/                                 # Frontend source code (TypeScript)
-│   └── 📁 admin/
-│       ├── 📁 components/                  # React components (TypeScript)
-│       │   ├── 📄 App.tsx                  # Main application router
-│       │   ├── 📄 GeneratorBase.tsx        # Base generator component
-│       │   ├── 📁 Pages/                   # Route-based page components
-│       │   │   ├── 📄 GeneratorPage.tsx    # Individual generator pages
-│       │   │   ├── 📄 HomePage.tsx         # Generator selection dashboard
-│       │   │   └── 📄 RootLayout.tsx       # Main layout with navigation
-│       │   └── 📁 Generators/              # Generator-specific components
-│       │       ├── 📄 CartSessionGenerator.tsx
-│       │       ├── 📄 CouponGenerator.tsx
-│       │       ├── 📄 CustomerGenerator.tsx
-│       │       ├── 📄 LocationGenerator.tsx
-│       │       ├── 📄 OrderGenerator.tsx
-│       │       ├── 📄 ProductGenerator.tsx
-│       │       ├── 📄 ProductVariationGenerator.tsx
-│       │       ├── 📄 ShippingPlanGenerator.tsx
-│       │       ├── 📄 TaxClassGenerator.tsx
-│       │       └── 📄 TransactionGenerator.tsx
-│       ├── 📁 lib/
-│       │   └── 📄 utils.ts                 # Utility functions
-│       ├── 📄 index.tsx                    # Frontend entry point (TypeScript)
-│       └── 📄 styles.css                   # Tailwind CSS with WordPress integration
-├── 📁 build/                               # Compiled production assets
-├── 📁 vendor/                              # Composer dependencies (PHP)
-├── 📁 node_modules/                        # NPM dependencies (JavaScript)
-├── 📄 composer.json                        # PHP dependencies and autoloading
-├── 📄 package.json                         # JavaScript dependencies and scripts
-├── 📄 webpack.config.js                    # Build configuration
-├── 📄 tailwind.config.js                   # CSS framework configuration
-├── 📄 phpcs.xml                            # PHP code quality rules
-├── 📄 phpstan.neon                         # Static analysis configuration
-└── 📁 docs/                                # Comprehensive documentation
+├── storeseeder.php              # Plugin header, constants, bootstrap
+├── class-storeseeder.php        # Singleton orchestrator: menu, assets, REST wiring
+├── includes/                    # PHP backend. PSR-4: StoreSeeder\ → includes/
+│   ├── Generators/              # What data looks like — no platform knowledge
+│   │   ├── Generator.php        #   abstract base: FakerPHP, batching, preview, logging
+│   │   └── Resources/           #   17 concrete generators, one per resource
+│   ├── Controllers/             # REST surface
+│   │   ├── Controller.php       #   abstract base: params, validation, platform resolution
+│   │   └── Resources/           #   17 controllers, one per resource
+│   ├── MCP/                     # Model Context Protocol integration (optional)
+│   │   ├── MCP_Server.php       #   ability + tool registration
+│   │   └── Abilities/
+│   │       ├── Ability.php      #   abstract base: dispatches through the REST API
+│   │       └── Resources/       #   17 abilities, one per resource
+│   └── Platforms/               # Where data goes
+│       ├── Platform_Interface.php  # what a platform must answer
+│       ├── Platform_Driver.php     # abstract base for shipped drivers
+│       ├── Writer.php              # abstract base: persists one resource
+│       ├── Registry.php            # holds drivers; owns storeseeder_platforms
+│       ├── Resolver.php            # auto | explicit → one target platform
+│       ├── Capability.php          # can this platform do this, and why not
+│       ├── Resource.php            # the 17 canonical resource names
+│       ├── Status.php              # canonical status vocabulary
+│       └── Drivers/
+│           └── Fluent_Cart/
+│               ├── Platform.php    # capability matrix + writer map
+│               └── Writers/        # 17 writers, one per resource
+├── src/                         # React admin (TypeScript)
+│   ├── index.tsx                # entry point, mounts into #storeseeder-root
+│   ├── components/              # App.tsx, Pages/, shell/, generator/, home/,
+│   │                            #   dashboard/, overlays/, ui/
+│   ├── lib/                     # generators.ts, platform.ts, fieldsFromSchema.ts, …
+│   ├── providers/               # Stats, Toast, Batch, Platform contexts
+│   ├── theme/  types/           # theme provider, shared TypeScript types
+│   └── styles.css  components.css
+├── build/                       # Compiled assets — the only JS shipped
+├── tests/
+│   ├── php/                     # PHPUnit, mirroring the includes/ layout
+│   └── e2e/                     # Playwright specs
+├── docs/                        # Documentation
+├── composer.json  package.json  # Dependencies and scripts
+├── webpack.config.js  tsconfig.json  postcss.config.js  tailwind.config.js
+└── phpcs.xml  phpstan.neon  phpunit.xml.dist
 ```
 
-### 📁 Directory Structure Explanation
+### Directory structure explanation
 
-- **`includes/`**: Contains all PHP backend logic with clear separation between generators and controllers
-- **`src/`**: Modern React frontend with component-based architecture
-- **`build/`**: Production-ready compiled assets
-- **`docs/`**: Complete documentation for users and developers
+The layout states the class hierarchy: each abstract sits at the root of the scope it
+governs, and its concrete children nest one level beneath it.
+
+- **`includes/Generators/`** — shapes data. A generator names no platform: no models, no
+  table names, no platform status strings, no database reads. That restriction is what lets
+  one generator feed every platform, and lets a fixed seed produce the same data on all of
+  them.
+- **`includes/Platforms/`** — persists data. Writers are the only place a platform's models,
+  tables and status spellings appear. Drivers register through the
+  `storeseeder_platforms` filter, so a platform can be added from a separate plugin.
+- **`includes/Controllers/`** — the REST surface, and where the target platform is resolved
+  for a request.
+- **`includes/MCP/`** — optional AI tooling; abilities dispatch through the REST API rather
+  than calling generators directly.
+- **`src/`** — the React admin.
+- **`build/`** — compiled assets; the source in `src/` is not shipped in the plugin package.
 
 ## 🔗 Deep Fluent Cart Integration
 
@@ -255,21 +248,23 @@ const router = createHashRouter([
 
 Route-focused components that handle specific URLs and layouts:
 
-- **`RootLayout.jsx`**: Main application wrapper with navigation and WordPress admin integration
-- **`HomePage.jsx`**: Dashboard with generator selection grid and quick actions
-- **`GeneratorPage.jsx`**: Individual generator interfaces with parameter controls
+- **`RootLayout.tsx`** — application wrapper, WordPress admin integration
+- **`HomePage.tsx`** — dashboard: stat cards, recent activity, generator grid
+- **`GeneratorPage.tsx`** — one generator: config column, live preview, run bar
+- **`SettingsPage.tsx`** — generation defaults, run history, sample data
+- **`PluginsPage.tsx`** — the author's other plugins
 
 #### Generator Components (`src/components/generator/`)
 
-Data generation components extending the base generator:
+- **`ConfigColumn.tsx`** — header, dependency notes, the target-platform prompt, and the
+  field sections derived from the generator's parameter schema
+- **`FieldSection.tsx`** and **`fields/`** — the schema-driven controls: `Chips`,
+  `FieldSelect`, `NumberField`, `RangeField`, `Stepper`, `TextField`, `Toggle`
+- **`PreviewTable.tsx`** — debounced, read-only rows from the `/preview` route
+- **`RunBar.tsx`** — count, seed, metadata toggle, and the run actions
 
-- **`GeneratorBase.jsx`**: Shared functionality for all generators
-  - Parameter validation and state management
-  - Progress tracking and error handling
-  - WordPress admin color scheme integration
-  - Real-time dependency checking
-
-- **Specific Generators**: Each generator component handles its unique parameters and UI
+There is no shared generator component. Every generator renders from its parameter schema
+through `lib/fieldsFromSchema.ts`, so adding one needs no new React.
 
 #### Component Communication Flow
 

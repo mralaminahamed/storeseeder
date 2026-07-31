@@ -134,10 +134,13 @@ PHP lives under the PSR-4 namespace `StoreSeeder\`:
 storeseeder.php           Plugin bootstrap
 class-storeseeder.php     Singleton orchestrator
 includes/
-  Abstracts/Generator.php            Base generator (FakerPHP, batch, preview, logging)
-  Abstracts/Controller.php           Base REST controller (WP_REST_Controller)
-  Generators/                        17 concrete generators
-  Controllers/                       17 REST controllers
+  Generators/Generator.php           Base generator (FakerPHP, batch, preview, logging)
+  Generators/Resources/              17 concrete generators — no platform knowledge
+  Controllers/Controller.php         Base REST controller (WP_REST_Controller)
+  Controllers/Resources/             17 REST controllers
+  Platforms/                         Platform layer: registry, resolver, capabilities
+  Platforms/Writer.php               Base writer — persists one resource
+  Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 17 writers
   MCP/                               MCP server + abilities
 ```
 

@@ -106,7 +106,9 @@ phpunit
 
 ```php
 <?php
-namespace StoreSeeder\Generators;
+namespace StoreSeeder\Generators\Resources;
+
+use StoreSeeder\Generators\Generator;
 
 class MyNewGenerator extends Generator {
     protected function validate_dependencies(): bool {
@@ -139,7 +141,9 @@ class MyNewGenerator extends Generator {
 
 ```php
 <?php
-namespace StoreSeeder\Controllers;
+namespace StoreSeeder\Controllers\Resources;
+
+use StoreSeeder\Controllers\Controller;
 
 class MyNew extends Controller {
     protected function validate_request_params(WP_REST_Request $request): array {
@@ -286,7 +290,7 @@ export default function MyNewGenerator() {
 ```php
 <?php
 use PHPUnit\Framework\TestCase;
-use StoreSeeder\Generators\ProductGenerator;
+use StoreSeeder\Generators\Resources\Product;
 
 class ProductGeneratorTest extends TestCase {
     private $generator;

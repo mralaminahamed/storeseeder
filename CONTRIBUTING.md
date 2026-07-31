@@ -149,13 +149,22 @@ styling, `@wordpress/i18n` for strings, and no `console.log` in shipped code.
 
 A generator is three coordinated pieces, all following existing patterns:
 
-1. `includes/Generators/` — a class extending `StoreSeeder\Abstracts\Generator`
-2. `includes/Controllers/` — a REST controller extending `StoreSeeder\Abstracts\Controller`, exposing
-   `storeseeder/v1/<resource>/generate` plus the preview route
-3. `src/` — registration so the generator appears in the admin, with its parameter schema
+1. `includes/Generators/Resources/` — a class extending `StoreSeeder\Generators\Generator`,
+   implementing `build_entity()` with FakerPHP only. It must name no platform: no models, no
+   table names, no platform status strings, no database reads.
+2. `includes/Platforms/Drivers/<Platform>/Writers/` — a class extending
+   `StoreSeeder\Platforms\Writer` that persists the entity, plus an entry in that driver's
+   `writer_classes()` and `capabilities()`
+3. `includes/Controllers/Resources/` — a REST controller extending
+   `StoreSeeder\Controllers\Controller`, exposing `storeseeder/v1/<resource>/generate` plus
+   the preview route
+4. `includes/Platforms/Resource.php` — add the canonical resource name
+5. `src/lib/generators.ts` — registration so it appears in the admin, with its parameter
+   schema and its `resource` key
 
-Persist through native Fluent Cart models rather than raw SQL, so schema, relationships, and money
-handling match real store data. Copy the closest existing generator as your starting point and add
+Persist through the platform's own models rather than raw SQL, so schema, relationships and money
+handling match real store data. Money in a canonical entity is an integer in the currency's minor
+unit; the writer converts if its platform stores decimals. Copy the closest existing generator as your starting point and add
 tests under `tests/php/`.
 
 ## Pull Requests
