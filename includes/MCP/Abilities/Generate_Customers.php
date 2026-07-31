@@ -25,6 +25,73 @@ class Generate_Customers extends Ability {
 
 	/**
 	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Customers', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate realistic WordPress customer accounts with billing/shipping addresses, demographic metadata, purchase history, and loyalty tier assignments.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'customer_types'            => array(
+				'type'        => 'array',
+				'description' => __( 'Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: ["regular","returning"].', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+				'default'     => array( 'regular', 'returning' ),
+			),
+			'include_billing'           => array(
+				'type'        => 'boolean',
+				'description' => __( 'Generate billing addresses. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'include_shipping'          => array(
+				'type'        => 'boolean',
+				'description' => __( 'Generate shipping addresses. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'different_addresses_ratio' => array(
+				'type'        => 'integer',
+				'description' => __( 'Percentage of customers with a different shipping address (0–100). Default: 30.', 'storeseeder' ),
+				'minimum'     => 0,
+				'maximum'     => 100,
+				'default'     => 30,
+			),
+			'simulate_purchase_history' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'marketing_opt_in_ratio'    => array(
+				'type'        => 'integer',
+				'description' => __( 'Percentage of customers opted into marketing emails (0–100). Default: 65.', 'storeseeder' ),
+				'minimum'     => 0,
+				'maximum'     => 100,
+				'default'     => 65,
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'customers',
+			'description' => __( 'Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent.', 'storeseeder' ),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
 	 *
 	 * @param array<string, mixed> $input Validated input from the MCP client.
 	 * @return array<string, mixed>|\WP_Error

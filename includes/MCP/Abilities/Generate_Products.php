@@ -25,6 +25,77 @@ class Generate_Products extends Ability {
 
 	/**
 	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Products', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'product_type'       => array(
+				'type'        => 'string',
+				'description' => __( 'Type of products to generate. Allowed: simple, variable, grouped, external, digital, mixed. Default: mixed.', 'storeseeder' ),
+				'enum'        => array( 'simple', 'variable', 'grouped', 'external', 'digital', 'mixed' ),
+				'default'     => 'mixed',
+			),
+			'price_min'          => array(
+				'type'        => 'number',
+				'description' => __( 'Minimum product price (USD). Default: 10.', 'storeseeder' ),
+				'default'     => 10,
+			),
+			'price_max'          => array(
+				'type'        => 'number',
+				'description' => __( 'Maximum product price (USD). Default: 500.', 'storeseeder' ),
+				'default'     => 500,
+			),
+			'include_attributes' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Generate product attributes (size, colour, material). Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'variation_count'    => array(
+				'type'        => 'integer',
+				'description' => __( 'Number of variations per variable product (1–20). Default: 5.', 'storeseeder' ),
+				'minimum'     => 1,
+				'maximum'     => 20,
+				'default'     => 5,
+			),
+			'manage_stock'       => array(
+				'type'        => 'boolean',
+				'description' => __( 'Enable stock management and generate inventory levels. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'description_length' => array(
+				'type'        => 'string',
+				'description' => __( 'Length of product descriptions. Allowed: short, medium, long. Default: medium.', 'storeseeder' ),
+				'enum'        => array( 'short', 'medium', 'long' ),
+				'default'     => 'medium',
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'products',
+			'description' => __( 'Array of generated product objects with id, title, type, variations count, price_range, and stock_status.', 'storeseeder' ),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
 	 *
 	 * @param array<string, mixed> $input Validated input from the MCP client.
 	 * @return array<string, mixed>|\WP_Error

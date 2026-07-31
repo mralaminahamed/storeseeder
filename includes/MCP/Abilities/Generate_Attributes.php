@@ -25,6 +25,30 @@ class Generate_Attributes extends Ability {
 
 	/**
 	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Attributes', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'attributes',
+			'description' => __( 'Array of generated attribute objects with id, name, type, slug, and values array.', 'storeseeder' ),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
 	 *
 	 * @param array<string, mixed> $input Validated input from the MCP client.
 	 * @return array<string, mixed>|\WP_Error

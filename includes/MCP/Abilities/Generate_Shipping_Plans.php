@@ -25,6 +25,62 @@ class Generate_Shipping_Plans extends Ability {
 
 	/**
 	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Shipping Plans', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate realistic shipping plans with tiered pricing methods (price-based, weight-based, quantity-based), regional coverage, delivery timeframes, and taxability settings.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'shipping_types' => array(
+				'type'        => 'array',
+				'description' => __( 'Shipping method types. Allowed: standard, express, overnight, pickup, free, weight_based, flat_rate. Default: ["standard","express","free"].', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+				'default'     => array( 'standard', 'express', 'free' ),
+			),
+			'cost_min'       => array(
+				'type'        => 'number',
+				'description' => __( 'Minimum shipping cost (USD). Default: 0.', 'storeseeder' ),
+				'minimum'     => 0,
+				'default'     => 0,
+			),
+			'cost_max'       => array(
+				'type'        => 'number',
+				'description' => __( 'Maximum shipping cost (USD). Default: 50.', 'storeseeder' ),
+				'minimum'     => 0,
+				'default'     => 50,
+			),
+			'coverage_areas' => array(
+				'type'        => 'array',
+				'description' => __( 'Geographic coverage. Allowed: domestic, international, regional, worldwide. Default: ["domestic","international"].', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+				'default'     => array( 'domestic', 'international' ),
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'shipping_plans',
+			'description' => __( 'Array of generated shipping plan objects with id, name, active status, calculation_base, methods count, and regions count.', 'storeseeder' ),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
 	 *
 	 * @param array<string, mixed> $input Validated input from the MCP client.
 	 * @return array<string, mixed>|\WP_Error
