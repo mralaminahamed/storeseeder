@@ -28,7 +28,7 @@ target platform's own models, so it respects the same schema, relationships, val
 handling as real data — and stays compatible across that platform's updates.
 
 Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
-that, and the same eighteen generators feed every driver. Fluent Cart is the driver shipped today.
+that, and the same eighteen generators feed every driver. Fluent Cart and WooCommerce ship today.
 
 Built for:
 
@@ -67,7 +67,8 @@ plugin header and [`readme.txt`](readme.txt) are the source of truth for these n
 | Platform | Status |
 |----------|--------|
 | [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — all 18 resources; licences need Fluent Cart Pro |
-| EasyCommerce, WooCommerce, StoreEngine | Planned |
+| [WooCommerce](https://wordpress.org/plugins/woocommerce/) | Shipped — 15 of 18 resources; subscriptions need WooCommerce Subscriptions. Transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent |
+| EasyCommerce, StoreEngine | Planned |
 | Anything else | A third party can register a driver from their own plugin, with no changes here |
 
 The target is chosen in the topbar and in **Settings**, and defaults to `Auto`. One platform active
@@ -83,7 +84,7 @@ nothing.
 
 ## Generators
 
-Seventeen generators, grouped by category in the admin, all platform-neutral — a generator names no
+Eighteen generators, grouped by category in the admin, all platform-neutral — a generator names no
 platform, which is what lets one of them feed every driver and lets a fixed seed produce identical
 data on all of them. Several build on others — orders need products and customers, refunds need charge
 transactions — and each one reports clearly when a prerequisite is missing.
@@ -195,6 +196,7 @@ includes/
   Platforms/Locale.php               The 75 generatable locales
   Platforms/Writer.php               Base writer — persists one resource
   Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 18 writers
+  Platforms/Drivers/Woo_Commerce/    Driver: matrix + shared Writer base + 15 writers
   MCP/                               MCP server + abilities
 ```
 

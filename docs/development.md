@@ -543,16 +543,22 @@ Two things bite when writing one:
 ### Platform stubs
 
 The e-commerce plugins StoreSeeder writes through are runtime dependencies, not Composer ones,
-so PHPStan cannot see their classes. Four stub packages fill that in — Fluent Cart, Fluent Cart
-Pro, EasyCommerce and StoreEngine — and they replaced four blanket `ignoreErrors` patterns that
-had been hiding every `FluentCart\…` symbol, and with them any wrong method name or argument
-count in a writer.
+so PHPStan cannot see their classes. Six stub packages fill that in — Fluent Cart, Fluent Cart
+Pro, EasyCommerce, StoreEngine, WooCommerce and WooCommerce Subscriptions — and they replaced
+four blanket `ignoreErrors` patterns that had been hiding every `FluentCart\…` symbol, and with
+them any wrong method name or argument count in a writer.
 
-Two consequences worth knowing when writing a writer:
+Order matters in `scanFiles`: a package whose classes extend another's goes after it. Fluent
+Cart Pro after Fluent Cart, WooCommerce Subscriptions after WooCommerce.
+
+Three consequences worth knowing when writing a writer:
 
 - **`create()` types as `Builder|Model`**, because Eloquent reaches it through the base model's
   `__callStatic`. Narrow the result with `instanceof` before returning or using it; a
   truthiness check does not narrow, and PHPStan will prove the guard can never fire.
+- **WooCommerce's setters are typed for what it stores**, which is decimal *strings* — a float
+  handed to `set_total()` is an argument-type error, and the reason it matters at runtime is
+  that a float is where a rounding difference creeps into a total.
 - **Use `Model::query()->create()`**, not the static `Model::create()`. Both work at runtime,
   but `create()` is an instance method on the builder, so the static form cannot be resolved.
 

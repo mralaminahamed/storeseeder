@@ -45,9 +45,36 @@ StoreSeeder writes through a **platform driver**, so the same generators can see
 e-commerce plugins.
 
 - **Fluent Cart** — shipped, all 18 resources. Licences are conditional: the tables belong to Fluent Cart Pro, so without it the resource reports that plugin by name
-- **EasyCommerce, WooCommerce, StoreEngine** — planned
+- **WooCommerce** — shipped, 15 of the 18 resources. Written through WooCommerce's own CRUD
+  objects (`WC_Product`, `WC_Order`, `WC_Customer`, `WC_Coupon`), the same route
+  `wc-smooth-generator` takes, so records are valid under HPOS or the post store and fire the
+  hooks other extensions listen for. Subscriptions need WooCommerce Subscriptions; transactions,
+  labels and licences are reported unsupported *with the reason*, because WooCommerce has no
+  equivalent and no plugin changes that — payment lives on the order, there are no order labels,
+  and licensing is not a core concept
+- **EasyCommerce, StoreEngine** — planned
 - **Anything else** — a third party can register a driver from their own plugin through the
   `storeseeder_platforms` filter, with no changes here
+
+### What each platform stores
+
+Fifteen resources exist on both. The three WooCommerce refuses are refused with a reason rather
+than dimmed in silence, because "install something" and "this platform works differently" are
+different answers:
+
+| Resource | Fluent Cart | WooCommerce |
+|---|---|---|
+| Transactions | a payment record per attempt | payment lives on the order — no separate record |
+| Labels | labels on orders and customers | no order or customer labels |
+| Licences | needs Fluent Cart Pro | not a core concept |
+| Subscriptions | core tables | needs WooCommerce Subscriptions |
+
+Two smaller differences worth knowing, since they change what the same entity produces:
+
+- A **WooCommerce customer is a WordPress user** — there is no separate customer record — so the
+  guest case is served by generating a guest order rather than an account-less customer.
+- A **variation needs a variable parent**. If the store has none, the WooCommerce writer promotes
+  an existing simple product rather than refusing, and adds the attribute variations vary on.
 
 The target is chosen in the topbar and defaults to `Auto`. One platform active resolves
 silently. With several active there is no safe default, so the generator page asks before it

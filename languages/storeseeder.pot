@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T15:46:57+00:00\n"
+"POT-Creation-Date: 2026-07-31T17:52:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -1105,6 +1105,7 @@ msgid "Fluent Cart Customer model not found. Please ensure Fluent Cart plugin is
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:58
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:69
 msgid "A user with this email address already exists."
 msgstr ""
 
@@ -1175,10 +1176,12 @@ msgid "Fluent Cart OrderTaxRate model not found. Please ensure Fluent Cart is ac
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:57
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:67
 msgid "No orders were found. Generate orders before generating order tax lines."
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Order_Tax_Rate.php:66
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:76
 msgid "No tax rates were found. Generate tax classes before generating order tax lines."
 msgstr ""
 
@@ -1221,6 +1224,7 @@ msgid "Failed to create product download."
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:62
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:180
 msgid "No products were found. Generate products before generating variations."
 msgstr ""
 
@@ -1265,6 +1269,7 @@ msgid "Fluent Cart Subscription model not found. Please ensure Fluent Cart is ac
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Subscription.php:63
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:89
 msgid "No orders were found. Generate orders before generating subscriptions."
 msgstr ""
 
@@ -1298,6 +1303,165 @@ msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Transaction.php:100
 msgid "Failed to create transaction."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:79
+msgid "WooCommerce"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:152
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:203
+msgid "WooCommerce Subscriptions"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:189
+msgid "WooCommerce records payment details on the order itself — a transaction id, a payment method and a date paid — rather than as separate transaction records."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:193
+msgid "WooCommerce has no order or customer labels. Product tags are a product taxonomy, which is a different thing."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:197
+msgid "Licensing is not a WooCommerce core concept, and the extensions that add it each use their own storage."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writer.php:103
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Attribute.php:57
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Attribute.php:134
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:60
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:66
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:139
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:60
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:149
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:74
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:137
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:58
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:58
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:145
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product.php:53
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Download.php:57
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:70
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:55
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Class.php:61
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Class.php:109
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:68
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:141
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Tax_Class.php:56
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Tax_Class.php:117
+msgid "WooCommerce is not active on this site."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:69
+msgid "No products were found. Generate products before generating cart sessions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:85
+msgid "The customer drawn already has a cart session. Generate more customers, or fewer sessions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Cart_Session.php:121
+msgid "Failed to create the cart session."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:108
+msgid "Failed to create the coupon."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:116
+msgid "free shipping"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:103
+msgid "Failed to create the customer."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:98
+msgid "Failed to write the log entry."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:67
+msgid "No products were found. Generate products before generating orders."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:82
+msgid "No line items could be added to the order."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:108
+msgid "Failed to create the order."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:94
+msgid "Failed to add the tax line to the order."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Order_Tax_Rate.php:178
+msgid "Tax"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product.php:89
+msgid "Failed to create the product."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Download.php:66
+msgid "No products were found. Generate products before generating downloads."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product_Variation.php:103
+msgid "Failed to create the product variation."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:65
+msgid "No paid orders were found. Generate orders before generating refunds."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:74
+msgid "The order drawn has already been refunded in full."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:112
+msgid "full"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Refund.php:112
+msgid "partial"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:95
+msgid "Failed to create the shipping zone."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:101
+msgid "Failed to add the shipping method."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:119
+msgid "free"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:178
+msgid "Free shipping"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Shipping_Plan.php:179
+msgid "Flat rate"
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:76
+msgid "Subscriptions are stored by WooCommerce Subscriptions, which is not active on this site. Install and activate it to generate them."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:98
+msgid "No products were found. Generate products before generating subscriptions."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:140
+msgid "Failed to save the subscription."
+msgstr ""
+
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:178
+msgid "WooCommerce Subscriptions is not active on this site."
 msgstr ""
 
 #. translators: %s: the platform identifier that was requested.

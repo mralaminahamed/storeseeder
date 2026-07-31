@@ -12,8 +12,8 @@ version did.
 
 StoreSeeder generates realistic test data for WordPress e-commerce platforms. It is not
 single-platform: a **platform driver** decides where data lands, and the same generators feed
-every platform. Fluent Cart is the only driver shipped so far; EasyCommerce, WooCommerce and
-StoreEngine are planned, and a third party can add one from their own plugin.
+every platform. Fluent Cart and WooCommerce ship; EasyCommerce and StoreEngine are planned, and
+a third party can add one from their own plugin.
 
 ## Commands
 
@@ -81,6 +81,7 @@ includes/
                   Registry.php  Resolver.php  Capability.php
                   Resource.php  Status.php  Locale.php
                   Drivers/Fluent_Cart/Platform.php + Writers/*      18 writers
+                  Drivers/Woo_Commerce/Platform.php + Writer.php + Writers/*  15
 ```
 
 Directories are named for the layer, not for what is inside them: each abstract sits at the
@@ -108,6 +109,18 @@ real product variations to have line items and their real prices to have a total
 proposes an SKU and the platform that owns the unique index checks it and re-rolls. So a
 writer legitimately reads before it writes. What it must never do is invent a name, address,
 date or quantity — those arrive on the entity, already localised.
+
+### A driver may refuse a resource, and must say why
+
+WooCommerce is the first driver that cannot do everything, and the shape of that answer is
+load-bearing. `Capability::unsupported( $reason )` is for a concept the platform does not have —
+WooCommerce records payment on the order, so there is no transaction record to create, and no
+plugin changes that. `Capability::missing_extension( $slug, $label )` is for one that a plugin
+would enable, like subscriptions. The two read differently to a user: one is a dead end, the
+other is a link. Never use the first where the second is true.
+
+The matrix and `writer_classes()` have to agree. A driver that claims a resource and ships no
+writer reports `storeseeder_missing_writer` at generate time — after the user chose it.
 
 ### Capabilities are computed, never cached
 
