@@ -79,6 +79,7 @@ final class Registry {
 			Commands\Platforms::class,
 			Commands\Locales::class,
 			Commands\Sample_Data::class,
+			Commands\Cleanup::class,
 		);
 	}
 

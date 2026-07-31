@@ -32,7 +32,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 
 	public function test_the_shipped_commands_are_registered(): void {
 		$this->assertSame(
-			array( 'generate', 'preview', 'platforms', 'locales', 'sample-data' ),
+			array( 'generate', 'preview', 'platforms', 'locales', 'sample-data', 'cleanup' ),
 			Registry::instance()->names()
 		);
 	}
@@ -54,7 +54,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 		);
 
 		$this->assertArrayHasKey( 'stub', Registry::instance()->all() );
-		$this->assertCount( 6, Registry::instance()->all() );
+		$this->assertCount( 7, Registry::instance()->all() );
 	}
 
 	public function test_filter_can_remove_a_command(): void {
@@ -88,7 +88,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 			}
 		);
 
-		$this->assertCount( 5, Registry::instance()->all() );
+		$this->assertCount( 6, Registry::instance()->all() );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 			}
 		);
 
-		$this->assertCount( 5, Registry::instance()->all() );
+		$this->assertCount( 6, Registry::instance()->all() );
 	}
 
 	/**
@@ -116,7 +116,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 
 		Registry::instance()->register_commands();
 
-		$this->assertCount( 5, Registry::instance()->all() );
+		$this->assertCount( 6, Registry::instance()->all() );
 	}
 }
 

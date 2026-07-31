@@ -12,6 +12,7 @@
 namespace StoreSeeder\Tests\CLI;
 
 use StoreSeeder\CLI\Command;
+use StoreSeeder\CLI\Commands\Cleanup;
 use StoreSeeder\CLI\Commands\Generate;
 use StoreSeeder\CLI\Commands\Locales;
 use StoreSeeder\CLI\Commands\Platforms;
@@ -161,7 +162,7 @@ class CommandTest extends StoreSeederUnitTestCase {
 	 * `wp help storeseeder <cmd>` is where people look first.
 	 */
 	public function test_every_command_declares_a_name_and_a_description(): void {
-		$classes = array( Generate::class, Preview::class, Platforms::class, Locales::class, Sample_Data::class );
+		$classes = array( Generate::class, Preview::class, Platforms::class, Locales::class, Sample_Data::class, Cleanup::class );
 
 		foreach ( $classes as $class ) {
 			$this->assertNotSame( '', $class::NAME, $class );
@@ -292,6 +293,40 @@ class CommandOutputTest extends StoreSeederUnitTestCase {
 		$this->assertNotEmpty( Locales::rows( 'german' ) );
 		$this->assertNotEmpty( Locales::rows( 'ja_JP' ) );
 		$this->assertSame( array(), Locales::rows( 'zzzzz' ) );
+	}
+
+	/**
+	 * The ledger table is what someone reads before agreeing to delete, so a count
+	 * attributed to the wrong resource is the failure that matters here.
+	 */
+	public function test_cleanup_rows_pair_each_resource_with_its_count(): void {
+		$rows = Cleanup::rows(
+			array(
+				'total'     => 3,
+				'resources' => array(
+					array( 'resource' => 'transaction', 'count' => 1 ),
+					array( 'resource' => 'order', 'count' => 2 ),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array( 'resource' => 'transaction', 'rows' => 1 ),
+				array( 'resource' => 'order', 'rows' => 2 ),
+			),
+			$rows
+		);
+	}
+
+	public function test_cleanup_rows_skip_entries_it_cannot_read(): void {
+		$rows = Cleanup::rows( array( 'resources' => array( array( 'count' => 4 ), 'order' ) ) );
+
+		$this->assertSame( array(), $rows );
+	}
+
+	public function test_cleanup_rows_are_empty_for_a_body_without_resources(): void {
+		$this->assertSame( array(), Cleanup::rows( array() ) );
 	}
 
 	/**
