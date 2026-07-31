@@ -56,8 +56,44 @@ class Generate_Tax_Classes extends Ability {
 			),
 			'include_compound' => array(
 				'type'        => 'boolean',
-				'description' => __( 'Include compound tax rate configurations. Default: true.', 'storeseeder' ),
+				'description' => __( 'Allow compound rates, which stack on top of the ones before them — a state tax over a federal one. Default: true.', 'storeseeder' ),
 				'default'     => true,
+			),
+			'jurisdictions'    => array(
+				'type'        => 'array',
+				'description' => __( 'How precise a rate row is. Allowed: country, state, city, postcode. A more precise row outranks a broader one. Default: ["country","state"].', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'country', 'state', 'city', 'postcode' ),
+				),
+				'default'     => array( 'country', 'state' ),
+			),
+			'rate_ranges'      => array(
+				'type'        => 'object',
+				'description' => __( 'Percentage bands per class type. A zero-rated or exempt class is always zero, whatever is given here.', 'storeseeder' ),
+				'properties'  => array(
+					'standard' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'min' => array( 'type' => 'number' ),
+							'max' => array( 'type' => 'number' ),
+						),
+					),
+					'reduced'  => array(
+						'type'       => 'object',
+						'properties' => array(
+							'min' => array( 'type' => 'number' ),
+							'max' => array( 'type' => 'number' ),
+						),
+					),
+					'digital'  => array(
+						'type'       => 'object',
+						'properties' => array(
+							'min' => array( 'type' => 'number' ),
+							'max' => array( 'type' => 'number' ),
+						),
+					),
+				),
 			),
 		);
 	}
@@ -98,8 +134,10 @@ class Generate_Tax_Classes extends Ability {
 			$payload['seed'] = (int) $input['seed'];
 		}
 
-		if ( isset( $input['tax_types'] ) ) {
-			$payload['tax_types'] = (array) $input['tax_types'];
+		foreach ( array( 'tax_types', 'jurisdictions', 'rate_ranges' ) as $key ) {
+			if ( isset( $input[ $key ] ) ) {
+				$payload[ $key ] = (array) $input[ $key ];
+			}
 		}
 
 		$payload['location_coverage'] = array(

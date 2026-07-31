@@ -89,7 +89,9 @@ class Tax_Class extends Controller {
 				'type'              => 'array',
 				'items'             => array(
 					'type' => 'string',
-					'enum' => array( 'country', 'state', 'city', 'county', 'postcode' ),
+					// `county` is gone: neither platform has a column for one, so it could only ever
+					// have been treated as a state or dropped in silence.
+					'enum' => array( 'country', 'state', 'city', 'postcode' ),
 				),
 				'default'           => array( 'country', 'state' ),
 				'sanitize_callback' => array( $this, 'sanitize_array' ),
