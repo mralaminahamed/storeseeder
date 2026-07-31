@@ -93,6 +93,49 @@ abstract class Writer {
 	abstract public function write( array $entity );
 
 	/**
+	 * The customer profile fields no platform has a column for.
+	 *
+	 * A birth date, a loyalty tier and a VIP flag are generated for every customer, and neither
+	 * WooCommerce nor Fluent Cart has anywhere native to put them. Stored under a namespaced key
+	 * rather than discarded: `demographics.age_groups` and `loyalty_tier_focus` are parameters, and
+	 * a parameter that changes an entity nobody can read afterwards is the same broken promise as
+	 * one nothing reads at all.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $meta Canonical customer metadata.
+	 *
+	 * @return array<string, scalar> Meta key, without a prefix, to value.
+	 */
+	protected function profile_meta( array $meta ): array {
+		$fields = array(
+			'birth_date'     => $meta['birth_date'] ?? null,
+			'gender'         => $meta['gender'] ?? null,
+			'occupation'     => $meta['occupation'] ?? null,
+			'loyalty_tier'   => $meta['loyalty_tier'] ?? null,
+			'loyalty_points' => $meta['loyalty_points'] ?? null,
+			'vip_status'     => isset( $meta['vip_status'] ) ? (int) (bool) $meta['vip_status'] : null,
+			'customer_since' => $meta['customer_since'] ?? null,
+			'last_login'     => $meta['last_login'] ?? null,
+			'source'         => $meta['source'] ?? null,
+		);
+
+		$stored = array();
+
+		foreach ( $fields as $key => $value ) {
+			// Null is "this customer has none", which is a real answer for a birth date and worth
+			// keeping distinct from a stored empty string.
+			if ( null === $value || '' === $value ) {
+				continue;
+			}
+
+			$stored[ $key ] = is_scalar( $value ) ? $value : (string) wp_json_encode( $value );
+		}
+
+		return $stored;
+	}
+
+	/**
 	 * Remove one row this writer created.
 	 *
 	 * Concrete rather than abstract, and unsupported by default: adding an abstract method

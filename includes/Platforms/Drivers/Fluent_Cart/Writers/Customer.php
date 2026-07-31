@@ -68,16 +68,37 @@ final class Customer extends Writer {
 		// reported a name belonging to nobody.
 		$username = $this->unique_username( (string) $entity['username_base'] );
 
+		$spent  = (int) $meta['total_spent'];
+		$orders = (int) $meta['total_orders'];
+
 		$customer_data = array(
-			'email'          => $email,
-			'first_name'     => $entity['first_name'],
-			'last_name'      => $entity['last_name'],
-			'status'         => 'active',
-			'purchase_value' => $meta['total_spent'],
-			'purchase_count' => $meta['total_orders'],
-			'ltv'            => $meta['total_spent'],
-			'aov'            => $meta['total_orders'] > 0 ? $meta['total_spent'] / $meta['total_orders'] : 0,
-			'notes'          => $entity['notes'],
+			'email'               => $email,
+			'first_name'          => $entity['first_name'],
+			'last_name'           => $entity['last_name'],
+			// The account status the run asked for, rather than 'active' for everybody: a store
+			// where no customer is ever inactive cannot test the screen that lists them.
+			'status'              => (string) ( $meta['account_status'] ?? 'active' ),
+			// A per-currency map of cents, which is what Fluent Cart's own migrator and
+			// CustomerHelper both write and what the model's accessor json_decodes back. A bare
+			// number is valid JSON and read as a total in no particular currency.
+			'purchase_value'      => array( (string) ( $entity['currency'] ?? 'USD' ) => $spent ),
+			'purchase_count'      => $orders,
+			// `ltv` is a BIGINT of cents, so the canonical minor units go in unchanged. This used
+			// to receive a float of dollars, which MySQL truncated — $1,234.56 became 1234, shown
+			// in the admin as $12.34.
+			'ltv'                 => $spent,
+			// `aov` is DECIMAL(18,2) and holds major units, so this one is divided.
+			'aov'                 => $orders > 0 ? round( $spent / $orders / 100, 2 ) : 0,
+			'first_purchase_date' => $meta['first_order_date'] ?? null,
+			'last_purchase_date'  => $meta['last_order_date'] ?? null,
+			// The denormalised address columns Fluent Cart's own customer list sorts and filters
+			// on. Left null, a generated customer appeared to have no location at all there, even
+			// with a full address book.
+			'country'             => $billing_address['country'] ?? null,
+			'city'                => $billing_address['city'] ?? null,
+			'state'               => $billing_address['state'] ?? null,
+			'postcode'            => $billing_address['postcode'] ?? null,
+			'notes'               => $entity['notes'],
 		);
 
 		// Create customer using Fluent Cart Customer model.
@@ -88,6 +109,19 @@ final class Customer extends Writer {
 
 		if ( ! $customer instanceof CustomerModel ) {
 			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart model.', 'storeseeder' ) );
+		}
+
+		// The demographic and loyalty fields, which Fluent Cart has no columns for either — it does
+		// have a customer meta table, which is where they go.
+		$this->write_profile_meta( (int) $customer->id, $meta );
+
+		// `created_at` is not in the model's fillable list, so passing it to create() drops it
+		// silently and Eloquent stamps today instead — the same mass-assignment trap that left
+		// every generated coupon unlimited. Written after the fact, where nothing filters it.
+		if ( ! empty( $entity['date_created'] ) ) {
+			CustomerModel::query()
+				->where( 'id', $customer->id )
+				->update( array( 'created_at' => (string) $entity['date_created'] ) );
 		}
 
 		if ( $entity['with_account'] ) {
@@ -127,7 +161,7 @@ final class Customer extends Writer {
 			'customer_since'  => $meta['customer_since'],
 			'loyalty_tier'    => $meta['loyalty_tier'],
 			'total_orders'    => $meta['total_orders'],
-			'total_spent'     => '$' . number_format( $meta['total_spent'], 2 ),
+			'total_spent'     => '$' . number_format( $spent / 100, 2 ),
 			'last_login'      => $meta['last_login'],
 		);
 
@@ -265,5 +299,37 @@ final class Customer extends Writer {
 			$id,
 			array( CustomerAddressModel::class => 'customer_id' )
 		);
+	}
+
+	/**
+	 * Persist the profile fields Fluent Cart has no columns for.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param int                  $customer_id Fluent Cart customer id.
+	 * @param array<string, mixed> $meta        Canonical customer metadata.
+	 *
+	 * @return void
+	 */
+	private function write_profile_meta( int $customer_id, array $meta ): void {
+		global $wpdb;
+
+		$now = current_time( 'Y-m-d H:i:s' );
+
+		foreach ( $this->profile_meta( $meta ) as $key => $value ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.SlowDBQuery.slow_db_query_meta_key, WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- fct_customer_meta has no Eloquent model, and these are writes rather than lookups.
+			$wpdb->insert(
+				$wpdb->prefix . 'fct_customer_meta',
+				array(
+					'customer_id' => $customer_id,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- a column name in an insert, not a lookup.
+					'meta_key'    => 'storeseeder_' . $key,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- likewise.
+					'meta_value'  => (string) $value,
+					'created_at'  => $now,
+					'updated_at'  => $now,
+				)
+			);
+		}
 	}
 }
