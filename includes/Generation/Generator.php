@@ -380,6 +380,28 @@ abstract class Generator {
 		}
 
 		/**
+		 * Filters every canonical entity before it is handed to a platform writer.
+		 *
+		 * The one to hook when the change is not resource-specific — stamping a run id
+		 * on everything generated, say, which through the per-resource filter would mean
+		 * seventeen callbacks. Runs first, so the per-resource filter still has the last
+		 * word.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_canonical_entity
+		 *
+		 * @param array<string, mixed> $entity        The canonical entity.
+		 * @param string               $resource_type The canonical resource name, e.g. `cart_session`.
+		 * @param Generator            $generator     The generator that built it.
+		 */
+		$entity = apply_filters(
+			'storeseeder_canonical_entity',
+			$entity,
+			$this->get_resource_type(),
+			$this
+		);
+
+		/**
 		 * Filters the canonical entity before it is handed to a platform writer.
 		 *
 		 * The entity is platform-neutral at this point: money is an integer in the
@@ -388,6 +410,7 @@ abstract class Generator {
 		 * which is what makes it the right place to change generated data.
 		 *
 		 * @since 1.1.0
+		 * @hook  storeseeder_canonical_{$resource_type}
 		 *
 		 * @param array<string, mixed> $entity    The canonical entity.
 		 * @param Generator            $generator The generator that built it.

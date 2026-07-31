@@ -19,6 +19,8 @@ namespace StoreSeeder\MCP;
 
 defined( 'ABSPATH' ) || exit;
 
+use StoreSeeder\Access;
+use StoreSeeder\Platforms\Locale;
 use WP_Error;
 use WP_REST_Request;
 
@@ -120,7 +122,7 @@ abstract class Ability {
 	public static function definition(): array {
 		$output = static::output();
 
-		return array(
+		$definition = array(
 			'label'               => static::label(),
 			'description'         => static::description(),
 			'category'            => self::CATEGORY,
@@ -128,6 +130,28 @@ abstract class Ability {
 			'output_schema'       => static::output_schema( $output['key'], $output['description'] ),
 			'execute_callback'    => array( static::class, 'execute' ),
 			'permission_callback' => array( self::class, 'permission_callback' ),
+		);
+
+		/**
+		 * Filters one ability's definition before it is registered.
+		 *
+		 * The seam for adjusting what an AI client is told about a tool — sharpening a
+		 * description, exposing a parameter a platform of your own added — without
+		 * replacing the class through storeseeder_mcp_abilities. The callbacks are part
+		 * of the definition, so this can also wrap execution.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_mcp_ability_definition
+		 *
+		 * @param array<string, mixed>   $definition The ability definition.
+		 * @param string                 $ability_id The ability id, e.g. `storeseeder/generate-products`.
+		 * @param class-string<Ability>  $ability    The ability class.
+		 */
+		return (array) apply_filters(
+			'storeseeder_mcp_ability_definition',
+			$definition,
+			static::ability_id(),
+			static::class
 		);
 	}
 
@@ -146,10 +170,14 @@ abstract class Ability {
 				'minimum'     => 1,
 				'maximum'     => 100,
 			),
+			// Enumerated from Locale, like the REST schema. A client that guesses a
+			// locale we do not support would otherwise be handed English data and told
+			// nothing, since FakerPHP falls back in silence.
 			'locale' => array(
 				'type'        => 'string',
 				'description' => __( 'Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US.', 'storeseeder' ),
-				'default'     => 'en_US',
+				'default'     => Locale::DEFAULT_LOCALE,
+				'enum'        => Locale::codes(),
 			),
 			'seed'   => array(
 				'type'        => 'integer',
@@ -195,16 +223,16 @@ abstract class Ability {
 	/**
 	 * Shared permission callback for every StoreSeeder ability.
 	 *
-	 * Mirrors the REST layer: only manage_options may generate data. Abilities
-	 * dispatch through the REST API, which checks this again, so this is the outer of
-	 * two gates rather than the only one.
+	 * Mirrors the REST layer by sharing its gate: both ask Access, so the storeseeder_capability
+	 * filter cannot grant one and not the other. Abilities dispatch through the REST API, which
+	 * checks again, so this is the outer of two gates rather than the only one.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return bool
 	 */
 	public static function permission_callback(): bool {
-		return current_user_can( 'manage_options' );
+		return Access::current_user_can();
 	}
 
 	/**

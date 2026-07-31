@@ -14,6 +14,7 @@ namespace StoreSeeder\Tests\MCP;
 
 use StoreSeeder\MCP\Ability;
 use StoreSeeder\MCP\Registry;
+use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Rest\Registry as Rest_Registry;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
@@ -30,6 +31,7 @@ class RegistryTest extends StoreSeederUnitTestCase {
 
 	public function tearDown(): void {
 		remove_all_filters( 'storeseeder_mcp_abilities' );
+		remove_all_filters( 'storeseeder_mcp_ability_definition' );
 		Registry::reset();
 		parent::tearDown();
 	}
@@ -147,6 +149,47 @@ class RegistryTest extends StoreSeederUnitTestCase {
 
 		$this->assertNotContains( 'storeseeder/generate-subscriptions', Registry::instance()->ids() );
 		$this->assertCount( 16, Registry::instance()->all() );
+	}
+
+	/**
+	 * The definition filter is how an integrator sharpens a description or exposes a
+	 * parameter of their own without replacing the ability class.
+	 */
+	public function test_definition_filter_can_amend_an_ability(): void {
+		add_filter(
+			'storeseeder_mcp_ability_definition',
+			static function ( array $definition, string $id ): array {
+				if ( 'storeseeder/generate-products' === $id ) {
+					$definition['label'] = 'Renamed';
+					$definition['input_schema']['properties']['tenant'] = array( 'type' => 'string' );
+				}
+
+				return $definition;
+			},
+			10,
+			2
+		);
+
+		$definitions = Registry::instance()->definitions();
+
+		$this->assertSame( 'Renamed', $definitions['storeseeder/generate-products']['label'] );
+		$this->assertArrayHasKey(
+			'tenant',
+			$definitions['storeseeder/generate-products']['input_schema']['properties']
+		);
+		// Scoped by id, so nothing else was touched.
+		$this->assertNotSame( 'Renamed', $definitions['storeseeder/generate-orders']['label'] );
+	}
+
+	/**
+	 * Locales are enumerated from Locale rather than described in prose, so a client
+	 * cannot ask for one that silently generates English.
+	 */
+	public function test_locale_enum_matches_the_supported_locales(): void {
+		$schema = Registry::instance()->definitions()['storeseeder/generate-products']['input_schema'];
+
+		$this->assertSame( Locale::codes(), $schema['properties']['locale']['enum'] );
+		$this->assertSame( Locale::DEFAULT_LOCALE, $schema['properties']['locale']['default'] );
 	}
 
 	public function test_malformed_entries_are_discarded(): void {

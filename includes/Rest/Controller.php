@@ -12,7 +12,9 @@
 
 namespace StoreSeeder\Rest;
 
+use StoreSeeder\Access;
 use StoreSeeder\Generation\Generator;
+use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Platforms\Resolver;
 use WP_REST_Controller;
@@ -129,6 +131,22 @@ abstract class Controller extends WP_REST_Controller {
 		$rest_base = $this->get_rest_base();
 
 		/**
+		 * Filters the REST API parameters for every generation endpoint.
+		 *
+		 * Runs before the per-endpoint filter, so a parameter added here can still be
+		 * removed for one resource. Use it for something that belongs on all seventeen
+		 * endpoints — a `dry_run` flag, an extra `meta_options` key — instead of
+		 * hooking each base in turn.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_rest_params
+		 *
+		 * @param array<string, mixed> $params    Default generation parameters.
+		 * @param string               $rest_base The endpoint being registered, e.g. `cart-sessions`.
+		 */
+		$params = apply_filters( 'storeseeder_rest_params', $this->get_generation_params(), $rest_base );
+
+		/**
 		 * Filters the REST API parameters for a specific endpoint.
 		 *
 		 * Allows developers to modify the parameter schema for specific endpoints,
@@ -140,7 +158,7 @@ abstract class Controller extends WP_REST_Controller {
 		 *
 		 * @param array<string, mixed> $params Default generation parameters from get_generation_params().
 		 */
-		$params = apply_filters( "storeseeder_rest_params_{$rest_base}", $this->get_generation_params() );
+		$params = apply_filters( "storeseeder_rest_params_{$rest_base}", $params );
 
 		register_rest_route(
 			$this->namespace,
@@ -189,17 +207,10 @@ abstract class Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error REST response with preview data or error details.
 	 */
 	public function preview_items( WP_REST_Request $request ) {
-		$generator         = $this->get_generator_instance();
-		$params            = $request->get_params();
-		$supported_locales = array( 'en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'pt_BR' );
+		$generator = $this->get_generator_instance();
+		$params    = $request->get_params();
 
-		$locale = $params['locale'] ?? 'en_US';
-		if ( ! in_array( $locale, $supported_locales, true ) ) {
-			$generator->log( "Unsupported locale '{$locale}' used; falling back to 'en_US'.", 'warning' );
-			$locale = 'en_US';
-		}
-
-		$generator->set_locale( $locale );
+		$generator->set_locale( $this->resolve_locale( $params, $generator ) );
 		$generator->set_faker();
 		$generator->set_generation_params( $params );
 
@@ -236,9 +247,8 @@ abstract class Controller extends WP_REST_Controller {
 		}
 
 		// Pass all request parameters to the generator.
-		$params            = $request->get_params();
-		$generator         = $this->get_generator_instance();
-		$supported_locales = array( 'en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'pt_BR' ); // Basic locales for now.
+		$params    = $request->get_params();
+		$generator = $this->get_generator_instance();
 
 		// Which store the rows land in is a property of the request, not of the
 		// generator, so it is resolved here and injected. Resolution can legitimately
@@ -252,13 +262,7 @@ abstract class Controller extends WP_REST_Controller {
 
 		$generator->set_platform( $platform );
 
-		// Set faker and locale.
-		$locale = $params['locale'] ?? 'en_US';
-		if ( ! in_array( $locale, $supported_locales, true ) ) {
-			$generator->log( "Unsupported locale '{$locale}' used; falling back to 'en_US'.", 'warning' );
-			$locale = 'en_US';
-		}
-		$generator->set_locale( $locale );
+		$generator->set_locale( $this->resolve_locale( $params, $generator ) );
 		$generator->set_faker();
 		$generator->set_generation_params( $params );
 
@@ -422,14 +426,47 @@ abstract class Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Narrow the requested locale to one that can actually be generated in
+	 *
+	 * The REST schema already rejects an unknown locale, so in practice this only
+	 * fills in the default when none was sent. It still logs a substitution, because
+	 * the alternative -- quietly producing English for a locale the caller asked for --
+	 * is the bug this replaced.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $params    Request parameters.
+	 * @param Generator            $generator Generator, used for logging.
+	 *
+	 * @return string A supported locale code.
+	 */
+	protected function resolve_locale( array $params, Generator $generator ): string {
+		$requested = isset( $params['locale'] ) ? (string) $params['locale'] : Locale::DEFAULT_LOCALE;
+
+		if ( Locale::is_supported( $requested ) ) {
+			return $requested;
+		}
+
+		$resolved = Locale::resolve( $requested );
+
+		$generator->log(
+			"Unsupported locale '{$requested}' requested; generating in '{$resolved}' instead.",
+			'warning'
+		);
+
+		return $resolved;
+	}
+
+	/**
 	 * Check if user has permission to generate items
 	 *
 	 * @param  WP_REST_Request $request Full data about the request.
 	 * @return bool|WP_Error
 	 */
 	public function generate_items_permissions_check( $request ) {
-		// Check if user can manage options (admin capability).
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Access::current_user_can() rather than a literal capability, so the admin
+		// menu, the MCP abilities and these routes cannot be granted separately.
+		if ( ! Access::current_user_can() ) {
 			return new WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to generate fake data.', 'storeseeder' ),
@@ -464,10 +501,13 @@ abstract class Controller extends WP_REST_Controller {
 				'validate_callback' => array( $this, 'validate_count' ),
 			),
 			'locale'        => array(
-				'description'       => __( 'Locale for generated data (e.g., en_US, fr_FR, de_DE).', 'storeseeder' ),
+				// Enumerated from Locale, not a fixed list. A hardcoded six here was
+				// what made the admin's locale picker a lie: it offered seventy-three
+				// and the API accepted six, silently generating English for the rest.
+				'description'       => __( 'Locale for generated data (e.g., en_US, fr_FR, ja_JP).', 'storeseeder' ),
 				'type'              => 'string',
-				'default'           => 'en_US',
-				'enum'              => array( 'en_US', 'fr_FR', 'de_DE', 'es_ES', 'it_IT', 'pt_BR' ), // Basic locales for now.
+				'default'           => Locale::DEFAULT_LOCALE,
+				'enum'              => Locale::codes(),
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'seed'          => array(

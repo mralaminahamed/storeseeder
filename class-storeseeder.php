@@ -14,7 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use StoreSeeder\Access;
 use StoreSeeder\MCP\MCP_Server;
+use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver as Platform_Resolver;
 use StoreSeeder\Rest\Registry as Rest_Registry;
@@ -172,7 +174,7 @@ class StoreSeeder {
 		add_menu_page(
 			__( 'StoreSeeder', 'storeseeder' ),
 			__( 'StoreSeeder', 'storeseeder' ),
-			'manage_options',
+			Access::capability(),
 			'storeseeder',
 			array( $this, 'render_admin_page' ),
 			$this->get_menu_icon(),
@@ -503,31 +505,46 @@ class StoreSeeder {
 		);
 		wp_add_inline_style( 'storeseeder-admin', $css_vars );
 
-		// Get locale information for frontend display.
+		// Locale information for the admin. All of them: the picker offers exactly what
+		// the REST API accepts, which was not previously true.
 		$wp_locale     = get_locale();
-		$faker_locale  = $this->get_faker_locale( $wp_locale );
-		$locale_labels = $this->get_locale_labels();
+		$faker_locale  = Locale::resolve( $wp_locale );
+		$locale_labels = Locale::all();
 
-		wp_localize_script(
-			'storeseeder-admin',
-			'storeseederApi',
-			array(
-				'restUrl'     => rest_url( 'storeseeder/v1/' ),
-				'restNonce'   => wp_create_nonce( 'wp_rest' ),
-				'version'     => defined( 'STORESEEDER_VERSION' ) ? STORESEEDER_VERSION : '',
-				'adminColors' => $admin_colors,
-				'colorScheme' => $current_color,
-				'locale'      => array(
-					'wordpress'  => $wp_locale,
-					'faker'      => $faker_locale,
-					'label'      => $locale_labels[ $faker_locale ] ?? 'English (United States)',
-					'allLocales' => $locale_labels,
-				),
-				// Inlined so the topbar renders its target on first paint. Fetching it
-				// would flash "Auto" with no platform beside it, then correct itself.
-				'platforms'   => $this->rest_platforms()->get_data(),
-			)
+		$payload = array(
+			'restUrl'     => rest_url( 'storeseeder/v1/' ),
+			'restNonce'   => wp_create_nonce( 'wp_rest' ),
+			'version'     => defined( 'STORESEEDER_VERSION' ) ? STORESEEDER_VERSION : '',
+			'adminColors' => $admin_colors,
+			'colorScheme' => $current_color,
+			'locale'      => array(
+				'wordpress'  => $wp_locale,
+				'faker'      => $faker_locale,
+				'label'      => Locale::label( $faker_locale ),
+				'allLocales' => $locale_labels,
+				'default'    => Locale::DEFAULT_LOCALE,
+			),
+			// Inlined so the topbar renders its target on first paint. Fetching it
+			// would flash "Auto" with no platform beside it, then correct itself.
+			'platforms'   => $this->rest_platforms()->get_data(),
 		);
+
+		/**
+		 * Filters the data inlined for the admin app as `window.storeseederApi`.
+		 *
+		 * How a plugin adding a platform gets its own configuration to the browser on
+		 * first paint instead of fetching it. Add keys; the app reads what it knows and
+		 * ignores the rest. Removing a key it does rely on will break the admin, and
+		 * whatever goes in here is printed into the page, so nothing secret.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_admin_payload
+		 *
+		 * @param array<string, mixed> $payload The data passed to wp_localize_script().
+		 */
+		$payload = (array) apply_filters( 'storeseeder_admin_payload', $payload );
+
+		wp_localize_script( 'storeseeder-admin', 'storeseederApi', $payload );
 
 		wp_set_script_translations( 'storeseeder-admin', 'storeseeder' );
 	}
@@ -891,7 +908,7 @@ class StoreSeeder {
 	 * @return bool True when the current user may manage the plugin.
 	 */
 	public function rest_permission_check(): bool {
-		return current_user_can( 'manage_options' );
+		return Access::current_user_can();
 	}
 
 	/**
@@ -910,7 +927,7 @@ class StoreSeeder {
 			array(
 				'exists'      => $exists,
 				'last_synced' => $exists && is_dir( $dir ) ? gmdate( 'c', (int) filemtime( $dir ) ) : null,
-				'repo_url'    => 'https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart',
+				'repo_url'    => $this->get_sample_data_source()['repo_url'],
 				'consent'     => '' === $consent ? null : $consent,
 			),
 			200
@@ -960,6 +977,59 @@ class StoreSeeder {
 	}
 
 	/**
+	 * Where sample data is downloaded from.
+	 *
+	 * One place, because the status endpoint reports a repository URL and the downloader
+	 * fetches an archive from it — two literals that could drift into disagreeing about
+	 * what the user consented to.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array{repo_url: string, zip_url: string} Repository page and archive URLs.
+	 */
+	private function get_sample_data_source(): array {
+		$owner  = 'mralaminahamed';
+		$repo   = 'storeseeder-sample-data-fluent-cart';
+		$branch = 'trunk';
+
+		$source = array(
+			'repo_url' => "https://github.com/{$owner}/{$repo}",
+			'zip_url'  => "https://github.com/{$owner}/{$repo}/archive/refs/heads/{$branch}.zip",
+		);
+
+		/**
+		 * Filters where sample data is downloaded from.
+		 *
+		 * A platform of your own can ship its own reference data — the shipped repository
+		 * holds Fluent Cart product names and addresses, which suit a different store
+		 * only by accident.
+		 *
+		 * Consent is unaffected: nothing is fetched from either URL until an administrator
+		 * accepts the prompt, and `repo_url` is what the Settings page shows them, so a
+		 * filter that changes only `zip_url` would misrepresent what they agreed to.
+		 * Change both.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_sample_data_source
+		 *
+		 * @param mixed $source Repository page and archive URLs, an
+		 *                      array{repo_url: string, zip_url: string} when unfiltered. Typed
+		 *                      loosely because a filter may return anything, and a return
+		 *                      missing either URL is discarded below.
+		 */
+		$filtered = apply_filters( 'storeseeder_sample_data_source', $source );
+
+		if ( ! is_array( $filtered ) || empty( $filtered['repo_url'] ) || empty( $filtered['zip_url'] ) ) {
+			return $source;
+		}
+
+		return array(
+			'repo_url' => (string) $filtered['repo_url'],
+			'zip_url'  => (string) $filtered['zip_url'],
+		);
+	}
+
+	/**
 	 * Download sample data from remote repository
 	 *
 	 * Downloads the sample data archive from GitHub and extracts it to the local directory.
@@ -969,12 +1039,9 @@ class StoreSeeder {
 	 * @return bool True on success, false on failure.
 	 */
 	private function download_sample_data(): bool {
-		$repo_owner = 'mralaminahamed';
-		$repo_name  = 'storeseeder-sample-data-fluent-cart';
-		$branch     = 'trunk';
+		$source = $this->get_sample_data_source();
 
-		// GitHub API URL for downloading the repository as zip.
-		$download_url = "https://github.com/{$repo_owner}/{$repo_name}/archive/refs/heads/{$branch}.zip";
+		$download_url = $source['zip_url'];
 
 		$sample_data_dir = $this->get_sample_data_directory();
 		$temp_zip_file   = $sample_data_dir . '/sample-data-temp.zip';
@@ -1263,7 +1330,7 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function ajax_dismiss_mcp_notice(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! Access::current_user_can() ) {
 			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'storeseeder' ) ), 403 );
 		}
 
@@ -1358,138 +1425,26 @@ class StoreSeeder {
 	/**
 	 * Get FakerPHP locale for display purposes
 	 *
-	 * Converts WordPress locale codes to FakerPHP compatible locale codes for
-	 * the admin interface display. Applies filters for customization and provides
-	 * fallback logic for unsupported locales. Used by the React frontend to
-	 * display current locale information.
-	 *
-	 * @since 1.0.0
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Use StoreSeeder\Platforms\Locale::resolve().
 	 *
 	 * @param string $locale WordPress locale code (e.g., 'en_US', 'fr_FR').
 	 *
-	 * @return string FakerPHP compatible locale code (defaults to 'en_US').
+	 * @return string A supported locale code.
 	 */
 	public function get_faker_locale( string $locale ): string {
-		/**
-		 * Filters the locale used for test data generation.
-		 *
-		 * Allows developers to override the default locale used by StoreSeeder
-		 * for generating test data. Useful for generating data in specific languages
-		 * or regional formats regardless of the site's locale setting.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_locale
-		 *
-		 * @param string $locale The current WordPress locale code (e.g., 'en_US').
-		 */
-		$custom_locale = apply_filters( 'storeseeder_locale', $locale );
-
-		// Get supported locales.
-		$supported_locales = array_keys( $this->get_locale_labels() );
-
-		// Direct match.
-		if ( in_array( $custom_locale, $supported_locales, true ) ) {
-			return $custom_locale;
-		}
-
-		// Try language fallback.
-		$language = substr( $custom_locale, 0, 2 );
-		foreach ( $supported_locales as $locale_code ) {
-			if ( strpos( $locale_code, $language . '_' ) === 0 ) {
-				return $locale_code;
-			}
-		}
-
-		// Default fallback.
-		return 'en_US';
+		return Locale::resolve( $locale );
 	}
 
 	/**
 	 * Get human-readable labels for all supported FakerPHP locales
 	 *
-	 * Returns a comprehensive array of supported FakerPHP locales with their
-	 * human-readable labels for use in the admin interface. Includes major
-	 * world languages and regions for international data generation support.
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Use StoreSeeder\Platforms\Locale::all().
 	 *
-	 * @since 1.0.0
-	 *
-	 * @return array<string, string> Associative array mapping locale codes to display labels.
+	 * @return array<string, string> Locale code => display label.
 	 */
 	public function get_locale_labels(): array {
-		return array(
-			'ar_SA'      => 'Arabic (Saudi Arabia)',
-			'at_AT'      => 'Austrian German',
-			'bg_BG'      => 'Bulgarian (Bulgaria)',
-			'bn_BD'      => 'Bangla (Bangladesh)',
-			'cs_CZ'      => 'Czech (Czech Republic)',
-			'da_DK'      => 'Danish (Denmark)',
-			'de_AT'      => 'German (Austria)',
-			'de_CH'      => 'German (Switzerland)',
-			'de_DE'      => 'German (Germany)',
-			'el_CY'      => 'Greek (Cyprus)',
-			'el_GR'      => 'Greek (Greece)',
-			'en_AU'      => 'English (Australia)',
-			'en_GB'      => 'English (Great Britain)',
-			'en_HK'      => 'English (Hong Kong)',
-			'en_IN'      => 'English (India)',
-			'en_NG'      => 'English (Nigeria)',
-			'en_NZ'      => 'English (New Zealand)',
-			'en_PH'      => 'English (Philippines)',
-			'en_SG'      => 'English (Singapore)',
-			'en_UG'      => 'English (Uganda)',
-			'en_US'      => 'English (United States)',
-			'en_ZA'      => 'English (South Africa)',
-			'es_AR'      => 'Spanish (Argentina)',
-			'es_ES'      => 'Spanish (Spain)',
-			'es_PE'      => 'Spanish (Peru)',
-			'es_VE'      => 'Spanish (Venezuela)',
-			'et_EE'      => 'Estonian (Estonia)',
-			'fa_IR'      => 'Persian (Iran)',
-			'fi_FI'      => 'Finnish (Finland)',
-			'fr_BE'      => 'French (Belgium)',
-			'fr_CA'      => 'French (Canada)',
-			'fr_CH'      => 'French (Switzerland)',
-			'fr_FR'      => 'French (France)',
-			'he_IL'      => 'Hebrew (Israel)',
-			'hr_HR'      => 'Croatian (Croatia)',
-			'hu_HU'      => 'Hungarian (Hungary)',
-			'hy_AM'      => 'Armenian (Armenia)',
-			'id_ID'      => 'Indonesian (Indonesia)',
-			'is_IS'      => 'Icelandic (Iceland)',
-			'it_CH'      => 'Italian (Switzerland)',
-			'it_IT'      => 'Italian (Italy)',
-			'ja_JP'      => 'Japanese (Japan)',
-			'ka_GE'      => 'Georgian (Georgia)',
-			'kk_KZ'      => 'Kazakh (Kazakhstan)',
-			'ko_KR'      => 'Korean (South Korea)',
-			'lt_LT'      => 'Lithuanian (Lithuania)',
-			'lv_LV'      => 'Latvian (Latvia)',
-			'me_ME'      => 'Montenegrin (Montenegro)',
-			'mn_MN'      => 'Mongolian (Mongolia)',
-			'ms_MY'      => 'Malay (Malaysia)',
-			'nb_NO'      => 'Norwegian Bokmål (Norway)',
-			'ne_NP'      => 'Nepali (Nepal)',
-			'nl_BE'      => 'Dutch (Belgium)',
-			'nl_NL'      => 'Dutch (Netherlands)',
-			'pl_PL'      => 'Polish (Poland)',
-			'pt_AO'      => 'Portuguese (Angola)',
-			'pt_BR'      => 'Portuguese (Brazil)',
-			'pt_PT'      => 'Portuguese (Portugal)',
-			'ro_MD'      => 'Romanian (Moldova)',
-			'ro_RO'      => 'Romanian (Romania)',
-			'ru_RU'      => 'Russian (Russia)',
-			'sk_SK'      => 'Slovak (Slovakia)',
-			'sl_SI'      => 'Slovenian (Slovenia)',
-			'sr_Cyrl_RS' => 'Serbian Cyrillic (Serbia)',
-			'sr_Latn_RS' => 'Serbian Latin (Serbia)',
-			'sr_RS'      => 'Serbian (Serbia)',
-			'sv_SE'      => 'Swedish (Sweden)',
-			'th_TH'      => 'Thai (Thailand)',
-			'tr_TR'      => 'Turkish (Turkey)',
-			'uk_UA'      => 'Ukrainian (Ukraine)',
-			'vi_VN'      => 'Vietnamese (Vietnam)',
-			'zh_CN'      => 'Chinese (China)',
-			'zh_TW'      => 'Chinese (Taiwan)',
-		);
+		return Locale::all();
 	}
 }

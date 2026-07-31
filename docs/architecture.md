@@ -11,6 +11,7 @@ storeseeder/
 ├── storeseeder.php              # Plugin header, constants, bootstrap
 ├── class-storeseeder.php        # Singleton orchestrator: menu, assets, REST wiring
 ├── includes/                    # PHP backend. PSR-4: StoreSeeder\ → includes/
+│   ├── Access.php               # One capability gate for menu, REST, MCP and AJAX
 │   ├── Generation/              # What data looks like — no platform knowledge
 │   │   ├── Generator.php        #   abstract base: FakerPHP, batching, preview, logging
 │   │   └── Generators/          #   17 concrete generators, one per resource
@@ -32,6 +33,7 @@ storeseeder/
 │       ├── Capability.php          # can this platform do this, and why not
 │       ├── Resource.php            # the 17 canonical resource names
 │       ├── Status.php              # canonical status vocabulary
+│       ├── Locale.php              # the 75 generatable locales; owns storeseeder_locales
 │       └── Drivers/
 │           └── Fluent_Cart/
 │               ├── Platform.php    # capability matrix + writer map
@@ -330,11 +332,15 @@ this one.
 |---|---|---|
 | `storeseeder_platforms` | filter | Register a driver. The whole surface needed to add a platform. |
 | `storeseeder_rest_controllers` | filter | Add or remove a REST controller, so a driver can expose a resource of its own |
+| `storeseeder_capability` | filter | The capability required to use StoreSeeder. Governs the admin menu, every REST route, every MCP ability and the AJAX handlers together, so access cannot be widened for one and not the others. An unusable return falls back to `manage_options` |
 | `storeseeder_mcp_abilities` | filter | Add or remove an MCP ability |
 | `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
 | `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
+| `storeseeder_canonical_entity` | filter | Mutate every neutral entity, whatever its resource. Runs before the per-resource filter, which therefore wins |
 | `storeseeder_canonical_{resource}` | filter | Mutate the neutral entity before it is written — applies to every platform equally |
 | `storeseeder_target_platform` | filter | Force the target, overriding request and stored option |
+| `storeseeder_locales` | filter | Narrow or extend the generatable locales. The admin picker, REST enum and MCP schema all read it, so they cannot disagree. An empty or malformed return is discarded rather than leaving nothing selectable |
+| `storeseeder_locale` | filter | Force the generation locale, overriding request and site locale |
 | `storeseeder_before_write_{platform}_{resource}` | action | |
 | `storeseeder_after_write_{platform}_{resource}` | action | Fires for failures too, so a listener sees the whole batch |
 | `storeseeder_generation_params_{type}` | filter | Adjust parameters before a run |
@@ -342,7 +348,11 @@ this one.
 | `storeseeder_before_generate_single_item_{type}` | action | |
 | `storeseeder_after_generate_single_item_{type}` | action | |
 | `storeseeder_after_batch_generate_{type}` | action | Cache clearing, index updates |
+| `storeseeder_rest_params` | filter | Alter the parameter schema of all seventeen endpoints; receives the REST base as its second argument. Runs before the per-endpoint filter |
 | `storeseeder_rest_params_{base}` | filter | Alter one endpoint's parameter schema |
+| `storeseeder_mcp_ability_definition` | filter | Amend one ability's definition — label, description, input schema, callbacks — without replacing the class |
+| `storeseeder_admin_payload` | filter | Add to the data inlined as `window.storeseederApi`, so a driver's own configuration is there on first paint |
+| `storeseeder_sample_data_source` | filter | Where sample data is downloaded from. Change `repo_url` and `zip_url` together: the first is what the consent prompt shows |
 | `storeseeder_rest_message` / `storeseeder_rest_response` | filter | Shape the REST response |
 | `storeseeder_{resource}_generation_result` | filter | Per-resource result payload |
 

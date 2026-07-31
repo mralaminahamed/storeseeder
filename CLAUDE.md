@@ -52,7 +52,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baseline: 256 tests, 1052 assertions.** For any refactor claiming no behaviour
+**Current baseline: 301 tests, 1707 assertions.** For any refactor claiming no behaviour
 change, that number must come back *identical*, not merely green. A changed count means a
 reference was missed.
 
@@ -64,6 +64,7 @@ React → REST → Controller → Generator → canonical entity → Writer → 
 
 ```
 includes/
+  Access.php      one capability gate: menu, REST, MCP, AJAX
   Generation/     Generator.php (abstract)   + Generators/*    17 generators
   Rest/           Controller.php (abstract)  + Controllers/*   17 controllers
                   Registry.php               owns storeseeder_rest_controllers
@@ -72,7 +73,7 @@ includes/
                   Ability.php (abstract)     + Abilities/*     17 abilities
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php
-                  Resource.php  Status.php
+                  Resource.php  Status.php  Locale.php
                   Drivers/Fluent_Cart/Platform.php + Writers/*      17 writers
 ```
 
@@ -117,7 +118,11 @@ implementing `Platform_Interface` (extending `Platform_Driver` is shortest) and 
 generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{id}`,
 `storeseeder_platform_supports_{id}`, `storeseeder_canonical_{resource}`,
 `storeseeder_target_platform`, and `storeseeder_before_write_{platform}_{resource}` /
-`_after_write_`.
+`_after_write_`. Cross-cutting ones: `storeseeder_capability` (one gate for menu, REST, MCP and
+AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_rest_params` (the
+all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
+`storeseeder_mcp_ability_definition`, `storeseeder_admin_payload`,
+`storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
 
 ## Conventions that differ from what you would guess
 
@@ -160,6 +165,16 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 - **`playwright.config.ts` excludes `screenshots.spec.ts` and `banners.spec.ts`** from the
   default project so runs do not clobber the shipped WordPress.org PNGs. Those are driven
   through `playwright.screenshots.config.ts`.
+- **The capability gate is `StoreSeeder\Access`, not a literal `manage_options`.** Four
+  surfaces check it — admin menu, REST, MCP, AJAX — and a site that grants the routes but not
+  the page has a broken plugin. It lives at the root of `includes/` rather than in a layer
+  directory because it belongs to none of them.
+- **Never write a locale list by hand.** `Platforms\Locale` is the only one; PHP reads it there
+  and TypeScript reads the codes the server inlines (`src/lib/locales.ts`). A second list is how
+  the admin came to offer 73 while the REST enum accepted 6 — and because `Factory::create()`
+  falls back to `en_US` in silence, the other 67 produced English with no error. Adding a locale
+  means FakerPHP ships a provider for it; `LocaleTest::test_list_matches_fakerphp_exactly()`
+  fails otherwise.
 - **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
 - **Sample data lives in a separate repo** and downloads only after an administrator accepts
   the consent prompt. That prompt is the only thing granting permission — see

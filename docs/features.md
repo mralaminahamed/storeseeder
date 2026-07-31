@@ -120,9 +120,14 @@ The remaining fourteen follow the same pattern; the admin renders whatever the s
 
 ## Locales
 
-The generation locale is one of six: `en_US`, `fr_FR`, `de_DE`, `es_ES`, `it_IT`, `pt_BR`.
-Anything else falls back to `en_US`. Locale affects names, addresses, phone numbers and
-postcodes.
+Seventy-five locales, every one of which FakerPHP ships a provider for — the admin picker, the
+REST `locale` enum and the MCP input schema are all enumerated from
+`StoreSeeder\Platforms\Locale`, so what is offered is exactly what generates. Locale affects
+names, addresses, phone numbers, company names and postcodes.
+
+An unrecognised locale falls back to the same language where a regional variant exists — a site
+on `de_LU` generates German — and to `en_US` when nothing matches. `storeseeder_locales` narrows
+or extends the list; `storeseeder_locale` overrides the choice outright.
 
 Optional **sample data** — locale-specific product names, addresses and customer tags — can be
 downloaded from GitHub to make content more realistic, but only after an administrator accepts a
@@ -131,7 +136,8 @@ defaults. See [external-services.md](external-services.md).
 
 ## REST API
 
-Every generator exposes two routes. All require `manage_options`.
+Every generator exposes two routes. All require `manage_options`, or whatever
+`storeseeder_capability` returns.
 
 ```
 POST /wp-json/storeseeder/v1/<rest-base>/generate
@@ -163,6 +169,10 @@ Filters and actions across the whole lifecycle, with the full table in
 - `storeseeder_mcp_abilities` — add or remove an MCP ability
 - `storeseeder_canonical_{resource}` — change generated data before it is written, for every
   platform at once
+- `storeseeder_locales` — narrow or extend the offered locales; the admin, REST enum and MCP
+  schema all follow it
+- `storeseeder_capability` — who may use the plugin, for the admin menu, REST and MCP at once
+- `storeseeder_admin_payload` — add to what the admin app receives on first paint
 - `storeseeder_generated_item_{type}`, `storeseeder_after_batch_generate_{type}` — observe or
   adjust a run
 - `storeseeder_platform_supports_{id}` — override a capability, or declare that your extension
