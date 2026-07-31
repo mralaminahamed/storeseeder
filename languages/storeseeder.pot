@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T21:02:13+00:00\n"
+"POT-Creation-Date: 2026-07-31T21:29:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -410,12 +410,12 @@ msgid "Sub-brand"
 msgstr ""
 
 #: includes/Generation/Generators/Cart_Session.php:42
-#: build/admin-app.js:26225
+#: build/admin-app.js:26202
 msgid "Cart Sessions"
 msgstr ""
 
 #: includes/Generation/Generators/Coupon.php:40
-#: build/admin-app.js:25769
+#: build/admin-app.js:25746
 msgid "Coupons"
 msgstr ""
 
@@ -424,7 +424,7 @@ msgid "Code"
 msgstr ""
 
 #: includes/Generation/Generators/Coupon.php:107
-#: includes/Generation/Generators/Product.php:107
+#: includes/Generation/Generators/Product.php:263
 msgid "Type"
 msgstr ""
 
@@ -438,7 +438,7 @@ msgstr ""
 
 #: includes/Generation/Generators/Coupon.php:119
 #: includes/Generation/Generators/Order.php:151
-#: includes/Generation/Generators/Product.php:119
+#: includes/Generation/Generators/Product.php:275
 msgid "Status"
 msgstr ""
 
@@ -451,7 +451,7 @@ msgid "Generates realistic customer profiles with comprehensive personal informa
 msgstr ""
 
 #: includes/Generation/Generators/Customer.php:631
-#: includes/Generation/Generators/Product.php:99
+#: includes/Generation/Generators/Product.php:255
 msgid "Name"
 msgstr ""
 
@@ -470,17 +470,17 @@ msgstr ""
 #: includes/Generation/Generators/Customer.php:647
 #: includes/Generation/Generators/Order.php:45
 #: build/admin-app.js:19599
-#: build/admin-app.js:25674
+#: build/admin-app.js:25651
 msgid "Orders"
 msgstr ""
 
 #: includes/Generation/Generators/Label.php:63
-#: build/admin-app.js:26482
+#: build/admin-app.js:26459
 msgid "Labels"
 msgstr ""
 
 #: includes/Generation/Generators/License.php:58
-#: build/admin-app.js:26522
+#: build/admin-app.js:26499
 msgid "Licenses"
 msgstr ""
 
@@ -524,24 +524,24 @@ msgid "Total"
 msgstr ""
 
 #: includes/Generation/Generators/Order_Tax_Rate.php:41
-#: build/admin-app.js:26492
+#: build/admin-app.js:26469
 msgid "Order Tax Lines"
 msgstr ""
 
-#: includes/Generation/Generators/Product.php:103
+#: includes/Generation/Generators/Product.php:259
 msgid "SKU"
 msgstr ""
 
-#: includes/Generation/Generators/Product.php:111
+#: includes/Generation/Generators/Product.php:267
 msgid "Price"
 msgstr ""
 
-#: includes/Generation/Generators/Product.php:115
+#: includes/Generation/Generators/Product.php:271
 msgid "Stock"
 msgstr ""
 
 #: includes/Generation/Generators/Product_Category.php:97
-#: build/admin-app.js:26346
+#: build/admin-app.js:26323
 msgid "Product Categories"
 msgstr ""
 
@@ -554,12 +554,12 @@ msgid "Sub-category"
 msgstr ""
 
 #: includes/Generation/Generators/Product_Download.php:41
-#: build/admin-app.js:26502
+#: build/admin-app.js:26479
 msgid "Product Downloads"
 msgstr ""
 
 #: includes/Generation/Generators/Product_Tag.php:79
-#: build/admin-app.js:26396
+#: build/admin-app.js:26373
 msgid "Product Tags"
 msgstr ""
 
@@ -568,7 +568,7 @@ msgid "Tag"
 msgstr ""
 
 #: includes/Generation/Generators/Product_Variation.php:43
-#: build/admin-app.js:25879
+#: build/admin-app.js:25856
 msgid "Product Variations"
 msgstr ""
 
@@ -581,27 +581,27 @@ msgid "Partial refund"
 msgstr ""
 
 #: includes/Generation/Generators/Shipping_Class.php:58
-#: build/admin-app.js:26472
+#: build/admin-app.js:26449
 msgid "Shipping Classes"
 msgstr ""
 
 #: includes/Generation/Generators/Shipping_Plan.php:51
-#: build/admin-app.js:25969
+#: build/admin-app.js:25946
 msgid "Shipping Plans"
 msgstr ""
 
 #: includes/Generation/Generators/Subscription.php:63
-#: build/admin-app.js:26512
+#: build/admin-app.js:26489
 msgid "Subscriptions"
 msgstr ""
 
 #: includes/Generation/Generators/Tax_Class.php:40
-#: build/admin-app.js:26043
+#: build/admin-app.js:26020
 msgid "Tax Classes"
 msgstr ""
 
 #: includes/Generation/Generators/Transaction.php:42
-#: build/admin-app.js:26133
+#: build/admin-app.js:26110
 msgid "Transactions"
 msgstr ""
 
@@ -878,22 +878,18 @@ msgid "Maximum product price (USD). Default: 500."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Products.php:63
-msgid "Generate product attributes (size, colour, material). Default: true."
+msgid "Record what the shop paid for each product, for margin reporting. Default: false."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Products.php:68
-msgid "Number of variations per variable product (1–20). Default: 5."
-msgstr ""
-
-#: includes/MCP/Abilities/Generate_Products.php:75
 msgid "Enable stock management and generate inventory levels. Default: true."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Products.php:80
+#: includes/MCP/Abilities/Generate_Products.php:73
 msgid "Length of product descriptions. Allowed: short, medium, long. Default: medium."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Products.php:93
+#: includes/MCP/Abilities/Generate_Products.php:86
 msgid "Array of generated product objects with id, title, type, variations count, price_range, and stock_status."
 msgstr ""
 
@@ -1139,7 +1135,7 @@ msgstr ""
 
 #: includes/Platforms/Capability.php:166
 #: includes/Rest/Controller.php:411
-#: build/admin-app.js:27125
+#: build/admin-app.js:27102
 msgid "Not supported by this platform."
 msgstr ""
 
@@ -1148,7 +1144,7 @@ msgid "Fluent Cart"
 msgstr ""
 
 #: includes/Platforms/Drivers/Fluent_Cart/Platform.php:137
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:180
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:185
 msgid "Fluent Cart Pro"
 msgstr ""
 
@@ -1156,7 +1152,7 @@ msgstr ""
 msgid "Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:208
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:213
 msgid "Fluent Cart only. Whether generated variations are bought once or on a subscription."
 msgstr ""
 
@@ -1183,7 +1179,7 @@ msgstr ""
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Coupon.php:62
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:47
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Order.php:76
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:61
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:72
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Product_Variation.php:48
 #: includes/Platforms/Drivers/Fluent_Cart/Writers/Tax_Class.php:47
 msgid "Fluent Cart plugin not found. Please ensure Fluent Cart is active."
@@ -1294,20 +1290,20 @@ msgstr ""
 msgid "Failed to create order tax line."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:65
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:76
 msgid "Fluent Cart Product model not found. Please ensure Fluent Cart plugin is active."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:88
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:119
 msgid "Failed to create product."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:247
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:336
 msgid "A generated product was recorded without a usable post id."
 msgstr ""
 
 #. translators: %d: post id.
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:278
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Product.php:367
 #, php-format
 msgid "Could not delete generated product %d."
 msgstr ""
@@ -1521,7 +1517,7 @@ msgstr ""
 msgid "Tax"
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product.php:93
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Product.php:102
 msgid "Failed to create the product."
 msgstr ""
 
@@ -1726,21 +1722,21 @@ msgstr ""
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Rest/Controller.php:732
+#: includes/Rest/Controller.php:738
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Rest/Controller.php:758
+#: includes/Rest/Controller.php:764
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Rest/Controller.php:780
+#: includes/Rest/Controller.php:786
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Rest/Controller.php:784
+#: includes/Rest/Controller.php:790
 msgid "Number of items generated."
 msgstr ""
 
@@ -1837,27 +1833,27 @@ msgid "Coupon"
 msgstr ""
 
 #: includes/Rest/Controllers/Coupon.php:78
-#: build/admin-app.js:25779
+#: build/admin-app.js:25756
 msgid "Types of discount coupons to generate"
 msgstr ""
 
 #: includes/Rest/Controllers/Coupon.php:88
-#: build/admin-app.js:25788
+#: build/admin-app.js:25765
 msgid "Discount value range"
 msgstr ""
 
 #: includes/Rest/Controllers/Coupon.php:116
-#: build/admin-app.js:25816
+#: build/admin-app.js:25793
 msgid "Usage limitation settings"
 msgstr ""
 
 #: includes/Rest/Controllers/Coupon.php:138
-#: build/admin-app.js:25838
+#: build/admin-app.js:25815
 msgid "Coupon validity period configuration"
 msgstr ""
 
 #: includes/Rest/Controllers/Coupon.php:156
-#: build/admin-app.js:25856
+#: build/admin-app.js:25833
 msgid "Coupon usage restrictions"
 msgstr ""
 
@@ -1970,54 +1966,38 @@ msgid "Maximum price."
 msgstr ""
 
 #: includes/Rest/Controllers/Product.php:121
-msgid "Product categories configuration."
+msgid "Record what the shop paid for each product, for margin reporting."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:125
-msgid "Create new categories if needed."
+#: includes/Rest/Controllers/Product.php:126
+msgid "How generated products are filed."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:130
-msgid "Maximum categories per product."
+#: includes/Rest/Controllers/Product.php:132
+msgid "Maximum existing categories to file each product under."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:139
-msgid "Product attributes configuration."
-msgstr ""
-
-#: includes/Rest/Controllers/Product.php:143
-msgid "Include product attributes."
-msgstr ""
-
-#: includes/Rest/Controllers/Product.php:148
-msgid "Number of variations for variable products."
-msgstr ""
-
-#: includes/Rest/Controllers/Product.php:157
+#: includes/Rest/Controllers/Product.php:141
 msgid "Inventory settings for generated products."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:161
+#: includes/Rest/Controllers/Product.php:145
 msgid "Enable stock management."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:166
+#: includes/Rest/Controllers/Product.php:150
 msgid "Stock quantity range."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:184
+#: includes/Rest/Controllers/Product.php:168
 msgid "Product content generation options."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:188
-msgid "Generate product images."
-msgstr ""
-
-#: includes/Rest/Controllers/Product.php:193
+#: includes/Rest/Controllers/Product.php:172
 msgid "Product description length."
 msgstr ""
 
-#: includes/Rest/Controllers/Product.php:213
+#: includes/Rest/Controllers/Product.php:192
 msgid "Generated products data."
 msgstr ""
 
@@ -2236,7 +2216,7 @@ msgid "Generated %1$s %2$s"
 msgstr ""
 
 #: build/admin-app.js:19375
-#: build/admin-app.js:27596
+#: build/admin-app.js:27573
 msgid "An error occurred."
 msgstr ""
 
@@ -2293,7 +2273,7 @@ msgid "New generation"
 msgstr ""
 
 #: build/admin-app.js:19590
-#: build/admin-app.js:25581
+#: build/admin-app.js:25558
 msgid "Customers"
 msgstr ""
 
@@ -3239,590 +3219,574 @@ msgid "Price range for generated products"
 msgstr ""
 
 #: build/admin-app.js:25500
-msgid "Product categories configuration"
+msgid "Record what the shop paid, for margin reporting"
 msgstr ""
 
-#: build/admin-app.js:25504
-msgid "Create new categories if needed"
+#: build/admin-app.js:25505
+msgid "How generated products are filed"
 msgstr ""
 
 #: build/admin-app.js:25509
-msgid "Maximum categories per product"
+msgid "Maximum existing categories to file each product under"
 msgstr ""
 
 #: build/admin-app.js:25518
-msgid "Product attributes configuration"
-msgstr ""
-
-#: build/admin-app.js:25522
-msgid "Include product attributes"
-msgstr ""
-
-#: build/admin-app.js:25527
-msgid "Number of variations for variable products"
-msgstr ""
-
-#: build/admin-app.js:25536
 msgid "Inventory settings for generated products"
 msgstr ""
 
-#: build/admin-app.js:25540
-#: build/admin-app.js:25927
+#: build/admin-app.js:25522
+#: build/admin-app.js:25904
 msgid "Enable stock management"
 msgstr ""
 
-#: build/admin-app.js:25545
-#: build/admin-app.js:25932
+#: build/admin-app.js:25527
+#: build/admin-app.js:25909
 msgid "Stock quantity range"
 msgstr ""
 
-#: build/admin-app.js:25563
+#: build/admin-app.js:25545
 msgid "Product content generation options"
 msgstr ""
 
-#: build/admin-app.js:25567
+#: build/admin-app.js:25549
 msgid "Length of product descriptions"
 msgstr ""
 
-#: build/admin-app.js:25573
-msgid "Include placeholder images"
-msgstr ""
-
-#: build/admin-app.js:25585
+#: build/admin-app.js:25562
 msgid "Generate customer profiles with addresses, purchase history, and loyalty data. Essential for testing user accounts and customer management."
 msgstr ""
 
-#: build/admin-app.js:25586
+#: build/admin-app.js:25563
 msgid "Store owners, CRM developers, membership site testers"
 msgstr ""
 
-#: build/admin-app.js:25592
+#: build/admin-app.js:25569
 msgid "Types of customers to generate"
 msgstr ""
 
-#: build/admin-app.js:25601
+#: build/admin-app.js:25578
 msgid "Demographic distribution"
 msgstr ""
 
-#: build/admin-app.js:25605
+#: build/admin-app.js:25582
 msgid "Age group distribution"
 msgstr ""
 
-#: build/admin-app.js:25616
+#: build/admin-app.js:25593
 msgid "Address generation preferences"
 msgstr ""
 
-#: build/admin-app.js:25620
+#: build/admin-app.js:25597
 msgid "Include billing addresses"
 msgstr ""
 
-#: build/admin-app.js:25625
+#: build/admin-app.js:25602
 msgid "Include shipping addresses"
 msgstr ""
 
-#: build/admin-app.js:25630
+#: build/admin-app.js:25607
 msgid "Percentage with different billing/shipping (0–100)"
 msgstr ""
 
-#: build/admin-app.js:25639
+#: build/admin-app.js:25616
 msgid "Purchase history simulation"
 msgstr ""
 
-#: build/admin-app.js:25643
+#: build/admin-app.js:25620
 msgid "Generate purchase history metadata"
 msgstr ""
 
-#: build/admin-app.js:25648
+#: build/admin-app.js:25625
 msgid "Include loyalty tier assignments"
 msgstr ""
 
-#: build/admin-app.js:25655
+#: build/admin-app.js:25632
 msgid "Contact and communication preferences"
 msgstr ""
 
-#: build/admin-app.js:25659
+#: build/admin-app.js:25636
 msgid "Include phone numbers"
 msgstr ""
 
-#: build/admin-app.js:25664
+#: build/admin-app.js:25641
 msgid "Percentage opted in for marketing (0–100)"
 msgstr ""
 
-#: build/admin-app.js:25678
+#: build/admin-app.js:25655
 msgid "Create complete order histories with payments, shipping, and tax calculations. Test your checkout flow and order management system."
 msgstr ""
 
-#: build/admin-app.js:25679
+#: build/admin-app.js:25656
 msgid "Store owners, payment gateway developers, shipping testers"
 msgstr ""
 
-#: build/admin-app.js:25685
+#: build/admin-app.js:25662
 msgid "Order status distribution"
 msgstr ""
 
-#: build/admin-app.js:25691
+#: build/admin-app.js:25668
 msgid "Type of customers for orders"
 msgstr ""
 
-#: build/admin-app.js:25697
-#: build/admin-app.js:26149
-#: build/admin-app.js:26241
+#: build/admin-app.js:25674
+#: build/admin-app.js:26126
+#: build/admin-app.js:26218
 msgid "Specific customer ID (when customer_type is 'specific')"
 msgstr ""
 
-#: build/admin-app.js:25705
+#: build/admin-app.js:25682
 msgid "Customer type distribution for mixed mode"
 msgstr ""
 
-#: build/admin-app.js:25709
+#: build/admin-app.js:25686
 msgid "Percentage of existing customers (0–100)"
 msgstr ""
 
-#: build/admin-app.js:25716
+#: build/admin-app.js:25693
 msgid "Percentage of new customers (0–100)"
 msgstr ""
 
-#: build/admin-app.js:25725
+#: build/admin-app.js:25702
 msgid "Number of items per order"
 msgstr ""
 
-#: build/admin-app.js:25729
+#: build/admin-app.js:25706
 msgid "Minimum items"
 msgstr ""
 
-#: build/admin-app.js:25735
+#: build/admin-app.js:25712
 msgid "Maximum items"
 msgstr ""
 
-#: build/admin-app.js:25744
+#: build/admin-app.js:25721
 msgid "Payment methods to use"
 msgstr ""
 
-#: build/admin-app.js:25753
+#: build/admin-app.js:25730
 msgid "Geographic distribution of orders"
 msgstr ""
 
-#: build/admin-app.js:25757
+#: build/admin-app.js:25734
 msgid "Countries to generate orders from"
 msgstr ""
 
-#: build/admin-app.js:25773
+#: build/admin-app.js:25750
 msgid "Generate discount codes with various rules and restrictions. Perfect for testing promotional campaigns and discount logic."
 msgstr ""
 
-#: build/admin-app.js:25774
+#: build/admin-app.js:25751
 msgid "Store owners, marketing teams, discount plugin developers"
 msgstr ""
 
-#: build/admin-app.js:25883
+#: build/admin-app.js:25860
 msgid "Create complex product variations with size, color, and material options. Essential for testing variable product functionality."
 msgstr ""
 
-#: build/admin-app.js:25884
-#: build/admin-app.js:26331
+#: build/admin-app.js:25861
+#: build/admin-app.js:26308
 msgid "E-commerce developers, product catalog managers"
 msgstr ""
 
-#: build/admin-app.js:25889
+#: build/admin-app.js:25866
 msgid "Specific product ID to generate variations for"
 msgstr ""
 
-#: build/admin-app.js:25894
+#: build/admin-app.js:25871
 msgid "Product types to consider for variation generation"
 msgstr ""
 
-#: build/admin-app.js:25903
+#: build/admin-app.js:25880
 msgid "Price variance settings for variations"
 msgstr ""
 
-#: build/admin-app.js:25907
+#: build/admin-app.js:25884
 msgid "Minimum variance %"
 msgstr ""
 
-#: build/admin-app.js:25914
+#: build/admin-app.js:25891
 msgid "Maximum variance %"
 msgstr ""
 
-#: build/admin-app.js:25923
+#: build/admin-app.js:25900
 msgid "Stock management settings for variations"
 msgstr ""
 
-#: build/admin-app.js:25950
+#: build/admin-app.js:25927
 msgid "Attribute generation settings"
 msgstr ""
 
-#: build/admin-app.js:25954
+#: build/admin-app.js:25931
 msgid "Create missing attributes if needed"
 msgstr ""
 
-#: build/admin-app.js:25959
+#: build/admin-app.js:25936
 msgid "Maximum attributes per variation"
 msgstr ""
 
-#: build/admin-app.js:25973
+#: build/admin-app.js:25950
 msgid "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows."
 msgstr ""
 
-#: build/admin-app.js:25974
+#: build/admin-app.js:25951
 msgid "Store owners, shipping plugin developers, logistics teams"
 msgstr ""
 
-#: build/admin-app.js:25979
+#: build/admin-app.js:25956
 msgid "Types of shipping methods to generate"
 msgstr ""
 
-#: build/admin-app.js:25988
+#: build/admin-app.js:25965
 msgid "Shipping cost range"
 msgstr ""
 
-#: build/admin-app.js:25992
+#: build/admin-app.js:25969
 msgid "Minimum cost"
 msgstr ""
 
-#: build/admin-app.js:25998
+#: build/admin-app.js:25975
 msgid "Maximum cost"
 msgstr ""
 
-#: build/admin-app.js:26006
+#: build/admin-app.js:25983
 msgid "Geographic coverage areas"
 msgstr ""
 
-#: build/admin-app.js:26015
+#: build/admin-app.js:25992
 msgid "Shipping calculation methods"
 msgstr ""
 
-#: build/admin-app.js:26024
+#: build/admin-app.js:26001
 msgid "Delivery time ranges"
 msgstr ""
 
-#: build/admin-app.js:26028
+#: build/admin-app.js:26005
 msgid "Minimum delivery days"
 msgstr ""
 
-#: build/admin-app.js:26034
+#: build/admin-app.js:26011
 msgid "Maximum delivery days"
 msgstr ""
 
-#: build/admin-app.js:26047
+#: build/admin-app.js:26024
 msgid "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance."
 msgstr ""
 
-#: build/admin-app.js:26048
+#: build/admin-app.js:26025
 msgid "Store owners, accountants, tax plugin developers"
 msgstr ""
 
-#: build/admin-app.js:26053
+#: build/admin-app.js:26030
 msgid "Types of tax classes to generate"
 msgstr ""
 
-#: build/admin-app.js:26062
+#: build/admin-app.js:26039
 msgid "Tax jurisdictions to generate rates for"
 msgstr ""
 
-#: build/admin-app.js:26071
+#: build/admin-app.js:26048
 msgid "Tax rate ranges by type"
 msgstr ""
 
-#: build/admin-app.js:26075
+#: build/admin-app.js:26052
 msgid "Standard tax rate range"
 msgstr ""
 
-#: build/admin-app.js:26093
+#: build/admin-app.js:26070
 msgid "Reduced tax rate range"
 msgstr ""
 
-#: build/admin-app.js:26113
+#: build/admin-app.js:26090
 msgid "Geographic coverage for tax rates"
 msgstr ""
 
-#: build/admin-app.js:26117
+#: build/admin-app.js:26094
 msgid "Countries to generate tax rates for"
 msgstr ""
 
-#: build/admin-app.js:26125
+#: build/admin-app.js:26102
 msgid "Include compound tax rates"
 msgstr ""
 
-#: build/admin-app.js:26137
+#: build/admin-app.js:26114
 msgid "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation."
 msgstr ""
 
-#: build/admin-app.js:26138
+#: build/admin-app.js:26115
 msgid "Payment gateway developers, accountants, financial analysts"
 msgstr ""
 
-#: build/admin-app.js:26143
+#: build/admin-app.js:26120
 msgid "Type of customers for transactions"
 msgstr ""
 
-#: build/admin-app.js:26157
+#: build/admin-app.js:26134
 msgid "Filter orders by status"
 msgstr ""
 
-#: build/admin-app.js:26166
+#: build/admin-app.js:26143
 msgid "Types of transactions to generate"
 msgstr ""
 
-#: build/admin-app.js:26175
+#: build/admin-app.js:26152
 msgid "Payment gateways to use for transactions"
 msgstr ""
 
-#: build/admin-app.js:26184
+#: build/admin-app.js:26161
 msgid "Transaction amount range"
 msgstr ""
 
-#: build/admin-app.js:26200
+#: build/admin-app.js:26177
 msgid "Transaction status distribution"
 msgstr ""
 
-#: build/admin-app.js:26229
+#: build/admin-app.js:26206
 msgid "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics."
 msgstr ""
 
-#: build/admin-app.js:26230
+#: build/admin-app.js:26207
 msgid "Marketing teams, cart recovery plugin developers"
 msgstr ""
 
-#: build/admin-app.js:26235
+#: build/admin-app.js:26212
 msgid "Type of customers for cart sessions"
 msgstr ""
 
-#: build/admin-app.js:26249
+#: build/admin-app.js:26226
 msgid "Percentage of guest carts (0–100)"
 msgstr ""
 
-#: build/admin-app.js:26256
+#: build/admin-app.js:26233
 msgid "Cart abandonment rate percentage (0–100)"
 msgstr ""
 
-#: build/admin-app.js:26263
+#: build/admin-app.js:26240
 msgid "Cart value range"
 msgstr ""
 
-#: build/admin-app.js:26267
+#: build/admin-app.js:26244
 msgid "Minimum cart value"
 msgstr ""
 
-#: build/admin-app.js:26273
+#: build/admin-app.js:26250
 msgid "Maximum cart value"
 msgstr ""
 
-#: build/admin-app.js:26281
+#: build/admin-app.js:26258
 msgid "Number of items per cart session"
 msgstr ""
 
-#: build/admin-app.js:26285
+#: build/admin-app.js:26262
 msgid "Minimum items per cart"
 msgstr ""
 
-#: build/admin-app.js:26291
+#: build/admin-app.js:26268
 msgid "Maximum items per cart"
 msgstr ""
 
-#: build/admin-app.js:26300
+#: build/admin-app.js:26277
 msgid "Abandonment tracking settings"
 msgstr ""
 
-#: build/admin-app.js:26304
+#: build/admin-app.js:26281
 msgid "Generate abandoned cart reminders"
 msgstr ""
 
-#: build/admin-app.js:26309
+#: build/admin-app.js:26286
 msgid "Maximum number of reminders"
 msgstr ""
 
-#: build/admin-app.js:26316
+#: build/admin-app.js:26293
 msgid "Cart recovery rate percentage (0–100)"
 msgstr ""
 
-#: build/admin-app.js:26326
+#: build/admin-app.js:26303
 msgid "Product Attributes"
 msgstr ""
 
-#: build/admin-app.js:26330
+#: build/admin-app.js:26307
 msgid "Generate product attributes such as Text, Color, and Image types. Attributes can be used to define product variations and filtering options."
 msgstr ""
 
-#: build/admin-app.js:26336
+#: build/admin-app.js:26313
 msgid "Types of attributes to generate"
 msgstr ""
 
-#: build/admin-app.js:26350
+#: build/admin-app.js:26327
 msgid "Generate product categories, nested where asked, and file existing products under them. For testing category archives, breadcrumbs, and filtered queries."
 msgstr ""
 
-#: build/admin-app.js:26351
+#: build/admin-app.js:26328
 msgid "Theme developers, store owners organising a catalogue"
 msgstr ""
 
-#: build/admin-app.js:26356
+#: build/admin-app.js:26333
 msgid "How many products to file under each category"
 msgstr ""
 
-#: build/admin-app.js:26363
+#: build/admin-app.js:26340
 msgid "Percentage created beneath an existing category (0–100)"
 msgstr ""
 
-#: build/admin-app.js:26371
+#: build/admin-app.js:26348
 msgid "Product Brands"
 msgstr ""
 
-#: build/admin-app.js:26375
+#: build/admin-app.js:26352
 msgid "Generate product brands and attach them to existing products, for testing brand archives, filters, and product pages. Needs a platform that has brands, and products to attach them to."
 msgstr ""
 
-#: build/admin-app.js:26376
+#: build/admin-app.js:26353
 msgid "Store owners with multi-brand catalogues, theme developers"
 msgstr ""
 
-#: build/admin-app.js:26381
+#: build/admin-app.js:26358
 msgid "How many products to attach each brand to"
 msgstr ""
 
-#: build/admin-app.js:26388
+#: build/admin-app.js:26365
 msgid "Percentage created as sub-brands of an existing brand (0–100)"
 msgstr ""
 
-#: build/admin-app.js:26400
+#: build/admin-app.js:26377
 msgid "Generate product tags and apply them to existing products, for testing tag archives, related products, and faceted search. WooCommerce has tags; Fluent Cart does not."
 msgstr ""
 
-#: build/admin-app.js:26401
+#: build/admin-app.js:26378
 msgid "Theme developers, merchandisers testing faceted search"
 msgstr ""
 
-#: build/admin-app.js:26406
+#: build/admin-app.js:26383
 msgid "How many products to apply each tag to"
 msgstr ""
 
-#: build/admin-app.js:26414
+#: build/admin-app.js:26391
 msgid "Refunds"
 msgstr ""
 
-#: build/admin-app.js:26418
+#: build/admin-app.js:26395
 msgid "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs."
 msgstr ""
 
-#: build/admin-app.js:26419
+#: build/admin-app.js:26396
 msgid "Store owners testing refund workflows, payment gateway developers"
 msgstr ""
 
-#: build/admin-app.js:26424
+#: build/admin-app.js:26401
 msgid "Order statuses eligible for refund generation"
 msgstr ""
 
-#: build/admin-app.js:26433
+#: build/admin-app.js:26410
 msgid "Payment gateways for transaction IDs"
 msgstr ""
 
-#: build/admin-app.js:26443
+#: build/admin-app.js:26420
 msgid "Logs"
 msgstr ""
 
-#: build/admin-app.js:26447
+#: build/admin-app.js:26424
 msgid "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails."
 msgstr ""
 
-#: build/admin-app.js:26448
+#: build/admin-app.js:26425
 msgid "Developers testing audit logs, admin panel log views"
 msgstr ""
 
-#: build/admin-app.js:26453
+#: build/admin-app.js:26430
 msgid "Log severity types to generate"
 msgstr ""
 
-#: build/admin-app.js:26462
+#: build/admin-app.js:26439
 msgid "Object types to generate log entries for"
 msgstr ""
 
-#: build/admin-app.js:26476
+#: build/admin-app.js:26453
 msgid "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag."
 msgstr ""
 
-#: build/admin-app.js:26477
+#: build/admin-app.js:26454
 msgid "Store owners configuring shipping rate groups"
 msgstr ""
 
-#: build/admin-app.js:26486
+#: build/admin-app.js:26463
 msgid "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to."
 msgstr ""
 
-#: build/admin-app.js:26487
+#: build/admin-app.js:26464
 msgid "Teams segmenting orders and customers with tags"
 msgstr ""
 
-#: build/admin-app.js:26496
+#: build/admin-app.js:26473
 msgid "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates."
 msgstr ""
 
-#: build/admin-app.js:26497
+#: build/admin-app.js:26474
 msgid "Developers testing tax reports and collected-tax views"
 msgstr ""
 
-#: build/admin-app.js:26506
+#: build/admin-app.js:26483
 msgid "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products."
 msgstr ""
 
-#: build/admin-app.js:26507
+#: build/admin-app.js:26484
 msgid "Developers testing digital-product fulfillment"
 msgstr ""
 
-#: build/admin-app.js:26516
+#: build/admin-app.js:26493
 msgid "Generate subscription records against existing orders. Records seed as fixtures; charging them is your platform's job and may need a paid add-on. Requires existing orders and products."
 msgstr ""
 
-#: build/admin-app.js:26517
+#: build/admin-app.js:26494
 msgid "Developers testing recurring-billing views and reports"
 msgstr ""
 
-#: build/admin-app.js:26526
+#: build/admin-app.js:26503
 msgid "Create software licences against existing orders — keys, site limits, activation counts and expiry dates, including licences already at their limit and some long expired. Requires Fluent Cart Pro, which owns the licensing tables."
 msgstr ""
 
-#: build/admin-app.js:26527
+#: build/admin-app.js:26504
 msgid "Developers testing licence validation, activation limits and renewal notices"
 msgstr ""
 
-#: build/admin-app.js:26560
+#: build/admin-app.js:26537
 msgid "Core"
 msgstr ""
 
-#: build/admin-app.js:26562
+#: build/admin-app.js:26539
 msgid "Advanced"
 msgstr ""
 
-#: build/admin-app.js:26564
+#: build/admin-app.js:26541
 msgid "Enhanced"
 msgstr ""
 
-#: build/admin-app.js:26835
+#: build/admin-app.js:26812
 msgid "Generation locale"
 msgstr ""
 
-#: build/admin-app.js:27107
+#: build/admin-app.js:27084
 msgid "Auto"
 msgstr ""
 
 #. translators: %s: name of the platform that Auto resolved to.
-#: build/admin-app.js:27109
+#: build/admin-app.js:27086
 #, js-format
 msgid "Auto · %s"
 msgstr ""
 
 #. translators: %1$s: total items, %2$s: number of generators
-#: build/admin-app.js:27605
+#: build/admin-app.js:27582
 #, js-format
 msgid "Batch complete · %1$s items"
 msgstr ""
 
 #. translators: %s: number of generators run
-#: build/admin-app.js:27606
+#: build/admin-app.js:27583
 #, js-format
 msgid "%s generator run"
 msgid_plural "%s generators run"
 msgstr[0] ""
 msgstr[1] ""
 
-#: build/admin-app.js:27608
+#: build/admin-app.js:27585
 msgid "Batch failed"
 msgstr ""

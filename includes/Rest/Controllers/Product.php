@@ -117,39 +117,23 @@ class Product extends Controller {
 					),
 				),
 			),
+			'track_cost'      => array(
+				'description' => __( 'Record what the shop paid for each product, for margin reporting.', 'storeseeder' ),
+				'type'        => 'boolean',
+				'default'     => false,
+			),
 			'categories'      => array(
-				'description' => __( 'Product categories configuration.', 'storeseeder' ),
+				'description' => __( 'How generated products are filed.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
-					'create_new'      => array(
-						'description' => __( 'Create new categories if needed.', 'storeseeder' ),
-						'type'        => 'boolean',
-						'default'     => true,
-					),
 					'max_per_product' => array(
-						'description' => __( 'Maximum categories per product.', 'storeseeder' ),
+						// Existing categories only. Creating them here would duplicate the
+						// Product Categories generator and leave two places inventing names.
+						'description' => __( 'Maximum existing categories to file each product under.', 'storeseeder' ),
 						'type'        => 'integer',
-						'minimum'     => 1,
+						'minimum'     => 0,
 						'maximum'     => 10,
 						'default'     => 3,
-					),
-				),
-			),
-			'attributes'      => array(
-				'description' => __( 'Product attributes configuration.', 'storeseeder' ),
-				'type'        => 'object',
-				'properties'  => array(
-					'include_attributes' => array(
-						'description' => __( 'Include product attributes.', 'storeseeder' ),
-						'type'        => 'boolean',
-						'default'     => true,
-					),
-					'variation_count'    => array(
-						'description' => __( 'Number of variations for variable products.', 'storeseeder' ),
-						'type'        => 'integer',
-						'minimum'     => 1,
-						'maximum'     => 20,
-						'default'     => 5,
 					),
 				),
 			),
@@ -184,11 +168,6 @@ class Product extends Controller {
 				'description' => __( 'Product content generation options.', 'storeseeder' ),
 				'type'        => 'object',
 				'properties'  => array(
-					'include_images'     => array(
-						'description' => __( 'Generate product images.', 'storeseeder' ),
-						'type'        => 'boolean',
-						'default'     => false,
-					),
 					'description_length' => array(
 						'description' => __( 'Product description length.', 'storeseeder' ),
 						'type'        => 'string',

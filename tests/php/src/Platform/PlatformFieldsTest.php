@@ -244,10 +244,14 @@ class PlatformFieldsTest extends StoreSeederUnitTestCase {
 	}
 
 	/**
-	 * And a run that sends only what the target understands says nothing, so the response shape is
-	 * unchanged for every existing caller.
+	 * A run that sends only what the target understands reports no *foreign* field.
+	 *
+	 * Products on Fluent Cart do report one thing — `backorders`, which its boolean column cannot
+	 * express in three values — so the assertion is about what is absent rather than about the key
+	 * being missing. That distinction is the point: the report names what this platform cannot do,
+	 * not what the caller did wrong.
 	 */
-	public function test_a_clean_run_reports_nothing_ignored(): void {
+	public function test_a_clean_run_reports_no_foreign_field(): void {
 		$this->require_platform( 'fluent-cart' );
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
@@ -260,6 +264,32 @@ class PlatformFieldsTest extends StoreSeederUnitTestCase {
 					'count'        => 1,
 					'platform'     => 'fluent-cart',
 					'payment_type' => 'subscription',
+				)
+			)
+		);
+
+		$data = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertNotContains( 'tax_status', (array) ( $data['ignored'] ?? array() ) );
+		$this->assertNotContains( 'catalog_visibility', (array) ( $data['ignored'] ?? array() ) );
+	}
+
+	/**
+	 * And a resource whose target stores every canonical field says nothing at all, so the response
+	 * shape is unchanged for every existing caller.
+	 */
+	public function test_a_resource_with_nothing_ignored_reports_nothing(): void {
+		$this->require_platform( 'fluent-cart' );
+
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		$request = new WP_REST_Request( 'POST', '/storeseeder/v1/coupons/generate' );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'count'    => 1,
+					'platform' => 'fluent-cart',
 				)
 			)
 		);
