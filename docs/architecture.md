@@ -72,339 +72,278 @@ governs, and its concrete children nest one level beneath it.
 - **`src/`** — the React admin.
 - **`build/`** — compiled assets; the source in `src/` is not shipped in the plugin package.
 
-## 🔗 Deep Fluent Cart Integration
+## 🔗 The platform layer
 
-StoreSeeder is built as a native extension of the Fluent Cart ecosystem, ensuring seamless compatibility and data integrity.
+StoreSeeder used to be a Fluent Cart plugin. It is now platform-agnostic above the driver
+line, and Fluent Cart is one driver.
 
-### 🎯 Native Model Integration
+### What a driver is
 
-The plugin leverages Fluent Cart's core data models directly:
+A driver answers four questions, through `Platforms\Platform_Interface`:
 
-- **Product Model**: Full integration with product attributes, variations, and inventory systems
-- **Customer Model**: Uses customer profiles, loyalty tiers, and purchase history tracking
-- **Order Model**: Implements complete order processing with payment, shipping, and tax calculations
-- **Coupon Model**: Supports advanced discount rules and validation logic
-- **Location Model**: Geographic hierarchy for multi-region tax and shipping calculations
+| Question | Method |
+|---|---|
+| What are you called? | `id()`, `label()` |
+| Are you installed right now? | `is_active()`, `version()` |
+| What can you generate, and why not? | `supports()` |
+| How do you persist resource X? | `writer( $resource_type )` |
 
-### 🗄️ Database Abstraction Layer
+Extending `Platforms\Platform_Driver` supplies the repetitive parts — lazily building
+writers, normalising the capability matrix, and applying the two per-driver filters.
 
-- **Consistent Data Access**: Uses Fluent Cart's Database class for all database operations
-- **Query Optimization**: Leverages Fluent Cart's optimized query patterns
-- **Transaction Management**: Ensures data consistency with proper rollback capabilities
-- **Security**: Inherits Fluent Cart's SQL injection prevention and sanitization
+### Where platform knowledge is allowed
 
-### 🧠 Business Logic Compliance
+Exactly one place: a **writer**. Models, table names, column names and status spellings appear
+inside `Platforms/Drivers/<Platform>/Writers/` and nowhere else.
 
-- **Validation Rules**: Enforces Fluent Cart's data validation and business rules
-- **Relationship Integrity**: Maintains proper foreign key relationships and dependencies
-- **State Management**: Respects Fluent Cart's object states and lifecycle management
-- **Event System**: Integrates with Fluent Cart's action/filter hooks for extensibility
+A generator produces a *canonical entity* and must name no platform — no models, no table
+names, no platform status strings, no database reads. That restriction is what lets one
+generator feed every platform, and lets a fixed seed produce identical data on all of them.
 
-### 🏷️ Advanced Meta Data Systems
+Two conventions carry every platform without special-casing:
 
-- **Order Item Meta**: Stores detailed line item information and customizations
-- **Product Meta**: Handles additional product specifications and attributes
-- **Customer Meta**: Manages extended customer information and preferences
-- **Dynamic Attributes**: Creates and manages product attribute systems automatically
+- **Money is an integer in the currency's minor unit**, with an explicit currency. Never a
+  float: binary rounding on a price is a real bug and an invisible one. Fluent Cart stores
+  cents so its writers pass the value through; platforms that store decimals divide.
+- **Statuses use the canonical vocabulary** in `Platforms/Status.php`, mapped per writer. The
+  canonical names are deliberately no single platform's spelling — WooCommerce needs a `wc-`
+  prefix, Fluent Cart does not.
 
-## 🎨 Design Patterns & Best Practices
+### What a writer legitimately does beyond writing
 
-StoreSeeder implements proven design patterns to ensure maintainability, extensibility, and code quality.
+Reads. The split is not "invented data vs. saved data" but "data with no platform in it vs.
+everything touching the platform, in either direction".
 
-### 📋 Abstract Base Classes
+Several resources cannot be shaped without reading real rows: an order needs real product
+variations to have line items and their real prices to have a total; a refund needs an existing
+charge transaction; a label needs orders to attach to. Resolving those foreign keys is the
+writer's job, because each platform stores and randomises them differently. Uniqueness works
+the same way — a generator proposes an SKU, and the platform that owns the unique index checks
+it and re-rolls.
 
-The plugin uses abstract base classes to enforce consistency and reduce code duplication:
+What a writer must never do is invent a name, address, date or quantity. Those arrive on the
+entity, already localised by FakerPHP.
 
-#### `Generator` Abstract Class
+### Capabilities are computed, never cached
+
+`supports()` runs per request. Support is conditional: WooCommerce core has no subscriptions
+until WooCommerce Subscriptions is active, and StoreEngine gates several resources behind its
+own addons. Caching the matrix in an option would mean activating a companion plugin failed to
+register.
+
+A bare boolean would be enough to disable a generator but not to explain it, so each
+unsupported resource carries a reason and, where one applies, the slug of the plugin that would
+enable it. The admin says "Requires WooCommerce Subscriptions" instead of dimming a tile in
+silence, and the REST API answers 400 rather than writing nothing and reporting success.
+
+### Choosing the target
+
+`Platforms\Resolver` turns a request into one platform, or into an error explaining why it
+cannot:
+
+| Situation | Result |
+|---|---|
+| Explicit platform id, registered and active | that platform |
+| Explicit id, unknown or inactive | `400` |
+| Auto, and a site-wide target is stored and still active | the stored platform |
+| Auto, exactly one platform active | that platform |
+| Auto, several active and none chosen | `409 storeseeder_platform_required`, listing candidates |
+| Auto, none active | `400` |
+
+Guessing is not an option: picking the wrong target writes rows into the wrong store, and
+nothing about that failure is visible afterwards. A stored target that has since been
+deactivated falls through to auto rather than erroring, so deactivating a plugin cannot leave
+the admin stuck behind an error it has no way to clear.
+
+The target is a site option, not a browser preference, so two administrators cannot
+unknowingly seed different platforms.
+
+## 🎨 Design patterns in use
+
+### Abstract base classes
+
+#### `Generators\Generator`
 
 ```php
 abstract class Generator {
-    protected function validate_dependencies(): bool;
-    protected function prepare_generation_data(array $params): array;
-    abstract protected function generate_single_item(array $params): array;
-    protected function post_generation_cleanup(): void;
+    // The only method a generator must implement. FakerPHP and loaded sample
+    // data only -- see "Where platform knowledge is allowed" above.
+    abstract protected function build_entity();
 
-    public function generate(array $params): array {
-        // Template method pattern implementation
-    }
+    abstract protected function get_resource_type(): string;
+    abstract public function get_supported_types(): array;
+    abstract public function get_description(): string;
 }
 ```
 
-**Key Features:**
+`generate( int $count )` is a template method and is not overridden. It validates the count,
+filters the parameters, seeds the faker, then loops: build an entity, filter it, hand it to the
+target platform's writer, and collect per-item failures without aborting the batch.
+`generate_single_item()` is `final` precisely so a generator cannot reach a platform even by
+accident.
 
-- **Dependency Validation**: Ensures required data exists before generation
-- **Parameter Preparation**: Standardizes input processing and validation
-- **Single Item Generation**: Abstract method for specific generator logic
-- **Cleanup Operations**: Post-generation cleanup and optimization
+`preview( int $count )` builds rows from `build_entity()` and writes nothing, which is what
+makes it safe to call on every keystroke in the admin.
 
-#### `Controller` Abstract Class
+#### `Controllers\Controller`
 
 ```php
 abstract class Controller extends WP_REST_Controller {
-    protected function validate_request_params(WP_REST_Request $request): array;
-    protected function prepare_response_data(array $data): array;
+    abstract protected function get_rest_base(): string;
     abstract protected function get_generator_instance(): Generator;
-
-    public function generate_items(WP_REST_Request $request): WP_REST_Response {
-        // Standardized REST API handling
-    }
+    abstract protected function get_resource_type(): string;
+    abstract protected function get_resource_type_label(): string;
 }
 ```
 
-**Key Features:**
+Each controller registers exactly two routes — `POST /<base>/generate` and
+`POST /<base>/preview` — and resolves the target platform for the request before handing it to
+the generator. Both callbacks return `WP_REST_Response|WP_Error`.
 
-- **Parameter Validation**: Comprehensive input sanitization and validation
-- **Response Formatting**: Consistent API response structure
-- **Error Handling**: Standardized error responses with proper HTTP status codes
-- **Generator Integration**: Clean separation between API and generation logic
-
-### 🏗️ Architectural Patterns
-
-#### Template Method Pattern
-
-All generators follow a consistent workflow:
-
-1. **Validate Dependencies** → Check for required data
-2. **Prepare Parameters** → Process and validate input
-3. **Generate Data** → Create realistic test data
-4. **Post-Processing** → Apply business rules and relationships
-5. **Cleanup** → Optimize and finalize data
-
-#### Factory Pattern
-
-Dynamic generator instantiation based on type:
+#### `Platforms\Writer`
 
 ```php
-class Generator_Factory {
-    public static function create(string $type): Generator {
-        return match($type) {
-            'product' => new Product_Generator(),
-            'customer' => new Customer_Generator(),
-            // ... other generators
-        };
-    }
+abstract class Writer {
+    abstract public function resource(): string;
+    abstract public function write( array $entity );   // array|WP_Error
 }
 ```
 
-#### Strategy Pattern
+Returning `array|WP_Error` rather than an id is deliberate: it is the contract
+`generate()` already loops over, so a per-item failure lands in the batch's error list instead
+of aborting the run. It also leaves room for a driver whose write is a remote HTTP call.
 
-Configurable generation strategies for different scenarios:
+### Extension points
 
-- **Realistic Mode**: Production-like data with business logic
-- **Development Mode**: Simplified data for quick testing
-- **Stress Test Mode**: Large datasets for performance testing
+Every seam is a filter, so a platform can be added from a separate plugin without patching
+this one.
 
-#### Observer Pattern
+| Hook | Kind | Purpose |
+|---|---|---|
+| `storeseeder_platforms` | filter | Register a driver. The whole surface needed to add a platform. |
+| `storeseeder_platform_writers_{id}` | filter | Replace or add a writer for one driver |
+| `storeseeder_platform_supports_{id}` | filter | Override the capability matrix; also how an extension declares it satisfies a requirement |
+| `storeseeder_canonical_{resource}` | filter | Mutate the neutral entity before it is written — applies to every platform equally |
+| `storeseeder_target_platform` | filter | Force the target, overriding request and stored option |
+| `storeseeder_before_write_{platform}_{resource}` | action | |
+| `storeseeder_after_write_{platform}_{resource}` | action | Fires for failures too, so a listener sees the whole batch |
+| `storeseeder_generation_params_{type}` | filter | Adjust parameters before a run |
+| `storeseeder_generated_item_{type}` | filter | Inspect or modify each produced item |
+| `storeseeder_before_generate_single_item_{type}` | action | |
+| `storeseeder_after_generate_single_item_{type}` | action | |
+| `storeseeder_after_batch_generate_{type}` | action | Cache clearing, index updates |
+| `storeseeder_rest_params_{base}` | filter | Alter one endpoint's parameter schema |
+| `storeseeder_rest_message` / `storeseeder_rest_response` | filter | Shape the REST response |
+| `storeseeder_{resource}_generation_result` | filter | Per-resource result payload |
 
-Event-driven architecture for extensibility:
+## ⚛️ Frontend architecture
 
-- **Generation Hooks**: `storeseeder_before_generation`
-- **Progress Tracking**: `storeseeder_generation_progress`
-- **Cleanup Hooks**: `storeseeder_after_generation`
+React 18 with React Router v7, entered at `src/index.tsx` and compiled to a single bundle at
+`build/admin-app.js`.
 
-## ⚛️ Modern Frontend Architecture
+### Routing
 
-The frontend is built with React 18 and React Router v7, providing a modern, maintainable, and performant user interface.
+`createHashRouter`, because the admin lives at one WordPress page and hash routes need no
+rewrite rules:
 
-### 🚦 React Router v7 Implementation
-
-StoreSeeder uses React Router v7's data router for optimal WordPress admin integration:
-
-#### Router Configuration
-
-```javascript
+```tsx
 const router = createHashRouter([
   {
-    path: "/",
+    path: '/',
     element: <RootLayout />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "generator/:type",
-        element: <GeneratorPage />,
-        loader: async ({ params }) => {
-          // Data loading for generator configuration
-          return loadGeneratorConfig(params.type);
-        },
-      },
+      { index: true,             element: <HomePage />      },
+      { path: 'generator/:type', element: <GeneratorPage /> },
+      { path: 'settings',        element: <SettingsPage />  },
+      { path: 'plugins',         element: <PluginsPage />   },
     ],
   },
 ]);
 ```
 
-**Key Benefits:**
+Every generator shares the one dynamic `generator/:type` route, matched against `route` in
+`src/lib/generators.ts`. There are no route loaders and no code splitting; the bundle is a
+single file.
 
-- **Hash-Based Routing**: Compatible with WordPress admin's URL structure
-- **Data Loading**: Pre-load generator configurations and dependencies
-- **Error Boundaries**: Graceful error handling for failed data loads
-- **Code Splitting**: Automatic route-based code splitting for performance
+### Component architecture
 
-### 🧩 Component Architecture
-
-#### Page Components (`src/components/Pages/`)
-
-Route-focused components that handle specific URLs and layouts:
+#### Page components (`src/components/Pages/`)
 
 - **`RootLayout.tsx`** — application wrapper, WordPress admin integration
-- **`HomePage.tsx`** — dashboard: stat cards, recent activity, generator grid
-- **`GeneratorPage.tsx`** — one generator: config column, live preview, run bar
-- **`SettingsPage.tsx`** — generation defaults, run history, sample data
+- **`HomePage.tsx`** — stat cards, recent activity, generator grid
+- **`GeneratorPage.tsx`** — config column, live preview, run bar
+- **`SettingsPage.tsx`** — generation defaults, run history, sample data, about, danger zone
 - **`PluginsPage.tsx`** — the author's other plugins
 
-#### Generator Components (`src/components/generator/`)
+#### Generator components (`src/components/generator/`)
 
-- **`ConfigColumn.tsx`** — header, dependency notes, the target-platform prompt, and the
-  field sections derived from the generator's parameter schema
-- **`FieldSection.tsx`** and **`fields/`** — the schema-driven controls: `Chips`,
-  `FieldSelect`, `NumberField`, `RangeField`, `Stepper`, `TextField`, `Toggle`
+- **`ConfigColumn.tsx`** — header, dependency notes, the target-platform prompt, and the field
+  sections derived from the generator's parameter schema
+- **`FieldSection.tsx`** and **`fields/`** — schema-driven controls: `Chips`, `FieldSelect`,
+  `NumberField`, `RangeField`, `Stepper`, `TextField`, `Toggle`
 - **`PreviewTable.tsx`** — debounced, read-only rows from the `/preview` route
-- **`RunBar.tsx`** — count, seed, metadata toggle, and the run actions
+- **`RunBar.tsx`** — count, seed, metadata toggle, and the two actions
 
 There is no shared generator component. Every generator renders from its parameter schema
-through `lib/fieldsFromSchema.ts`, so adding one needs no new React.
+through `src/lib/fieldsFromSchema.ts`, so adding one needs no new React.
 
-#### Component Communication Flow
+#### Data flow
 
 ```
-User Action → Page Component → Generator Component → REST API → PHP Controller → Generator → Database
-                      ↓
-              Real-time Feedback ← Progress Updates ← Generation Status
+User action → GeneratorPage → REST → Controller → Generator → canonical entity
+                                                                    ↓
+                          Toast + stats ← REST response ← Writer → platform models
 ```
 
-### 🎨 Styling & Theming
+The preview path is separate and never reaches a writer, which is why previewing works even
+when no target platform has been chosen.
 
-#### Tailwind CSS Integration
+### State management
 
-- **WordPress Admin Colors**: Automatic adaptation to user's color scheme
-- **CSS Variables**: Dynamic theming with WordPress admin color integration
-- **Responsive Design**: Mobile-first approach with WordPress breakpoints
-- **Component Library**: Consistent design system across all components
+React context, four providers, no external state library:
 
-#### Color Scheme Integration
+- **`StatsProvider`** — run counts and recent activity, persisted to `localStorage`
+- **`ToastProvider`** — transient notifications
+- **`BatchProvider`** — the queue behind "Add to batch"; runs items sequentially in the browser
+- **`PlatformProvider`** — the active platforms, the resolved target, and the capability matrix,
+  seeded from a payload the server inlines so the topbar never renders a target it then
+  corrects
+
+### Styling
+
+Tailwind CSS v4, plus `src/components.css` for component styles that outgrow utilities — plain
+CSS scoped under `.fp-root`.
+
+The admin picks up the user's WordPress colour scheme. `class-storeseeder.php` inlines four
+custom properties, which Tailwind consumes as theme colours:
 
 ```css
 :root {
-  --wp-admin-color-primary: #2271b1;
-  --wp-admin-color-secondary: #135e96;
-  /* Additional WordPress admin colors */
-}
-
-.generator-button {
-  background-color: var(--wp-admin-color-primary);
-  border-color: var(--wp-admin-color-secondary);
+  --wp-admin-primary:   /* from the user's scheme */;
+  --wp-admin-secondary: /* … */;
+  --wp-admin-highlight: /* … */;
+  --wp-admin-accent:    /* … */;
 }
 ```
 
-### 🔄 State Management
+## ⚡ Scale and limits
 
-#### Local Component State
+Being straight about this matters more than describing an optimisation strategy the plugin does
+not have.
 
-- **Parameter State**: Complex nested objects for generator configuration
-- **Progress State**: Real-time generation progress and status updates
-- **Validation State**: Form validation and error handling
+- **A run is capped at 100 items** (`$max_batch_size`, enforced by `validate_count()` and by
+  the REST schema). Larger datasets come from repeated runs, or from queueing several through
+  the batch tray.
+- **The batch queue is client-side.** It posts each item in turn from the browser. There is no
+  cron, no background worker, and no server-side async.
+- **Writes are per item.** No bulk inserts, no transactions, no chunking, no resume. A failed
+  item is recorded in the batch's error list and the run continues; a batch where nothing
+  succeeded returns `500` with the first reason rather than `200` and "0 items created".
+- **Nothing is cached.** No object cache, no transients. The capability matrix is deliberately
+  recomputed per request, as above.
+- **No raw SQL.** Every write goes through the platform's own models, so validation,
+  relationships and money handling match what the platform would do itself. There is no
+  `$wpdb` usage in `includes/`.
 
-#### Data Flow Architecture
-
-1. **User Input** → Component state updates
-2. **Validation** → Client-side parameter validation
-3. **API Request** → REST API call with validated parameters
-4. **Server Processing** → PHP validation and generation
-5. **Response Handling** → UI updates with results or errors
-
-## ⚡ Performance Optimization
-
-StoreSeeder is designed for high-performance data generation, even with large datasets and complex relationships.
-
-### 📊 Batch Processing Architecture
-
-#### Intelligent Chunking
-
-- **Memory-Efficient Processing**: Processes data in configurable chunks to prevent memory exhaustion
-- **Progress Tracking**: Real-time progress updates with resumable operations
-- **Error Recovery**: Failed batches can be retried without restarting the entire process
-
-#### Configuration Options
-
-```javascript
-const generationConfig = {
-  batch_size: 50, // Items per batch
-  memory_limit: "256M", // PHP memory limit monitoring
-  timeout_protection: true, // Automatic timeout handling
-  progress_callback: (progress) => updateUI(progress),
-};
-```
-
-### 🗄️ Database Optimization
-
-#### Query Optimization Strategies
-
-- **Prepared Statements**: All database queries use prepared statements for security and performance
-- **Bulk Inserts**: Multiple records inserted in single transactions where possible
-- **Index Utilization**: Leverages existing Fluent Cart database indexes
-- **Connection Pooling**: Efficient database connection management
-
-#### Transaction Management
-
-```php
-$database->transaction(function() use ($items) {
-    foreach ($items as $item) {
-        $this->insert_item($item);
-        $this->update_relationships($item);
-    }
-}); // Automatic rollback on failure
-```
-
-### 🚀 Memory Management
-
-#### Garbage Collection Optimization
-
-- **Object Cleanup**: Explicit cleanup of large objects after processing
-- **Memory Monitoring**: Tracks memory usage and triggers cleanup when approaching limits
-- **Streaming Processing**: Processes large datasets without loading everything into memory
-
-#### Resource Management
-
-- **File Handle Management**: Proper opening/closing of file resources
-- **Cache Invalidation**: Strategic cache clearing to prevent memory bloat
-- **Temporary Data Cleanup**: Automatic removal of temporary generation data
-
-### 📈 Caching Strategies
-
-#### Multi-Level Caching
-
-- **Object Cache**: WordPress object cache for frequently accessed data
-- **Transient Cache**: Temporary caching for generation session data
-- **Dependency Cache**: Cached validation of data dependencies and relationships
-
-#### Cache Invalidation
-
-- **Smart Invalidation**: Only clears relevant cache entries after generation
-- **Dependency Tracking**: Tracks which cache entries depend on generated data
-- **Performance Monitoring**: Cache hit/miss ratios for optimization
-
-### 🔧 Advanced Optimizations
-
-#### Algorithm Optimizations
-
-- **Relationship Pre-computation**: Calculates complex relationships before generation
-- **Data Normalization**: Reuses common data patterns to reduce processing
-- **Parallel Processing**: Utilizes WordPress background processing where available
-
-#### Monitoring & Profiling
-
-- **Performance Metrics**: Tracks generation speed and resource usage
-- **Bottleneck Identification**: Identifies slow operations for optimization
-- **Scalability Testing**: Validates performance with increasing dataset sizes
-
-### 📊 Performance Benchmarks
-
-| Dataset Size | Generation Time | Memory Usage | CPU Usage |
-| ------------ | --------------- | ------------ | --------- |
-| 100 items    | < 5 seconds     | < 32MB       | < 10%     |
-| 1,000 items  | < 30 seconds    | < 128MB      | < 25%     |
-| 10,000 items | < 5 minutes     | < 512MB      | < 50%     |
-
-\*Benchmarks performed on standard WordPress hosting with PHP 8.0+
+Memory is the practical ceiling on a single run, and 100 items is comfortably inside it on
+default PHP settings.

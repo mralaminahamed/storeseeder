@@ -1,403 +1,382 @@
 # 🛠️ Development Guide
 
-Welcome to the StoreSeeder v1.0.0 development guide! This comprehensive resource will help you contribute effectively to the project, now featuring complete TypeScript support and parameter schema alignment.
+How to work on StoreSeeder. Commands here are the ones that exist in `composer.json` and
+`package.json`; see [`CLAUDE.md`](../CLAUDE.md) for the invariants and traps, and
+[`AGENTS.md`](../AGENTS.md) for coding style.
 
-## 🚀 Quick Development Setup
+## 🚀 Setup
 
 ### Prerequisites
 
-- **PHP**: 7.4+ (8.0+ recommended)
-- **Node.js**: 16+ (18+ recommended for TypeScript)
-- **Composer**: 2.0+
-- **WordPress**: 5.0+ with Fluent Cart plugin
-- **Git**: For version control
-- **TypeScript**: 4.5+ (included with project dependencies)
+- **PHP** 7.4+ (8.0+ recommended). 7.4 is a hard floor — no union return types, `match`,
+  enums, constructor promotion or `readonly`.
+- **Node.js** 20+ (`@wordpress/scripts` v30 requires it; CI runs 22–24)
+- **Composer** 2.0+
+- **Yarn** — the repo is yarn-managed (`packageManager: yarn@4`, only `yarn.lock` is
+  committed). Do not use npm.
+- **WordPress** 6.5+, with at least one supported e-commerce platform active
+- **MySQL** for the PHPUnit suite
 
-### One-Command Setup
+### Setup
 
 ```bash
-# Clone and setup in one go
 git clone https://github.com/mralaminahamed/storeseeder.git
 cd storeseeder
 composer install && yarn install && yarn build
 ```
 
-### v1.0.0: TypeScript Migration
+`build/` is not committed, so `yarn build` is required before the admin page renders anything.
 
-**All React components have been migrated to TypeScript (.tsx) for better type safety and developer experience.**
+## 🏗️ Commands
 
-- **Type Definitions**: Comprehensive interfaces for all generator parameters
-- **Parameter Validation**: Type-safe parameter schemas with proper validation
-- **API Integration**: Strongly typed API responses and error handling
-- **Build System**: Enhanced webpack configuration for TypeScript compilation
-
-## 🏗️ Build System & Commands
-
-### Development Workflow
+### Frontend
 
 ```bash
-# Start development server with hot reload
-yarn start
-
-# Production build (optimized for deployment)
-yarn build
-
-# Update packages
-yarn packages-update
+yarn start                  # webpack watch
+yarn build                  # production bundle -> build/admin-app.js
+yarn lint:js                # ESLint (flat config)
+yarn lint:js:fix
+yarn packages-update        # update @wordpress/* packages
+npx tsc --noEmit            # not wired to a script, still catches real errors
 ```
 
-### Code Quality Assurance
+### PHP
 
 ```bash
-# Full quality check suite
-composer run lint         # PHP CodeSniffer (WordPress standards)
-composer run analyse      # PHP static analysis (level 8)
-
-# Auto-fix issues where possible
-composer run format       # Auto-fix PHP code style
-
-# Build and package management
-yarn packages-update   # Update WordPress packages
-```
-
-### Testing Commands
-
-```bash
-# Run PHP unit tests
-composer test
-
-# Run with code coverage
+composer phpcs              # WPCS. Scans includes/ only
+composer phpcbf             # autofix
+composer phpstan            # level 7, over includes/ + class-storeseeder.php
+composer phpcs:plugin-review # the stricter WordPress.org submission ruleset
+composer test               # PHPUnit — needs environment, see below
 composer test:coverage
-
-# WordPress integration tests
-phpunit
+composer makepot            # requires build/admin-app.js to exist first
+composer release            # lint, analyse, build, makepot, prod install, zip
+composer zip:dev            # unoptimised zip for testing
 ```
 
-## 📋 Coding Standards & Quality
+Aliases exist for muscle memory: `lint` → `phpcs`, `format`/`fix` → `phpcbf`,
+`analyse` → `phpstan`.
 
-### PHP Standards (WordPress Coding Standards)
+### Running the PHP suite
 
-- **PSR-4 Autoloading**: Strict namespace and file structure compliance
-- **WordPress Functions**: Use WordPress core functions over native PHP where possible
-- **Security**: Nonce verification, input sanitization, and prepared statements
-- **Documentation**: PHPDoc blocks for all classes, methods, and properties
-- **Error Handling**: Proper exception handling with user-friendly messages
+`composer test` alone fails with a database error. It needs a dedicated database and three
+environment variables:
 
-### JavaScript Standards (WordPress JavaScript Standards)
+```bash
+mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS wordpress_test;"
+export WP_PHPUNIT__DIR="$PWD/vendor/wp-phpunit/wp-phpunit" \
+       WP_DB_PASS=your-mysql-password \
+       WP_PATH=/path/to/wordpress
+composer test
+```
 
-- **ES6+ Features**: Modern JavaScript with Babel transpilation
-- **React Best Practices**: Functional components with hooks
-- **Accessibility**: WCAG compliance with proper ARIA attributes
-- **Performance**: Code splitting and lazy loading for optimal performance
-- **WordPress Integration**: wp.i18n for internationalization
+`phpunit.xml.dist` declares an empty `WP_DB_PASS`, which is correct for CI and usually wrong
+locally. PHPUnit does not override an already-exported variable, so exporting wins.
 
-### CSS Standards (WordPress CSS Standards)
+The suite loads real platform plugins from directories beside the plugin, and only those
+StoreSeeder ships a driver for. Tests needing an absent platform skip through
+`require_platform( $id )` rather than failing, so the suite runs with only the platforms you
+happen to have.
 
-- **Tailwind CSS**: Utility-first approach with WordPress admin integration
-- **BEM Methodology**: Block Element Modifier naming convention
-- **CSS Variables**: WordPress admin color scheme integration
-- **Responsive Design**: Mobile-first approach with WordPress breakpoints
+**The suite is currently 256 tests / 1052 assertions.** For a change that claims no behaviour
+difference, that number must come back identical, not merely green — a changed count means a
+reference was missed.
 
-## 🔧 Architecture & Development Patterns
+### End-to-end
 
-### Generator Development Workflow
+```bash
+yarn test:e2e               # Playwright
+yarn test:e2e:ui            # interactive
+yarn test:e2e:report
+yarn test:e2e:screenshots   # regenerates .wordpress-org screenshots
+yarn test:e2e:banners       # regenerates .wordpress-org banners
+```
 
-#### 1. Backend Generator Implementation
+> [!WARNING]
+> `yarn test:e2e:setup` runs `tests/e2e/setup.sh`, which **resets the admin password** of the
+> target site. Only point it at a throwaway install.
+
+The screenshot and banner specs are excluded from the default Playwright project so ordinary
+runs cannot overwrite the shipped WordPress.org images; they run through
+`playwright.screenshots.config.ts`.
+
+## 📋 Coding standards
+
+Full rules in [`AGENTS.md`](../AGENTS.md). The ones people get wrong:
+
+- **PHP indents with tabs**, per WPCS, even though `.editorconfig` says spaces. TypeScript
+  indents with 2 spaces.
+- **PHP methods and variables are `snake_case`**; classes and filenames are PascalCase with
+  underscores (`Order_Tax_Rate.php`).
+- `$resource` is rejected by WPCS as a reserved name — use `$resource_type`.
+- Every user-facing string goes through `@wordpress/i18n` or `__()`, with a
+  `/* translators: */` comment for each placeholder.
+- Font weights are round hundreds only: 400, 500, 600, 700.
+
+## 🔧 Adding a generator
+
+A resource needs five pieces. Copy the closest existing set rather than starting blank.
+
+### 1. The generator — shapes data, names no platform
+
+`includes/Generators/Resources/My_Thing.php`
 
 ```php
 <?php
+
 namespace StoreSeeder\Generators\Resources;
 
 use StoreSeeder\Generators\Generator;
 
-class MyNewGenerator extends Generator {
-    protected function validate_dependencies(): bool {
-        // Check for required data
-        return true;
+defined( 'ABSPATH' ) || exit;
+
+class My_Thing extends Generator {
+
+    protected function get_resource_type(): string {
+        return 'my_thing';
     }
 
-    protected function prepare_generation_data(array $params): array {
-        // Process and validate parameters
-        return $params;
+    public function get_supported_types(): array {
+        return array( 'my_things' => __( 'My Things', 'storeseeder' ) );
     }
 
-    protected function generate_single_item(array $params): array {
-        // Generate single item logic
-        return [
-            'id' => 123,
-            'name' => 'Generated Item',
-            'created_at' => current_time('mysql'),
-        ];
+    public function get_description(): string {
+        return 'Generates my things for testing.';
     }
 
-    protected function post_generation_cleanup(): void {
-        // Cleanup operations
-        wp_cache_flush();
+    /**
+     * FakerPHP and loaded sample data only. No models, no table names, no
+     * platform status strings, no database reads.
+     *
+     * @return array<string, mixed>
+     */
+    protected function build_entity() {
+        return array(
+            'title'  => $this->get_faker()->sentence( 3 ),
+            // Integer minor units. Never a float.
+            'amount' => (int) round( $this->get_faker()->randomFloat( 2, 5, 500 ) * 100 ),
+        );
     }
 }
 ```
 
-#### 2. REST API Controller
+`generate()` and `generate_single_item()` are not overridable — the latter is `final`, so a
+generator cannot reach a platform even by accident.
+
+### 2. The writer — persists it, for one platform
+
+`includes/Platforms/Drivers/Fluent_Cart/Writers/My_Thing.php`
 
 ```php
 <?php
+
+namespace StoreSeeder\Platforms\Drivers\Fluent_Cart\Writers;
+
+use StoreSeeder\Platforms\Resource;
+use StoreSeeder\Platforms\Writer;
+use WP_Error;
+
+defined( 'ABSPATH' ) || exit;
+
+final class My_Thing extends Writer {
+
+    public function resource(): string {
+        return Resource::MY_THING;
+    }
+
+    /**
+     * @param array<string, mixed> $entity Canonical entity.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function write( array $entity ) {
+        // Resolve foreign keys and check uniqueness here -- only the platform
+        // knows what already exists.
+        return array( 'id' => 1, 'title' => $entity['title'] );
+    }
+}
+```
+
+### 3. Register it on the driver
+
+Add the resource to `capabilities()` and the class to `writer_classes()` in
+`includes/Platforms/Drivers/Fluent_Cart/Platform.php`. A driver that claims a resource but
+ships no writer is reported as `storeseeder_missing_writer` rather than failing per item.
+
+### 4. The canonical name
+
+Add a constant to `includes/Platforms/Resource.php` and include it in `all()`.
+
+### 5. The controller and the admin entry
+
+`includes/Controllers/Resources/My_Thing.php`:
+
+```php
+<?php
+
 namespace StoreSeeder\Controllers\Resources;
 
 use StoreSeeder\Controllers\Controller;
+use StoreSeeder\Generators\Generator;
+use StoreSeeder\Generators\Resources\My_Thing as My_Thing_Generator;
 
-class MyNew extends Controller {
-    protected function validate_request_params(WP_REST_Request $request): array {
-        // Parameter validation logic
-        return $request->get_params();
+defined( 'ABSPATH' ) || exit;
+
+class My_Thing extends Controller {
+
+    protected function get_rest_base(): string {
+        return 'my_things';
     }
 
-    protected function prepare_response_data(array $data): array {
-        // Response formatting
-        return [
-            'success' => true,
-            'data' => $data,
-            'message' => __('Items generated successfully', 'storeseeder'),
-        ];
+    protected function get_resource_type(): string {
+        return 'my_thing';
+    }
+
+    protected function get_resource_type_label(): string {
+        return __( 'My Thing', 'storeseeder' );
     }
 
     protected function get_generator_instance(): Generator {
-        return new MyNewGenerator();
+        return new My_Thing_Generator();
     }
 }
 ```
 
-#### 3. Frontend Component (TypeScript)
+Then instantiate it in the `$controllers` array in `class-storeseeder.php`, and add an entry to
+`src/lib/generators.ts` with `route` (the REST base), `resource` (the canonical name), an icon
+from `src/lib/icons.tsx`, and the parameter schema.
 
-```tsx
-import React, { useState } from 'react';
-import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
+**No React is needed.** Fields render from the parameter schema through
+`src/lib/fieldsFromSchema.ts`.
 
-interface MyNewGeneratorParams {
-    count: number;
-    type: 'basic' | 'advanced';
-    options: {
-        enabled: boolean;
-        settings: Record<string, any>;
-    };
-}
+## 🧪 Testing
 
-export default function MyNewGenerator() {
-    const [params, setParams] = useState<MyNewGeneratorParams>({
-        count: 10,
-        type: 'basic',
-        options: {
-            enabled: true,
-            settings: {},
-        },
-    });
+### PHP
 
-    const [isGenerating, setIsGenerating] = useState(false);
-
-    const handleGenerate = async () => {
-        setIsGenerating(true);
-        try {
-            const response = await apiFetch({
-                path: '/storeseeder/v1/my-new',
-                method: 'POST',
-                data: params,
-            });
-
-            // Handle success
-            console.log('Generation completed:', response);
-        } catch (error) {
-            // Handle error
-            console.error('Generation failed:', error);
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-    return (
-        <div className="space-y-6">
-            <h3 className="text-lg font-medium">
-                {__('My New Generator', 'storeseeder')}
-            </h3>
-
-            {/* Form controls */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        {__('Count', 'storeseeder')}
-                    </label>
-                    <input
-                        type="number"
-                        value={params.count}
-                        onChange={(e) => setParams(prev => ({
-                            ...prev,
-                            count: parseInt(e.target.value) || 0
-                        }))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        {__('Type', 'storeseeder')}
-                    </label>
-                    <select
-                        value={params.type}
-                        onChange={(e) => setParams(prev => ({
-                            ...prev,
-                            type: e.target.value as 'basic' | 'advanced'
-                        }))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    >
-                        <option value="basic">
-                            {__('Basic', 'storeseeder')}
-                        </option>
-                        <option value="advanced">
-                            {__('Advanced', 'storeseeder')}
-                        </option>
-                    </select>
-                </div>
-            </div>
-
-            {/* Generate button */}
-            <div className="flex justify-end">
-                <button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                    {isGenerating ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            {__('Generating...', 'storeseeder')}
-                        </>
-                    ) : (
-                        __('Generate Items', 'storeseeder')
-                    )}
-                </button>
-            </div>
-        </div>
-    );
-}
-```
-
-## 🧪 Testing Strategy
-
-### Unit Testing
+Tests live under `tests/php/src/`, mirroring the `includes/` layout, and extend
+`StoreSeeder\Tests\StoreSeederUnitTestCase` — not `PHPUnit\Framework\TestCase`. The base
+class boots a real REST server, provides request helpers, and offers
+`require_platform( $id )` so a driver test skips cleanly when its platform is not installed.
 
 ```php
 <?php
-use PHPUnit\Framework\TestCase;
+
+namespace StoreSeeder\Tests\Generators;
+
 use StoreSeeder\Generators\Resources\Product;
+use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
-class ProductGeneratorTest extends TestCase {
-    private $generator;
+/**
+ * @covers \StoreSeeder\Generators\Resources\Product
+ */
+class ProductGeneratorTest extends StoreSeederUnitTestCase {
 
-    protected function setUp(): void {
-        $this->generator = new ProductGenerator();
-    }
+    public function test_build_entity_shape(): void {
+        $generator = new Product();
+        $generator->set_locale( 'en_US' );
+        $generator->set_faker();
+        $generator->set_generation_params( array( 'seed' => 1 ) );
 
-    public function test_generate_single_product(): void {
-        $params = [
-            'product_type' => 'simple',
-            'price_range' => ['min' => 10, 'max' => 100],
-        ];
+        // preview() exercises build_entity() without needing a platform,
+        // because previewing never reaches a writer.
+        $preview = $generator->preview( 3 );
 
-        $result = $this->generator->generate($params);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('id', $result);
-        $this->assertArrayHasKey('name', $result);
-        $this->assertGreaterThan(0, $result['id']);
+        $this->assertArrayHasKey( 'columns', $preview );
+        $this->assertCount( 3, $preview['rows'] );
     }
 }
 ```
 
-### Integration Testing
+Note the real signatures: `generate( int $count )` takes a count, not a parameter array —
+parameters go in through `set_generation_params()` — and it returns a **list** of generated
+items, not one item.
+
+A run needs a target platform, so a test that actually persists must call
+`$generator->set_platform( … )` first, or go through the REST route, which resolves it.
+
+### REST
 
 ```php
-public function test_rest_api_integration(): void {
-    $admin_user = $this->create_admin_user();
-    wp_set_current_user($admin_user);
+public function test_generate_products(): void {
+    $this->require_platform( 'fluent-cart' );
+    wp_set_current_user( $this->create_admin_user() );
+    do_action( 'rest_api_init' );
 
-    $request = $this->create_request('POST', '/storeseeder/v1/products', [
-        'count' => 5,
-        'product_type' => 'simple',
-    ]);
+    $request = new \WP_REST_Request( 'POST', '/storeseeder/v1/products/generate' );
+    $request->set_param( 'count', 2 );
+    $request->set_param( 'platform', 'fluent-cart' );
 
-    $response = rest_do_request($request);
+    $response = rest_do_request( $request );
+    $data     = $response->get_data();
 
-    $this->assertEquals(200, $response->get_status());
-    $this->assertArrayHasKey('success', $response->get_data());
-    $this->assertTrue($response->get_data()['success']);
+    $this->assertSame( 200, $response->get_status() );
+    // The payload is { message, <resource_type>: [ … ] }. There is no
+    // `success` key and no `data` wrapper.
+    $this->assertArrayHasKey( 'product', $data );
+    $this->assertCount( 2, $data['product'] );
 }
 ```
 
-### Frontend Testing (Jest + React Testing Library)
+Mind the route: it is `/generate`, not the bare base, and the REST base is not always the
+resource name (`cart-sessions` for `cart_session`, `tax_classes` for `tax_class`).
 
-```tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ProductGenerator from '../components/Generators/ProductGenerator';
+### Frontend
 
-test('generates products successfully', async () => {
-    // Mock API
-    global.fetch = jest.fn(() =>
-        Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({
-                success: true,
-                data: { generated: 5 },
-                message: 'Products generated successfully'
-            })
-        })
-    );
+**Playwright, under `tests/e2e/`. There is no Jest and no React Testing Library** — do not add
+imports assuming otherwise.
 
-    render(<ProductGenerator />);
+```ts
+import { test, expect } from '@playwright/test';
 
-    const generateButton = screen.getByRole('button', { name: /generate/i });
-    fireEvent.click(generateButton);
+test('products generator renders', async ({ page }) => {
+  await page.goto('/wp-admin/admin.php?page=storeseeder');
+  await page.getByTestId('app-shell').waitFor();
 
-    await waitFor(() => {
-        expect(screen.getByText('Products generated successfully')).toBeInTheDocument();
-    });
+  await page.getByTestId('gen-card-products').click();
+  await page.getByTestId('generator-runbar').waitFor();
+
+  await expect(page.getByTestId('generate-btn')).toBeEnabled();
 });
 ```
 
-## 🚀 Deployment & Release Process
+Components carry `data-testid` attributes for this purpose; prefer them over CSS selectors,
+which change with styling.
 
-### Version Management
+## 🚀 Deployment & Release
+
+### Version management
+
+The version lives in three places and they must agree, or the release workflow fails its own
+check:
+
+1. `storeseeder.php` — the `Version:` plugin header
+2. `storeseeder.php` — the `STORESEEDER_VERSION` constant
+3. `readme.txt` — `Stable tag`
+
+`composer.json` has no `version` field, and `package.json`'s is not read by anything shipped —
+so `npm version` does not update the authoritative sources. Edit the three by hand, then:
 
 ```bash
-# Update version in package.json and composer.json
-npm version patch  # or minor, major
-composer update --lock
-
-# Build production assets
-yarn build
-
-# Create release archive
-composer run release
+composer release        # lint, analyse, clean, build, makepot, prod install, zip
 ```
 
-### WordPress.org Deployment
+### WordPress.org deployment
 
-The project includes automated deployment workflows:
+- `.github/workflows/svn-deploy.yml` runs on a tag push, and refuses to proceed if the tag
+  does not match the plugin header version
+- `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` and `.wordpress-org/`
+  assets on push to trunk, so a readme change reaches the public listing without a release
 
-- **GitHub Actions**: Automatic deployment on tag creation
-- **Asset Management**: Screenshots and banners automatically included
-- **Version Sync**: Consistent versioning across all files
+### Release checklist
 
-### Release Checklist
-
-- [ ] Update version numbers in all files
-- [ ] Update changelog with new features
-- [ ] Run full test suite
-- [ ] Build production assets
-- [ ] Test plugin activation
-- [ ] Verify WordPress.org compatibility
-- [ ] Create GitHub release with assets
+- [ ] Version matches in all three places above
+- [ ] `CHANGELOG.md` updated; `readme.txt` changelog carries the recent entries
+- [ ] `composer test` — the count matches the recorded baseline
+- [ ] `composer phpcs`, `composer phpstan`, `yarn lint:js`, `npx tsc --noEmit`
+- [ ] `composer phpcs:plugin-review` for the WordPress.org ruleset
+- [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
+- [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)
+- [ ] `docs/external-services.md` and `readme.txt` still agree about outbound requests
 
 ## 🔍 Debugging & Troubleshooting
 
@@ -433,38 +412,54 @@ if (!function_exists('storeseeder')) {
 #### API Debugging
 
 ```javascript
-// Enable API debugging in browser console
-localStorage.setItem('debug', 'storeseeder:*');
-
-// Log API requests
+// There is no plugin debug flag. To watch REST traffic from the admin, add a
+// middleware in the browser console:
 wp.apiFetch.use((options, next) => {
     console.log('API Request:', options);
     return next(options);
 });
 ```
 
-## 📚 Advanced Development Topics
+Server-side, set `WP_DEBUG_LOG` and read `wp-content/debug.log`; `Generator::log()` writes
+structured entries tagged with the resource type.
 
-### Custom Generator Development
+## 📚 Advanced topics
 
-1. **Extend Base Generator**: Create specialized generators for custom data types
-2. **Parameter Schema**: Define comprehensive parameter validation schemas
-3. **Database Integration**: Implement custom database operations and relationships
-4. **WordPress Hooks**: Integrate with WordPress action/filter system
+### Adding a platform driver
 
-### Performance Optimization
+The whole surface is one filter. From your own plugin:
 
-- **Query Optimization**: Use WordPress database optimization techniques
-- **Caching Strategy**: Implement appropriate caching for frequently accessed data
-- **Memory Management**: Handle large datasets efficiently
-- **Background Processing**: Use WordPress cron for long-running operations
+```php
+add_filter( 'storeseeder_platforms', function ( array $platforms ): array {
+    $platforms[] = new My_Platform_Driver();   // extends StoreSeeder\Platforms\Platform_Driver
+    return $platforms;
+} );
+```
 
-### Security Best Practices
+Declare `capabilities()` honestly — a resource your platform cannot represent should say so,
+with the plugin that would enable it where one applies — and map each supported resource to a
+writer in `writer_classes()`. Everything else (the admin picker, capability dimming, REST
+validation, MCP) follows from that.
 
-- **Input Validation**: Comprehensive parameter validation and sanitization
-- **Capability Checks**: Proper WordPress capability verification
-- **Nonce Protection**: CSRF protection for all forms and API calls
-- **SQL Injection Prevention**: Prepared statements for all database queries
+### Security
+
+- **Capability checks**: every REST route and AJAX handler verifies `manage_options`
+- **Input validation**: parameters are validated by the JSON Schema registered with
+  `register_rest_route`, with `sanitize_callback` on each
+- **Nonces**: the admin sends `X-WP-Nonce` via `@wordpress/api-fetch`; the AJAX handler checks
+  its own nonce
+- **No raw SQL**: writes go through the platform's models, so there are no queries to
+  parameterise. If you find yourself reaching for `$wpdb` in a writer, check whether the
+  platform exposes a model for it first.
+- **Archive extraction**: the sample-data ZIP is validated entry by entry before extraction so
+  nothing can be written outside the target directory. See [`SECURITY.md`](../SECURITY.md).
+
+### What the plugin deliberately does not do
+
+Worth knowing before proposing an optimisation for it: there is no caching, no transients, no
+DB transactions, no bulk inserts, no chunking, no resume, and no cron or background worker. A
+run is capped at 100 items and the batch queue is a client-side sequential loop. See
+[architecture.md](architecture.md#-scale-and-limits).
 
 ## 🤝 Contributing Guidelines
 
@@ -499,11 +494,7 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 ## 📞 Support & Resources
 
-- **GitHub Issues**: Bug reports and feature requests
-- **WordPress.org Forums**: Community support
-- **Documentation**: Comprehensive guides and API reference
-- **Slack Channel**: Real-time developer discussions
-
----
-
-*This development guide is continuously updated. Last updated: November 11, 2025*
+- [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues) — bugs and feature requests
+- [`SUPPORT.md`](../SUPPORT.md) — where to ask, what to include, what is out of scope
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — branching, commit conventions, quality gates
+- [`CLAUDE.md`](../CLAUDE.md) — architecture invariants and the traps that have no compiler behind them
