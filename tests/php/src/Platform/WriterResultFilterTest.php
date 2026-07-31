@@ -40,9 +40,14 @@ class WriterResultFilterTest extends StoreSeederUnitTestCase {
 			$source = (string) file_get_contents( (string) $file );
 			$name   = basename( (string) $file );
 
-			$this->assertStringContainsString(
-				'$this->filter_result(',
-				$source,
+			// Either the writer calls it, or it returns a shared helper on the base class that
+			// does — `create_term_in()` is how brands, categories and tags all persist, and it
+			// fires the filter once for the three of them rather than three near-identical times.
+			$offers = false !== strpos( $source, '$this->filter_result(' )
+				|| false !== strpos( $source, '$this->create_term_in(' );
+
+			$this->assertTrue(
+				$offers,
 				"{$name} returns its result without offering storeseeder_{resource}_generation_result"
 			);
 		}

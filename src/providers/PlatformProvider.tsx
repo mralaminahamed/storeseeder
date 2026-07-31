@@ -4,11 +4,12 @@ import {
   AUTO,
   activePlatforms,
   capabilityFor,
+  platformFieldsFor,
   initialPlatformState,
   setTargetPlatform,
   targetLabel,
 } from "@/lib/platform";
-import type { Capability, PlatformInfo, PlatformState } from "@/types";
+import type { Capability, ParameterConfig, PlatformInfo, PlatformState } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Context shape
@@ -34,6 +35,13 @@ interface PlatformContextState {
   setTarget: (platform: string) => Promise<void>;
   /** Whether one resource can be generated on the current target. */
   capability: (resource: string) => Capability | null;
+  /**
+   * The target's own extra parameters for one resource.
+   *
+   * Beside `capability` because they answer two halves of the same question — what this platform
+   * can do with a resource, and what it can do that no other platform can.
+   */
+  platformFields: (resource: string) => Record<string, ParameterConfig>;
 }
 
 const PlatformContext = createContext<PlatformContextState | null>(null);
@@ -76,6 +84,11 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
     [state, selected]
   );
 
+  const platformFields = useCallback(
+    (resource: string) => platformFieldsFor(state, selected, resource),
+    [state, selected]
+  );
+
   const target = selected !== AUTO ? selected : state.resolved;
 
   return (
@@ -89,6 +102,7 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
         target,
         setTarget,
         capability,
+        platformFields,
       }}
     >
       {children}

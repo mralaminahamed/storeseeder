@@ -48,21 +48,31 @@ final class Capability {
 	private $extension;
 
 	/**
+	 * Canonical fields this platform cannot store, even though it stores the resource.
+	 *
+	 * @since 1.1.0
+	 * @var array<int, string>
+	 */
+	private $ignored_fields;
+
+	/**
 	 * Constructor.
 	 *
-	 * Private — use the named constructors, which document the three cases that
+	 * Private — use the named constructors, which document the four cases that
 	 * actually occur.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param bool   $supported Whether the resource can be generated.
-	 * @param string $reason    Explanation when unsupported.
-	 * @param string $extension Plugin slug that would enable it.
+	 * @param bool               $supported      Whether the resource can be generated.
+	 * @param string             $reason         Explanation when unsupported.
+	 * @param string             $extension      Plugin slug that would enable it.
+	 * @param array<int, string> $ignored_fields Fields the platform cannot store.
 	 */
-	private function __construct( bool $supported, string $reason = '', string $extension = '' ) {
-		$this->supported = $supported;
-		$this->reason    = $reason;
-		$this->extension = $extension;
+	private function __construct( bool $supported, string $reason = '', string $extension = '', array $ignored_fields = array() ) {
+		$this->supported      = $supported;
+		$this->reason         = $reason;
+		$this->extension      = $extension;
+		$this->ignored_fields = $ignored_fields;
 	}
 
 	/**
@@ -74,6 +84,29 @@ final class Capability {
 	 */
 	public static function supported(): self {
 		return new self( true );
+	}
+
+	/**
+	 * Supported, but with some of the entity's fields ignored.
+	 *
+	 * The honest middle ground, and the one this class was missing. A platform can store a
+	 * resource without storing everything a canonical entity carries: WooCommerce has customers
+	 * but no separate customer record, so `with_account` cannot mean what it means elsewhere; it
+	 * has shipping classes but keeps their cost on the shipping *method*, so a class's `cost` has
+	 * nowhere to go.
+	 *
+	 * Dropping those in the writer and saying nothing is what produced the `include_images` bug —
+	 * a control the admin offers that does nothing. Naming them lets the UI mark them and the
+	 * REST response report them.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<int, string> $ignored Canonical field names this platform cannot store.
+	 *
+	 * @return self
+	 */
+	public static function supported_except( array $ignored ): self {
+		return new self( true, '', '', array_values( array_unique( $ignored ) ) );
 	}
 
 	/**
@@ -167,6 +200,30 @@ final class Capability {
 	}
 
 	/**
+	 * Canonical fields this platform ignores.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public function get_ignored_fields(): array {
+		return $this->ignored_fields;
+	}
+
+	/**
+	 * Whether one field is ignored by this platform.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $field Canonical field name.
+	 *
+	 * @return bool
+	 */
+	public function ignores( string $field ): bool {
+		return in_array( $field, $this->ignored_fields, true );
+	}
+
+	/**
 	 * REST representation.
 	 *
 	 * @since 1.1.0
@@ -175,9 +232,10 @@ final class Capability {
 	 */
 	public function to_array(): array {
 		return array(
-			'supported' => $this->supported,
-			'reason'    => $this->reason,
-			'extension' => $this->extension,
+			'supported'      => $this->supported,
+			'reason'         => $this->reason,
+			'extension'      => $this->extension,
+			'ignored_fields' => $this->ignored_fields,
 		);
 	}
 }

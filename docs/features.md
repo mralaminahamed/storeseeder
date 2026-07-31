@@ -214,6 +214,38 @@ Filters and actions across the whole lifecycle, with the full table in
 - `storeseeder_platform_supports_{id}` — override a capability, or declare that your extension
   satisfies a requirement
 
+## Platform-specific parameters
+
+Some properties exist on one platform and nowhere else. Those are not canonical entity fields — a
+generator names no platform, and a field only one platform stores would make a fixed seed produce
+different data elsewhere. They are **generation parameters** the driver declares and its own writer
+reads:
+
+| Platform | Resource | Parameters |
+|---|---|---|
+| WooCommerce | Products | `featured_ratio`, `catalog_visibility`, `tax_status` |
+| Fluent Cart | Products, Variations | `payment_type` (`onetime` or `subscription`) |
+
+The admin shows them only when that platform is the target, so a control is never offered for a run
+that would ignore it. The REST endpoint is looser by necessity — routes are registered before a
+target is resolved, so it accepts any driver's field — and reports what the target could not use in
+an `ignored` key on the response.
+
+`storeseeder_platform_fields_{id}` is the seam for an extension that adds a column to its platform.
+
+### Supported, but not in full
+
+A platform can store a resource without storing everything a canonical entity carries, and the
+capability says which fields it drops rather than the writer discarding them quietly:
+
+| Platform | Resource | Ignored | Why |
+|---|---|---|---|
+| WooCommerce | Customers | `with_account` | A WooCommerce customer *is* a WordPress user; there is no account-less customer record |
+| WooCommerce | Shipping Classes | `cost`, `per_item` | A class's cost belongs to a shipping *method*, so the same class costs different amounts per zone |
+
+The generator page prints those under the fields, so a setting that will not apply says so before
+the run rather than after it.
+
 ## Deleting generated data
 
 Settings → **Danger zone** offers to delete what StoreSeeder created: the products, orders,

@@ -22,13 +22,15 @@ function platform(
     active: true,
     version: "1.0.0",
     supports: {
-      product: { supported: true, reason: "", extension: "" },
+      product: { supported: true, reason: "", extension: "", ignored_fields: [] },
       subscription: {
         supported: false,
         reason: "Requires WooCommerce Subscriptions.",
         extension: "woocommerce-subscriptions",
+        ignored_fields: [],
       },
     },
+    fields: {},
     ...overrides,
   };
 }
@@ -152,7 +154,7 @@ describe("capabilityFor", () => {
       platforms: [
         platform("fluent-cart"),
         platform("stub-cart", {
-          supports: { product: { supported: false, reason: "No.", extension: "" } },
+          supports: { product: { supported: false, reason: "No.", extension: "", ignored_fields: [] } },
         }),
       ],
     });

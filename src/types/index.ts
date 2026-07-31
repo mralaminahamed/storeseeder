@@ -69,6 +69,14 @@ export interface Capability {
   reason: string;
   /** Plugin slug that would enable this, or '' when none applies. */
   extension: string;
+  /**
+   * Canonical fields this platform stores the resource *without*.
+   *
+   * Supported and incomplete is a real state — WooCommerce has customers but no separate
+   * customer record, so `with_account` cannot mean what it means elsewhere. Naming them is what
+   * lets the form say so instead of offering a control that does nothing.
+   */
+  ignored_fields: string[];
 }
 
 export interface PlatformInfo {
@@ -78,6 +86,12 @@ export interface PlatformInfo {
   version: string | null;
   /** Keyed by the canonical resource name, not by REST base. */
   supports: Record<string, Capability>;
+  /**
+   * Extra generation parameters only this platform understands, keyed by resource then by
+   * parameter name. Merged into the form when this platform is the target, and left out
+   * otherwise — another platform's field is a control that would be ignored.
+   */
+  fields: Record<string, Record<string, ParameterConfig>>;
 }
 
 export interface PlatformState {

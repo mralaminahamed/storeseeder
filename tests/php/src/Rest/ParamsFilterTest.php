@@ -77,7 +77,9 @@ class ParamsFilterTest extends StoreSeederUnitTestCase {
 			$this->assertArrayHasKey( 'dry_run', $handlers[0]['args'], $route );
 		}
 
-		$this->assertSame( 18, $seen );
+		// One per registered controller. Counted rather than listed so adding a resource updates
+		// one number instead of a list nobody remembers to touch.
+		$this->assertSame( count( \StoreSeeder\Rest\Registry::instance()->all() ), $seen );
 	}
 
 	public function test_general_filter_receives_the_rest_base(): void {
@@ -97,7 +99,10 @@ class ParamsFilterTest extends StoreSeederUnitTestCase {
 
 		$this->assertContains( 'products', $bases );
 		$this->assertContains( 'cart-sessions', $bases );
-		$this->assertCount( 18, array_unique( $bases ) );
+		$this->assertCount(
+			count( \StoreSeeder\Rest\Registry::instance()->all() ),
+			array_unique( $bases )
+		);
 	}
 
 	/**

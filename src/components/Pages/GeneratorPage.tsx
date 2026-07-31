@@ -73,7 +73,8 @@ export default function GeneratorPage() {
   const { recordRun } = useStats();
   const { toast } = useToast();
   const { add: addToBatch } = useBatch();
-  const { target, ambiguous, capability, active, setTarget } = usePlatform();
+  const { target, ambiguous, capability, platformFields: platformFieldsFor, active, setTarget } =
+    usePlatform();
 
   const generator = generators.find((g) => g.route === type);
 
@@ -236,6 +237,8 @@ export default function GeneratorPage() {
   // Two separate reasons a run cannot proceed, and they need different words: no
   // target chosen yet, versus a target that cannot represent this resource.
   const cap = capability(generator.resource);
+  // The target's own parameters, merged into the form by ConfigColumn.
+  const platformFields = platformFieldsFor(generator.resource);
   const unsupported = null !== cap && !cap.supported;
   const blocked = ambiguous || unsupported;
 
@@ -252,6 +255,8 @@ export default function GeneratorPage() {
             platforms={active}
             onPickTarget={(id) => void setTarget(id)}
             unsupported={unsupported ? cap : null}
+            platformFields={platformFields}
+            ignoredFields={cap?.ignored_fields ?? []}
           />
 
           {/* ---- Right: preview column ---- */}

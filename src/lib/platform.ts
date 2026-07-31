@@ -1,6 +1,11 @@
 import apiFetch from "@wordpress/api-fetch";
 import { __, sprintf } from "@wordpress/i18n";
-import type { Capability, PlatformInfo, PlatformState } from "@/types";
+import type {
+  Capability,
+  ParameterConfig,
+  PlatformInfo,
+  PlatformState,
+} from "@/types";
 
 /**
  * The value meaning "decide for me". Sent verbatim to the REST API, which
@@ -114,6 +119,25 @@ export function capabilityFor(
       supported: false,
       reason: __("Not supported by this platform.", "storeseeder"),
       extension: "",
+      ignored_fields: [],
     }
   );
+}
+
+/**
+ * The resolved target's own extra parameters for one resource.
+ *
+ * Only the target's: a field belonging to another platform would render as a control that the
+ * run then ignores, which is the failure this whole mechanism exists to stop. Empty when there is
+ * no target yet, so the form shows the canonical fields and nothing speculative.
+ */
+export function platformFieldsFor(
+  state: PlatformState,
+  selected: string,
+  resource: string,
+): Record<string, ParameterConfig> {
+  const id = selected !== AUTO && selected !== "" ? selected : state.resolved;
+  const platform = findPlatform(state, id);
+
+  return platform?.fields?.[resource] ?? {};
 }

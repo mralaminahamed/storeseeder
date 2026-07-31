@@ -140,9 +140,28 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 `_after_write_`. Cross-cutting ones: `storeseeder_capability` (one gate for menu, REST, MCP and
 AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_rest_params` (the
 all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
-`storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`, `storeseeder_purge_order`,
+`storeseeder_platform_fields_{id}`, `storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`,
+`storeseeder_purge_order`,
 `storeseeder_admin_payload`,
 `storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
+
+### A platform-specific field is a parameter, never an entity field
+
+`Platform_Driver::fields( $resource )` returns JSON Schema fragments only that driver understands
+— WooCommerce's `tax_status`, Fluent Cart's `payment_type`. They arrive as *generation parameters*
+and its writer reads them from `$this->params`; they never touch the canonical entity, because a
+field only one platform stores would make a fixed seed produce different data on the others.
+
+Routes register on `rest_api_init`, before any platform is resolved, so the endpoint accepts the
+**union** of every driver's fields and the response reports what the resolved target could not use
+(`ignored`). Compare against what the request *sent*, never the merged parameters — every declared
+argument with a default is present regardless, so the naive check reports every other platform's
+field on every run.
+
+Declaring a field the writer does not read recreates the `include_images` bug, which is the whole
+reason this seam exists. `Capability::supported_except( array $fields )` is the other half: a
+platform that stores a resource but not all of its canonical fields says which, and the admin
+prints it instead of dropping them silently.
 
 ### Deleting generated data means the ledger, never a heuristic
 

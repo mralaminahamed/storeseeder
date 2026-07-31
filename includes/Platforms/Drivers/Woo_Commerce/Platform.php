@@ -185,6 +185,13 @@ final class Platform extends Platform_Driver {
 			$matrix[ $resource_type ] = true;
 		}
 
+		// Supported, but not in full — and the writers already say why in their own docblocks.
+		// A WooCommerce customer *is* a WordPress user, so `with_account` cannot mean what it
+		// means on a platform with a separate customer record; and a shipping class's cost lives
+		// on the shipping method, so the class itself has nowhere to keep one.
+		$matrix[ Resource::CUSTOMER ]       = Capability::supported_except( array( 'with_account' ) );
+		$matrix[ Resource::SHIPPING_CLASS ] = Capability::supported_except( array( 'cost', 'per_item' ) );
+
 		$matrix[ Resource::TRANSACTION ] = Capability::unsupported(
 			__( 'WooCommerce records payment details on the order itself — a transaction id, a payment method and a date paid — rather than as separate transaction records.', 'storeseeder' )
 		);
@@ -205,6 +212,52 @@ final class Platform extends Platform_Driver {
 		}
 
 		return $matrix;
+	}
+
+	/**
+	 * WooCommerce-only generation parameters.
+	 *
+	 * Three product properties WooCommerce stores and no canonical entity carries, because no
+	 * other platform has them: whether a product is featured, whether it appears in the catalogue
+	 * and in search, and whether it is taxable. Each is read by the product writer from
+	 * `$this->params`; declaring one the writer ignores would recreate the bug this seam exists
+	 * to fix.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected function platform_fields( string $resource_type ): array {
+		if ( Resource::PRODUCT !== $resource_type ) {
+			return array();
+		}
+
+		return array(
+			'featured_ratio'     => array(
+				'description'       => __( 'WooCommerce only. Percentage of products marked featured (0–100).', 'storeseeder' ),
+				'type'              => 'integer',
+				'minimum'           => 0,
+				'maximum'           => 100,
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+			),
+			'catalog_visibility' => array(
+				'description'       => __( 'WooCommerce only. Where generated products appear.', 'storeseeder' ),
+				'type'              => 'string',
+				'enum'              => array( 'visible', 'catalog', 'search', 'hidden' ),
+				'default'           => 'visible',
+				'sanitize_callback' => 'sanitize_key',
+			),
+			'tax_status'         => array(
+				'description'       => __( 'WooCommerce only. Whether generated products are taxable.', 'storeseeder' ),
+				'type'              => 'string',
+				'enum'              => array( 'taxable', 'shipping', 'none' ),
+				'default'           => 'taxable',
+				'sanitize_callback' => 'sanitize_key',
+			),
+		);
 	}
 
 	/**

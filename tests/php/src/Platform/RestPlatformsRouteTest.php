@@ -25,6 +25,10 @@ class RestPlatformsRouteTest extends StoreSeederUnitTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
+
+		// The base case pins a target so the rest of the suite is not testing resolution by
+		// accident. This class reports what resolution *did*, so it starts from Auto.
+		remove_all_filters( 'storeseeder_target_platform' );
 		Registry::reset();
 		delete_option( Resolver::OPTION );
 		$this->plugin = storeseeder();

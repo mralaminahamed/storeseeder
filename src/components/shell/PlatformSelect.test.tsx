@@ -23,7 +23,7 @@ jest.mock("@wordpress/api-fetch", () => ({
 }));
 
 function platform(id: string, label: string, active = true): PlatformInfo {
-  return { id, label, active, version: "1.0.0", supports: {} };
+  return { id, label, active, version: "1.0.0", supports: {}, fields: {} };
 }
 
 function mount(state: Partial<PlatformState>) {
