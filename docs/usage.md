@@ -63,14 +63,58 @@ Several generators build on others. Orders need products and customers; refunds 
 transactions; order tax lines need orders and tax rates. A generator whose prerequisite is
 missing says so and names what to generate first.
 
-A workable order for a demo store:
+The real shape is a graph, not a list — an arrow means "needs this first":
 
-1. Products
-2. Customers
-3. Coupons, Tax Classes, Shipping Plans
-4. Orders
-5. Transactions
-6. Refunds, Labels, Order Tax Lines, Subscriptions
+```mermaid
+flowchart LR
+    P["Products"]
+    C["Customers"]
+    CP["Coupons"]
+    TC["Tax Classes"]
+    SP["Shipping Plans"]
+    SC["Shipping Classes"]
+    LG["Logs"]
+    O["Orders"]
+    PV["Product Variations"]
+    AT["Attributes"]
+    CS["Cart Sessions"]
+    T["Transactions"]
+    R["Refunds"]
+    L["Labels"]
+    OTL["Order Tax Lines"]
+    PD["Product Downloads"]
+    SB["Subscriptions"]
+
+    P --> PV
+    P --> AT
+    P --> CS
+    P --> O
+    C --> O
+    CP -.->|"optional"| O
+    O --> T
+    T --> R
+    O --> L
+    C --> L
+    O --> OTL
+    TC --> OTL
+    P --> PD
+    O --> PD
+    O --> SB
+    P --> SB
+
+    SP:::standalone
+    SC:::standalone
+    LG:::standalone
+    classDef standalone stroke-dasharray: 4 4
+```
+
+Dashed nodes need nothing first. Working left to right, a sensible order for a demo store is:
+
+1. **Products**, **Customers** — everything else hangs off these
+2. **Coupons**, **Tax Classes**, **Shipping Plans**, **Shipping Classes**, **Logs** — independent
+3. **Orders**
+4. **Transactions**
+5. **Refunds**, **Labels**, **Order Tax Lines**, **Product Downloads**, **Subscriptions**
 
 ### The batch queue
 

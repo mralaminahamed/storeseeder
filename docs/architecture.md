@@ -72,10 +72,94 @@ governs, and its concrete children nest one level beneath it.
 - **`src/`** — the React admin.
 - **`build/`** — compiled assets; the source in `src/` is not shipped in the plugin package.
 
+### The layers, and where platform knowledge is allowed
+
+```mermaid
+flowchart TD
+    subgraph admin["src/ &mdash; React admin"]
+        UI["Pages &middot; schema-driven fields<br/>live preview &middot; batch queue"]
+    end
+
+    subgraph rest["includes/Controllers/ &mdash; REST"]
+        CTRL["Controller<br/>validates params, resolves the target"]
+    end
+
+    subgraph gen["includes/Generators/ &mdash; what data looks like"]
+        GEN["Generator<br/><code>build_entity()</code><br/>FakerPHP only"]
+    end
+
+    ENT(["Canonical entity<br/>platform-neutral"])
+
+    subgraph plat["includes/Platforms/ &mdash; where data goes"]
+        REG["Registry &middot; Resolver<br/>capability matrix"]
+        subgraph drv["Drivers/&lt;Platform&gt;/"]
+            WR["Writer<br/>the only place a platform is named"]
+        end
+    end
+
+    STORE[("The store")]
+
+    UI --> CTRL
+    CTRL --> GEN
+    GEN --> ENT
+    ENT --> WR
+    WR --> STORE
+
+    CTRL -.->|"which platform?"| REG
+    REG -.->|"target"| WR
+
+    style ENT stroke-dasharray: 4 4
+```
+
+Read the diagram as a rule, not a picture: everything above the canonical entity is
+platform-neutral, everything that names a platform is inside a driver, and nothing crosses that
+line in either direction.
+
 ## 🔗 The platform layer
 
 StoreSeeder used to be a Fluent Cart plugin. It is now platform-agnostic above the driver
 line, and Fluent Cart is one driver.
+
+### A request, end to end
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Admin (React)
+    participant C as Controller
+    participant R as Resolver
+    participant G as Generator
+    participant W as Writer
+    participant P as Platform models
+
+    U->>C: POST /products/generate { count, platform, … }
+    C->>C: validate against JSON Schema
+    C->>R: resolve(platform)
+
+    alt several platforms active, none chosen
+        R--)C: WP_Error 409 platform_required
+        C--)U: 409 + candidate list
+    else resolved
+        R--)C: Platform
+        C->>C: check supports(resource)
+        C->>G: set_platform() then generate(count)
+
+        loop count times, failures collected not fatal
+            G->>G: build_entity() — FakerPHP only
+            G->>W: write(entity)
+            W->>P: resolve FKs, map statuses, insert
+            P--)W: created record
+            W--)G: array or WP_Error
+        end
+
+        G--)C: items + per-item errors
+        C--)U: 200 { message, resource: [ … ] }
+    end
+```
+
+The preview path branches off before the resolver is ever consulted — `preview()` builds rows
+from `build_entity()` and returns them, so previewing works with no platform chosen and writes
+nothing.
 
 ### What a driver is
 
@@ -140,6 +224,29 @@ silence, and the REST API answers 400 rather than writing nothing and reporting 
 
 `Platforms\Resolver` turns a request into one platform, or into an error explaining why it
 cannot:
+
+```mermaid
+flowchart TD
+    START(["resolve(requested)"]) --> FILTER["storeseeder_target_platform filter"]
+    FILTER --> EXPLICIT{"explicit id given?"}
+
+    EXPLICIT -->|yes| KNOWN{"registered?"}
+    KNOWN -->|no| E400A["400 unknown_platform"]
+    KNOWN -->|yes| ACTIVE{"active?"}
+    ACTIVE -->|no| E400B["400 platform_inactive"]
+    ACTIVE -->|yes| OK(["use it"])
+
+    EXPLICIT -->|"no — auto"| STORED{"site target stored<br/>and still active?"}
+    STORED -->|yes| OK
+    STORED -->|no| COUNT{"how many active?"}
+    COUNT -->|"exactly 1"| OK
+    COUNT -->|"0"| E400C["400 no_platform"]
+    COUNT -->|"2 or more"| E409["409 platform_required<br/>+ candidates"]
+
+    style OK stroke-width:2px
+    style E409 stroke-width:2px
+```
+
 
 | Situation | Result |
 |---|---|
@@ -289,10 +396,29 @@ through `src/lib/fieldsFromSchema.ts`, so adding one needs no new React.
 
 #### Data flow
 
-```
-User action → GeneratorPage → REST → Controller → Generator → canonical entity
-                                                                    ↓
-                          Toast + stats ← REST response ← Writer → platform models
+```mermaid
+flowchart LR
+    ACT(["User action"]) --> GP["GeneratorPage"]
+
+    GP -->|"/generate"| CTRL["Controller"]
+    GP -->|"/preview<br/>debounced"| PCTRL["Controller"]
+
+    CTRL --> GEN["Generator"]
+    GEN --> ENT(["Canonical entity"])
+    ENT --> WR["Writer"]
+    WR --> PM["Platform models"]
+
+    PCTRL --> PGEN["Generator<br/><code>preview()</code>"]
+    PGEN --> ROWS(["Preview rows"])
+    ROWS --> TBL["PreviewTable"]
+
+    WR --> RESP(["REST response"])
+    RESP --> TOAST["Toast + stats"]
+    TOAST --> GP
+    TBL --> GP
+
+    style ENT stroke-dasharray: 4 4
+    style ROWS stroke-dasharray: 4 4
 ```
 
 The preview path is separate and never reaches a writer, which is why previewing works even

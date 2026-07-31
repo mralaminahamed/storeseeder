@@ -109,7 +109,7 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 | [Installation](docs/installation.md) | Requirements, install paths, activation with Fluent Cart |
 | [Usage](docs/usage.md) | Running generators, live preview, batch queue, settings, run history |
 | [Features](docs/features.md) | The 17 generators and what each writes into the store |
-| [Architecture](docs/architecture.md) | Request flow from the React admin through controllers, generators, and models |
+| [Architecture](docs/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
 | [Development](docs/development.md) | Local setup, build and test commands, adding a generator, release process |
 | [External Services](docs/external-services.md) | The two outbound requests, what they send, and how to opt out |
 | [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record |
@@ -121,12 +121,31 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 
 ```mermaid
 flowchart LR
-    A["React admin<br/>src"] -->|"POST /storeseeder/v1/{resource}/generate"| B["Controller<br/>generate_items()"]
-    B -->|"JSON Schema validation"| C["Generator<br/>generate()"]
-    C -->|FakerPHP| D["Fluent Cart models"]
-    D --> E["WordPress database"]
-    C -->|"{ id, message, metadata }"| A
+    A["React admin<br/><code>src/</code>"]
+    B["Controller<br/><code>generate_items()</code>"]
+    R{"Resolver<br/>which platform?"}
+    C["Generator<br/><code>build_entity()</code>"]
+    E(["Canonical entity<br/>minor-unit money<br/>canonical statuses"])
+    W["Writer<br/>one per platform"]
+    M["Platform models<br/>Fluent Cart, …"]
+    D[("WordPress<br/>database")]
+
+    A -->|"POST /storeseeder/v1/&lt;base&gt;/generate"| B
+    B -->|"JSON Schema validation"| R
+    R -->|"target platform"| C
+    C -->|"FakerPHP only —<br/>names no platform"| E
+    E --> W
+    W -->|"resolves FKs,<br/>maps statuses"| M
+    M --> D
+    W -.->|"{ message, &lt;resource&gt;: [ … ] }"| A
+
+    style E stroke-dasharray: 4 4
 ```
+
+The entity in the middle is the whole point: a generator produces platform-neutral data, and a
+writer is the only thing that knows what store it is going into. That is what lets the same
+seventeen generators seed any supported platform, and what lets a fixed seed produce identical
+data on all of them.
 
 PHP lives under the PSR-4 namespace `StoreSeeder\`:
 

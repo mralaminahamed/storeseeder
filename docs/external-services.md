@@ -39,6 +39,39 @@ has no sample data.
 | **Terms of Service** | https://docs.github.com/en/site-policy/github-terms/github-terms-of-service |
 | **Privacy Policy** | https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement |
 
+The three states a site can be in, and every transition that can cause a request:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> Undecided: plugin activated
+
+    Undecided --> Granted: administrator accepts the prompt
+    Undecided --> Declined: administrator declines
+
+    Granted --> Granted: Sync now / Force re-sync
+    Granted --> Granted: admin page opened, files missing
+    Granted --> Declined: Revoke
+
+    Declined --> Granted: administrator accepts later
+
+    note right of Undecided
+        No request is ever made.
+        Sync now and Force re-sync reopen
+        the prompt instead of downloading.
+    end note
+
+    note right of Declined
+        No request is ever made.
+        Generators use built-in defaults.
+    end note
+```
+
+Only the `Granted` state can produce an outbound request, and every arrow into it is an explicit
+administrator action. Nothing here is triggered by activation, by a schedule, or by generating
+data.
+
 The downloaded archive is validated before extraction: entry paths are checked so that no file can be
 written outside the target directory (zip-slip / path traversal). See [`SECURITY.md`](../SECURITY.md).
 
