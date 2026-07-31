@@ -177,26 +177,27 @@ abstract class Writer {
 	}
 
 	/**
-	 * Create a brand term and attach it to products.
+	 * Create a taxonomy term and attach it to products.
 	 *
-	 * Here rather than in each driver because a brand is a taxonomy term on every platform that
-	 * has one, and the only things that differ are the taxonomy's name and where the products
-	 * come from — both arguments, which keeps this class free of any platform's vocabulary, the
-	 * same way `delete_model()` takes a model class.
+	 * Here rather than in each driver because brands and categories are taxonomy terms on every
+	 * platform that has them, and the only things that differ are the taxonomy's name and where
+	 * the products come from — both arguments, which keeps this class free of any platform's
+	 * vocabulary, the same way `delete_model()` takes a model class.
 	 *
-	 * The differences it does absorb are real: WooCommerce and EasyCommerce call the taxonomy
-	 * `product_brand`, Fluent Cart calls it `product-brands`, and a writer that hard-coded
-	 * either would silently create nothing on the other.
+	 * The differences it absorbs are real: WooCommerce calls its taxonomies `product_brand` and
+	 * `product_cat`, Fluent Cart calls them `product-brands` and `product-categories`, and a
+	 * writer that hard-coded either pair would silently create nothing on the other platform.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param string               $taxonomy    Brand taxonomy name.
-	 * @param array<string, mixed> $entity      Canonical brand entity.
+	 * @param string               $taxonomy    Taxonomy name.
+	 * @param array<string, mixed> $entity      Canonical entity with name, slug, description,
+	 *                                          link_count and nested.
 	 * @param array<int, int>      $product_ids Products to attach it to.
 	 *
 	 * @return array<string, mixed>|\WP_Error
 	 */
-	protected function create_brand_in( string $taxonomy, array $entity, array $product_ids ) {
+	protected function create_term_in( string $taxonomy, array $entity, array $product_ids ) {
 		$name   = $this->unique_term_name( $taxonomy, (string) $entity['name'] );
 		$parent = empty( $entity['nested'] ) ? 0 : $this->random_term_id( $taxonomy );
 
@@ -216,7 +217,7 @@ abstract class Writer {
 
 		$id = (int) $term['term_id'];
 
-		// Attached to real products, because a brand on nothing is invisible outside the
+		// Attached to real products, because a term on nothing is invisible outside the
 		// taxonomy screen — the same reason the attribute writer links its terms.
 		$wanted   = max( 0, (int) $entity['link_count'] );
 		$attached = 0;

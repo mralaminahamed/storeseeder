@@ -100,6 +100,7 @@ final class Registry {
 			Controllers\Cart_Session::class,
 			Controllers\Attribute::class,
 			Controllers\Brand::class,
+			Controllers\Product_Category::class,
 			Controllers\Refund::class,
 			Controllers\Log::class,
 			Controllers\Shipping_Class::class,

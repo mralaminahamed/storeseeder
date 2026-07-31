@@ -1,6 +1,6 @@
 <?php
 /**
- * Fluent Cart brand writer
+ * Fluent Cart product category writer
  *
  * @since   1.1.0
  * @package StoreSeeder\Platforms\Drivers\Fluent_Cart\Writers
@@ -16,22 +16,22 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Persists a canonical brand into Fluent Cart's `product-brands` taxonomy.
+ * Persists a canonical product category into Fluent Cart's `product-categories` taxonomy.
  *
- * Note the hyphen. Fluent Cart registers `product-brands` where WooCommerce and EasyCommerce use
- * `product_brand`, and nothing about a brand entity hints at that — which is why the taxonomy
- * name lives here, in the one layer allowed to know a platform's spelling.
+ * Hyphenated and plural, where WooCommerce uses `product_cat` and EasyCommerce `product_cat`
+ * too — three spellings of one idea, which is precisely the knowledge that belongs in a writer
+ * and nowhere above it.
  *
  * @since 1.1.0
  */
-final class Brand extends Writer {
+final class Product_Category extends Writer {
 	/**
-	 * The taxonomy Fluent Cart keeps brands in.
+	 * The taxonomy Fluent Cart keeps product categories in.
 	 *
 	 * @since 1.1.0
 	 * @var string
 	 */
-	const TAXONOMY = 'product-brands';
+	const TAXONOMY = 'product-categories';
 
 	/**
 	 * The resource this writer persists.
@@ -41,15 +41,15 @@ final class Brand extends Writer {
 	 * @return string
 	 */
 	public function resource(): string {
-		return Resource::BRAND;
+		return Resource::PRODUCT_CATEGORY;
 	}
 
 	/**
-	 * Create a Fluent Cart brand and attach it to products.
+	 * Create a Fluent Cart product category and file products under it.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param array<string, mixed> $entity Canonical brand entity.
+	 * @param array<string, mixed> $entity Canonical category entity.
 	 *
 	 * @return array<string, mixed>|WP_Error
 	 */
@@ -57,7 +57,7 @@ final class Brand extends Writer {
 		if ( ! taxonomy_exists( self::TAXONOMY ) ) {
 			return new WP_Error(
 				'missing_fluent_cart',
-				__( 'Fluent Cart is not active on this site, so its brand taxonomy is not registered.', 'storeseeder' )
+				__( 'Fluent Cart is not active on this site, so its product category taxonomy is not registered.', 'storeseeder' )
 			);
 		}
 
@@ -65,7 +65,7 @@ final class Brand extends Writer {
 	}
 
 	/**
-	 * Remove a generated brand.
+	 * Remove a generated category.
 	 *
 	 * @since 1.1.0
 	 *
