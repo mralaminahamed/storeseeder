@@ -168,13 +168,13 @@ final class Tax_Class extends Writer {
 		);
 
 		// Create tax class using Fluent Cart TaxClass model.
-		$tax_class = TaxClassModel::create( $tax_class_data );
+		$tax_class = TaxClassModel::query()->create( $tax_class_data );
 
 		if ( is_wp_error( $tax_class ) ) {
 			return $tax_class;
 		}
 
-		if ( ! $tax_class ) {
+		if ( ! $tax_class instanceof TaxClassModel ) {
 			return new WP_Error( 'tax_class_creation_failed', __( 'Failed to create tax class using Fluent Cart model.', 'storeseeder' ) );
 		}
 

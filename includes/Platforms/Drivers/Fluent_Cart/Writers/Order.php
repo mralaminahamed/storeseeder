@@ -137,7 +137,7 @@ final class Order extends Writer {
 		// Create order using Fluent Cart Order model.
 		$order = OrderModel::query()->create( $order_data );
 
-		if ( ! $order ) {
+		if ( ! $order instanceof OrderModel ) {
 			return new WP_Error( 'order_creation_failed', __( 'Failed to create order using Fluent Cart model.', 'storeseeder' ) );
 		}
 

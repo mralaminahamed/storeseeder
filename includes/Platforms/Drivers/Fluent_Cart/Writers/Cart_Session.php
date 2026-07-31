@@ -213,7 +213,12 @@ final class Cart_Session extends Writer {
 	 */
 	private function create_cart_session( array $data ): ?CartModel {
 		try {
-			return CartModel::query()->create( $data );
+			$created = CartModel::query()->create( $data );
+
+			// Eloquent's create() is reached through __callStatic, so its declared type is
+			// Builder|Model rather than this model. Narrowing here is what makes the
+			// nullable return type above true rather than merely intended.
+			return $created instanceof CartModel ? $created : null;
 		} catch ( Exception $e ) {
 			return null;
 		}

@@ -86,7 +86,7 @@ final class Customer extends Writer {
 			$customer_data
 		);
 
-		if ( ! $customer ) {
+		if ( ! $customer instanceof CustomerModel ) {
 			return new WP_Error( 'customer_creation_failed', __( 'Failed to create customer using Fluent Cart model.', 'storeseeder' ) );
 		}
 

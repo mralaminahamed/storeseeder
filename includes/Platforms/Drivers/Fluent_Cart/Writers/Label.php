@@ -114,7 +114,12 @@ final class Label extends Writer {
 		}
 
 		try {
-			return LabelModel::query()->create( array( 'value' => $value ) );
+			$created = LabelModel::query()->create( array( 'value' => $value ) );
+
+			// Eloquent's create() is reached through __callStatic, so its declared type is
+			// Builder|Model rather than this model. Narrowing here is what makes the
+			// nullable return type above true rather than merely intended.
+			return $created instanceof LabelModel ? $created : null;
 		} catch ( Exception $e ) {
 			return null;
 		}

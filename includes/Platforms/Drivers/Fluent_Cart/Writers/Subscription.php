@@ -143,7 +143,12 @@ final class Subscription extends Writer {
 	 */
 	private function create_subscription( array $data ): ?SubscriptionModel {
 		try {
-			return SubscriptionModel::query()->create( $data );
+			$created = SubscriptionModel::query()->create( $data );
+
+			// Eloquent's create() is reached through __callStatic, so its declared type is
+			// Builder|Model rather than this model. Narrowing here is what makes the
+			// nullable return type above true rather than merely intended.
+			return $created instanceof SubscriptionModel ? $created : null;
 		} catch ( Exception $e ) {
 			return null;
 		}

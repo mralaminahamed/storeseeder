@@ -155,7 +155,7 @@ final class Coupon extends Writer {
 		// Create coupon using Fluent Cart Coupon model.
 		$coupon = CouponModel::query()->create( $coupon_data );
 
-		if ( ! $coupon ) {
+		if ( ! $coupon instanceof CouponModel ) {
 			return new WP_Error( 'coupon_creation_failed', __( 'Failed to create coupon using Fluent Cart model.', 'storeseeder' ) );
 		}
 

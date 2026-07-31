@@ -509,6 +509,26 @@ Two things bite when writing one:
   explicit `return;` inside the guard, or PHPStan reads the whole rest of the method as
   operating on a `WP_Error`.
 
+### Platform stubs
+
+The e-commerce plugins StoreSeeder writes through are runtime dependencies, not Composer ones,
+so PHPStan cannot see their classes. Four stub packages fill that in — Fluent Cart, Fluent Cart
+Pro, EasyCommerce and StoreEngine — and they replaced four blanket `ignoreErrors` patterns that
+had been hiding every `FluentCart\…` symbol, and with them any wrong method name or argument
+count in a writer.
+
+Two consequences worth knowing when writing a writer:
+
+- **`create()` types as `Builder|Model`**, because Eloquent reaches it through the base model's
+  `__callStatic`. Narrow the result with `instanceof` before returning or using it; a
+  truthiness check does not narrow, and PHPStan will prove the guard can never fire.
+- **Use `Model::query()->create()`**, not the static `Model::create()`. Both work at runtime,
+  but `create()` is an instance method on the builder, so the static form cannot be resolved.
+
+`composer.json` currently points at the stub repositories by VCS because they are not on
+Packagist yet; that `repositories` block can be deleted once they are, without touching the
+`require-dev` constraints.
+
 PHPStan needs `php-stubs/wp-cli-stubs` to see the `WP_CLI` class at all — it is in
 `scanFiles` in `phpstan.neon`, not `stubFiles`, because the class is not autoloadable from
 here.

@@ -52,7 +52,7 @@ final class Attribute extends Writer {
 		$title = (string) $entity['title'];
 		$slug  = (string) $entity['slug'];
 
-		$group = AttributeGroup::create(
+		$group = AttributeGroup::query()->create(
 			array(
 				'title'       => $title,
 				'slug'        => $slug,
@@ -62,14 +62,14 @@ final class Attribute extends Writer {
 			)
 		);
 
-		if ( ! $group || ! $group->id ) {
+		if ( ! $group instanceof AttributeGroup || ! $group->id ) {
 			return new WP_Error( 'attribute_creation_failed', __( 'Failed to create attribute group.', 'storeseeder' ) );
 		}
 
 		$values = array();
 
 		foreach ( (array) $entity['terms'] as $i => $label ) {
-			$term = AttributeTerm::create(
+			$term = AttributeTerm::query()->create(
 				array(
 					'group_id'    => $group->id,
 					'serial'      => $i + 1,
@@ -80,7 +80,7 @@ final class Attribute extends Writer {
 				)
 			);
 
-			if ( $term && $term->id ) {
+			if ( $term instanceof AttributeTerm && $term->id ) {
 				$values[] = array(
 					'id'    => (int) $term->id,
 					'label' => $label,

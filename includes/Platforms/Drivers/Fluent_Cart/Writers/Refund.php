@@ -98,7 +98,7 @@ final class Refund extends Writer {
 			)
 		);
 
-		if ( ! $refund || ! $refund->id ) {
+		if ( ! $refund instanceof OrderTransaction || ! $refund->id ) {
 			return new WP_Error( 'refund_creation_failed', __( 'Failed to create refund transaction.', 'storeseeder' ) );
 		}
 

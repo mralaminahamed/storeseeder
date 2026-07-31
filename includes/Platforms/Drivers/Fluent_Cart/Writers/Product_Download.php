@@ -178,7 +178,12 @@ final class Product_Download extends Writer {
 	 */
 	private function create_download( array $data ): ?ProductDownloadModel {
 		try {
-			return ProductDownloadModel::query()->create( $data );
+			$created = ProductDownloadModel::query()->create( $data );
+
+			// Eloquent's create() is reached through __callStatic, so its declared type is
+			// Builder|Model rather than this model. Narrowing here is what makes the
+			// nullable return type above true rather than merely intended.
+			return $created instanceof ProductDownloadModel ? $created : null;
 		} catch ( Exception $e ) {
 			return null;
 		}

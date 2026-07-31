@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a3c04538ec0139cd164896b608944c5",
+    "content-hash": "76205937f1077b423f5d903e21398d7c",
     "packages": [
         {
             "name": "bluemmb/faker-picsum-photos-provider",
@@ -658,6 +658,404 @@
                 "source": "https://github.com/mockery/mockery"
             },
             "time": "2024-05-16T03:13:13+00:00"
+        },
+        {
+            "name": "mralaminahamed/easycommerce-stubs",
+            "version": "v1.47",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs.git",
+                "reference": "4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-easycommerce-stubs/zipball/4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9",
+                "reference": "4c1e4f8e807c44d1c4d79031f6c8c410b2c197a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4",
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+            },
+            "require-dev": {
+                "php-stubs/generator": "^0.8.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "suggest": {
+                "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
+            },
+            "type": "library",
+            "autoload-dev": {
+                "psr-4": {
+                    "EasyCommerceStubs\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "post-update-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "analyze": [
+                    "phpstan analyze"
+                ],
+                "check": [
+                    "@cs",
+                    "@test",
+                    "@analyze"
+                ],
+                "cleanup": [
+                    "git clean -xdf --exclude='.idea' --exclude='.vscode'",
+                    "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+                ],
+                "cs": [
+                    "phpcs"
+                ],
+                "cs-fix": [
+                    "phpcbf"
+                ],
+                "generate": [
+                    "bash bin/generate.sh"
+                ],
+                "release": [
+                    "bash bin/release-latest-versions.sh"
+                ],
+                "release-all": [
+                    "bash bin/release-all-versions.sh"
+                ],
+                "test": [
+                    "phpunit"
+                ],
+                "test-coverage": [
+                    "phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Al Amin Ahamed",
+                    "homepage": "https://github.com/mralaminahamed"
+                }
+            ],
+            "description": "EasyCommerce function and class declaration stubs for static analysis.",
+            "homepage": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs",
+            "keywords": [
+                "easycommerce",
+                "ecommerce",
+                "phpstan",
+                "static analysis",
+                "stubs",
+                "wordpress",
+                "wordpress-plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs/issues",
+                "source": "https://github.com/mralaminahamed/phpstan-easycommerce-stubs"
+            },
+            "time": "2026-07-31T11:53:26+00:00"
+        },
+        {
+            "name": "mralaminahamed/fluent-cart-pro-stubs",
+            "version": "v1.5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs.git",
+                "reference": "e81a881721a6d9deec42721c9e7f80aa6743b734"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-pro-stubs/zipball/e81a881721a6d9deec42721c9e7f80aa6743b734",
+                "reference": "e81a881721a6d9deec42721c9e7f80aa6743b734",
+                "shasum": ""
+            },
+            "require": {
+                "mralaminahamed/fluent-cart-stubs": "^1.6",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "php-stubs/generator": "^0.8.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "suggest": {
+                "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
+            },
+            "type": "library",
+            "autoload-dev": {
+                "psr-4": {
+                    "FluentCartProStubs\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "post-update-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "analyze": [
+                    "phpstan analyze"
+                ],
+                "check": [
+                    "@cs",
+                    "@test",
+                    "@analyze"
+                ],
+                "cleanup": [
+                    "git clean -xdf --exclude='.idea' --exclude='.vscode'",
+                    "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+                ],
+                "cs": [
+                    "phpcs"
+                ],
+                "cs-fix": [
+                    "phpcbf"
+                ],
+                "generate": [
+                    "bash bin/generate.sh"
+                ],
+                "test": [
+                    "phpunit"
+                ],
+                "test-coverage": [
+                    "phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Al Amin Ahamed",
+                    "homepage": "https://github.com/mralaminahamed"
+                }
+            ],
+            "description": "Fluent Cart Pro function and class declaration stubs for static analysis.",
+            "homepage": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs",
+            "keywords": [
+                "ecommerce",
+                "fluent-cart",
+                "fluent-cart-pro",
+                "phpstan",
+                "static analysis",
+                "stubs",
+                "wordpress"
+            ],
+            "support": {
+                "issues": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs/issues",
+                "source": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs"
+            },
+            "time": "2026-07-31T12:02:56+00:00"
+        },
+        {
+            "name": "mralaminahamed/fluent-cart-stubs",
+            "version": "v1.6.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs.git",
+                "reference": "ba336e1f73ef6ef14e0c1de4963891f4dd50a766"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-fluent-cart-stubs/zipball/ba336e1f73ef6ef14e0c1de4963891f4dd50a766",
+                "reference": "ba336e1f73ef6ef14e0c1de4963891f4dd50a766",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4",
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+            },
+            "require-dev": {
+                "php-stubs/generator": "^0.8.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "suggest": {
+                "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
+            },
+            "type": "library",
+            "autoload-dev": {
+                "psr-4": {
+                    "FluentCartStubs\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "post-update-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "analyze": [
+                    "phpstan analyze"
+                ],
+                "check": [
+                    "@cs",
+                    "@test",
+                    "@analyze"
+                ],
+                "cleanup": [
+                    "git clean -xdf --exclude='.idea' --exclude='.vscode'",
+                    "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+                ],
+                "cs": [
+                    "phpcs"
+                ],
+                "cs-fix": [
+                    "phpcbf"
+                ],
+                "generate": [
+                    "bash bin/generate.sh"
+                ],
+                "release": [
+                    "bash bin/release-latest-versions.sh"
+                ],
+                "release-all": [
+                    "bash bin/release-all-versions.sh"
+                ],
+                "test": [
+                    "phpunit"
+                ],
+                "test-coverage": [
+                    "phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Al Amin Ahamed",
+                    "homepage": "https://github.com/mralaminahamed"
+                }
+            ],
+            "description": "Fluent Cart function and class declaration stubs for static analysis.",
+            "homepage": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs",
+            "keywords": [
+                "ecommerce",
+                "fluent-cart",
+                "phpstan",
+                "static analysis",
+                "stubs",
+                "wordpress",
+                "wordpress-plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs/issues",
+                "source": "https://github.com/mralaminahamed/phpstan-fluent-cart-stubs"
+            },
+            "time": "2026-07-31T12:00:18+00:00"
+        },
+        {
+            "name": "mralaminahamed/storeengine-stubs",
+            "version": "v2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mralaminahamed/phpstan-storeengine-stubs.git",
+                "reference": "2b0b869d20771160f01242eb1a5f0b8e7d12fa73"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mralaminahamed/phpstan-storeengine-stubs/zipball/2b0b869d20771160f01242eb1a5f0b8e7d12fa73",
+                "reference": "2b0b869d20771160f01242eb1a5f0b8e7d12fa73",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4",
+                "php-stubs/wordpress-stubs": "^5.3 || ^6.0"
+            },
+            "require-dev": {
+                "php-stubs/generator": "^0.8.0",
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "suggest": {
+                "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
+            },
+            "type": "library",
+            "autoload-dev": {
+                "psr-4": {
+                    "StoreEngineStubs\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "post-update-cmd": [
+                    "@composer --working-dir=source/ update --no-interaction"
+                ],
+                "analyze": [
+                    "phpstan analyze"
+                ],
+                "check": [
+                    "@cs",
+                    "@test",
+                    "@analyze"
+                ],
+                "cleanup": [
+                    "git clean -xdf --exclude='.idea' --exclude='.vscode'",
+                    "git status --short --ignored | sed -n -e 's#^!! ##p' | xargs -r rm -vrf"
+                ],
+                "cs": [
+                    "phpcs"
+                ],
+                "cs-fix": [
+                    "phpcbf"
+                ],
+                "generate": [
+                    "bash bin/generate.sh"
+                ],
+                "release": [
+                    "bash bin/release-latest-versions.sh"
+                ],
+                "release-all": [
+                    "bash bin/release-all-versions.sh"
+                ],
+                "test": [
+                    "phpunit"
+                ],
+                "test-coverage": [
+                    "phpunit --coverage-html coverage"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Al Amin Ahamed",
+                    "homepage": "https://github.com/mralaminahamed"
+                }
+            ],
+            "description": "StoreEngine function and class declaration stubs for static analysis.",
+            "homepage": "https://github.com/mralaminahamed/phpstan-storeengine-stubs",
+            "keywords": [
+                "ecommerce",
+                "phpstan",
+                "static analysis",
+                "storeengine",
+                "stubs",
+                "wordpress",
+                "wordpress-plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/mralaminahamed/phpstan-storeengine-stubs/issues",
+                "source": "https://github.com/mralaminahamed/phpstan-storeengine-stubs"
+            },
+            "time": "2026-07-31T11:53:26+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -1377,6 +1775,54 @@
                 }
             ],
             "time": "2026-07-27T10:28:41+00:00"
+        },
+        {
+            "name": "phpstan/extension-installer",
+            "version": "1.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/extension-installer.git",
+                "reference": "85e90b3942d06b2326fba0403ec24fe912372936"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/extension-installer/zipball/85e90b3942d06b2326fba0403ec24fe912372936",
+                "reference": "85e90b3942d06b2326fba0403ec24fe912372936",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": "^7.2 || ^8.0",
+                "phpstan/phpstan": "^1.9.0 || ^2.0"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2.0",
+                "phpstan/phpstan-strict-rules": "^0.11 || ^0.12 || ^1.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "PHPStan\\ExtensionInstaller\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\ExtensionInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Composer plugin for automatic installation of PHPStan extensions",
+            "keywords": [
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpstan/extension-installer/issues",
+                "source": "https://github.com/phpstan/extension-installer/tree/1.4.3"
+            },
+            "time": "2024-09-04T20:21:43+00:00"
         },
         {
             "name": "phpstan/phpstan",

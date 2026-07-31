@@ -93,7 +93,7 @@ final class Log extends Writer {
 			)
 		);
 
-		if ( ! $activity || ! $activity->id ) {
+		if ( ! $activity instanceof Activity || ! $activity->id ) {
 			return new WP_Error( 'log_creation_failed', __( 'Failed to create activity log entry.', 'storeseeder' ) );
 		}
 

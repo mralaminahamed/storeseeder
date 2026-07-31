@@ -118,7 +118,12 @@ final class Shipping_Class extends Writer {
 	 */
 	private function create_shipping_class( array $data ): ?ShippingClassModel {
 		try {
-			return ShippingClassModel::query()->create( $data );
+			$created = ShippingClassModel::query()->create( $data );
+
+			// Eloquent's create() is reached through __callStatic, so its declared type is
+			// Builder|Model rather than this model. Narrowing here is what makes the
+			// nullable return type above true rather than merely intended.
+			return $created instanceof ShippingClassModel ? $created : null;
 		} catch ( Exception $e ) {
 			return null;
 		}

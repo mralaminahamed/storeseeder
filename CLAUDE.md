@@ -173,6 +173,12 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
   surfaces check it — admin menu, REST, MCP, AJAX — and a site that grants the routes but not
   the page has a broken plugin. It lives at the root of `includes/` rather than in a layer
   directory because it belongs to none of them.
+- **The platform plugins have PHPStan stubs; do not blanket-ignore their symbols.**
+  `phpstan.neon` scans `mralaminahamed/{fluent-cart,fluent-cart-pro,easycommerce,storeengine}-stubs`,
+  which replaced four `#.*FluentCart\\.*#` ignores that hid every symbol in the driver — a wrong
+  method name in a writer included. Eloquent's `create()` types as `Builder|Model` through
+  `__callStatic`, so narrow it with `instanceof` rather than a truthiness check, and use
+  `Model::query()->create()` rather than the static `Model::create()`.
 - **Never write a locale list by hand.** `Platforms\Locale` is the only one; PHP reads it there
   and TypeScript reads the codes the server inlines (`src/lib/locales.ts`). A second list is how
   the admin came to offer 73 while the REST enum accepted 6 — and because `Factory::create()`

@@ -1,6 +1,3 @@
-includes:
-    - vendor/szepeviktor/phpstan-wordpress/extension.neon
-
 parameters:
     level: 7
 
@@ -42,6 +39,19 @@ parameters:
     # 47 calls to an unknown class. Dev-only: the commands never run unless WP_CLI is real.
     scanFiles:
         - vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+        # The platform drivers write through these plugins' own models. Before the stubs
+        # existed, four blanket ignoreErrors patterns hid every FluentCart symbol — which
+        # also hid a wrong method name or argument count in a writer, the exact mistake
+        # static analysis is for.
+        - vendor/mralaminahamed/fluent-cart-stubs/fluent-cart-stubs.stub
+        - vendor/mralaminahamed/fluent-cart-stubs/fluent-cart-constants-stubs.stub
+        - vendor/mralaminahamed/easycommerce-stubs/easycommerce-stubs.stub
+        - vendor/mralaminahamed/easycommerce-stubs/easycommerce-constants-stubs.stub
+        - vendor/mralaminahamed/storeengine-stubs/storeengine-stubs.stub
+        - vendor/mralaminahamed/storeengine-stubs/storeengine-constants-stubs.stub
+        # Pro's classes extend the free plugin's, so it goes after them.
+        - vendor/mralaminahamed/fluent-cart-pro-stubs/fluent-cart-pro-stubs.stub
+        - vendor/mralaminahamed/fluent-cart-pro-stubs/fluent-cart-pro-constants-stubs.stub
 
     # WordPress constants
     dynamicConstantNames:
@@ -96,14 +106,6 @@ parameters:
         - '#Parameter \#1 \$function_to_add of function add_action expects callable\(\): mixed, array given\.#'
         - '#Parameter \#1 \$function_to_add of function add_filter expects callable, array given\.#'
 
-        # Fluent Cart plugin dependencies (external plugin classes, runtime-only)
-        - '#.*FluentCart\\Models\\.*#'
-        - '#.*FluentCart\\Helpers\\.*#'
-        - '#.*FluentCart\\App\\Models\\.*#'
-        - '#.*FluentCart\\App\\Helpers\\.*#'
-        - '#Class FluentCart\\App\\Models\\.* not found\.#'
-        - '#Class FluentCart\\App\\Helpers\\.* not found\.#'
-        - '#Call to static method query\(\) on an unknown class FluentCart\\App\\Models\\.*\.#'
 
         # mcp-adapter plugin classes (runtime-only dependency, present only when
         # the mcp-adapter plugin is active)

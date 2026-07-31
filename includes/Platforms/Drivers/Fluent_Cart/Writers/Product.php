@@ -160,7 +160,7 @@ final class Product extends Writer {
 
 		$product = ProductModel::query()->create( $product_data );
 
-		if ( ! $product ) {
+		if ( ! $product instanceof ProductModel ) {
 			return null;
 		}
 
@@ -206,8 +206,10 @@ final class Product extends Writer {
 			)
 		);
 
-		// The detail row points at the variation customers land on by default.
-		if ( $detail && $variation ) {
+		// The detail row points at the variation customers land on by default. instanceof
+		// rather than a truthiness check: create() is typed Builder|Model through
+		// __callStatic, so only this narrows it enough to reach save().
+		if ( $detail instanceof ProductDetailModel && $variation instanceof ProductVariationModel ) {
 			$detail->default_variation_id = $variation->id;
 			$detail->save();
 		}
