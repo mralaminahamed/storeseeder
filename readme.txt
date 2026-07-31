@@ -1,4 +1,4 @@
-=== StoreSeeder ===
+=== StoreSeeder – eCommerce Test Data Generator for Fluent Cart ===
 Contributors: mralaminahamed
 Tags: test data, dummy data, demo content, ecommerce, faker
 Requires at least: 6.5

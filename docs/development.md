@@ -456,6 +456,10 @@ Separately, `.github/workflows/svn-readme-assets-update.yml` syncs `readme.txt` 
 - [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
 - [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)
 - [ ] `docs/external-services.md` and `readme.txt` still agree about outbound requests
+- [ ] If a driver shipped this release, the platform is added to the `readme.txt` title and
+      the `Plugin Name` header — and **only** if it shipped. The title is the strongest
+      search signal WordPress.org has, and naming a platform with no driver behind it is a
+      claim the plugin cannot honour
 
 ## 🔍 Debugging & Troubleshooting
 

@@ -65,14 +65,24 @@ function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable 
 
 export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarProps) {
   const { pathname } = useLocation();
-  const { state, target, capability } = usePlatform();
+  const { state, target, active, ambiguous, capability } = usePlatform();
 
-  // Names the store being seeded rather than a fixed platform. Falls back to a
-  // generic word when nothing is resolved, which is the case on a site with several
-  // platforms active and no choice made yet.
-  const platformLabel =
-    state.platforms.find((p) => p.id === target)?.label ??
-    __("Multi-platform", "storeseeder");
+  /**
+   * The line under the wordmark: which store this will write to.
+   *
+   * It used to fall back to "Multi-platform" for anything unresolved, which read as a
+   * feature boast in the two cases where it was actually a problem — nothing installed,
+   * or several installed with no choice made. Both now say what to do about it.
+   */
+  const platformLabel = (): string => {
+    const resolved = state.platforms.find((p) => p.id === target)?.label;
+
+    if (resolved) return resolved;
+    if (ambiguous) return __("Choose a target", "storeseeder");
+    if (0 === active.length) return __("No platform active", "storeseeder");
+
+    return __("No target chosen", "storeseeder");
+  };
 
   const unavailableReason = (resource: string): string | undefined => {
     const cap = capability(resource);
@@ -87,7 +97,13 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
         {!collapsed && (
           <div className="fp-brand-text">
             <div className="fp-brand-name">StoreSeeder</div>
-            <div className="fp-brand-sub">{platformLabel}</div>
+            <div
+              className="fp-brand-sub"
+              data-testid="brand-sub"
+              title={__("Where generated data is written", "storeseeder")}
+            >
+              {platformLabel()}
+            </div>
           </div>
         )}
         <button
