@@ -57,6 +57,28 @@ final class Status {
 	const EXPIRED  = 'expired';
 	const DISABLED = 'disabled';
 
+	/**
+	 * Transaction states.
+	 *
+	 * `AUTHORIZED` and `DISPUTED` have no order-status counterpart, and the four that read like one
+	 * are deliberately the same words: a completed transaction and a completed order mean the same
+	 * thing to a reader, and two vocabularies for one idea is what this class exists to prevent.
+	 * Fluent Cart spells completed `succeeded` and disputed `dispute_lost`; its writer maps them.
+	 *
+	 * @since 1.1.0
+	 */
+	const AUTHORIZED = 'authorized';
+	const DISPUTED   = 'disputed';
+
+	/**
+	 * Transaction types.
+	 *
+	 * @since 1.1.0
+	 */
+	const CHARGE  = 'charge';
+	const REFUND  = 'refund';
+	const DISPUTE = 'dispute';
+
 	const IN_STOCK     = 'in_stock';
 	const OUT_OF_STOCK = 'out_of_stock';
 	const ON_BACKORDER = 'on_backorder';
@@ -77,6 +99,43 @@ final class Status {
 			self::CANCELLED,
 			self::FAILED,
 			self::REFUNDED,
+		);
+	}
+
+	/**
+	 * Every transaction state.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public static function transaction_statuses(): array {
+		return array(
+			self::PENDING,
+			self::AUTHORIZED,
+			self::COMPLETED,
+			self::FAILED,
+			self::REFUNDED,
+			self::DISPUTED,
+		);
+	}
+
+	/**
+	 * Every transaction type.
+	 *
+	 * Charge, refund and dispute are the three every gateway models. A seeder has no business
+	 * inventing others: the Refund generator filters on charge, so a transaction with an
+	 * unrecognised type is invisible to it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<int, string>
+	 */
+	public static function transaction_types(): array {
+		return array(
+			self::CHARGE,
+			self::REFUND,
+			self::DISPUTE,
 		);
 	}
 
