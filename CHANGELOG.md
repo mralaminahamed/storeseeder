@@ -11,6 +11,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **StoreSeeder is no longer a Fluent Cart plugin.** Where data lands is now decided by a
+  *platform driver*, and the same seventeen generators feed every driver — a generator names no
+  platform, so a fixed seed produces identical data wherever it is written. Fluent Cart is the
+  driver shipped; `storeseeder_platforms` is the whole surface needed to add another from a
+  separate plugin. The target is chosen in the topbar and in Settings, stored site-wide so two
+  administrators cannot unknowingly seed different stores, and with more than one platform active
+  the generator page asks rather than guessing — writing rows into the wrong store is not a
+  failure anyone would notice afterwards.
+- Capability support is **computed per request, never cached**, because it is conditional:
+  WooCommerce has no subscriptions until WooCommerce Subscriptions is active, and StoreEngine
+  gates resources behind addons. An unsupported resource reports which plugin would enable it
+  instead of dimming a tile in silence, and the REST API answers 400 rather than reporting
+  success and writing nothing.
+- `GET /platforms` and `POST /platforms/target` for reading the platform matrix and setting the
+  site-wide target.
+- **Seventy-five locales**, every one FakerPHP ships a provider for, searchable in the picker by
+  language name or locale code.
+- **Settings** gains a Target platform card — the site-wide option previously reachable only from
+  a topbar dropdown, naming what `Auto` resolves to — and an Appearance card for theme and
+  density.
+- `storeseeder_capability` sets who may use the plugin, governing the admin menu, every REST
+  route, every MCP ability and the AJAX handlers together, so access cannot be widened for one
+  surface and left behind on another.
+- Filters for the cases where only a per-resource hook existed: `storeseeder_canonical_entity`
+  and `storeseeder_rest_params` apply to all seventeen resources and run before their specific
+  counterparts. Plus `storeseeder_locales`, `storeseeder_mcp_ability_definition`,
+  `storeseeder_admin_payload` and `storeseeder_sample_data_source`.
+- The products preview gains a **Type** column, and it reads the run's own `product_type`
+  parameter rather than rolling a fresh value — choose `digital` and every previewed row says
+  digital, which is the question the control beside it just asked. `mixed` is the only setting
+  that varies per row, which is what mixed means.
+- **Fluent Cart Pro support, and a licence generator.** The driver now detects Pro, reports it
+  as an extension of the platform — `[{ slug, label, active, version }]`, a new
+  `Platform_Driver::extensions()` seam that WooCommerce Subscriptions will use the same way —
+  and gates the new **licences** resource on it. Pro owns `fct_licenses`, so without Pro there
+  is nowhere to write one; the capability reports the plugin by name, so the admin can say
+  "install Fluent Cart Pro" and the REST API answers with the same reason instead of failing
+  once per item.
+  The generator makes licences worth testing against: unlimited and limited tiers, some at
+  their activation limit, some expired in the past, some withdrawn while still dated, and
+  activation rows for the sites a licence is live on. Eighteen generators now.
+- **WP-CLI.** `wp storeseeder generate <resource>` plus `preview`, `platforms`, `locales` and
+  `sample-data`, each dispatching through the same REST controller the admin uses — so
+  validation, platform resolution and the capability check are one implementation rather than
+  three. Any parameter the endpoint accepts works as a flag, including lists
+  (`--payment_methods=stripe,paypal`) and objects (`--price_range='{"min":5,"max":500}'`);
+  an unknown flag is rejected with the list of parameters that endpoint takes, because
+  `--lokale=de_DE` silently generating English is worse than an error. Commands that touch
+  store state require `--user`: shell access is not the same as consent to write to this
+  site's tables, and this keeps one answer to "who may generate?" across all four surfaces.
+- **Translations resolve from the plugin's own `languages/` directory**, for PHP and for the
+  React admin. `load_plugin_textdomain()` runs on `init`, and `wp_set_script_translations()`
+  now receives the path — without it core looked only in `wp-content/languages/plugins`, so a
+  bundled JSON translation, or one Loco Translate wrote beside the plugin, was ignored for
+  every admin string. Loco Translate and WPML String Translation both work without
+  configuration.
 - The plugin screen clears other plugins' admin notices — setup wizards, review nags, upgrade
   prompts — so the interface starts at the top of the page instead of below a stack of messages
   about the rest of the site. Only this screen is affected, and
@@ -18,6 +74,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- PHPStan analyses `storeseeder.php` as well, and its `ignoreErrors` list went from 42 patterns
+  to 9. Twenty-four were WordPress functions that the WordPress stubs have covered all along,
+  and eighteen more suppressed nothing at all — each one a standing offer to swallow the first
+  future error that happened to match its wording. `reportUnmatchedIgnoredErrors` is on now, so
+  a pattern has to keep earning its place; the three that mask genuinely unreachable branches
+  are labelled as findings to revisit rather than left looking like noise.
+- The REST API, MCP schemas and admin picker all enumerate locales from one list, so what is
+  offered is exactly what generates.
+- `includes/` is laid out so the directories state the class hierarchy: each abstract sits at the
+  root of the scope it governs, its concrete children one level beneath. Three registries —
+  platforms, REST controllers, MCP abilities — replace three hardcoded lists of seventeen, each
+  with its own filter.
+- Density reaches controls, not only containers: buttons, chips, inputs, selects, badges, pills
+  and switches read the same tokens the compact override changes, so their padding and type scale
+  with the boxes around them.
 - New brand mark: the icon is a single indigo lit like glass rather than a two-colour gradient
   ramp, and the WordPress.org banners and screenshots now share that palette from one source.
 - Every clickable row, overlay and field caption is reachable by keyboard. Rows that navigate are
@@ -28,6 +99,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Three writers offered no result filter, and one was named after a resource that no longer
+  exists.** Attributes, logs and refunds returned their result with no hook at all, while the
+  other fifteen resources had one — so integration code written against "every writer fires
+  `storeseeder_{resource}_generation_result`" was wrong for three of eighteen. And the
+  shipping-plan writer still fired `storeseeder_shipping_method_generation_result`, left over
+  from before the resource was renamed. The hook name is now derived from the writer's own
+  resource by `Writer::filter_result()`, so it cannot drift again; the old shipping hook keeps
+  firing after the correct one, deprecated, so existing callbacks still run. Two tests fail if
+  a writer stops offering the filter or starts hardcoding a name.
+- Nineteen hooks were undocumented, including every per-resource result filter and the admin
+  filters for notices, menu icon and permalinks. The architecture table is now checked against
+  the source.
+- `jest.config.js` would have shipped in the release zip; `.distignore` had not been revisited
+  since Jest arrived.
+- The WordPress.org screenshots and banners were regenerated, and three pieces of copy in them
+  had gone stale: the frame caption and banner both said "for Fluent Cart" on a plugin that is
+  no longer Fluent-Cart-only, and the banner advertised 17 generators. The banner now names
+  WP-CLI, which is new. The Settings screenshot needed more than a re-shoot: the page grew from
+  four cards to eight across three sections, so the old whole-page capture clipped a card in
+  half — it now captures a frame-shaped viewport with the sidebar collapsed, which is what the
+  settings column wants, and the frames carry the product tagline under the wordmark.
+- The recorded test baselines in CLAUDE.md and AGENTS.md were two and five commits stale, which
+  makes them useless for the one thing they are for — noticing that a refactor changed the
+  count.
+- The icon set carried `grid`, byte-identical to `dashboard`: one glyph under two names, which
+  is the ambiguity the icon pass was meant to remove. Also dropped two dead exports,
+  `fetchPlatforms()` and `toLabel()`.
+- **The locale picker was a lie.** The admin offered seventy-three locales while the REST API
+  accepted six, and FakerPHP falls back to `en_US` without complaining — so sixty-seven of them
+  silently produced English. `pt_AO` was offered with no provider behind it, while `ar_EG`,
+  `ar_JO` and `en_CA` shipped with faker and were never offered. A test now fails if the list and
+  faker's providers drift apart.
+- The picker also stored the display *label*, so the chosen value could never be sent to the API
+  as-is, and the topbar globe wrote a key nothing read — clicking a locale changed the pill and
+  nothing else.
+- An unrecognised locale falls back within its own language, preferring that language's own
+  country: a `de_LU` site gets `de_DE` rather than the Austrian German that sorted first.
 - **The admin interface is translatable.** None of it was, for two independent reasons.
   `wp i18n make-pot` does not read `.tsx` sources, so every string in the React admin — "New
   generation", "Add to batch", the generator descriptions, the settings labels — was absent

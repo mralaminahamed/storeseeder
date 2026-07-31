@@ -14,24 +14,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use StoreSeeder\Controllers\Product;
-use StoreSeeder\Controllers\Customer;
-use StoreSeeder\Controllers\Order;
-use StoreSeeder\Controllers\Coupon;
-use StoreSeeder\Controllers\Product_Variation;
-use StoreSeeder\Controllers\Shipping_Plan;
-use StoreSeeder\Controllers\Tax_Class;
-use StoreSeeder\Controllers\Transaction;
-use StoreSeeder\Controllers\Cart_Session;
-use StoreSeeder\Controllers\Attribute;
-use StoreSeeder\Controllers\Refund;
-use StoreSeeder\Controllers\Log;
-use StoreSeeder\Controllers\Shipping_Class;
-use StoreSeeder\Controllers\Label;
-use StoreSeeder\Controllers\Order_Tax_Rate;
-use StoreSeeder\Controllers\Product_Download;
-use StoreSeeder\Controllers\Subscription;
+use StoreSeeder\Access;
+use StoreSeeder\CLI\Registry as CLI_Registry;
+use StoreSeeder\Generation\Ledger;
+use StoreSeeder\Generation\Purge;
 use StoreSeeder\MCP\MCP_Server;
+use StoreSeeder\MCP\Settings as MCP_Settings;
+use StoreSeeder\Platforms\Locale;
+use StoreSeeder\Platforms\Platform_Driver;
+use StoreSeeder\Platforms\Registry as Platform_Registry;
+use StoreSeeder\Platforms\Resolver as Platform_Resolver;
+use StoreSeeder\Rest\Registry as Rest_Registry;
 
 /**
  * Main Plugin Class for StoreSeeder
@@ -129,6 +122,12 @@ class StoreSeeder {
 		register_activation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'activate_plugin' ) );
 		register_deactivation_hook( STORESEEDER_PLUGIN_FILE, array( $this, 'flush_rewrite_rules' ) );
 
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+		// The ledger's table, for sites updated by uploading a zip — that never fires the
+		// activation hook, and an absent table means generated rows stop being recorded and
+		// the cleanup silently has nothing to offer.
+		add_action( 'admin_init', array( Ledger::class, 'maybe_install' ) );
+
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -143,6 +142,46 @@ class StoreSeeder {
 		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_row_meta' ), 10, 2 );
 
 		$this->init_mcp();
+		$this->init_cli();
+	}
+
+	/**
+	 * Load the plugin's translations.
+	 *
+	 * On `init` rather than `plugins_loaded`: loading a textdomain before `init` is what
+	 * WordPress 6.7 started warning about, and nothing here needs a translated string
+	 * earlier than that.
+	 *
+	 * WordPress finds translations in `wp-content/languages/plugins/` on its own. This call
+	 * is what additionally makes the plugin's *own* `languages/` directory work, which is
+	 * where Loco Translate writes by default when it is told to keep files with the plugin,
+	 * and where a bundled translation would live.
+	 *
+	 * @since 1.1.0
+	 * @hooked init
+	 *
+	 * @return void
+	 */
+	public function load_textdomain(): void {
+		load_plugin_textdomain(
+			'storeseeder',
+			false,
+			dirname( plugin_basename( STORESEEDER_PLUGIN_FILE ) ) . '/languages'
+		);
+	}
+
+	/**
+	 * Register the WP-CLI commands.
+	 *
+	 * The registry is inspectable without WP_CLI present — which is what lets the command
+	 * logic be tested in PHPUnit — so the guard lives inside it rather than here.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	private function init_cli(): void {
+		CLI_Registry::instance()->register_commands();
 	}
 
 	/**
@@ -186,7 +225,7 @@ class StoreSeeder {
 		add_menu_page(
 			__( 'StoreSeeder', 'storeseeder' ),
 			__( 'StoreSeeder', 'storeseeder' ),
-			'manage_options',
+			Access::capability(),
 			'storeseeder',
 			array( $this, 'render_admin_page' ),
 			$this->get_menu_icon(),
@@ -517,30 +556,58 @@ class StoreSeeder {
 		);
 		wp_add_inline_style( 'storeseeder-admin', $css_vars );
 
-		// Get locale information for frontend display.
+		// Locale information for the admin. All of them: the picker offers exactly what
+		// the REST API accepts, which was not previously true.
 		$wp_locale     = get_locale();
-		$faker_locale  = $this->get_faker_locale( $wp_locale );
-		$locale_labels = $this->get_locale_labels();
+		$faker_locale  = Locale::resolve( $wp_locale );
+		$locale_labels = Locale::all();
 
-		wp_localize_script(
-			'storeseeder-admin',
-			'storeseederApi',
-			array(
-				'restUrl'     => rest_url( 'storeseeder/v1/' ),
-				'restNonce'   => wp_create_nonce( 'wp_rest' ),
-				'version'     => defined( 'STORESEEDER_VERSION' ) ? STORESEEDER_VERSION : '',
-				'adminColors' => $admin_colors,
-				'colorScheme' => $current_color,
-				'locale'      => array(
-					'wordpress'  => $wp_locale,
-					'faker'      => $faker_locale,
-					'label'      => $locale_labels[ $faker_locale ] ?? 'English (United States)',
-					'allLocales' => $locale_labels,
-				),
-			)
+		$payload = array(
+			'restUrl'     => rest_url( 'storeseeder/v1/' ),
+			'restNonce'   => wp_create_nonce( 'wp_rest' ),
+			'version'     => defined( 'STORESEEDER_VERSION' ) ? STORESEEDER_VERSION : '',
+			'adminColors' => $admin_colors,
+			'colorScheme' => $current_color,
+			'locale'      => array(
+				'wordpress'  => $wp_locale,
+				'faker'      => $faker_locale,
+				'label'      => Locale::label( $faker_locale ),
+				'allLocales' => $locale_labels,
+				'default'    => Locale::DEFAULT_LOCALE,
+			),
+			// Inlined so the topbar renders its target on first paint. Fetching it
+			// would flash "Auto" with no platform beside it, then correct itself.
+			'platforms'   => $this->rest_platforms()->get_data(),
+			// Inlined for the same reason, and because it cannot change while the page is
+			// open: MCP availability depends on which plugins are active.
+			'mcp'         => MCP_Server::status(),
 		);
 
-		wp_set_script_translations( 'storeseeder-admin', 'storeseeder' );
+		/**
+		 * Filters the data inlined for the admin app as `window.storeseederApi`.
+		 *
+		 * How a plugin adding a platform gets its own configuration to the browser on
+		 * first paint instead of fetching it. Add keys; the app reads what it knows and
+		 * ignores the rest. Removing a key it does rely on will break the admin, and
+		 * whatever goes in here is printed into the page, so nothing secret.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_admin_payload
+		 *
+		 * @param array<string, mixed> $payload The data passed to wp_localize_script().
+		 */
+		$payload = (array) apply_filters( 'storeseeder_admin_payload', $payload );
+
+		wp_localize_script( 'storeseeder-admin', 'storeseederApi', $payload );
+
+		// The third argument is the plugin's own languages directory. Without it core looks
+		// only in wp-content/languages/plugins, so a bundled JSON translation — or one Loco
+		// Translate wrote beside the plugin — would be ignored for every admin string.
+		wp_set_script_translations(
+			'storeseeder-admin',
+			'storeseeder',
+			STORESEEDER_PLUGIN_PATH . 'languages'
+		);
 	}
 
 	/**
@@ -561,32 +628,10 @@ class StoreSeeder {
 			return;
 		}
 
-		$controllers = array(
-			// Core generators.
-			new Product(),
-			new Customer(),
-			new Coupon(),
-
-			// Enhanced generators.
-			new Cart_Session(),
-			new Shipping_Plan(),
-			new Tax_Class(),
-			new Order(),
-			new Product_Variation(),
-			new Transaction(),
-			new Attribute(),
-			new Refund(),
-			new Log(),
-			new Shipping_Class(),
-			new Label(),
-			new Order_Tax_Rate(),
-			new Product_Download(),
-			new Subscription(),
-		);
-
-		foreach ( $controllers as $controller ) {
-			$controller->register_routes();
-		}
+		// The controllers come from the registry rather than a list here, so a
+		// third-party platform can expose a resource of its own through the
+		// storeseeder_rest_controllers filter without patching this file.
+		Rest_Registry::instance()->register_routes();
 
 		// Register the sample-data download endpoint.
 		register_rest_route(
@@ -628,6 +673,390 @@ class StoreSeeder {
 				),
 			)
 		);
+
+		// Register the platform endpoints.
+		register_rest_route(
+			'storeseeder/v1',
+			'/platforms',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_platforms' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+			)
+		);
+
+		// Register the access endpoints. Reading who has access needs only the plugin's
+		// own gate; changing it needs manage_options, so a role granted through this
+		// setting cannot widen it further.
+		register_rest_route(
+			'storeseeder/v1',
+			'/access',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_access' ),
+					'permission_callback' => array( $this, 'rest_access_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_set_access' ),
+					'permission_callback' => array( $this, 'rest_manage_access_permission_check' ),
+					'args'                => array(
+						'roles' => array(
+							'type'     => 'array',
+							'required' => true,
+							'items'    => array(
+								'type' => 'string',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// Register the generated-data endpoints. Reading the ledger needs only the plugin's
+		// own gate; deleting is gated the same way, because it removes exactly the rows that
+		// gate allowed the user to create — and nothing else.
+		register_rest_route(
+			'storeseeder/v1',
+			'/generated',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_generated' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'rest_delete_generated' ),
+					'permission_callback' => array( $this, 'rest_permission_check' ),
+					'args'                => array(
+						'resource' => array(
+							// Canonical resource name, not a REST base: the ledger and the
+							// writers both speak in resources.
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'limit'    => array(
+							'type'    => 'integer',
+							'default' => 100,
+							'minimum' => 1,
+							'maximum' => 500,
+						),
+						// Drops the records without touching the store, for a ledger that no
+						// longer matches reality. Named for what it does, because forgetting
+						// and deleting are opposite mistakes to make.
+						'forget'   => array(
+							'type'    => 'boolean',
+							'default' => false,
+						),
+					),
+				),
+			)
+		);
+
+		// Register the MCP endpoints. Reading what the AI surface exposes needs only the
+		// plugin's own gate; changing what an agent may do to the store needs
+		// manage_options, like the access setting it sits beside.
+		register_rest_route(
+			'storeseeder/v1',
+			'/mcp',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'rest_mcp' ),
+					'permission_callback' => array( $this, 'rest_access_permission_check' ),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'rest_set_mcp' ),
+					'permission_callback' => array( $this, 'rest_manage_access_permission_check' ),
+					'args'                => array(
+						// All three optional: the admin saves the switch that moved, and an
+						// absent key leaves that toggle alone rather than clearing it.
+						'enabled'  => array(
+							'type' => 'boolean',
+						),
+						'preview'  => array(
+							'type' => 'boolean',
+						),
+						'generate' => array(
+							'type' => 'boolean',
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'storeseeder/v1',
+			'/platforms/target',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'rest_set_target_platform' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'platform' => array(
+						// Not enumerated: drivers are extensible through the
+						// storeseeder_platforms filter, so a fixed enum would reject a
+						// valid third-party platform. Resolver validates instead.
+						'type'              => 'string',
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_key',
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * REST: who may generate data.
+	 *
+	 * Reports the roles on offer, the ones allowed, the effective capability, and whether
+	 * the caller may change any of it — the admin renders the card read-only otherwise
+	 * rather than offering a control that would 403.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response Access payload.
+	 */
+	public function rest_access(): WP_REST_Response {
+		return new WP_REST_Response(
+			array(
+				'capability'    => Access::capability(),
+				'filtered'      => Access::capability() !== Access::DEFAULT_CAPABILITY,
+				'adminRole'     => Access::ADMIN_ROLE,
+				'roles'         => Access::assignable_roles(),
+				'allowedRoles'  => Access::allowed_roles(),
+				'canManage'     => Access::current_user_can_manage(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: set which roles may generate data.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `roles` holds the slugs to allow.
+	 *
+	 * @return WP_REST_Response The access payload after the change.
+	 */
+	public function rest_set_access( WP_REST_Request $request ): WP_REST_Response {
+		Access::set_allowed_roles( (array) $request->get_param( 'roles' ) );
+
+		return $this->rest_access();
+	}
+
+	/**
+	 * Permission check for reading who has access.
+	 *
+	 * Administrators can always read it, even where a filter narrowed the capability past
+	 * what they hold — otherwise the one setting that could undo that lock-out would be
+	 * behind the lock.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public function rest_access_permission_check(): bool {
+		return Access::current_user_can() || Access::current_user_can_manage();
+	}
+
+	/**
+	 * Permission check for changing who has access.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool True when the current user may grant access to others.
+	 */
+	public function rest_manage_access_permission_check(): bool {
+		return Access::current_user_can_manage();
+	}
+
+	/**
+	 * REST: what StoreSeeder has created on this site.
+	 *
+	 * Counts come from the plugin's own ledger, not from the store's tables, so this is a
+	 * report of what the cleanup would remove rather than of what the store contains.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response Ledger payload.
+	 */
+	public function rest_generated(): WP_REST_Response {
+		$counts    = Ledger::counts();
+		$resources = array();
+
+		// Ordered as they will be deleted, so the list the admin shows and the work it
+		// describes cannot disagree.
+		foreach ( Purge::order() as $resource_type ) {
+			if ( empty( $counts[ $resource_type ] ) ) {
+				continue;
+			}
+
+			$resources[] = array(
+				'resource' => $resource_type,
+				'count'    => (int) $counts[ $resource_type ],
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'total'     => array_sum( $counts ),
+				'resources' => $resources,
+				'platforms' => Ledger::platforms(),
+				'batch'     => Purge::BATCH,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: delete a batch of generated rows.
+	 *
+	 * Batched rather than all at once, and the response says what is left: deleting an order
+	 * takes several queries, so a site with thousands of recorded rows would otherwise time
+	 * out having reported nothing. The admin calls again until `remaining` is zero.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; `resource`, `limit`, `forget`.
+	 *
+	 * @return WP_REST_Response What was deleted, and what is left.
+	 */
+	public function rest_delete_generated( WP_REST_Request $request ): WP_REST_Response {
+		$resource = (string) $request->get_param( 'resource' );
+
+		if ( $request->get_param( 'forget' ) ) {
+			$forgotten = Ledger::forget_all();
+
+			return new WP_REST_Response(
+				array(
+					'deleted'     => 0,
+					'forgotten'   => $forgotten,
+					'remaining'   => 0,
+					'by_resource' => array(),
+					'errors'      => array(),
+				),
+				200
+			);
+		}
+
+		$result = Purge::run( $resource, (int) $request->get_param( 'limit' ) );
+
+		$result['forgotten'] = 0;
+
+		return new WP_REST_Response( $result, 200 );
+	}
+
+	/**
+	 * REST: what the AI surface exposes, and whether it is on.
+	 *
+	 * The same payload the admin is handed inline at page load, so the card renders from
+	 * one shape whether it was inlined or fetched after a save.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response MCP status payload.
+	 */
+	public function rest_mcp(): WP_REST_Response {
+		return new WP_REST_Response( MCP_Server::status(), 200 );
+	}
+
+	/**
+	 * REST: turn the AI surface, previews or generation on or off.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The REST request; any of `enabled`, `preview`, `generate`.
+	 *
+	 * @return WP_REST_Response The MCP status after the change.
+	 */
+	public function rest_set_mcp( WP_REST_Request $request ): WP_REST_Response {
+		$changes = array();
+
+		foreach ( array( 'enabled', 'preview', 'generate' ) as $toggle ) {
+			// A null check rather than has_param(): `false` is a change the client meant,
+			// and a parameter it never sent must not read as false.
+			if ( null !== $request->get_param( $toggle ) ) {
+				$changes[ $toggle ] = (bool) $request->get_param( $toggle );
+			}
+		}
+
+		MCP_Settings::update( $changes );
+
+		return $this->rest_mcp();
+	}
+
+	/**
+	 * REST: the platforms this site could seed, and which one it will
+	 *
+	 * Capabilities are recomputed here on every request rather than cached, because
+	 * activating a companion plugin has to change the answer immediately — WooCommerce
+	 * gains subscriptions the moment WooCommerce Subscriptions is switched on.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function rest_platforms(): WP_REST_Response {
+		$registry = $this->platforms();
+		$resolver = $this->platform_resolver();
+		$resolved = $resolver->resolve();
+
+		$platforms = array();
+
+		foreach ( $registry->all() as $platform ) {
+			$supports = array();
+
+			foreach ( $platform->supports() as $resource_type => $capability ) {
+				$supports[ $resource_type ] = $capability->to_array();
+			}
+
+			$platforms[] = array(
+				'id'       => $platform->id(),
+				'label'    => $platform->label(),
+				'active'   => $platform->is_active(),
+				'version'  => $platform->version(),
+				'supports' => $supports,
+				// Keyed by resource, so the generator page can merge this platform's own
+				// parameters into the form when it is the target — and leave another
+				// platform's out rather than offering a control that would be ignored.
+				'fields'   => $platform instanceof Platform_Driver ? $platform->all_fields() : array(),
+			);
+		}
+
+		return new WP_REST_Response(
+			array(
+				'platforms' => $platforms,
+				'stored'    => $resolver->stored(),
+				'resolved'  => is_wp_error( $resolved ) ? null : $resolved->id(),
+				'ambiguous' => $resolver->is_ambiguous(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST: choose the site-wide target platform
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function rest_set_target_platform( WP_REST_Request $request ) {
+		$stored = $this->platform_resolver()->store( (string) $request->get_param( 'platform' ) );
+
+		if ( is_wp_error( $stored ) ) {
+			return $stored;
+		}
+
+		return $this->rest_platforms();
 	}
 
 	/**
@@ -642,6 +1071,10 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function activate_plugin(): void {
+		// Before anything else: a run that happens before the table exists is a run the
+		// cleanup can never undo.
+		Ledger::install();
+
 		// Runs before the flush below, since changing the structure is what
 		// makes the rules stale in the first place.
 		$this->maybe_set_postname_permalinks();
@@ -829,7 +1262,7 @@ class StoreSeeder {
 	 * @return bool True when the current user may manage the plugin.
 	 */
 	public function rest_permission_check(): bool {
-		return current_user_can( 'manage_options' );
+		return Access::current_user_can();
 	}
 
 	/**
@@ -848,7 +1281,7 @@ class StoreSeeder {
 			array(
 				'exists'      => $exists,
 				'last_synced' => $exists && is_dir( $dir ) ? gmdate( 'c', (int) filemtime( $dir ) ) : null,
-				'repo_url'    => 'https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart',
+				'repo_url'    => $this->get_sample_data_source()['repo_url'],
 				'consent'     => '' === $consent ? null : $consent,
 			),
 			200
@@ -898,6 +1331,59 @@ class StoreSeeder {
 	}
 
 	/**
+	 * Where sample data is downloaded from.
+	 *
+	 * One place, because the status endpoint reports a repository URL and the downloader
+	 * fetches an archive from it — two literals that could drift into disagreeing about
+	 * what the user consented to.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array{repo_url: string, zip_url: string} Repository page and archive URLs.
+	 */
+	private function get_sample_data_source(): array {
+		$owner  = 'mralaminahamed';
+		$repo   = 'storeseeder-sample-data-fluent-cart';
+		$branch = 'trunk';
+
+		$source = array(
+			'repo_url' => "https://github.com/{$owner}/{$repo}",
+			'zip_url'  => "https://github.com/{$owner}/{$repo}/archive/refs/heads/{$branch}.zip",
+		);
+
+		/**
+		 * Filters where sample data is downloaded from.
+		 *
+		 * A platform of your own can ship its own reference data — the shipped repository
+		 * holds Fluent Cart product names and addresses, which suit a different store
+		 * only by accident.
+		 *
+		 * Consent is unaffected: nothing is fetched from either URL until an administrator
+		 * accepts the prompt, and `repo_url` is what the Settings page shows them, so a
+		 * filter that changes only `zip_url` would misrepresent what they agreed to.
+		 * Change both.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_sample_data_source
+		 *
+		 * @param mixed $source Repository page and archive URLs, an
+		 *                      array{repo_url: string, zip_url: string} when unfiltered. Typed
+		 *                      loosely because a filter may return anything, and a return
+		 *                      missing either URL is discarded below.
+		 */
+		$filtered = apply_filters( 'storeseeder_sample_data_source', $source );
+
+		if ( ! is_array( $filtered ) || empty( $filtered['repo_url'] ) || empty( $filtered['zip_url'] ) ) {
+			return $source;
+		}
+
+		return array(
+			'repo_url' => (string) $filtered['repo_url'],
+			'zip_url'  => (string) $filtered['zip_url'],
+		);
+	}
+
+	/**
 	 * Download sample data from remote repository
 	 *
 	 * Downloads the sample data archive from GitHub and extracts it to the local directory.
@@ -907,12 +1393,9 @@ class StoreSeeder {
 	 * @return bool True on success, false on failure.
 	 */
 	private function download_sample_data(): bool {
-		$repo_owner = 'mralaminahamed';
-		$repo_name  = 'storeseeder-sample-data-fluent-cart';
-		$branch     = 'trunk';
+		$source = $this->get_sample_data_source();
 
-		// GitHub API URL for downloading the repository as zip.
-		$download_url = "https://github.com/{$repo_owner}/{$repo_name}/archive/refs/heads/{$branch}.zip";
+		$download_url = $source['zip_url'];
 
 		$sample_data_dir = $this->get_sample_data_directory();
 		$temp_zip_file   = $sample_data_dir . '/sample-data-temp.zip';
@@ -1095,10 +1578,19 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function dependency_notice(): void {
-		if ( ! $this->is_fluent_cart_active() ) {
+		if ( ! $this->check_dependencies() ) {
+			// Naming the supported platforms rather than one of them: on a site with
+			// none of them installed, "requires Fluent Cart" reads as an instruction
+			// to install the wrong thing.
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
-				esc_html__( 'StoreSeeder requires Fluent Cart plugin to be installed and active.', 'storeseeder' )
+				esc_html(
+					sprintf(
+						/* translators: %s: comma-separated list of supported e-commerce platforms. */
+						__( 'StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s.', 'storeseeder' ),
+						implode( ', ', $this->platforms()->labels() )
+					)
+				)
 			);
 		}
 
@@ -1192,7 +1684,7 @@ class StoreSeeder {
 	 * @return void
 	 */
 	public function ajax_dismiss_mcp_notice(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! Access::current_user_can() ) {
 			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'storeseeder' ) ), 403 );
 		}
 
@@ -1206,33 +1698,53 @@ class StoreSeeder {
 	/**
 	 * Check if Fluent Cart plugin is active
 	 *
-	 * Verifies that the required Fluent Cart plugin is installed and activated
-	 * by checking the active plugins list. This is a critical dependency check
-	 * that prevents the plugin from functioning without its core requirement.
-	 *
-	 * @since 1.0.0
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Fluent Cart is one driver among several. Ask the driver, or
+	 *                   ask the registry whether anything at all is seedable.
 	 *
 	 * @return bool True if Fluent Cart is active, false otherwise.
 	 */
 	public function is_fluent_cart_active(): bool {
-		$plugin = 'fluent-cart/fluent-cart.php';
+		$platform = $this->platforms()->get( 'fluent-cart' );
 
-		return in_array( $plugin, (array) get_option( 'active_plugins', array() ), true );
+		return null !== $platform && $platform->is_active();
+	}
+
+	/**
+	 * The platform driver registry
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return Platform_Registry
+	 */
+	public function platforms(): Platform_Registry {
+		return Platform_Registry::instance();
+	}
+
+	/**
+	 * Resolver for the target platform
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return Platform_Resolver
+	 */
+	public function platform_resolver(): Platform_Resolver {
+		return new Platform_Resolver( $this->platforms() );
 	}
 
 	/**
 	 * Check plugin dependencies
 	 *
-	 * Validates that all required dependencies are met before enabling plugin features.
-	 * Currently checks for Fluent Cart plugin activation, but can be extended
-	 * for additional dependencies in the future.
+	 * True when at least one supported e-commerce platform is active. It is
+	 * deliberately not "Fluent Cart is active" any more: gating the admin menu and the
+	 * REST routes on one platform is what made every other one unreachable.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return bool True if all dependencies are met, false otherwise.
 	 */
 	public function check_dependencies(): bool {
-		return $this->is_fluent_cart_active();
+		return $this->platforms()->has_active();
 	}
 
 	/**
@@ -1267,138 +1779,26 @@ class StoreSeeder {
 	/**
 	 * Get FakerPHP locale for display purposes
 	 *
-	 * Converts WordPress locale codes to FakerPHP compatible locale codes for
-	 * the admin interface display. Applies filters for customization and provides
-	 * fallback logic for unsupported locales. Used by the React frontend to
-	 * display current locale information.
-	 *
-	 * @since 1.0.0
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Use StoreSeeder\Platforms\Locale::resolve().
 	 *
 	 * @param string $locale WordPress locale code (e.g., 'en_US', 'fr_FR').
 	 *
-	 * @return string FakerPHP compatible locale code (defaults to 'en_US').
+	 * @return string A supported locale code.
 	 */
 	public function get_faker_locale( string $locale ): string {
-		/**
-		 * Filters the locale used for test data generation.
-		 *
-		 * Allows developers to override the default locale used by StoreSeeder
-		 * for generating test data. Useful for generating data in specific languages
-		 * or regional formats regardless of the site's locale setting.
-		 *
-		 * @since 1.0.0
-		 * @hook  storeseeder_locale
-		 *
-		 * @param string $locale The current WordPress locale code (e.g., 'en_US').
-		 */
-		$custom_locale = apply_filters( 'storeseeder_locale', $locale );
-
-		// Get supported locales.
-		$supported_locales = array_keys( $this->get_locale_labels() );
-
-		// Direct match.
-		if ( in_array( $custom_locale, $supported_locales, true ) ) {
-			return $custom_locale;
-		}
-
-		// Try language fallback.
-		$language = substr( $custom_locale, 0, 2 );
-		foreach ( $supported_locales as $locale_code ) {
-			if ( strpos( $locale_code, $language . '_' ) === 0 ) {
-				return $locale_code;
-			}
-		}
-
-		// Default fallback.
-		return 'en_US';
+		return Locale::resolve( $locale );
 	}
 
 	/**
 	 * Get human-readable labels for all supported FakerPHP locales
 	 *
-	 * Returns a comprehensive array of supported FakerPHP locales with their
-	 * human-readable labels for use in the admin interface. Includes major
-	 * world languages and regions for international data generation support.
+	 * @since      1.0.0
+	 * @deprecated 1.1.0 Use StoreSeeder\Platforms\Locale::all().
 	 *
-	 * @since 1.0.0
-	 *
-	 * @return array<string, string> Associative array mapping locale codes to display labels.
+	 * @return array<string, string> Locale code => display label.
 	 */
 	public function get_locale_labels(): array {
-		return array(
-			'ar_SA'      => 'Arabic (Saudi Arabia)',
-			'at_AT'      => 'Austrian German',
-			'bg_BG'      => 'Bulgarian (Bulgaria)',
-			'bn_BD'      => 'Bangla (Bangladesh)',
-			'cs_CZ'      => 'Czech (Czech Republic)',
-			'da_DK'      => 'Danish (Denmark)',
-			'de_AT'      => 'German (Austria)',
-			'de_CH'      => 'German (Switzerland)',
-			'de_DE'      => 'German (Germany)',
-			'el_CY'      => 'Greek (Cyprus)',
-			'el_GR'      => 'Greek (Greece)',
-			'en_AU'      => 'English (Australia)',
-			'en_GB'      => 'English (Great Britain)',
-			'en_HK'      => 'English (Hong Kong)',
-			'en_IN'      => 'English (India)',
-			'en_NG'      => 'English (Nigeria)',
-			'en_NZ'      => 'English (New Zealand)',
-			'en_PH'      => 'English (Philippines)',
-			'en_SG'      => 'English (Singapore)',
-			'en_UG'      => 'English (Uganda)',
-			'en_US'      => 'English (United States)',
-			'en_ZA'      => 'English (South Africa)',
-			'es_AR'      => 'Spanish (Argentina)',
-			'es_ES'      => 'Spanish (Spain)',
-			'es_PE'      => 'Spanish (Peru)',
-			'es_VE'      => 'Spanish (Venezuela)',
-			'et_EE'      => 'Estonian (Estonia)',
-			'fa_IR'      => 'Persian (Iran)',
-			'fi_FI'      => 'Finnish (Finland)',
-			'fr_BE'      => 'French (Belgium)',
-			'fr_CA'      => 'French (Canada)',
-			'fr_CH'      => 'French (Switzerland)',
-			'fr_FR'      => 'French (France)',
-			'he_IL'      => 'Hebrew (Israel)',
-			'hr_HR'      => 'Croatian (Croatia)',
-			'hu_HU'      => 'Hungarian (Hungary)',
-			'hy_AM'      => 'Armenian (Armenia)',
-			'id_ID'      => 'Indonesian (Indonesia)',
-			'is_IS'      => 'Icelandic (Iceland)',
-			'it_CH'      => 'Italian (Switzerland)',
-			'it_IT'      => 'Italian (Italy)',
-			'ja_JP'      => 'Japanese (Japan)',
-			'ka_GE'      => 'Georgian (Georgia)',
-			'kk_KZ'      => 'Kazakh (Kazakhstan)',
-			'ko_KR'      => 'Korean (South Korea)',
-			'lt_LT'      => 'Lithuanian (Lithuania)',
-			'lv_LV'      => 'Latvian (Latvia)',
-			'me_ME'      => 'Montenegrin (Montenegro)',
-			'mn_MN'      => 'Mongolian (Mongolia)',
-			'ms_MY'      => 'Malay (Malaysia)',
-			'nb_NO'      => 'Norwegian Bokmål (Norway)',
-			'ne_NP'      => 'Nepali (Nepal)',
-			'nl_BE'      => 'Dutch (Belgium)',
-			'nl_NL'      => 'Dutch (Netherlands)',
-			'pl_PL'      => 'Polish (Poland)',
-			'pt_AO'      => 'Portuguese (Angola)',
-			'pt_BR'      => 'Portuguese (Brazil)',
-			'pt_PT'      => 'Portuguese (Portugal)',
-			'ro_MD'      => 'Romanian (Moldova)',
-			'ro_RO'      => 'Romanian (Romania)',
-			'ru_RU'      => 'Russian (Russia)',
-			'sk_SK'      => 'Slovak (Slovakia)',
-			'sl_SI'      => 'Slovenian (Slovenia)',
-			'sr_Cyrl_RS' => 'Serbian Cyrillic (Serbia)',
-			'sr_Latn_RS' => 'Serbian Latin (Serbia)',
-			'sr_RS'      => 'Serbian (Serbia)',
-			'sv_SE'      => 'Swedish (Sweden)',
-			'th_TH'      => 'Thai (Thailand)',
-			'tr_TR'      => 'Turkish (Turkey)',
-			'uk_UA'      => 'Ukrainian (Ukraine)',
-			'vi_VN'      => 'Vietnamese (Vietnam)',
-			'zh_CN'      => 'Chinese (China)',
-			'zh_TW'      => 'Chinese (Taiwan)',
-		);
+		return Locale::all();
 	}
 }

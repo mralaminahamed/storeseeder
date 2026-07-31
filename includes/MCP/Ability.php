@@ -1,0 +1,420 @@
+<?php
+/**
+ * Abstract base class for all StoreSeeder MCP Ability execute callbacks.
+ *
+ * Each concrete Ability class maps one ability ID to one StoreSeeder REST
+ * endpoint. The shared generate() method handles building the payload,
+ * dispatching a WP_REST_Request internally (no HTTP round-trip), and
+ * returning the response array to the Abilities API.
+ *
+ * Using WP_REST_Request internally keeps authentication trivial — the
+ * current user is already verified by the permission_callback before
+ * execute() is ever called.
+ *
+ * @package StoreSeeder\MCP
+ * @since   2.1.0
+ */
+
+namespace StoreSeeder\MCP;
+
+defined( 'ABSPATH' ) || exit;
+
+use StoreSeeder\Access;
+use StoreSeeder\Platforms\Locale;
+use WP_Error;
+use WP_REST_Request;
+
+/**
+ * Abstract_Ability
+ *
+ * @since 1.0.0
+ */
+abstract class Ability {
+
+	/**
+	 * The REST route base (e.g. "products", "customers", "orders").
+	 * Concrete classes must define this constant.
+	 *
+	 * @since 1.0.0
+	 */
+	const REST_BASE = '';
+
+	/**
+	 * REST namespace shared by all StoreSeeder endpoints.
+	 *
+	 * @since 1.0.0
+	 */
+	const REST_NAMESPACE = 'storeseeder/v1';
+
+	/**
+	 * Ability category every StoreSeeder ability belongs to.
+	 *
+	 * @since 1.1.0
+	 */
+	const CATEGORY = 'storeseeder';
+
+	/**
+	 * The ability id this class registers as.
+	 *
+	 * Derived from REST_BASE rather than declared, so an ability's id and the endpoint
+	 * it dispatches to cannot disagree — which would otherwise be a silent bug, the
+	 * ability appearing to work while pointing at the wrong generator. Verified to
+	 * reproduce all seventeen shipped ids exactly. Override if a third-party ability
+	 * needs a different name.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	public static function ability_id(): string {
+		return 'storeseeder/generate-' . str_replace( '_', '-', static::REST_BASE );
+	}
+
+	/**
+	 * The id of this resource's read-only counterpart.
+	 *
+	 * Every generator has two tools: one that creates rows and one that only shows what it
+	 * would create. They are separate ids rather than a parameter because an AI client's
+	 * permission model works on tools — "you may call preview, not generate" is enforceable,
+	 * "you may call generate with dry_run: true" is a promise.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	public static function preview_ability_id(): string {
+		return 'storeseeder/preview-' . str_replace( '_', '-', static::REST_BASE );
+	}
+
+	/**
+	 * Human-readable name shown to MCP clients.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	abstract public static function label(): string;
+
+	/**
+	 * What this ability does, written for an AI client deciding whether to call it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return string
+	 */
+	abstract public static function description(): string;
+
+	/**
+	 * Resource-specific input properties, merged over the common ones.
+	 *
+	 * Lives beside build_payload() on purpose: the schema declares the flat input an
+	 * MCP client sends, and build_payload() re-nests it for the REST endpoint. Kept in
+	 * separate files, those two drift.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	protected static function input_properties(): array {
+		return array();
+	}
+
+	/**
+	 * The response envelope this ability returns.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array{key: string, description: string}
+	 */
+	abstract protected static function output(): array;
+
+	/**
+	 * The full ability definition, as the Abilities API expects it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function definition(): array {
+		$output = static::output();
+
+		$definition = array(
+			'label'               => static::label(),
+			'description'         => static::description(),
+			'category'            => self::CATEGORY,
+			'input_schema'        => static::input_schema(),
+			'output_schema'       => static::output_schema( $output['key'], $output['description'] ),
+			'execute_callback'    => array( static::class, 'execute' ),
+			'permission_callback' => array( self::class, 'permission_callback' ),
+			'meta'                => self::meta( false ),
+		);
+
+		/**
+		 * Filters one ability's definition before it is registered.
+		 *
+		 * The seam for adjusting what an AI client is told about a tool — sharpening a
+		 * description, exposing a parameter a platform of your own added — without
+		 * replacing the class through storeseeder_mcp_abilities. The callbacks are part
+		 * of the definition, so this can also wrap execution.
+		 *
+		 * @since 1.1.0
+		 * @hook  storeseeder_mcp_ability_definition
+		 *
+		 * @param array<string, mixed>   $definition The ability definition.
+		 * @param string                 $ability_id The ability id, e.g. `storeseeder/generate-products`.
+		 * @param class-string<Ability>  $ability    The ability class.
+		 */
+		return (array) apply_filters(
+			'storeseeder_mcp_ability_definition',
+			$definition,
+			static::ability_id(),
+			static::class
+		);
+	}
+
+	/**
+	 * Input schema: the common count/locale/seed parameters plus this ability's own.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected static function input_schema(): array {
+		$common = array(
+			'count'  => array(
+				'type'        => 'integer',
+				'description' => __( 'Number of items to generate (1–100). Required.', 'storeseeder' ),
+				'minimum'     => 1,
+				'maximum'     => 100,
+			),
+			// Enumerated from Locale, like the REST schema. A client that guesses a
+			// locale we do not support would otherwise be handed English data and told
+			// nothing, since FakerPHP falls back in silence.
+			'locale' => array(
+				'type'        => 'string',
+				'description' => __( 'Faker locale for generated data (e.g. en_US, fr_FR, de_DE, ja_JP). Affects names, addresses, and phone numbers. Default: en_US.', 'storeseeder' ),
+				'default'     => Locale::DEFAULT_LOCALE,
+				'enum'        => Locale::codes(),
+			),
+			'seed'   => array(
+				'type'        => 'integer',
+				'description' => __( 'Optional integer seed for reproducible data generation. Omit for random output.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+		);
+
+		return array(
+			'type'       => 'object',
+			'required'   => array( 'count' ),
+			'properties' => array_merge( $common, static::input_properties() ),
+		);
+	}
+
+	/**
+	 * Output schema for the generated-items envelope.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_key      Key in the response object holding the items array.
+	 * @param string $items_description Human-readable description of the items.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected static function output_schema( string $resource_key, string $items_description ): array {
+		return array(
+			'type'       => 'object',
+			'properties' => array(
+				'message'     => array(
+					'type'        => 'string',
+					'description' => __( 'Human-readable summary of the generation result.', 'storeseeder' ),
+				),
+				$resource_key => array(
+					'type'        => 'array',
+					'description' => $items_description,
+					'items'       => array( 'type' => 'object' ),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Shared permission callback for every StoreSeeder ability.
+	 *
+	 * Mirrors the REST layer by sharing its gate: both ask Access, so the storeseeder_capability
+	 * filter cannot grant one and not the other. Abilities dispatch through the REST API, which
+	 * checks again, so this is the outer of two gates rather than the only one.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public static function permission_callback(): bool {
+		return Access::current_user_can();
+	}
+
+	/**
+	 * Entry point called by the Abilities API.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $input Validated input from the MCP client.
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public static function execute( array $input = array() ) {
+		return static::dispatch( $input );
+	}
+
+	/**
+	 * Entry point for the read-only tool.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $input Validated input from the MCP client.
+	 *
+	 * @return array<string, mixed>|WP_Error
+	 */
+	public static function execute_preview( array $input = array() ) {
+		return static::dispatch( $input, 'preview' );
+	}
+
+	/**
+	 * The read-only definition of this ability.
+	 *
+	 * Same inputs, different route and a different envelope: a preview answers with the
+	 * columns and rows a run would produce and writes nothing, so it needs no target
+	 * platform and cannot fail for want of one.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function preview_definition(): array {
+		$output = static::output();
+
+		$definition = array(
+			'label'               => sprintf(
+				/* translators: %s: the generate tool's label, e.g. "Generate Products". */
+				__( 'Preview: %s', 'storeseeder' ),
+				static::label()
+			),
+			'description'         => sprintf(
+				/* translators: %s: the resource's own tool description. */
+				__( 'Read-only. Shows the rows this generator would create, without writing anything — use it to check a set of parameters before generating. %s', 'storeseeder' ),
+				static::description()
+			),
+			'category'            => self::CATEGORY,
+			'input_schema'        => static::input_schema(),
+			'output_schema'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'columns' => array(
+						'type'        => 'array',
+						'description' => __( 'Column definitions, each with a key and a label.', 'storeseeder' ),
+						'items'       => array( 'type' => 'object' ),
+					),
+					'rows'    => array(
+						'type'        => 'array',
+						'description' => sprintf(
+							/* translators: %s: the resource's row description. */
+							__( 'Sample rows that would be created. %s', 'storeseeder' ),
+							$output['description']
+						),
+						'items'       => array( 'type' => 'object' ),
+					),
+				),
+			),
+			'execute_callback'    => array( static::class, 'execute_preview' ),
+			'permission_callback' => array( self::class, 'permission_callback' ),
+			'meta'                => self::meta( true ),
+		);
+
+		/** This filter documented in StoreSeeder\MCP\Ability::definition(). */
+		return (array) apply_filters(
+			'storeseeder_mcp_ability_definition',
+			$definition,
+			static::preview_ability_id(),
+			static::class
+		);
+	}
+
+	/**
+	 * The metadata the MCP layer reads off an ability.
+	 *
+	 * Two audiences. `mcp.public` is what mcp-adapter's **default** server checks before it
+	 * will run an ability through `execute-ability`, so setting it means these tools also
+	 * work for anyone already pointed at `/wp-json/mcp/mcp-adapter-default-server` instead
+	 * of StoreSeeder's own endpoint. `annotations` is what an AI client reads to decide how
+	 * carefully to treat a tool: a preview is read-only and repeatable, a generate run is
+	 * neither — it inserts rows, and calling it twice inserts twice as many.
+	 *
+	 * Nothing here is destructive: StoreSeeder only ever creates.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param bool $read_only Whether this is the preview tool.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function meta( bool $read_only ): array {
+		return array(
+			'mcp'         => array(
+				'public' => true,
+				'type'   => 'tool',
+			),
+			'annotations' => array(
+				'readonly'    => $read_only,
+				'destructive' => false,
+				'idempotent'  => $read_only,
+			),
+		);
+	}
+
+	/**
+	 * Dispatch an internal REST request and return the decoded response body.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $params Parameters to forward as JSON body.
+	 * @param string               $action Endpoint to call: 'generate' or 'preview'.
+	 * @return array<string, mixed>|WP_Error
+	 */
+	protected static function dispatch( array $params, string $action = 'generate' ) {
+		$route = '/' . static::REST_NAMESPACE . '/' . static::REST_BASE . '/' . $action;
+
+		$request = new WP_REST_Request( 'POST', $route );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( $params ) );
+
+		$response = rest_do_request( $request );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$server = rest_get_server();
+		$data   = $server->response_to_data( $response, false );
+
+		if ( $response->is_error() ) {
+			$status  = $response->get_status();
+			$message = isset( $data['message'] ) ? (string) $data['message'] : __( 'Unknown REST error.', 'storeseeder' ); // @phpstan-ignore isset.offset
+			return new WP_Error( 'ecfp_rest_error', $message, array( 'status' => $status ) );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Normalise the raw ability input, extracting the resource-specific
+	 * parameters into the nested arrays the REST controller expects.
+	 *
+	 * Concrete classes override this when their endpoint expects nested params.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string, mixed> $input Raw MCP input.
+	 * @return array<string, mixed> Payload ready for the REST endpoint.
+	 */
+	protected static function build_payload( array $input ): array {
+		return $input;
+	}
+}

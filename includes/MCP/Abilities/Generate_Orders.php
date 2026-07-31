@@ -8,7 +8,8 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
+use StoreSeeder\Platforms\Status;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +23,84 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Orders extends Ability {
 
 	const REST_BASE = 'orders';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Orders', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate realistic orders with line items priced from the catalogue, billing and shipping addresses, payment details, shipping and tax, a shopper note and the dates a paid or completed order carries. Requires at least one product to exist, and one customer unless guest orders are asked for.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'order_status'     => array(
+				'type'        => 'array',
+				'description' => __( 'Statuses to draw from. Allowed: pending, processing, on_hold, completed, cancelled, refunded, failed. Default: a spread across all of them.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => Status::order_statuses(),
+				),
+			),
+			'items_per_order'  => array(
+				'type'        => 'object',
+				'description' => __( 'Line items per order, as a min and max. Default: 1 to 3.', 'storeseeder' ),
+				'properties'  => array(
+					'min' => array( 'type' => 'integer' ),
+					'max' => array( 'type' => 'integer' ),
+				),
+			),
+			'payment_methods'  => array(
+				'type'        => 'array',
+				'description' => __( 'Payment methods to distribute across orders. Default: ["stripe","paypal","cod"].', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+			),
+			'countries'        => array(
+				'type'        => 'array',
+				'description' => __( 'Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is what makes generated data obviously fake.', 'storeseeder' ),
+				'items'       => array( 'type' => 'string' ),
+			),
+			'include_customer' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Attach a customer account. False generates guest orders, which every store takes and no fixture had. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'customer_id'      => array(
+				'type'        => 'integer',
+				'description' => __( 'Attach every order to this customer, for giving one account an order history. Ignored when include_customer is false.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+			'include_shipping' => array(
+				'type'        => 'boolean',
+				'description' => __( 'Charge shipping. False generates orders with no shipping line, which is what a download-only store looks like. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'include_tax'      => array(
+				'type'        => 'boolean',
+				'description' => __( 'Apply tax. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'orders',
+			'description' => __( 'Array of generated order objects with id, order_number, status, total, payment_method, and item count.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -50,37 +129,31 @@ class Generate_Orders extends Ability {
 		}
 
 		if ( isset( $input['order_status'] ) ) {
-			$payload['order_status'] = $input['order_status'];
+			$payload['order_status'] = (array) $input['order_status'];
 		}
 
-		if ( isset( $input['customer_type'] ) ) {
-			$payload['customer_type'] = $input['customer_type'];
+		if ( isset( $input['items_per_order'] ) ) {
+			$payload['items_per_order'] = (array) $input['items_per_order'];
 		}
-
-		if ( isset( $input['specific_customer_id'] ) ) {
-			$payload['specific_customer_id'] = (int) $input['specific_customer_id'];
-		}
-
-		$payload['order_value'] = array(
-			'min_total' => $input['min_total'] ?? 10,
-			'max_total' => $input['max_total'] ?? 1000,
-		);
-
-		$payload['items_per_order'] = array(
-			'min' => $input['min_items'] ?? 1,
-			'max' => $input['max_items'] ?? 5,
-		);
 
 		if ( isset( $input['payment_methods'] ) ) {
 			$payload['payment_methods'] = (array) $input['payment_methods'];
 		}
 
-		if ( isset( $input['customer_distribution'] ) ) {
-			$payload['customer_distribution'] = $input['customer_distribution'];
+		// Flattened for the client, nested for the generator: an MCP client writes a list of
+		// countries and should not have to know the shape the admin form happens to send.
+		if ( isset( $input['countries'] ) ) {
+			$payload['geographical_distribution'] = array( 'countries' => (array) $input['countries'] );
 		}
 
-		if ( isset( $input['geographical_distribution'] ) ) {
-			$payload['geographical_distribution'] = $input['geographical_distribution'];
+		foreach ( array( 'include_customer', 'include_shipping', 'include_tax' ) as $flag ) {
+			if ( isset( $input[ $flag ] ) ) {
+				$payload[ $flag ] = (bool) $input[ $flag ];
+			}
+		}
+
+		if ( isset( $input['customer_id'] ) ) {
+			$payload['customer_id'] = (int) $input['customer_id'];
 		}
 
 		return $payload;

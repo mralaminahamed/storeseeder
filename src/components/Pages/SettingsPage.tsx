@@ -3,6 +3,8 @@ import { useState, useCallback, useEffect } from "@wordpress/element";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
+import { Seg } from "@/components/ui/Seg";
+import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 import { Toggle } from "@/components/generator/fields/Toggle";
 import { NumberField } from "@/components/generator/fields/NumberField";
 import { TextField } from "@/components/generator/fields/TextField";
@@ -18,8 +20,24 @@ import {
 } from "@/lib/consent";
 import type { SampleDataStatus } from "@/lib/consent";
 import { getSettings, saveSettings } from "@/lib/settings";
+import { fetchAccess, saveAllowedRoles } from "@/lib/access";
+import type { AccessState } from "@/lib/access";
+import { fetchMcp, parseMcpStatus, saveMcpToggle } from "@/lib/mcp";
+import type { McpToggle } from "@/lib/mcp";
+import {
+  fetchGenerated,
+  deleteGenerated,
+  purgeGenerated,
+} from "@/lib/generated";
+import type { GeneratedState } from "@/lib/generated";
+import { resourceLabel } from "@/lib/generators";
+import { requestTweaksPanel } from "@/lib/events";
+import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
+import { AUTO } from "@/lib/platform";
+import { usePlatform } from "@/providers/PlatformProvider";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
+import { useTheme, type Density, type Theme } from "@/theme/useTheme";
 
 // Localized from STORESEEDER_VERSION; the fallback only shows if the script
 // data is missing, which would mean the admin app failed to enqueue properly.
@@ -31,26 +49,72 @@ const SUPPORT_URL =
   "https://github.com/mralaminahamed/storeseeder/issues";
 const DOCS_URL =
   "https://github.com/mralaminahamed/storeseeder#readme";
+// Automattic's remote-MCP proxy: the package a desktop client is pointed at, and the place
+// the connection details are documented. Linked rather than restated, because the config
+// format is theirs to change.
+const MCP_CLIENT_URL = "https://github.com/Automattic/mcp-wordpress-remote";
 
 // ---------------------------------------------------------------------------
 // Settings card shell
 // ---------------------------------------------------------------------------
+
+/**
+ * A settings group, with a heading that says who the settings inside affect.
+ *
+ * The page had none: site-wide settings and per-browser preferences sat in one column
+ * in an order nobody chose, and the only clue about which was which was a note below
+ * the fold. Scope is the first thing you need to know before changing a setting on a
+ * site other people use.
+ */
+function SetSection({
+  title,
+  desc,
+  note,
+  children,
+}: {
+  title: string;
+  desc: string;
+  /** Transient status for the whole section, e.g. the save marker. */
+  note?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="fp-set-section">
+      <div className="fp-set-section-head">
+        <h2 className="fp-set-section-title">
+          {title}
+          {note}
+        </h2>
+        <p className="fp-set-section-desc">{desc}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function SetCard({
   icon,
   title,
   desc,
   danger,
+  scope,
+  testId,
   children,
 }: {
   icon: IconName;
   title: string;
   desc: string;
   danger?: boolean;
+  /** Who a change here affects. Shown as a badge, because it changes the stakes. */
+  scope?: "site" | "browser";
+  testId?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className={`fp-card fp-set-card${danger ? " fp-danger-card" : ""}`}>
+    <div
+      className={`fp-card fp-set-card${danger ? " fp-danger-card" : ""}`}
+      data-testid={testId}
+    >
       <div className="fp-set-card-head">
         <span
           className="fp-set-card-ic"
@@ -69,6 +133,17 @@ function SetCard({
         <div>
           <div className={`fp-set-card-title${danger ? " fp-danger-label" : ""}`}>
             {title}
+            {/* The site badge is accented because it is the one with consequences for
+                other people; the browser badge is the quiet default. */}
+            {scope && (
+              <span
+                className={`fp-badge fp-set-scope${"site" === scope ? " tone-accent" : ""}`}
+              >
+                {"site" === scope
+                  ? __("Site-wide", "storeseeder")
+                  : __("This browser", "storeseeder")}
+              </span>
+            )}
           </div>
           <div className="fp-set-card-desc">{desc}</div>
         </div>
@@ -87,6 +162,21 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const { clearStats } = useStats();
   const { toast } = useToast();
+  const { theme, setTheme, density, setDensity } = useTheme();
+  const {
+    state: platformState,
+    selected: platformSelected,
+    active: activePlatformList,
+    ambiguous: platformAmbiguous,
+    setTarget: setPlatformTarget,
+  } = usePlatform();
+
+  // Who may generate. Server-held, unlike the rest of this page.
+  const [access, setAccess] = useState<AccessState | null>(null);
+  // Distinguished from "still loading", so a failed fetch says so instead of showing a
+  // skeleton that never resolves.
+  const [accessFailed, setAccessFailed] = useState(false);
+  const [savingRoles, setSavingRoles] = useState(false);
 
   // Sample data sync state
   const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
@@ -99,18 +189,52 @@ export default function SettingsPage() {
 
   const nonce = window.storeseederApi?.restNonce ?? "";
   const restUrl = window.storeseederApi?.restUrl ?? "";
-  const allLocales = window.storeseederApi?.locale?.allLocales ?? {};
+  // Locales come from the server, which lists exactly what the REST API accepts.
+  // Options carry the code so the label never has to be mapped back to one.
+  const locales = localeOptions();
+  // Inlined by the server: what MCP needs depends on which plugins are active, which
+  // cannot change while this page is open, so there is nothing to fetch or to skeleton.
+  // Held in state all the same, because the three switches below change it.
+  const [mcp, setMcp] = useState(
+    window.storeseederApi?.mcp
+      ? parseMcpStatus(window.storeseederApi.mcp)
+      : null,
+  );
+  const [savingMcp, setSavingMcp] = useState(false);
 
-  // Map between faker code (stored) and human label (displayed).
-  const codeToLabel = (code: string) => allLocales[code] ?? code;
-  const labelToCode = (label: string) =>
-    Object.keys(allLocales).find((c) => allLocales[c] === label) ?? label;
-  const localeLabels = Object.values(allLocales).filter(Boolean);
+  // What StoreSeeder has created, from its own ledger — the only thing the delete below is
+  // ever allowed to touch.
+  const [generated, setGenerated] = useState<GeneratedState | null>(null);
+  const [purging, setPurging] = useState(false);
+  // Two-step rather than a browser confirm(): a native dialog blocks the page and looks
+  // nothing like the rest of the admin.
+  const [confirmPurge, setConfirmPurge] = useState(false);
+  const [purgeNote, setPurgeNote] = useState("");
+  const [purgeErrors, setPurgeErrors] = useState<string[]>([]);
 
+  // Applied and stored on change. The page used to have two "Save settings" buttons
+  // writing the same object, next to three cards that saved the instant you touched
+  // them — so a value could be typed, left unsaved, and then written by a button in a
+  // different card. These are browser preferences, so there is nothing to lose by
+  // writing them immediately, and it makes one model for the whole page.
   const set = <K extends keyof typeof settings>(
     key: K,
     value: (typeof settings)[K],
-  ) => setSettings((s) => ({ ...s, [key]: value }));
+  ) =>
+    setSettings((s) => {
+      const next = { ...s, [key]: value };
+      saveSettings(next);
+      setSaved(true);
+      return next;
+    });
+
+  // Clear the marker a moment after the last change, rather than per keystroke.
+  useEffect(() => {
+    if (!saved) return;
+
+    const t = setTimeout(() => setSaved(false), 1600);
+    return () => clearTimeout(t);
+  }, [saved, settings]);
 
   const refreshSyncStatus = useCallback(
     () =>
@@ -147,9 +271,12 @@ export default function SettingsPage() {
   const syncSummary = (): JSX.Element => {
     if (statusLoading) {
       return (
-        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
-          {__("Checking status…", "storeseeder")}
-        </div>
+        <>
+          <SkeletonText lines={2} />
+          <span className="sr-only" role="status">
+            {__("Checking status…", "storeseeder")}
+          </span>
+        </>
       );
     }
 
@@ -206,12 +333,6 @@ export default function SettingsPage() {
       "Nothing has been downloaded yet. Sync now asks for your permission first.",
       "storeseeder",
     );
-  };
-
-  const handleSave = () => {
-    saveSettings(settings);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
   };
 
   const handleSync = useCallback(
@@ -305,6 +426,260 @@ export default function SettingsPage() {
     [restUrl, nonce],
   );
 
+  // Auto first, then whatever is actually loaded. A target stored for a platform that
+  // has since been deactivated is kept as an option, labelled as such — dropping it
+  // would silently show "Auto" while the site option still says otherwise.
+  const platformOptions = [
+    { id: AUTO, label: __("Auto — whichever platform is active", "storeseeder") },
+    ...activePlatformList.map((p) => ({ id: p.id, label: p.label })),
+  ];
+
+  if (
+    platformSelected !== AUTO &&
+    !platformOptions.some((o) => o.id === platformSelected)
+  ) {
+    platformOptions.push({
+      id: platformSelected,
+      label: sprintf(
+        /* translators: %s: platform id stored in the site option. */
+        __("%s (not active)", "storeseeder"),
+        platformSelected,
+      ),
+    });
+  }
+
+  const handlePlatformChange = (id: string) => {
+    const next = platformOptions.find((o) => o.id === id);
+    if (!next || next.id === platformSelected) return;
+
+    void setPlatformTarget(next.id).then(() =>
+      toast(
+        AUTO === next.id
+          ? __("Target platform set to Auto", "storeseeder")
+          : sprintf(
+              /* translators: %s: platform name. */
+              __("Target platform set to %s", "storeseeder"),
+              next.label,
+            ),
+      ),
+    );
+  };
+
+  const resolvedPlatformLabel = platformState.resolved
+    ? (activePlatformList.find((p) => p.id === platformState.resolved)?.label ??
+      platformState.resolved)
+    : null;
+
+  const platformHint = () => {
+    if (platformAmbiguous) {
+      return __(
+        "More than one platform is active, so Auto cannot decide. Pick one here, or you will be asked on each generator page.",
+        "storeseeder",
+      );
+    }
+
+    if (!resolvedPlatformLabel) {
+      return __(
+        "No supported platform is active yet. Activate one and it appears here.",
+        "storeseeder",
+      );
+    }
+
+    return sprintf(
+      /* translators: %s: platform name Auto currently resolves to. */
+      __("Auto currently resolves to %s.", "storeseeder"),
+      resolvedPlatformLabel,
+    );
+  };
+
+  useEffect(() => {
+    void fetchAccess()
+      .then(setAccess)
+      .catch(() => setAccessFailed(true));
+  }, []);
+
+  const refreshGenerated = useCallback(() => {
+    // Failure leaves the card showing nothing to delete, which is the safe direction: it
+    // offers no button rather than a button with a made-up count on it.
+    void fetchGenerated()
+      .then(setGenerated)
+      .catch(() => setGenerated(null));
+  }, []);
+
+  useEffect(refreshGenerated, [refreshGenerated]);
+
+  const toggleRole = async (role: string, granted: boolean) => {
+    if (!access) return;
+
+    const next = granted
+      ? [...access.allowedRoles, role]
+      : access.allowedRoles.filter((r) => r !== role);
+
+    // Optimistic, then corrected by what the server stored — it drops roles the site
+    // no longer defines, so the response is the truth, not the request.
+    setAccess({ ...access, allowedRoles: next });
+    setSavingRoles(true);
+
+    try {
+      setAccess(await saveAllowedRoles(next));
+      toast(
+        granted
+          ? sprintf(
+              /* translators: %s: role name. */
+              __("%s can now generate data", "storeseeder"),
+              access.roles[role] ?? role,
+            )
+          : sprintf(
+              /* translators: %s: role name. */
+              __("%s can no longer generate data", "storeseeder"),
+              access.roles[role] ?? role,
+            ),
+      );
+    } catch {
+      setAccess(await fetchAccess().catch(() => access));
+      toast(__("Could not save who has access", "storeseeder"));
+    } finally {
+      setSavingRoles(false);
+    }
+  };
+
+  /**
+   * Flip one MCP switch.
+   *
+   * Optimistic, then replaced by what the server stored: the master switch withdraws the
+   * other two, and the tool count is the server's arithmetic, not a guess made here.
+   */
+  const toggleMcp = async (toggle: McpToggle, value: boolean) => {
+    if (!mcp) return;
+
+    setMcp({ ...mcp, [toggle]: value });
+    setSavingMcp(true);
+
+    try {
+      setMcp(await saveMcpToggle(toggle, value));
+    } catch {
+      setMcp(await fetchMcp().catch(() => mcp));
+      toast(__("Could not save the AI tool settings", "storeseeder"));
+    } finally {
+      setSavingMcp(false);
+    }
+  };
+
+  /** The card's headline icon: a warning only when something is actually wrong. */
+  const mcpIcon = (): IconName => {
+    if (!mcp) return "alert";
+    if (!mcp.available) return "alert";
+    if (!mcp.enabled || 0 === mcp.tools) return "info";
+    return "check2";
+  };
+
+  /** One line saying what an AI client can currently do here. */
+  const mcpSummary = (): string => {
+    if (!mcp || !mcp.available) {
+      return __("Not available on this site", "storeseeder");
+    }
+
+    if (!mcp.enabled) return __("Off — no tools are exposed", "storeseeder");
+
+    if (0 === mcp.tools) {
+      return __(
+        "On, but neither kind of tool is allowed — nothing is exposed",
+        "storeseeder",
+      );
+    }
+
+    return sprintf(
+      /* translators: 1: number of tools exposed, 2: number of generators. */
+      __("Active — %1$d tools across %2$d generators", "storeseeder"),
+      mcp.tools,
+      mcp.abilities,
+    );
+  };
+
+  /**
+   * Delete every row StoreSeeder recorded creating.
+   *
+   * Batched by the server, so this reports progress between rounds rather than holding a
+   * spinner: clearing a few thousand rows takes several requests, and a page that looks
+   * frozen invites a reload halfway through.
+   */
+  const handlePurge = async () => {
+    setConfirmPurge(false);
+    setPurging(true);
+    setPurgeErrors([]);
+    setPurgeNote("");
+
+    try {
+      const result = await purgeGenerated("", (deleted, remaining) =>
+        setPurgeNote(
+          sprintf(
+            /* translators: 1: rows deleted so far, 2: rows still to go. */
+            __("Deleted %1$s, %2$s to go…", "storeseeder"),
+            deleted.toLocaleString(),
+            remaining.toLocaleString(),
+          ),
+        ),
+      );
+
+      setPurgeErrors(result.errors);
+      setPurgeNote("");
+      toast(
+        sprintf(
+          /* translators: %s: number of rows deleted. */
+          __("Deleted %s generated rows", "storeseeder"),
+          result.deleted.toLocaleString(),
+        ),
+      );
+    } catch {
+      toast(__("Could not delete the generated data", "storeseeder"));
+    } finally {
+      setPurging(false);
+      refreshGenerated();
+    }
+  };
+
+  /**
+   * Drop the records without touching the store.
+   *
+   * For a ledger that no longer matches reality — a database restored from elsewhere, rows
+   * removed by hand — where the alternative is a count that can never be cleared.
+   */
+  const handleForget = async () => {
+    setPurging(true);
+
+    try {
+      const result = await deleteGenerated("", true);
+      setPurgeErrors([]);
+      toast(
+        sprintf(
+          /* translators: %s: number of records dropped. */
+          __("Forgot %s records; the rows are untouched", "storeseeder"),
+          result.forgotten.toLocaleString(),
+        ),
+      );
+    } catch {
+      toast(__("Could not clear the records", "storeseeder"));
+    } finally {
+      setPurging(false);
+      refreshGenerated();
+    }
+  };
+
+  /** What the delete button says, which depends on whether there is anything to delete. */
+  const purgeButtonLabel = (): string => {
+    if (purging) return __("Deleting…", "storeseeder");
+
+    const total = generated?.total ?? 0;
+
+    if (0 === total) return __("No generated data to delete", "storeseeder");
+
+    return sprintf(
+      /* translators: %s: number of rows. */
+      __("Delete generated data (%s rows)", "storeseeder"),
+      total.toLocaleString(),
+    );
+  };
+
   const handleClearData = () => {
     clearStats();
     toast(__("Run history cleared", "storeseeder"));
@@ -343,7 +718,7 @@ export default function SettingsPage() {
           <h1 className="fp-h1">{__("Settings", "storeseeder")}</h1>
           <p className="fp-sub">
             {__(
-              "Configure default behaviour for data generation.",
+              "What StoreSeeder writes, who may write it, and how this admin looks.",
               "storeseeder",
             )}
           </p>
@@ -351,141 +726,320 @@ export default function SettingsPage() {
       </div>
 
       <div className="fp-settings-col">
-        {/* Generation defaults */}
+        <SetSection
+          title={__("This site", "storeseeder")}
+          desc={__("Stored on the server and shared by everyone who uses StoreSeeder here.", "storeseeder")}
+        >
+        {/* Target platform. Site-wide, stored server-side, and the same option the
+            topbar selector writes — it belongs where someone configuring the plugin
+            will look for it, not only behind a dropdown in the header. */}
+        {/* `boxes`, matching the topbar platform selector — the same concept should not
+            wear two icons — and leaving `database` to mean stored data, which is what the
+            Sample data card below uses it for. */}
         <SetCard
-          icon="sliders"
-          title={__("Generation defaults", "storeseeder")}
+          icon="store"
+          testId="settings-target-platform"
+          scope="site"
+          title={__("Target platform", "storeseeder")}
           desc={__(
-            "Pre-fill values on every generator page.",
+            "Where generated data is written. Applies to every user on this site.",
             "storeseeder",
           )}
         >
           <div>
             <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-count">
-                {__("Default count", "storeseeder")}
+              <label className="fp-set-label" htmlFor="ss-target-platform">
+                {__("Platform", "storeseeder")}
               </label>
-              <p className="fp-set-hint">
-                {__(
-                  "Number of items pre-filled on every generator page.",
-                  "storeseeder",
-                )}
-              </p>
-              <NumberField
-                id="ss-default-count"
-                value={settings.defaultCount}
-                width={130}
-                onChange={(v) =>
-                  set("defaultCount", Math.max(1, parseInt(v, 10) || 1))
-                }
-              />
-            </div>
-
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-locale">
-                {__("Default locale", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {__(
-                  "Faker locale used when generating data.",
-                  "storeseeder",
-                )}
-              </p>
+              <p className="fp-set-hint">{platformHint()}</p>
               <FieldSelect
-                id="ss-default-locale"
-                value={codeToLabel(settings.defaultLocale)}
-                options={localeLabels}
+                id="ss-target-platform"
+                value={platformSelected}
+                options={platformOptions.map((o) => ({
+                  value: o.id,
+                  label: o.label,
+                }))}
                 width={320}
-                onChange={(label) => set("defaultLocale", labelToCode(label))}
+                onChange={handlePlatformChange}
               />
             </div>
 
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-default-seed">
-                {__("Default seed", "storeseeder")}
-              </label>
-              <p className="fp-set-hint">
-                {__(
-                  "Fixed seed for reproducible runs. Leave blank for random output.",
-                  "storeseeder",
+            {activePlatformList.length > 0 && (
+              <p className="fp-set-hint mb-0">
+                {sprintf(
+                  /* translators: %s: comma-separated platform names with versions. */
+                  __("Active: %s", "storeseeder"),
+                  activePlatformList
+                    .map((p) => (p.version ? `${p.label} ${p.version}` : p.label))
+                    .join(", "),
                 )}
               </p>
-              <div style={{ maxWidth: 220 }}>
-                <TextField
-                  id="ss-default-seed"
-                  value={settings.defaultSeed}
-                  ph={__("random (leave blank)", "storeseeder")}
-                  onChange={(v) => set("defaultSeed", v)}
-                />
+            )}
+          </div>
+        </SetCard>
+
+        {/* Who may generate. Server-held and site-wide, unlike everything below it,
+            and the only setting on this page with a security consequence — generated
+            rows go straight into the store's own tables. */}
+        {!access && !accessFailed && (
+          <SetCard
+            icon="users"
+            scope="site"
+            testId="settings-access-loading"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <div className="fp-skel-text" aria-hidden="true">
+              <Skeleton height={34} />
+              <Skeleton height={34} />
+              <Skeleton height={34} width="72%" />
+            </div>
+            <span className="sr-only" role="status">
+              {__("Loading roles…", "storeseeder")}
+            </span>
+          </SetCard>
+        )}
+
+        {accessFailed && (
+          <SetCard
+            icon="users"
+            scope="site"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <p className="fp-set-hint mb-0" style={{ color: "var(--red)" }}>
+              {__(
+                "Could not load who has access. Reload the page to try again.",
+                "storeseeder",
+              )}
+            </p>
+          </SetCard>
+        )}
+
+        {access && (
+          <SetCard
+            icon="users"
+            testId="settings-access"
+            scope="site"
+            title={__("Who can generate data", "storeseeder")}
+            desc={__(
+              "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools.",
+              "storeseeder",
+            )}
+          >
+            <div>
+              {Object.keys(access.roles).length === 0 && (
+                <p className="fp-set-hint mb-0">
+                  {__(
+                    "This site defines no roles other than Administrator.",
+                    "storeseeder",
+                  )}
+                </p>
+              )}
+
+              {Object.entries(access.roles).map(([slug, name]) => (
+                <div className="fp-set-field full" key={slug}>
+                  <Toggle
+                    checked={access.allowedRoles.includes(slug)}
+                    disabled={!access.canManage || savingRoles}
+                    onChange={(granted) => void toggleRole(slug, granted)}
+                    testId={`role-${slug}`}
+                    label={name}
+                    hint={
+                      access.allowedRoles.includes(slug)
+                        ? __(
+                            "Can generate data, and can write it into the live store.",
+                            "storeseeder",
+                          )
+                        : __("No access.", "storeseeder")
+                    }
+                  />
+                </div>
+              ))}
+
+              {!access.canManage && (
+                <p className="fp-set-hint mb-0">
+                  {__(
+                    "Only administrators can change who has access, so that a role granted here cannot widen it further.",
+                    "storeseeder",
+                  )}
+                </p>
+              )}
+
+              {access.filtered && (
+                <p className="fp-set-hint mb-0">
+                  {sprintf(
+                    /* translators: %s: capability name, e.g. edit_shop_orders. */
+                    __(
+                      "Code on this site also grants access through the %s capability, via the storeseeder_capability filter.",
+                      "storeseeder",
+                    ),
+                    access.capability,
+                  )}
+                </p>
+              )}
+            </div>
+          </SetCard>
+        )}
+
+        {/* MCP. Site-wide, since it depends on which plugins are active — and reported
+            rather than hidden when unavailable: the two things it needs are not StoreSeeder's
+            to install, so naming them is the only useful thing this card can do. */}
+        {mcp && (
+          <SetCard
+            icon="sparkles"
+            scope="site"
+            testId="settings-mcp"
+            title={__("AI tools (MCP)", "storeseeder")}
+            desc={__(
+              "Exposes the generators as tools an AI client can call, so test data can be asked for in words rather than clicked.",
+              "storeseeder",
+            )}
+          >
+            <div>
+              <div className="fp-set-sync">
+                <span className="fp-set-sync-ic">
+                  <Icon name={mcpIcon()} size={19} />
+                </span>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+                    {mcpSummary()}
+                  </div>
+                  {mcp.available && mcp.enabled && 0 < mcp.tools && (
+                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                      <code>{mcp.route}</code>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="fp-set-field full">
-              <Toggle
-                checked={settings.defaultIncludeMeta}
-                onChange={(v) => set("defaultIncludeMeta", v)}
-                label={__(
-                  "Include metadata by default",
-                  "storeseeder",
-                )}
-                hint={__(
-                  "Pre-check the Include Metadata toggle on every generator.",
-                  "storeseeder",
-                )}
-              />
-            </div>
+              {/* Three switches, in the order the risk grows: whether there is an AI
+                  surface at all, whether an agent may look, whether it may write. Two
+                  tools per generator is what makes that last one a real boundary — with
+                  generation off an agent can still answer "what would 50 orders look
+                  like?", and cannot put them in the store. */}
+              {mcp.available && (
+                <div style={{ marginTop: 4 }}>
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled}
+                      disabled={!mcp.can_manage || savingMcp}
+                      onChange={(v) => void toggleMcp("enabled", v)}
+                      testId="mcp-enabled"
+                      label={__("Enable AI tools", "storeseeder")}
+                      hint={__(
+                        "Serves the MCP endpoint. Off means no tools at all, and a client can no longer connect.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
 
-            <Button variant="primary" icon="check" onClick={handleSave}>
-              {saved
-                ? __("Saved!", "storeseeder")
-                : __("Save settings", "storeseeder")}
-            </Button>
-          </div>
-        </SetCard>
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled && mcp.preview}
+                      disabled={!mcp.can_manage || !mcp.enabled || savingMcp}
+                      onChange={(v) => void toggleMcp("preview", v)}
+                      testId="mcp-preview"
+                      label={sprintf(
+                        /* translators: %d: number of generators. */
+                        __("Allow preview tools (%d)", "storeseeder"),
+                        mcp.abilities,
+                      )}
+                      hint={__(
+                        "Read-only. Shows the rows a run would create, and writes nothing.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
 
-        {/* Run history */}
-        <SetCard
-          icon="history"
-          title={__("Run history", "storeseeder")}
-          desc={__(
-            "Control how much history is retained.",
-            "storeseeder",
-          )}
-        >
-          <div>
-            <div className="fp-set-field">
-              <label className="fp-set-label" htmlFor="ss-max-runs">
-                {__("Max runs per generator", "storeseeder")}
-              </label>
+                  <div className="fp-set-field full">
+                    <Toggle
+                      checked={mcp.enabled && mcp.generate}
+                      disabled={!mcp.can_manage || !mcp.enabled || savingMcp}
+                      onChange={(v) => void toggleMcp("generate", v)}
+                      testId="mcp-generate"
+                      label={sprintf(
+                        /* translators: %d: number of generators. */
+                        __("Allow generating (%d, writes rows)", "storeseeder"),
+                        mcp.abilities,
+                      )}
+                      hint={__(
+                        "Lets an agent insert data into the store. Off leaves it able to preview only.",
+                        "storeseeder",
+                      )}
+                    />
+                  </div>
+
+                  {!mcp.can_manage && (
+                    <p className="fp-set-hint">
+                      {__(
+                        "Only administrators can change what an AI client may do.",
+                        "storeseeder",
+                      )}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* One line per missing dependency, because "install the Abilities API" and
+                  "install mcp-adapter" are different jobs and a combined message sends the
+                  reader looking for the wrong one. */}
+              {!mcp.available && (
+                <ul className="fp-set-reqs">
+                  <li>
+                    <Icon
+                      name={mcp.abilities_api ? "check2" : "x"}
+                      size={14}
+                      className={mcp.abilities_api ? "is-met" : "is-missing"}
+                    />
+                    {__(
+                      "WordPress Abilities API — bundled with WordPress 6.9 and later, or installable as a plugin",
+                      "storeseeder",
+                    )}
+                  </li>
+                  <li>
+                    <Icon
+                      name={mcp.adapter ? "check2" : "x"}
+                      size={14}
+                      className={mcp.adapter ? "is-met" : "is-missing"}
+                    />
+                    {__(
+                      "The mcp-adapter plugin, which serves the tools to a client",
+                      "storeseeder",
+                    )}
+                  </li>
+                </ul>
+              )}
+
               <p className="fp-set-hint">
                 {__(
-                  "How many recent runs to store in history per generator type.",
+                  "Optional. Nothing else changes when it is absent — the admin, the REST API and WP-CLI all work the same. The same tools are also reachable through mcp-adapter's own default server, under whatever these switches allow.",
                   "storeseeder",
                 )}
               </p>
-              <NumberField
-                id="ss-max-runs"
-                value={settings.maxRunsPerGenerator}
-                width={130}
-                onChange={(v) =>
-                  set(
-                    "maxRunsPerGenerator",
-                    Math.min(50, Math.max(5, parseInt(v, 10) || 10)),
-                  )
-                }
-              />
+
+              {/* A client needs a proxy and an application password, neither of which this
+                  page can hand out. Automattic's package documents both, and is where the
+                  config format is kept up to date. */}
+              <a href={MCP_CLIENT_URL} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="sm" icon="external" type="button">
+                  {__("How to connect a client", "storeseeder")}
+                </Button>
+              </a>
             </div>
-            <Button variant="primary" icon="check" onClick={handleSave}>
-              {saved
-                ? __("Saved!", "storeseeder")
-                : __("Save settings", "storeseeder")}
-            </Button>
-          </div>
-        </SetCard>
+          </SetCard>
+        )}
 
         {/* Sample data */}
         <SetCard
           icon="database"
+          scope="site"
           title={__("Sample data", "storeseeder")}
           desc={__(
             "Locale-specific reference data used by generators to produce realistic output.",
@@ -550,8 +1104,10 @@ export default function SettingsPage() {
             </div>
 
             <div style={{ marginTop: 14 }}>
+              {/* The server reports the repository, which storeseeder_sample_data_source
+                  can change; the constant is only a fallback for a failed status call. */}
               <a
-                href={SAMPLE_DATA_REPO_URL}
+                href={syncStatus?.repo_url || SAMPLE_DATA_REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -565,7 +1121,220 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
+        </SetSection>
 
+        <SetSection
+          title={__("Your preferences", "storeseeder")}
+          desc={__("Stored in this browser, for you alone. Nothing here changes what anyone else sees.", "storeseeder")}
+          note={
+            saved ? (
+              <span className="fp-set-saved" data-testid="settings-saved">
+                <Icon name="check2" size={13} />
+                {__("Saved", "storeseeder")}
+              </span>
+            ) : null
+          }
+        >
+        {/* Generation defaults */}
+        <SetCard
+          icon="sliders"
+          scope="browser"
+          title={__("Generation defaults", "storeseeder")}
+          desc={__(
+            "Pre-fill values on every generator page.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-count">
+                {__("Default count", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "Number of items pre-filled on every generator page.",
+                  "storeseeder",
+                )}
+              </p>
+              <NumberField
+                id="ss-default-count"
+                value={settings.defaultCount}
+                width={130}
+                onChange={(v) =>
+                  set("defaultCount", Math.max(1, parseInt(v, 10) || 1))
+                }
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-locale">
+                {__("Default locale", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {sprintf(
+                  /* translators: %d: number of available locales. */
+                  __(
+                    "Locale used when generating data — %d available, all accepted by the REST API.",
+                    "storeseeder",
+                  ),
+                  locales.length,
+                )}
+              </p>
+              <FieldSelect
+                id="ss-default-locale"
+                value={settings.defaultLocale}
+                options={locales.map((l) => ({
+                  value: l.code,
+                  label: l.label,
+                }))}
+                width={320}
+                onChange={(code) => set("defaultLocale", code || DEFAULT_LOCALE)}
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-default-seed">
+                {__("Default seed", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "Fixed seed for reproducible runs. Leave blank for random output.",
+                  "storeseeder",
+                )}
+              </p>
+              <div style={{ maxWidth: 220 }}>
+                <TextField
+                  id="ss-default-seed"
+                  value={settings.defaultSeed}
+                  ph={__("random (leave blank)", "storeseeder")}
+                  onChange={(v) => set("defaultSeed", v)}
+                />
+              </div>
+            </div>
+
+            <div className="fp-set-field full">
+              <Toggle
+                checked={settings.defaultIncludeMeta}
+                onChange={(v) => set("defaultIncludeMeta", v)}
+                label={__(
+                  "Include metadata by default",
+                  "storeseeder",
+                )}
+                hint={__(
+                  "Pre-check the Include Metadata toggle on every generator.",
+                  "storeseeder",
+                )}
+              />
+            </div>
+          </div>
+        </SetCard>
+
+        {/* Appearance. Theme and density only — accent and per-token colors stay in
+            Tweaks, which is linked below rather than reproduced here. Both read the
+            same ThemeProvider, so a change made in one shows in the other. */}
+        <SetCard
+          icon="palette"
+          testId="settings-appearance"
+          scope="browser"
+          title={__("Appearance", "storeseeder")}
+          desc={__(
+            "How the admin looks. Saved in this browser, per user.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Theme", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Independent of the WordPress admin colour scheme.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Theme>
+                value={theme}
+                onChange={setTheme}
+                ariaLabel={__("Theme", "storeseeder")}
+                options={[
+                  { v: "light", label: __("Light", "storeseeder"), ic: "sun" },
+                  { v: "dark", label: __("Dark", "storeseeder"), ic: "moon" },
+                ]}
+              />
+            </div>
+
+            <div className="fp-set-field">
+              <span className="fp-set-label">{__("Density", "storeseeder")}</span>
+              <p className="fp-set-hint">
+                {__(
+                  "Compact tightens row heights and padding across every page.",
+                  "storeseeder",
+                )}
+              </p>
+              <Seg<Density>
+                value={density}
+                onChange={setDensity}
+                ariaLabel={__("Density", "storeseeder")}
+                options={[
+                  {
+                    v: "comfortable",
+                    label: __("Comfortable", "storeseeder"),
+                  },
+                  { v: "compact", label: __("Compact", "storeseeder") },
+                ]}
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              icon="sliders"
+              onClick={requestTweaksPanel}
+            >
+              {__("Accent & custom colours…", "storeseeder")}
+            </Button>
+          </div>
+        </SetCard>
+
+        {/* Run history */}
+        <SetCard
+          icon="history"
+          scope="browser"
+          title={__("Run history", "storeseeder")}
+          desc={__(
+            "Control how much history is retained.",
+            "storeseeder",
+          )}
+        >
+          <div>
+            <div className="fp-set-field">
+              <label className="fp-set-label" htmlFor="ss-max-runs">
+                {__("Max runs per generator", "storeseeder")}
+              </label>
+              <p className="fp-set-hint">
+                {__(
+                  "How many recent runs to store in history per generator type.",
+                  "storeseeder",
+                )}
+              </p>
+              <NumberField
+                id="ss-max-runs"
+                value={settings.maxRunsPerGenerator}
+                width={130}
+                onChange={(v) =>
+                  set(
+                    "maxRunsPerGenerator",
+                    Math.min(50, Math.max(5, parseInt(v, 10) || 10)),
+                  )
+                }
+              />
+            </div>          </div>
+        </SetCard>
+        </SetSection>
+
+        <SetSection
+          title={__("Plugin", "storeseeder")}
+          desc={__("Version, links, and the actions that cannot be undone.", "storeseeder")}
+        >
         {/* About */}
         <SetCard
           icon="info"
@@ -603,6 +1372,108 @@ export default function SettingsPage() {
           danger
         >
           <div>
+            {/* First, because it is the only action here that touches the store. The count
+                comes from the plugin's own ledger of rows it wrote, so this deletes what
+                StoreSeeder created and nothing that resembles it. */}
+            <div className="fp-danger-act" data-testid="danger-generated">
+              <div>
+                {confirmPurge ? (
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <Button
+                      variant="danger"
+                      icon="trash"
+                      onClick={() => void handlePurge()}
+                      disabled={purging}
+                      data-testid="delete-generated-confirm"
+                    >
+                      {sprintf(
+                        /* translators: %s: number of rows. */
+                        __("Yes, delete %s rows", "storeseeder"),
+                        (generated?.total ?? 0).toLocaleString(),
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setConfirmPurge(false)}
+                      disabled={purging}
+                    >
+                      {__("Cancel", "storeseeder")}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="danger"
+                    icon="trash"
+                    onClick={() => setConfirmPurge(true)}
+                    disabled={purging || 0 === (generated?.total ?? 0)}
+                    data-testid="delete-generated"
+                  >
+                    {purgeButtonLabel()}
+                  </Button>
+                )}
+              </div>
+
+              <p className="fp-set-hint" style={{ marginTop: 7 }}>
+                {0 === (generated?.total ?? 0)
+                  ? __(
+                      "Nothing recorded yet. Rows created by StoreSeeder are logged so they can be removed later; anything generated before this version was released is not in that log.",
+                      "storeseeder",
+                    )
+                  : __(
+                      "Permanently removes the products, orders, customers and other rows StoreSeeder created, along with what hangs off them. Only rows StoreSeeder recorded creating are touched — your own data is never matched on.",
+                      "storeseeder",
+                    )}
+              </p>
+
+              {/* The breakdown is what makes the number checkable before it is acted on. */}
+              {generated && 0 < generated.resources.length && (
+                <ul className="fp-set-reqs" data-testid="generated-breakdown">
+                  {generated.resources.map((row) => (
+                    <li key={row.resource}>
+                      <Icon name="list" size={14} />
+                      {sprintf(
+                        /* translators: 1: resource name, e.g. Products. 2: number of rows. */
+                        __("%1$s — %2$s", "storeseeder"),
+                        resourceLabel(row.resource),
+                        row.count.toLocaleString(),
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {purgeNote && (
+                <p className="fp-set-hint" aria-live="polite">
+                  {purgeNote}
+                </p>
+              )}
+
+              {/* A refusal names its reason once, not once per row, and offers the only
+                  thing that can clear a count that will never delete: forgetting it. */}
+              {0 < purgeErrors.length && (
+                <div style={{ marginTop: 4 }}>
+                  {purgeErrors.map((error) => (
+                    <p
+                      className="fp-set-hint"
+                      style={{ color: "var(--red)" }}
+                      key={error}
+                    >
+                      {error}
+                    </p>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    icon="x"
+                    onClick={() => void handleForget()}
+                    disabled={purging}
+                  >
+                    {__("Forget the remaining records", "storeseeder")}
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div className="fp-danger-act">
               <div>
                 <Button variant="danger" icon="trash" onClick={handleClearData}>
@@ -619,7 +1490,7 @@ export default function SettingsPage() {
                 )}
               </p>
             </div>
-            <div className="fp-danger-act">
+            <div className="fp-danger-act mb-0">
               <div>
                 <Button
                   variant="danger"
@@ -632,7 +1503,7 @@ export default function SettingsPage() {
                   )}
                 </Button>
               </div>
-              <p className="fp-set-hint" style={{ marginTop: 7 }}>
+              <p className="fp-set-hint mb-0" style={{ marginTop: 7 }}>
                 {__(
                   "Resets all settings to their default values.",
                   "storeseeder",
@@ -641,6 +1512,8 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
+        </SetSection>
+
       </div>
     </div>
   );

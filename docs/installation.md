@@ -2,13 +2,17 @@
 
 ## Requirements
 
-Before installing StoreSeeder, ensure your system meets these requirements:
-
-- **WordPress**: 5.0 or higher
+- **WordPress**: 6.5 or higher
 - **PHP**: 7.4 or higher (8.0+ recommended)
-- **Fluent Cart**: Latest version required
-- **Memory**: Minimum 256MB (512MB recommended for large datasets)
-- **Storage**: 100MB free space for plugin files and sample data
+- **A supported e-commerce platform**, active. StoreSeeder writes through a platform driver
+  rather than to one fixed plugin. Fluent Cart and WooCommerce ship today; EasyCommerce
+  and StoreEngine are planned, and a third party can register their own.
+
+StoreSeeder will **activate without any platform installed** — it declares no `Requires
+Plugins` header, deliberately, so it can be installed on a site running whichever platform you
+use. What a missing platform costs you is the admin menu and the REST routes, which stay
+hidden until at least one driver reports itself active. An admin notice names the platforms you
+could install.
 
 ## Installation Methods
 
@@ -26,64 +30,72 @@ Before installing StoreSeeder, ensure your system meets these requirements:
 3. **Upload**: Upload the `storeseeder` folder to `/wp-content/plugins/`
 4. **Activate**: Go to **Plugins** in WordPress admin and activate
 
-### Method 3: Composer (For Developers)
+### Method 3: From source
+
+The repository is not published to Packagist, and the plugin declares no
+`composer/installers` dependency, so `composer require` will not place it in
+`wp-content/plugins/`. Clone it instead:
 
 ```bash
-composer require mralaminahamed/storeseeder
+cd wp-content/plugins
+git clone https://github.com/mralaminahamed/storeseeder.git
+cd storeseeder
+composer install
+yarn install
+yarn build          # the admin is a compiled bundle; without this the page is blank
 ```
+
+`build/` is not committed, so a source checkout must be built before the admin will render.
 
 ## Post-Installation Setup
 
-### 1. Verify Dependencies
+### 1. Choose where data goes
 
-The plugin will automatically check for Fluent Cart. If missing:
-- Install and activate Fluent Cart plugin
-- Refresh the plugins page
-- StoreSeeder should now be available
+Open **StoreSeeder** in the admin menu.
 
-### 2. Initial Configuration
+- **One platform active** — it is selected automatically. Nothing to do.
+- **More than one active** — the topbar gains a target selector, defaulting to `Auto`. With
+  several platforms present there is no safe default, so the generator page will ask which
+  store to write to before it will run. The choice is site-wide and persists.
 
-1. Navigate to **StoreSeeder** in the WordPress admin menu
-2. The plugin will automatically download sample data on first visit
-3. Configure your preferences in the settings panel
+A generator the chosen platform cannot represent is dimmed and says why, naming the plugin
+that would enable it where one would.
 
-### 3. Development Setup (Optional)
+### 2. Sample data (optional)
 
-For development or advanced customization:
+Generators work immediately from built-in defaults. For richer, locale-specific content
+StoreSeeder can download reference data from GitHub — but only after you accept a one-time
+consent prompt shown on the admin page. Declining costs no functionality, and the decision can
+be changed from **Settings** at any time. See
+[external-services.md](external-services.md) for exactly what is requested and when.
 
-```bash
-# Install Node.js dependencies
-npm install
+### 3. Generation defaults (optional)
 
-# Install PHP dependencies
-composer install
-
-# Build assets for production
-npm run build
-```
+**Settings** holds the default count, faker locale, seed, and metadata toggle. These are stored
+in your browser, not in the database, so they are per-person rather than per-site.
 
 ## Troubleshooting
 
-### Common Issues
+**No StoreSeeder menu item**
+- No supported platform is active — check the admin notice, which lists them
+- Confirm your user has the `manage_options` capability
 
-**Plugin won't activate:**
-- Ensure Fluent Cart is installed and active
-- Check PHP version compatibility
-- Verify file permissions
+**Admin page is blank**
+- Built from source without running `yarn build`
+- Check the browser console for JavaScript errors
 
-**Admin menu not visible:**
-- Confirm user has `manage_options` capability
-- Check for JavaScript errors in browser console
-- Clear WordPress cache if using caching plugins
+**"Choose where to write" will not go away**
+- More than one platform is active and none has been chosen. Pick one in the topbar or on the
+  generator page; it is stored site-wide.
 
-**Generation fails:**
-- Check PHP memory limits
-- Verify database permissions
-- Ensure Fluent Cart tables exist
+**Generation fails**
+- Read the error message: generators that build on others say so explicitly, e.g. orders need
+  products and customers first, refunds need charge transactions
+- Check PHP memory limits and that the platform's own tables exist
 
 ### Debug Mode
 
-Enable WordPress debug mode for detailed error logging:
+Enable WordPress debug logging for detailed errors:
 
 ```php
 // Add to wp-config.php
@@ -91,39 +103,32 @@ define( 'WP_DEBUG', true );
 define( 'WP_DEBUG_LOG', true );
 ```
 
+StoreSeeder writes structured entries to `wp-content/debug.log` when `WP_DEBUG_LOG` is on.
+There is no plugin-specific debug constant.
+
 ### Getting Help
 
-- Check the [FAQ](https://github.com/mralaminahamed/storeseeder/wiki/FAQ)
-- Review [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
-- Contact support via the WordPress.org forums
+- [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
+- [SUPPORT.md](../SUPPORT.md) — where to ask, what to include, what is out of scope
 
 ## Updating
 
-### Automatic Updates
-
-The plugin supports automatic updates through WordPress.org.
-
-### Manual Updates
-
-1. **Backup**: Always backup your database before updating
-2. **Deactivate**: Deactivate the plugin in WordPress admin
-3. **Replace Files**: Upload new files via FTP/SFTP
-4. **Activate**: Reactivate the plugin
-5. **Verify**: Test functionality with small data generation
+1. **Backup** the database before updating
+2. Update through **Plugins → Updates**, or replace the plugin folder
+3. **Verify** with a small generation run
 
 ## Uninstallation
 
-### Complete Removal
+1. **Deactivate** the plugin in WordPress admin
+2. **Delete** it to remove the plugin files
 
-1. **Deactivate**: Deactivate the plugin in WordPress admin
-2. **Delete**: Click **Delete** to remove all plugin files
-3. **Clean Database**: Manually remove generated test data if needed
+Deleting the plugin does **not** remove data it generated, the
+`storeseeder_sample_data_consent` and `storeseeder_target_platform` options, or the downloaded
+sample data in `wp-content/uploads/`. There is no uninstall routine — generated records are
+indistinguishable from real ones by design, so removing them automatically would risk deleting
+data you wanted.
 
-### Data Cleanup
+Remove generated data through your platform's own admin screens or bulk delete tools.
 
-Generated test data can be removed through:
-- WordPress admin (individual items)
-- Bulk delete tools
-- Custom database queries (advanced users only)
-
-**⚠️ Warning**: Always backup before removing generated data.
+> [!WARNING]
+> Always back up before removing generated data.

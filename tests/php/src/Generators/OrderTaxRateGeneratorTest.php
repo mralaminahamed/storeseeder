@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Order_Tax_Rate;
+use StoreSeeder\Generation\Generators\Order_Tax_Rate;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order_Tax_Rate generator.
  *
- * @covers \StoreSeeder\Generators\Order_Tax_Rate
+ * @covers \StoreSeeder\Generation\Generators\Order_Tax_Rate
  */
 class OrderTaxRateGeneratorTest extends StoreSeederUnitTestCase {
 

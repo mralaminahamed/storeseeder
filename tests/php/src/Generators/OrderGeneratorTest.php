@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Order;
+use StoreSeeder\Generation\Generators\Order;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Order generator.
  *
- * @covers \StoreSeeder\Generators\Order
+ * @covers \StoreSeeder\Generation\Generators\Order
  */
 class OrderGeneratorTest extends StoreSeederUnitTestCase {
 

@@ -11,6 +11,9 @@ import { LocalePicker } from "@/components/overlays/LocalePicker";
 import { TweaksPanel } from "@/components/overlays/TweaksPanel";
 import { BatchTray } from "@/components/overlays/BatchTray";
 import { generators } from "@/lib/generators";
+import { OPEN_TWEAKS_EVENT } from "@/lib/events";
+import { defaultLocale, localeLabel } from "@/lib/locales";
+import { getSettings, saveSettings } from "@/lib/settings";
 import { useStats } from "@/providers/StatsProvider";
 import { useBatch } from "@/providers/BatchProvider";
 
@@ -58,20 +61,17 @@ export function AppShell() {
     });
   };
 
-  // ---- locale (persisted) ----
-  const [locale, setLocaleRaw] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem("fp_locale");
-      if (saved) return saved;
-    } catch {}
-    return window.storeseederApi?.locale?.label ?? "English (United States)";
-  });
+  // ---- locale ----
+  // Backed by the same `defaultLocale` setting the generators read, so the topbar
+  // control is the real one. It used to write its own `fp_locale` key that nothing
+  // else consulted: picking Japanese changed the pill and generated English.
+  const [locale, setLocaleRaw] = useState<string>(
+    () => getSettings().defaultLocale || defaultLocale(),
+  );
 
-  const setLocale = (l: string) => {
-    setLocaleRaw(l);
-    try {
-      localStorage.setItem("fp_locale", l);
-    } catch {}
+  const setLocale = (code: string) => {
+    setLocaleRaw(code);
+    saveSettings({ ...getSettings(), defaultLocale: code });
   };
 
   // ---- overlay open flags ----
@@ -104,6 +104,15 @@ export function AppShell() {
     return () => window.removeEventListener("keydown", handler, { capture: true });
   }, []);
 
+  // Settings offers theme and density too, and links to the panel for the rest —
+  // accent, custom colors. An event rather than a prop: the Settings page is two
+  // router levels down and nothing between the two needs to know about tweaks.
+  useEffect(() => {
+    const open = () => setTweaksOpen(true);
+    window.addEventListener(OPEN_TWEAKS_EVENT, open);
+    return () => window.removeEventListener(OPEN_TWEAKS_EVENT, open);
+  }, []);
+
   // ---- scroll-to-top of content on route change ----
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -129,7 +138,7 @@ export function AppShell() {
         <div className="fp-main">
           <Topbar
             crumb={crumb}
-            locale={locale}
+            locale={localeLabel(locale)}
             onOpenLocale={() => setLocaleOpen(true)}
             onOpenTweaks={() => setTweaksOpen(true)}
             batchCount={batch.length}

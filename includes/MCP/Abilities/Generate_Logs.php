@@ -8,7 +8,7 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +22,47 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Logs extends Ability {
 
 	const REST_BASE = 'logs';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Logs', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate activity log entries for orders, products, customers, coupons, refunds, carts, transactions, and system events. Returns log IDs, object types, actions, and severity levels.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'log_types' => array(
+				'type'        => 'array',
+				'description' => __( 'Log severity types to generate. Default: all types.', 'storeseeder' ),
+				'items'       => array(
+					'type' => 'string',
+					'enum' => array( 'info', 'success', 'warning', 'error' ),
+				),
+				'default'     => array( 'info', 'success', 'warning', 'error' ),
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'logs',
+			'description' => __( 'Array of generated log objects with id, object, action, type, note, and is_public.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}

@@ -32,12 +32,45 @@ has no sample data.
 |---|---|
 | **Service** | GitHub |
 | **Endpoint** | `https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip` |
-| **When the request happens** | Only after an administrator has accepted the consent prompt on the plugin admin page: by the prompt's own approval button, or by **Sync now** / **Force re-sync** in Settings once permission is already on record. Never on activation, and never on a schedule. |
+| **When the request happens** | Only after an administrator has accepted the consent prompt on the plugin admin page. Three cases: the prompt's own approval button; **Sync now** / **Force re-sync** in Settings once permission is on record; and opening the plugin admin page when permission is already granted but the extracted files are missing, which re-downloads them silently. Never before permission is granted, never on activation, and never on a schedule. |
 | **Made by** | The site's PHP process, via the WordPress HTTP API |
 | **Data sent** | An unauthenticated HTTP `GET`. No site, user, or store data is included — only the request itself, plus the IP address and user agent inherent to any HTTP request. |
 | **Data received** | A ZIP archive of JSON reference files, extracted into `wp-content/uploads/storeseeder-sample-data-fluent-cart/` |
 | **Terms of Service** | https://docs.github.com/en/site-policy/github-terms/github-terms-of-service |
 | **Privacy Policy** | https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement |
+
+The three states a site can be in, and every transition that can cause a request:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> Undecided: plugin activated
+
+    Undecided --> Granted: administrator accepts the prompt
+    Undecided --> Declined: administrator declines
+
+    Granted --> Granted: Sync now / Force re-sync
+    Granted --> Granted: admin page opened, files missing
+    Granted --> Declined: Revoke
+
+    Declined --> Granted: administrator accepts later
+
+    note right of Undecided
+        No request is ever made.
+        Sync now and Force re-sync reopen
+        the prompt instead of downloading.
+    end note
+
+    note right of Declined
+        No request is ever made.
+        Generators use built-in defaults.
+    end note
+```
+
+Only the `Granted` state can produce an outbound request, and every arrow into it is an explicit
+administrator action. Nothing here is triggered by activation, by a schedule, or by generating
+data.
 
 The downloaded archive is validated before extraction: entry paths are checked so that no file can be
 written outside the target directory (zip-slip / path traversal). See [`SECURITY.md`](../SECURITY.md).

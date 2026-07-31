@@ -31,7 +31,7 @@ Manual check:
 - [ ] Branched off `trunk`, commits follow `type(scope): summary`
 - [ ] `composer lint`, `composer analyse`, and `composer test` pass
 - [ ] `yarn build` compiles
-- [ ] New PHP has PHPDoc; REST routes validate input against JSON Schema and require `manage_options`
+- [ ] New PHP has PHPDoc; REST routes validate input against JSON Schema and gate on `StoreSeeder\Access`
 - [ ] New user-facing strings are translatable; `composer makepot` re-run if strings changed
 - [ ] Docs updated where relevant (`README.md`, `docs/`, `CHANGELOG.md`)
 - [ ] Any new outbound HTTP request is documented in `docs/external-services.md`, and summarised in

@@ -16,9 +16,9 @@ StoreSeeder is maintained by one developer, so a little triage on your side goes
 ## Bugs and Feature Requests
 
 Open an issue on the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) using the
-bug report or feature request template. Include the StoreSeeder, Fluent Cart, WordPress, and PHP
-versions, plus the generator and parameters involved — without those, a report usually cannot be
-reproduced.
+bug report or feature request template. Include the StoreSeeder, WordPress, and PHP versions, which
+e-commerce platform you are writing to and its version, plus the generator and parameters involved —
+without those, a report usually cannot be reproduced.
 
 ## Security Vulnerabilities
 
@@ -30,7 +30,11 @@ the [security policy](SECURITY.md).
 
 A few checks resolve most reports:
 
-- Fluent Cart is installed **and active** — StoreSeeder cannot activate without it
+- A supported e-commerce platform is installed **and active** — Fluent Cart, today. StoreSeeder
+  activates without one and says so on its own screen, so "nothing generates" usually means no
+  platform is active
+- With more than one platform active, a target has been chosen — the generator page asks, and both
+  run actions stay disabled until it is answered
 - You are on a development or staging site, not production
 - The plugin was built (`yarn build`) if you installed from source rather than a release zip
 - `WP_DEBUG` is on, and you have captured anything relevant from `debug.log` and the browser console
@@ -39,9 +43,12 @@ A few checks resolve most reports:
 
 - Running StoreSeeder on a production store, or recovering data it wrote there — back up before
   generating
-- Fluent Cart itself; take core store questions to
+- The e-commerce platform itself; take core store questions to its own support — for Fluent Cart,
   [Fluent Cart support](https://wordpress.org/support/plugin/fluent-cart/)
-- Fluent Cart Pro features that generated records depend on, such as active subscription billing
+- Paid platform features that generated records depend on, such as active subscription billing on
+  Fluent Cart Pro
+- Third-party platform drivers registered through `storeseeder_platforms` — report those to whoever
+  ships the driver
 - Custom generator development on your behalf — [CONTRIBUTING.md](CONTRIBUTING.md) documents the
   pattern if you want to build one
 

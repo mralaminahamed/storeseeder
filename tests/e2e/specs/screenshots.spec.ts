@@ -120,7 +120,15 @@ function frame(options: {
     width: 58px; height: 58px; display: block;
     filter: drop-shadow(0 6px 14px rgba(${BRAND.shadow}, .38));
   }
-  .brand span { color: #fff; font-size: 27px; font-weight: 700; letter-spacing: -.01em; }
+  /* Wordmark and tagline stack, so the mark reads as a lockup rather than a
+     floating word. The tagline is the one line that says what the plugin is —
+     the frame's heading names the screen, not the product. */
+  .brand-text { display: flex; flex-direction: column; gap: 3px; }
+  .brand-name { color: #fff; font-size: 27px; font-weight: 700; letter-spacing: -.01em; line-height: 1; }
+  .brand-tagline {
+    color: rgba(255,255,255,.72); font-size: 13.5px; font-weight: 500;
+    letter-spacing: .01em; line-height: 1;
+  }
 
   .head { position: absolute; top: 126px; left: 0; right: 0; text-align: center; }
   .kicker {
@@ -156,7 +164,10 @@ function frame(options: {
 
   <div class="brand">
     ${iconSvg}
-    <span>StoreSeeder</span>
+    <div class="brand-text">
+      <div class="brand-name">StoreSeeder</div>
+      <div class="brand-tagline">Test data for WordPress e-commerce</div>
+    </div>
   </div>
 
   <div class="head">
@@ -168,7 +179,7 @@ function frame(options: {
     <img src="data:image/png;base64,${shotBase64}" alt="">
   </div>
 
-  <div class="foot">StoreSeeder &middot; Realistic test data for Fluent Cart</div>
+  <div class="foot">StoreSeeder &middot; Realistic test data for WordPress e-commerce</div>
 </body>
 </html>`;
 }
@@ -218,9 +229,16 @@ const SHOTS = [
     capture: '.fp-page',
     kicker: 'Configuration',
     title: 'Settings',
-    // The settings column is capped at 680px, so a wide capture leaves a dead
-    // band beside it. A narrower viewport lets the column fill the frame.
-    viewport: { width: 1320, height: 1050 },
+    // The first section only: since the page grew to three sections and eight cards,
+    // capturing `.fp-page` clipped a card in half. This one carries what a reader needs —
+    // where data is written and who may write it — and framing the section rather than the
+    // page also removes the dead band beside the 680px column.
+    capture: 'viewport',
+    viewport: { width: 1000, height: 545 },
+    // Collapsed: the settings column is what this shot is about, and the nav costs it 190px
+    // of width. The other four shots keep the nav expanded, because the generator pages are
+    // partly about finding your way around.
+    collapseNav: true,
   },
 ] as const;
 
@@ -231,13 +249,28 @@ test.describe('Screenshots', () => {
   for (const [index, shot] of SHOTS.entries()) {
     test(`${index + 1}. ${shot.file}`, async ({ page }) => {
       await page.setViewportSize('viewport' in shot ? shot.viewport : CAPTURE_VIEWPORT);
+
+      if ('collapseNav' in shot && shot.collapseNav) {
+        // The same key the sidebar's own toggle writes, set before the app boots so it
+        // renders collapsed rather than animating shut mid-capture.
+        await page.addInitScript(() =>
+          window.localStorage.setItem('fp_nav_collapsed', '1'),
+        );
+      }
+
       await page.goto(`${PLUGIN_URL}${shot.hash}`, { waitUntil: 'domcontentloaded' });
       await page.getByTestId(shot.ready).waitFor({ timeout: 20_000 });
       await hideWpChrome(page);
       // Let the live preview request settle so no row renders mid-fetch.
       await page.waitForTimeout(1200);
 
-      const shotBase64 = (await page.locator(shot.capture).first().screenshot()).toString('base64');
+      // 'viewport' captures the frame-shaped region rather than an element: for a page taller
+      // than the card, an element capture either crops arbitrarily or shrinks to a thumbnail.
+      const shotBase64 = (
+        'viewport' === shot.capture
+          ? await page.screenshot()
+          : await page.locator(shot.capture).first().screenshot()
+      ).toString('base64');
 
       // Compose on a blank page so the frame's styles cannot inherit anything
       // from wp-admin.

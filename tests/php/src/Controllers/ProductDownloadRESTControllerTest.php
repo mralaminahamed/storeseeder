@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Product_Download;
+use StoreSeeder\Rest\Controllers\Product_Download;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Download REST controller.
  *
- * @covers \StoreSeeder\Controllers\Product_Download
+ * @covers \StoreSeeder\Rest\Controllers\Product_Download
  */
 class ProductDownloadRESTControllerTest extends StoreSeederUnitTestCase {
 

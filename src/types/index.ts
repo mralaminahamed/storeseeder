@@ -10,13 +10,98 @@ declare global {
       adminColors?: Record<string, string>;
       colorScheme?: string;
       locale?: {
+        /** The site's WordPress locale narrowed to one we can generate in. */
         faker?: string;
+        /** Display label for `faker`. */
         label?: string;
         wordpress?: string;
+        /** Every generatable locale: code => label. Exactly what the REST API accepts. */
         allLocales?: Record<string, string>;
+        /** Fallback locale, when none is chosen or one cannot be matched. */
+        default?: string;
       };
+      /**
+       * Inlined by the server so the topbar knows its target on first paint.
+       * Absent on an older build, in which case the provider fetches instead.
+       */
+      platforms?: PlatformState;
+      /** What MCP would need on this site, and what it has. */
+      mcp?: McpStatus;
     };
   }
+}
+
+/**
+ * MCP's two dependencies, and whether the site has them.
+ *
+ * Separate booleans rather than one `available`, because "install the Abilities API" and
+ * "install mcp-adapter" are different instructions and the user needs the right one.
+ */
+export interface McpStatus {
+  available: boolean;
+  abilities_api: boolean;
+  adapter: boolean;
+  /** How many generators there are — two tools each, at most. */
+  abilities: number;
+  /** How many tools are actually exposed under the current settings. */
+  tools: number;
+  /** Master switch: whether StoreSeeder serves an MCP server at all. */
+  enabled: boolean;
+  /** Whether the read-only preview tools are exposed. */
+  preview: boolean;
+  /** Whether the generate tools — the ones that write rows — are exposed. */
+  generate: boolean;
+  /** Whether the current user may change any of the three. */
+  can_manage: boolean;
+  /** The endpoint an MCP client connects to. */
+  route: string;
+}
+
+/**
+ * Whether one platform can generate one resource, and why not when it cannot.
+ *
+ * A bare boolean would be enough to dim a tile but not to explain it — and
+ * "install WooCommerce Subscriptions" is actionable in a way that a greyed-out
+ * card is not.
+ */
+export interface Capability {
+  supported: boolean;
+  reason: string;
+  /** Plugin slug that would enable this, or '' when none applies. */
+  extension: string;
+  /**
+   * Canonical fields this platform stores the resource *without*.
+   *
+   * Supported and incomplete is a real state — WooCommerce has customers but no separate
+   * customer record, so `with_account` cannot mean what it means elsewhere. Naming them is what
+   * lets the form say so instead of offering a control that does nothing.
+   */
+  ignored_fields: string[];
+}
+
+export interface PlatformInfo {
+  id: string;
+  label: string;
+  active: boolean;
+  version: string | null;
+  /** Keyed by the canonical resource name, not by REST base. */
+  supports: Record<string, Capability>;
+  /**
+   * Extra generation parameters only this platform understands, keyed by resource then by
+   * parameter name. Merged into the form when this platform is the target, and left out
+   * otherwise — another platform's field is a control that would be ignored.
+   */
+  fields: Record<string, Record<string, ParameterConfig>>;
+}
+
+export interface PlatformState {
+  platforms: PlatformInfo[];
+  /** The site-wide target, or '' for auto. */
+  stored: string;
+  /** What auto resolves to right now, or null when it cannot be decided. */
+  resolved: string | null;
+  /** True when more than one platform is active and none has been chosen. */
+  ambiguous: boolean;
 }
 
 /**
@@ -66,7 +151,14 @@ export interface Generator {
   iconName: IconName;
   description: string;
   useCase?: string;
+  /** REST base, e.g. `cart-sessions`. */
   route: string;
+  /**
+   * Canonical resource name, e.g. `cart_session`. Keys into the capability matrix.
+   * Held separately rather than derived from `route` because the two key spaces
+   * genuinely differ, and no singularisation rule survives `shipping_classes`.
+   */
+  resource: string;
   popular?: boolean;
   parameterConfig?: Record<string, ParameterConfig>;
 }

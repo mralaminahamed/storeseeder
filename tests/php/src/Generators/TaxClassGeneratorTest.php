@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Tax_Class;
+use StoreSeeder\Generation\Generators\Tax_Class;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Tax_Class generator.
  *
- * @covers \StoreSeeder\Generators\Tax_Class
+ * @covers \StoreSeeder\Generation\Generators\Tax_Class
  */
 class TaxClassGeneratorTest extends StoreSeederUnitTestCase {
 

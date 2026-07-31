@@ -52,6 +52,8 @@ tests/
 .travis.yml
 .circleci/
 phpunit.xml.dist
+jest.config.js
+jest.setup.ts
 /.phpstan-cache/
 /coverage/
 /test-results/

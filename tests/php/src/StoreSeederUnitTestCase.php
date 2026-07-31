@@ -8,6 +8,7 @@
 namespace StoreSeeder\Tests;
 
 use Brain\Monkey;
+use StoreSeeder\Platforms\Registry;
 use WP_REST_Request;
 use WP_REST_Server;
 use WP_UnitTestCase;
@@ -54,6 +55,15 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 		parent::setUp();
 		Monkey\setUp();
 
+		// Pin the target platform for the whole suite. With more than one shipped driver
+		// active in the environment — and a dev machine will have several — `Auto` is
+		// deliberately ambiguous, because guessing which store to write to is the one failure
+		// nobody notices afterwards. A test about a controller or a generator has to state the
+		// target, or it is testing resolution by accident and answering 409.
+		//
+		// Tests that *are* about resolution clear this in their own setUp; see ResolverTest.
+		add_filter( 'storeseeder_target_platform', array( $this, 'pinned_test_platform' ) );
+
 		if ( $this->is_unit_test ) {
 			return;
 		}
@@ -79,8 +89,36 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function tear_down() {
+		remove_filter( 'storeseeder_target_platform', array( $this, 'pinned_test_platform' ) );
 		Monkey\tearDown();
 		parent::tear_down();
+	}
+
+	/**
+	 * The platform the suite writes to unless a test says otherwise.
+	 *
+	 * Fluent Cart for preference, since it is the driver every resource has a writer for; any
+	 * other active driver rather than nothing, so the suite still runs on a machine without it.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string|null $requested What the caller asked for.
+	 *
+	 * @return string|null
+	 */
+	public function pinned_test_platform( $requested ) {
+		// An explicit request always wins — this only fills in for `Auto`.
+		if ( is_string( $requested ) && '' !== $requested && 'auto' !== $requested ) {
+			return $requested;
+		}
+
+		$active = Registry::instance()->active();
+
+		if ( array() === $active ) {
+			return $requested;
+		}
+
+		return isset( $active['fluent-cart'] ) ? 'fluent-cart' : (string) array_key_first( $active );
 	}
 
 	/**
@@ -92,8 +130,27 @@ abstract class StoreSeederUnitTestCase extends WP_UnitTestCase {
 	 * @return void
 	 */
 	protected function require_fluent_cart(): void {
-		if ( ! defined( 'FLUENTCART_VERSION' ) ) {
-			$this->markTestSkipped( 'Fluent Cart is not active in the test environment.' );
+		$this->require_platform( 'fluent-cart' );
+	}
+
+	/**
+	 * Skip unless one platform's driver can actually write.
+	 *
+	 * Driver tests need the platform itself on disk, and a contributor will rarely
+	 * have all of them. Skipping is the honest outcome — a driver test that passes
+	 * without its platform present is testing nothing.
+	 *
+	 * @param string $id Platform id, as the registry knows it.
+	 *
+	 * @return void
+	 */
+	protected function require_platform( string $id ): void {
+		$platform = Registry::instance()->get( $id );
+
+		if ( null === $platform || ! $platform->is_active() ) {
+			$this->markTestSkipped(
+				sprintf( '%s is not active in the test environment.', $id )
+			);
 		}
 	}
 

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Shipping_Plan;
+use StoreSeeder\Generation\Generators\Shipping_Plan;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Shipping_Plan generator.
  *
- * @covers \StoreSeeder\Generators\Shipping_Plan
+ * @covers \StoreSeeder\Generation\Generators\Shipping_Plan
  */
 class ShippingPlanGeneratorTest extends StoreSeederUnitTestCase {
 

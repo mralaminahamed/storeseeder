@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Generators;
 
-use StoreSeeder\Generators\Customer;
+use StoreSeeder\Generation\Generators\Customer;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Customer generator.
  *
- * @covers \StoreSeeder\Generators\Customer
+ * @covers \StoreSeeder\Generation\Generators\Customer
  */
 class CustomerGeneratorTest extends StoreSeederUnitTestCase {
 

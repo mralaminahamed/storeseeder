@@ -32,6 +32,13 @@ class McpNoticeDismissAjaxTest extends WP_Ajax_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
+		// A JSON response is only JSON if nothing else printed. wpdb echoes its errors as HTML
+		// by default in tests, and another plugin loaded in the suite querying something the
+		// test database cannot serve is enough to put that HTML inside this endpoint's body —
+		// which reads here as "the handler returned nothing" and is a lie. Errors are still
+		// recorded in $wpdb->last_error; they just stop being printed into the payload.
+		$GLOBALS['wpdb']->hide_errors();
+
 		$this->admin_id = self::factory()->user->create( array( 'role' => 'administrator' ) );
 		wp_set_current_user( $this->admin_id );
 	}

@@ -120,6 +120,32 @@
   --ctl-h-lg: 44px;
   --ctl-h-icon: 34px;
 
+  /* control interiors. Heights alone left compact half-done: a 34px button still
+     carried 16px of side padding and 13.5px type, so it shrank vertically and
+     nowhere else. */
+  --pad-btn-x: 16px;
+  --pad-btn-x-sm: 11px;
+  --pad-btn-x-lg: 22px;
+  --pad-ctl-x: 12px;
+  --pad-chip-x: 13px;
+  --pad-pill-y: 6px;
+  --pad-pill-x: 10px;
+  --gap-ctl: 7px;
+  --badge-h: 21px;
+  --switch-w: 38px;
+  --switch-h: 22px;
+  --switch-knob: 18px;
+
+  /* type scale. Every component reads these rather than its own px, so compact
+     tightens text with the boxes around it. */
+  --fs-ctl-lg: 14.5px;
+  --fs-ctl: 13.5px;
+  --fs-body: 13px;
+  --fs-ctl-sm: 12.5px;
+  --fs-hint: 12px;
+  --fs-micro: 11px;
+  --fs-nano: 10.5px;
+
   /* icon tiles */
   --tile: 38px;
   --tile-sm: 30px;
@@ -276,6 +302,27 @@ body:not(.admin-bar) .fp-root { --fp-admin-bar: 0px; }
   --ctl-h-sm: 28px;
   --ctl-h-lg: 39px;
   --ctl-h-icon: 30px;
+
+  --pad-btn-x: 13px;
+  --pad-btn-x-sm: 9px;
+  --pad-btn-x-lg: 18px;
+  --pad-ctl-x: 10px;
+  --pad-chip-x: 11px;
+  --pad-pill-y: 4px;
+  --pad-pill-x: 9px;
+  --gap-ctl: 6px;
+  --badge-h: 19px;
+  --switch-w: 34px;
+  --switch-h: 20px;
+  --switch-knob: 16px;
+
+  --fs-ctl-lg: 13.5px;
+  --fs-ctl: 13px;
+  --fs-body: 12.5px;
+  --fs-ctl-sm: 12px;
+  --fs-hint: 11.5px;
+  --fs-micro: 10.5px;
+  --fs-nano: 10px;
 
   --tile: 32px;
   --tile-sm: 26px;

@@ -8,7 +8,7 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +22,70 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Products extends Ability {
 
 	const REST_BASE = 'products';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Products', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate realistic Fluent Cart products with attributes, variations, categories, pricing strategies, and inventory data. Returns an array of created product IDs and summaries.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'product_type'       => array(
+				'type'        => 'string',
+				'description' => __( 'Type of products to generate. Allowed: simple, variable, grouped, external, digital, mixed. Default: mixed.', 'storeseeder' ),
+				'enum'        => array( 'simple', 'variable', 'grouped', 'external', 'digital', 'mixed' ),
+				'default'     => 'mixed',
+			),
+			'price_min'          => array(
+				'type'        => 'number',
+				'description' => __( 'Minimum product price (USD). Default: 10.', 'storeseeder' ),
+				'default'     => 10,
+			),
+			'price_max'          => array(
+				'type'        => 'number',
+				'description' => __( 'Maximum product price (USD). Default: 500.', 'storeseeder' ),
+				'default'     => 500,
+			),
+			'track_cost'         => array(
+				'type'        => 'boolean',
+				'description' => __( 'Record what the shop paid for each product, for margin reporting. Default: false.', 'storeseeder' ),
+				'default'     => false,
+			),
+			'manage_stock'       => array(
+				'type'        => 'boolean',
+				'description' => __( 'Enable stock management and generate inventory levels. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'description_length' => array(
+				'type'        => 'string',
+				'description' => __( 'Length of product descriptions. Allowed: short, medium, long. Default: medium.', 'storeseeder' ),
+				'enum'        => array( 'short', 'medium', 'long' ),
+				'default'     => 'medium',
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'products',
+			'description' => __( 'Array of generated product objects with id, title, type, variations count, price_range, and stock_status.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -61,12 +125,6 @@ class Generate_Products extends Ability {
 			);
 		}
 
-		// Nest attributes options.
-		$payload['attributes'] = array(
-			'include_attributes' => $input['include_attributes'] ?? true,
-			'variation_count'    => $input['variation_count'] ?? 5,
-		);
-
 		// Nest inventory options including optional stock_range.
 		$inventory = array(
 			'manage_stock' => $input['manage_stock'] ?? true,
@@ -79,22 +137,17 @@ class Generate_Products extends Ability {
 		}
 		$payload['inventory'] = $inventory;
 
-		// Nest categories options.
-		if ( isset( $input['categories_create_new'] ) || isset( $input['categories_max_per_product'] ) ) {
+		// Nest categories options. Existing categories only — creating them is the Product
+		// Categories generator's job, and two places inventing category names is one too many.
+		if ( isset( $input['categories_max_per_product'] ) ) {
 			$payload['categories'] = array(
-				'create_new'      => $input['categories_create_new'] ?? true,
-				'max_per_product' => $input['categories_max_per_product'] ?? 3,
+				'max_per_product' => $input['categories_max_per_product'],
 			);
 		}
 
-		// Nest content options including optional include_images.
-		$content_options = array(
+		$payload['content_options'] = array(
 			'description_length' => $input['description_length'] ?? 'medium',
 		);
-		if ( isset( $input['include_images'] ) ) {
-			$content_options['include_images'] = (bool) $input['include_images'];
-		}
-		$payload['content_options'] = $content_options;
 
 		return $payload;
 	}

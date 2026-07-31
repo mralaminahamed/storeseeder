@@ -1,12 +1,12 @@
 import React from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { Icon } from "@/lib/icons";
 import { SectionLabel } from "@/components/ui/section-label";
 import { fieldsFromSchema, asParamValue } from "@/lib/fieldsFromSchema";
 import { getPath } from "@/lib/paths";
 import type { ParamBag } from "@/lib/paths";
 import { Field } from "@/components/generator/FieldSection";
-import type { Generator, ParamValue } from "@/types";
+import type { Capability, Generator, ParamValue, ParameterConfig, PlatformInfo } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Dependency notes keyed by generator route
@@ -17,7 +17,7 @@ const DEP: Record<string, () => string> = {
     __("Targets existing completed / processing orders", "storeseeder"),
   "product-variations": () =>
     __("Applied to existing variable products", "storeseeder"),
-  transaction: () => __("Generated against existing orders", "storeseeder"),
+  transactions: () => __("Generated against existing orders", "storeseeder"),
   "cart-sessions": () =>
     __("Uses your existing products & customers", "storeseeder"),
 };
@@ -30,6 +30,22 @@ interface ConfigColumnProps {
   generator: Generator;
   params: ParamBag;
   setField: (key: string, value: ParamValue) => void;
+  /** True when several platforms are active and none has been chosen yet. */
+  needsTarget?: boolean;
+  /** The platforms that could be chosen. */
+  platforms?: PlatformInfo[];
+  onPickTarget?: (id: string) => void;
+  /** Set when the chosen platform cannot represent this resource. */
+  unsupported?: Capability | null;
+  /**
+   * Extra parameters the *target* platform understands, merged into the form.
+   *
+   * Only the target's. Rendering another platform's field would offer a control the run then
+   * ignores, which is the failure the whole seam exists to prevent.
+   */
+  platformFields?: Record<string, ParameterConfig>;
+  /** Canonical fields the target stores this resource without. */
+  ignoredFields?: string[];
 }
 
 /**
@@ -40,9 +56,21 @@ export function ConfigColumn({
   generator,
   params,
   setField,
+  needsTarget = false,
+  platforms = [],
+  onPickTarget,
+  unsupported = null,
+  platformFields = {},
+  ignoredFields = [],
 }: ConfigColumnProps): JSX.Element {
   const depNote = DEP[generator.route]?.();
-  const sections = fieldsFromSchema(generator.parameterConfig ?? {});
+  // The target's own parameters are merged last so a platform field is visible beside the
+  // canonical ones — and only the target's, because another platform's would be a control the
+  // run ignores. See Platform_Driver::fields().
+  const sections = fieldsFromSchema({
+    ...(generator.parameterConfig ?? {}),
+    ...platformFields,
+  });
   const hasFields =
     sections.length > 0 && sections.some((s) => s.fields.length > 0);
 
@@ -69,7 +97,72 @@ export function ConfigColumn({
       {/* Description */}
       <p className="fp-config-desc">{generator.description}</p>
 
+      {/* Target platform prompt — the run is blocked until this is answered, so it
+          sits above the fields rather than beside the Generate button. */}
+      {needsTarget && (
+        <div className="fp-dep fp-dep-warn" data-testid="target-prompt">
+          <Icon name="store" size={15} />
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {__("Choose where to write", "storeseeder")}
+            </div>
+            <p style={{ margin: "4px 0 8px", color: "var(--text-faint)", fontSize: 13 }}>
+              {__(
+                "More than one e-commerce platform is active, so there is no safe default.",
+                "storeseeder",
+              )}
+            </p>
+            <div className="fp-target-choices">
+              {platforms.map((platform) => (
+                <button
+                  key={platform.id}
+                  type="button"
+                  className="fp-btn fp-btn-outline fp-btn-sm"
+                  onClick={() => onPickTarget?.(platform.id)}
+                  data-testid={`target-choice-${platform.id}`}
+                >
+                  {platform.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unsupported on the chosen platform. Says which plugin would enable it when
+          one would, because a dimmed control that explains nothing is a dead end. */}
+      {unsupported && (
+        <div className="fp-dep fp-dep-warn" data-testid="unsupported-notice">
+          {/* `alert`, not `info`: this box is why a run cannot happen, and it sits in a
+              warn container. The neutral dependency note below keeps `info`. */}
+          <Icon name="alert" size={15} />
+          <div>
+            <div style={{ fontWeight: 500 }}>
+              {__("Not available here", "storeseeder")}
+            </div>
+            <p style={{ margin: "4px 0 0", color: "var(--text-faint)", fontSize: 13 }}>
+              {unsupported.reason}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Dependency note */}
+      {/* Supported but incomplete. The alternative is a control that appears to work, which is
+          the bug the capability's ignored-field list was added to stop. */}
+      {ignoredFields.length > 0 && (
+        <p className="fp-config-note" data-testid="ignored-fields">
+          {sprintf(
+            /* translators: %s: comma-separated list of field names. */
+            __(
+              "This platform stores %s differently, so those settings are ignored on a run.",
+              "storeseeder",
+            ),
+            ignoredFields.join(", "),
+          )}
+        </p>
+      )}
+
       {depNote && (
         <div className="fp-dep">
           <Icon name="info" size={15} />

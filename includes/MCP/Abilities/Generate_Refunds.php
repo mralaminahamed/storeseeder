@@ -8,7 +8,7 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +22,30 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Refunds extends Ability {
 
 	const REST_BASE = 'refunds';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Refunds', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate refund records against existing Fluent Cart orders. Requires completed or processing orders to exist. Returns refund IDs, amounts, statuses, and gateway transaction IDs.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'refunds',
+			'description' => __( 'Array of generated refund objects with id, order_id, amount, status, and payment_gateway.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}

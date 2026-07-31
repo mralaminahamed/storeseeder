@@ -10,7 +10,7 @@
  * @wordpress-plugin
  * Plugin Name:       StoreSeeder
  * Plugin URI:        https://github.com/mralaminahamed/storeseeder
- * Description:       Create realistic test data for your Fluent Cart store in seconds! Generate products, customers, orders, coupons and more with our intuitive admin interface. Perfect for development, testing, and demos. Features smart defaults, real-time validation, and seamless WordPress integration.
+ * Description:       Realistic test data for WordPress e-commerce platforms. Eighteen generators — products, customers, orders, coupons and more — write through a platform driver, so the same data can seed any supported store. Fluent Cart ships; other platforms can register their own driver. For development, testing, and demos.
  * Version:           1.0.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
@@ -20,7 +20,6 @@
  * License:           GPLv2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Domain Path:       /languages
- * Requires Plugins:  fluent-cart
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

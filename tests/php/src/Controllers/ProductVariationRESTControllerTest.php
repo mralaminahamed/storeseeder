@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Product_Variation;
+use StoreSeeder\Rest\Controllers\Product_Variation;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Product_Variation REST controller.
  *
- * @covers \StoreSeeder\Controllers\Product_Variation
+ * @covers \StoreSeeder\Rest\Controllers\Product_Variation
  */
 class ProductVariationRESTControllerTest extends StoreSeederUnitTestCase {
 

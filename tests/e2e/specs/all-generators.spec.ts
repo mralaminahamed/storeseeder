@@ -12,7 +12,10 @@ const GENERATORS = [
   { route: "tax_classes",          name: 'Tax Classes' },
   { route: "transactions",         name: 'Transactions' },
   { route: "cart-sessions",        name: 'Cart Sessions' },
-  { route: "attributes",           name: 'Attributes' },
+  { route: "attributes",           name: 'Product Attributes' },
+  { route: "product_categories",   name: 'Product Categories' },
+  { route: "brands",               name: 'Product Brands' },
+  { route: "product_tags",         name: 'Product Tags' },
   { route: "refunds",              name: 'Refunds' },
   { route: "logs",                 name: 'Logs' },
   { route: "shipping_classes",     name: 'Shipping Classes' },
@@ -20,6 +23,7 @@ const GENERATORS = [
   { route: "order_tax_rates",      name: 'Order Tax Lines' },
   { route: "product_downloads",    name: 'Product Downloads' },
   { route: "subscriptions",        name: 'Subscriptions' },
+  { route: "licenses",             name: 'Licenses' },
 ] as const;
 
 for (const { route, name } of GENERATORS) {

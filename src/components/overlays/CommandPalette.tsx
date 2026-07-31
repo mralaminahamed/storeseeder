@@ -1,9 +1,9 @@
 import React from "react";
 import { useState, useEffect, useRef } from "@wordpress/element";
 import { useNavigate } from "react-router-dom";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 
-import { generators } from "@/lib/generators";
+import { categoryLabel, sortedGenerators } from "@/lib/generators";
 import { Icon } from "@/lib/icons";
 import type { IconName } from "@/lib/icons";
 
@@ -33,7 +33,10 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
     { key: "dashboard", name: __("Overview", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "dashboard", path: "/" },
     { key: "settings", name: __("Settings", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "settings", path: "/settings" },
     { key: "plugins", name: __("Our Plugins", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "plug", path: "/plugins" },
-    ...generators.map((g) => ({
+    // Sorted, not declaration order: the sidebar sorts on category and `order`, and a
+    // palette listing the same generators in a different sequence is the kind of
+    // inconsistency nobody reports but everybody feels.
+    ...sortedGenerators().map((g) => ({
       key: `gen:${g.route}`,
       name: g.name,
       grp: sprintfGroup(g.category),
@@ -154,7 +157,11 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
   );
 }
 
-/** Suffix a generator category with " generator" for the palette group label. */
+/** The palette's group heading for a category, e.g. "Core generator". */
 function sprintfGroup(category: string): string {
-  return `${category} ${__("generator", "storeseeder")}`;
+  return sprintf(
+    /* translators: %s: category name, e.g. Core. */
+    __("%s generator", "storeseeder"),
+    categoryLabel(category),
+  );
 }

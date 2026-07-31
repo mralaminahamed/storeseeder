@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@/lib/icons";
+import { PlatformSelect } from "@/components/shell/PlatformSelect";
 import { useTheme } from "@/theme/useTheme";
 
 // ---------------------------------------------------------------------------
@@ -58,7 +59,14 @@ export function Topbar({
           </button>
         )}
 
-        <button className="fp-locale-pill fp-focusable" onClick={onOpenLocale}>
+        <PlatformSelect />
+
+        <button
+          className="fp-locale-pill fp-focusable"
+          onClick={onOpenLocale}
+          data-testid="locale-pill"
+          title={locale}
+        >
           <Icon name="globe" size={14} />
           {locale.split(" (")[0]}
         </button>

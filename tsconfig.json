@@ -1,7 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "es6"],
+    // ES2020 rather than es5: TypeScript 6 deprecated the es5 target, and it never governed
+    // what shipped anyway — Babel does the downlevelling, with browser support coming from
+    // @wordpress/browserslist-config. This only decides which lib types are in scope.
+    "target": "ES2020",
+    // ES2020 to match the target. The old "es6" left Object.entries, Array.includes and
+    // flatMap out of scope while the code used all three — webpack never noticed, because
+    // Babel transpiles without consulting these types.
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -10,16 +16,25 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    // "bundler" matches how the code is actually resolved — by webpack — and replaces the
+    // deprecated node10 algorithm. It also resolves the "@/*" paths below without baseUrl.
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
+    // No baseUrl: deprecated in TypeScript 6, and unnecessary once paths are written
+    // relative to this file. The same alias exists in webpack.config.js and in
+    // jest.config.js — three places that have to agree.
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  // jest.setup.ts is named explicitly: it sits at the root rather than under src/, and
+  // this run is the only type-check it gets.
+  "include": ["src", "jest.setup.ts"],
+  // Tests live beside their sources under src/, so they are type-checked by the same
+  // `npx tsc --noEmit` run as the code. That is deliberate: it is the only type-check
+  // the tests get, since Jest transpiles through Babel and does not type-check.
+  "exclude": ["node_modules", "build", "vendor"]
 }

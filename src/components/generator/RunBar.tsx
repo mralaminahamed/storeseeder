@@ -19,6 +19,12 @@ interface RunBarProps {
   onGenerate: () => void;
   onAddBatch: () => void;
   generating: boolean;
+  /**
+   * Blocks both actions when the run cannot proceed — no target chosen, or a target
+   * that cannot represent this resource. Queueing it to the batch is blocked too,
+   * since the batch would only fail later and further from the explanation.
+   */
+  disabled?: boolean;
 }
 
 export function RunBar({
@@ -31,6 +37,7 @@ export function RunBar({
   onGenerate,
   onAddBatch,
   generating,
+  disabled = false,
 }: RunBarProps): JSX.Element {
   const generateLabel =
     count === 1
@@ -80,6 +87,7 @@ export function RunBar({
         size="lg"
         icon="layers"
         onClick={onAddBatch}
+        disabled={disabled}
         type="button"
         data-testid="add-to-batch"
       >
@@ -92,7 +100,7 @@ export function RunBar({
         size="lg"
         icon="play"
         onClick={onGenerate}
-        disabled={generating}
+        disabled={generating || disabled}
         type="button"
         data-testid="generate-btn"
       >

@@ -7,13 +7,13 @@
 
 namespace StoreSeeder\Tests\Controllers;
 
-use StoreSeeder\Controllers\Tax_Class;
+use StoreSeeder\Rest\Controllers\Tax_Class;
 use StoreSeeder\Tests\StoreSeederUnitTestCase;
 
 /**
  * Tests for the Tax_Class REST controller.
  *
- * @covers \StoreSeeder\Controllers\Tax_Class
+ * @covers \StoreSeeder\Rest\Controllers\Tax_Class
  */
 class TaxClassRESTControllerTest extends StoreSeederUnitTestCase {
 

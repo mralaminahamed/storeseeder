@@ -8,7 +8,7 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +22,30 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Attributes extends Ability {
 
 	const REST_BASE = 'attributes';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Product Attributes', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate Fluent Cart product attributes (Color, Size, Material, etc.) with option values. Returns an array of created attribute IDs, names, types, and values.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'attributes',
+			'description' => __( 'Array of generated attribute objects with id, name, type, slug, and values array.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}

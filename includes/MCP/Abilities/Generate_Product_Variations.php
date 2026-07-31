@@ -8,7 +8,7 @@
 
 namespace StoreSeeder\MCP\Abilities;
 
-use StoreSeeder\Abstracts\Ability;
+use StoreSeeder\MCP\Ability;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,6 +22,66 @@ defined( 'ABSPATH' ) || exit;
 class Generate_Product_Variations extends Ability {
 
 	const REST_BASE = 'product-variations';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function label(): string {
+		return __( 'Generate Product Variations', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function description(): string {
+		return __( 'Generate product variations (size/colour/storage combinations) for existing products. Creates variation records with unique SKUs, individual pricing, stock levels, and dimension metadata. Requires products to exist.', 'storeseeder' );
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function input_properties(): array {
+		return array(
+			'specific_product_id' => array(
+				'type'        => 'integer',
+				'description' => __( 'Generate variations only for this product ID. Omit to pick a random eligible product.', 'storeseeder' ),
+				'minimum'     => 1,
+			),
+			'exclude_product_ids' => array(
+				'type'        => 'array',
+				'description' => __( 'Array of product IDs to skip during generation.', 'storeseeder' ),
+				'items'       => array( 'type' => 'integer' ),
+				'default'     => array(),
+			),
+			'manage_stock'        => array(
+				'type'        => 'boolean',
+				'description' => __( 'Enable inventory tracking for variations. Default: true.', 'storeseeder' ),
+				'default'     => true,
+			),
+			'stock_min'           => array(
+				'type'        => 'integer',
+				'description' => __( 'Minimum stock quantity per variation. Default: 0.', 'storeseeder' ),
+				'minimum'     => 0,
+				'default'     => 0,
+			),
+			'stock_max'           => array(
+				'type'        => 'integer',
+				'description' => __( 'Maximum stock quantity per variation. Default: 100.', 'storeseeder' ),
+				'minimum'     => 1,
+				'default'     => 100,
+			),
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	protected static function output(): array {
+		return array(
+			'key'         => 'product_variations',
+			'description' => __( 'Array of generated variation objects with id, product_id, name, sku, price, stock_quantity, type, status, and attributes.', 'storeseeder' ),
+		);
+	}
 
 	/**
 	 * {@inheritdoc}
