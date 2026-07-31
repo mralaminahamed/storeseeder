@@ -145,6 +145,17 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
 `storeseeder_admin_payload`,
 `storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
 
+### A declared parameter must change the output
+
+The Products generator declared six parameter groups and read one. `price_range` was the worst:
+the admin offered a min and a max, and every product came out between 9.99 and 999.99. Anything
+declared in `generators.ts`, a controller's `get_resource_specific_params()` or an MCP ability's
+`input_properties()` has to reach `build_entity()` or a writer — and all three surfaces have to
+agree, because they are three declarations of one contract.
+
+When a parameter cannot be honoured, remove it. `Capability::supported_except()` is for a field one
+*platform* cannot store, not for one nothing implements.
+
 ### A platform-specific field is a parameter, never an entity field
 
 `Platform_Driver::fields( $resource )` returns JSON Schema fragments only that driver understands

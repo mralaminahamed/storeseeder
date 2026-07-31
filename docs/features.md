@@ -121,14 +121,22 @@ shipped:
 
 - `product_type` — `physical` | `digital` | `mixed`
 - `price_range` — `{ min, max }`
-- `categories` — `create_new`, `max_per_product`
-- `attributes` — `include_attributes`, `variation_count`
+- `track_cost` — record what the shop paid, for margin reporting
+- `categories` — `max_per_product`, drawn from categories that already exist
 - `inventory` — `manage_stock`, `stock_range`
-- `content_options` — `description_length` (`short` | `medium` | `long`), `include_images`
+- `content_options` — `description_length` (`short` | `medium` | `long`)
 
-> [!NOTE]
-> `include_images` is accepted and currently ignored — no image is generated or attached. It is
-> declared in the schema ahead of the implementation.
+Each of those changes the output. That is worth stating because until recently most of them did
+not: the generator declared six groups and read one, so the price range in the admin was decorative
+and every product came out between 9.99 and 999.99. Three parameters that no writer could ever read
+— `include_images`, `attributes.include_attributes`, `attributes.variation_count` — have been
+removed rather than left as controls that do nothing. Attributes and variations are their own
+generators; images will return when there is something to attach.
+
+A product now carries `slug`, `short_description`, `sale_price`, `cost`, `manage_stock`,
+`backorders`, `sold_individually` and a category count alongside the original fields. All of them
+exist on both shipped platforms, though not always under the same name — WooCommerce's sale price is
+Fluent Cart's compare-at price, and WooCommerce's cost of goods is Fluent Cart's item cost.
 
 ### Customers
 
