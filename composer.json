@@ -40,7 +40,9 @@
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-coding-standards/wpcs": "^3.1",
     "wp-phpunit/wp-phpunit": "^7.0",
-    "yoast/phpunit-polyfills": "^4.0"
+    "yoast/phpunit-polyfills": "^4.0",
+    "php-stubs/woocommerce-stubs": "dev-master",
+    "mralaminahamed/woocommerce-subscriptions-stubs": "^9.0.1"
   },
   "config": {
     "platform": {
@@ -134,6 +136,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/mralaminahamed/phpstan-fluent-cart-pro-stubs"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/mralaminahamed/phpstan-woocommerce-subscriptions-stubs"
     }
   ]
 }

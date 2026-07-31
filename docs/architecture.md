@@ -42,9 +42,13 @@ storeseeder/
 │       ├── Status.php              # canonical status vocabulary
 │       ├── Locale.php              # the 75 generatable locales; owns storeseeder_locales
 │       └── Drivers/
-│           └── Fluent_Cart/
-│               ├── Platform.php    # capability matrix + writer map
-│               └── Writers/        # 18 writers, one per resource
+│           ├── Fluent_Cart/
+│           │   ├── Platform.php    # capability matrix + writer map
+│           │   └── Writers/        # 18 writers, one per resource
+│           └── Woo_Commerce/
+│               ├── Platform.php    # matrix: 15 supported, 3 refused with reasons
+│               ├── Writer.php      # shared money, status and foreign-key helpers
+│               └── Writers/        # 15 writers, through WooCommerce's CRUD objects
 ├── src/                         # React admin (TypeScript)
 │   ├── index.tsx                # entry point, mounts into #storeseeder-root
 │   ├── components/              # App.tsx, Pages/, shell/, generator/, home/,
@@ -133,7 +137,22 @@ line in either direction.
 ## 🔗 The platform layer
 
 StoreSeeder used to be a Fluent Cart plugin. It is now platform-agnostic above the driver
-line, and Fluent Cart is one driver.
+line, and Fluent Cart is one driver of two.
+
+The second one, WooCommerce, is where the abstraction earned itself. Two things it forced:
+
+**A driver may refuse.** Fluent Cart stores all eighteen resources, so nothing until now had to
+answer "this platform has no such thing". WooCommerce has no transaction record (payment lives
+on the order), no order or customer labels, and no licensing — and none of those is a missing
+plugin. `Capability::unsupported( $reason )` says so and names nothing to install;
+`Capability::missing_extension()` is for subscriptions, which a plugin does provide. The
+distinction is what the admin renders as a dead end versus a link.
+
+**Writers differ more than tables do.** Fluent Cart's writers speak Eloquent; WooCommerce's go
+through `WC_Product`, `WC_Order`, `WC_Customer` and `WC_Coupon`, because the CRUD layer is what
+picks the data store (HPOS or posts), fires the hooks extensions listen for, and keeps a record
+valid across an upgrade. Both write money from the same integer minor units and both map the
+same canonical statuses — which is exactly the surface the canonical entity was for.
 
 ### A request, end to end
 
@@ -235,8 +254,8 @@ It lives on `Platform_Driver` rather than `Platform_Interface`, deliberately: ad
 to the interface would break every third-party driver that implements it directly, which is a
 documented extension point. Callers use it through `instanceof Platform_Driver`.
 
-Fluent Cart reports Fluent Cart Pro, and gates the licence resource on it. WooCommerce will
-report WooCommerce Subscriptions the same way.
+Fluent Cart reports Fluent Cart Pro, and gates the licence resource on it. WooCommerce reports
+WooCommerce Subscriptions the same way, and gates the subscription resource on it.
 
 ### Capabilities are computed, never cached
 

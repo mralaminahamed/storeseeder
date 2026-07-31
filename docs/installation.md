@@ -5,8 +5,8 @@
 - **WordPress**: 6.5 or higher
 - **PHP**: 7.4 or higher (8.0+ recommended)
 - **A supported e-commerce platform**, active. StoreSeeder writes through a platform driver
-  rather than to one fixed plugin. Fluent Cart is the only driver shipped today; EasyCommerce,
-  WooCommerce and StoreEngine are planned, and a third party can register their own.
+  rather than to one fixed plugin. Fluent Cart and WooCommerce ship today; EasyCommerce
+  and StoreEngine are planned, and a third party can register their own.
 
 StoreSeeder will **activate without any platform installed** — it declares no `Requires
 Plugins` header, deliberately, so it can be installed on a site running whichever platform you

@@ -13,6 +13,7 @@
 namespace StoreSeeder\Platforms;
 
 use StoreSeeder\Platforms\Drivers\Fluent_Cart\Platform as Fluent_Cart;
+use StoreSeeder\Platforms\Drivers\Woo_Commerce\Platform as Woo_Commerce;
 
 /**
  * Registry of available platform drivers.
@@ -97,7 +98,16 @@ final class Registry {
 		 *                                     trusted, since a filter can return
 		 *                                     whatever it likes.
 		 */
-		$platforms = apply_filters( 'storeseeder_platforms', array( new Fluent_Cart() ) );
+		$platforms = apply_filters(
+			'storeseeder_platforms',
+			array(
+				// In preference order, which is what Resolver falls back to when exactly one
+				// platform is active. Both are only *candidates* here — an inactive driver
+				// reports itself as such and is never resolved to.
+				new Fluent_Cart(),
+				new Woo_Commerce(),
+			)
+		);
 
 		$this->platforms = array();
 

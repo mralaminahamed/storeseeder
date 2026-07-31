@@ -21,6 +21,11 @@ class ResolverTest extends StoreSeederUnitTestCase {
 
 	public function setUp(): void {
 		parent::setUp();
+
+		// The base case pins a target so the rest of the suite is not testing resolution by
+		// accident. This class *is* testing resolution, so it starts from Auto.
+		remove_all_filters( 'storeseeder_target_platform' );
+
 		Registry::reset();
 		delete_option( Resolver::OPTION );
 	}
@@ -54,11 +59,42 @@ class ResolverTest extends StoreSeederUnitTestCase {
 		Registry::reset();
 	}
 
+	/**
+	 * Replace the driver list outright, rather than appending to it.
+	 *
+	 * "The only active platform" has to be something a test establishes, not something it
+	 * inherits from whichever plugins happen to be on the machine — these two cases started
+	 * failing the moment a second shipped driver existed, which was a fact about the
+	 * environment rather than about the resolver.
+	 *
+	 * @param array<int, array{0: string, 1: bool}> $specs id/active pairs.
+	 *
+	 * @return void
+	 */
+	private function only( array $specs ): void {
+		add_filter(
+			'storeseeder_platforms',
+			static function () use ( $specs ): array {
+				$platforms = array();
+
+				foreach ( $specs as $spec ) {
+					$platforms[] = new StubPlatform( $spec[0], $spec[1] );
+				}
+
+				return $platforms;
+			}
+		);
+
+		Registry::reset();
+	}
+
 	public function test_auto_resolves_the_only_active_platform(): void {
+		$this->only( array( array( 'solo-cart', true ) ) );
+
 		$platform = ( new Resolver() )->resolve();
 
 		$this->assertNotWPError( $platform );
-		$this->assertSame( 'fluent-cart', $platform->id() );
+		$this->assertSame( 'solo-cart', $platform->id() );
 	}
 
 	public function test_auto_is_ambiguous_with_two_active_platforms(): void {
@@ -96,14 +132,19 @@ class ResolverTest extends StoreSeederUnitTestCase {
 	 * cannot clear from the UI, so a stale target falls through to auto.
 	 */
 	public function test_stored_target_that_went_inactive_falls_through(): void {
-		$this->register( array( array( 'stub-cart', false ) ) );
+		$this->only(
+			array(
+				array( 'gone-cart', false ),
+				array( 'live-cart', true ),
+			)
+		);
 
-		update_option( Resolver::OPTION, 'stub-cart', false );
+		update_option( Resolver::OPTION, 'gone-cart', false );
 
 		$resolved = ( new Resolver() )->resolve();
 
 		$this->assertNotWPError( $resolved );
-		$this->assertSame( 'fluent-cart', $resolved->id() );
+		$this->assertSame( 'live-cart', $resolved->id() );
 	}
 
 	public function test_explicit_request_wins(): void {

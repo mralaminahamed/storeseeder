@@ -14,7 +14,7 @@ Generate realistic e-commerce test data with 18 generators, a platform driver pe
 
 StoreSeeder generates realistic test data for WordPress e-commerce platforms. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
 
-Where the data lands is decided by a **platform driver**, and the same eighteen generators feed every driver. **Fluent Cart is the driver included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
+Where the data lands is decided by a **platform driver**, and the same eighteen generators feed every driver. **Fluent Cart and WooCommerce are included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
 
 All data is created through the target platform's own models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with that platform's updates.
 
@@ -23,7 +23,7 @@ All data is created through the target platform's own models, so generated recor
 **Highlights**
 
 * **18 generators** — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
-* **One driver per platform** — the generators are platform-neutral, so the same fixed seed produces identical data wherever it is written. Fluent Cart ships; the driver layer is public for the rest.
+* **One driver per platform** — the generators are platform-neutral, so the same fixed seed produces identical data wherever it is written. Fluent Cart and WooCommerce ship; the driver layer is public for the rest.
 * **Modern admin** — a single-page React app (React Router v7, Tailwind CSS v4, lucide icons) that adapts to your WordPress admin color scheme.
 * **Live preview** — a read-only preview of real faker rows that refreshes as you change settings, without persisting anything.
 * **75 locales** — names, addresses, phone numbers, and postcodes in any locale FakerPHP ships a provider for. The picker offers exactly what the REST API accepts, searchable by name or code.
@@ -90,17 +90,17 @@ The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable t
 = Requirements =
 * WordPress 6.5+
 * PHP 7.4+ (8.0+ recommended)
-* One supported e-commerce platform, active. Today: Fluent Cart. StoreSeeder activates without it and tells you what is missing, rather than blocking activation — blocking would rule out every other platform.
+* One supported e-commerce platform, active. Today: Fluent Cart or WooCommerce. StoreSeeder activates without it and tells you what is missing, rather than blocking activation — blocking would rule out every other platform.
 * 256MB memory minimum (512MB for large datasets)
 * MCP integration (optional): WordPress Abilities API + `mcp-adapter` plugin
 
 == Frequently Asked Questions ==
 
 = Which e-commerce platforms are supported? =
-Fluent Cart, today, for all 18 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. Support is provided by a platform driver rather than wired into the generators, so more can be added — drivers for other platforms are planned. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
+Fluent Cart and WooCommerce today. Fluent Cart covers all 18 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. WooCommerce covers 15: subscriptions need WooCommerce Subscriptions, and transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent for them and no plugin changes that. Support is provided by a platform driver rather than wired into the generators, so more can be added. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
 
 = How does platform integration work? =
-Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models, in Fluent Cart's case — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data.
+Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models for Fluent Cart, the CRUD objects (WC_Product, WC_Order, WC_Customer) for WooCommerce — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data, and so it stays valid across that platform's updates.
 
 = Can I add support for my own platform? =
 Yes, from your own plugin and without patching this one. Register a driver on the `storeseeder_platforms` filter and the generators, REST API, and admin pick it up. A driver answers what it is called, whether it is active, which resources it supports, and which writer handles each one. See the architecture documentation for the full contract.

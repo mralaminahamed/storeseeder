@@ -50,6 +50,15 @@ parameters:
         - vendor/mralaminahamed/easycommerce-stubs/easycommerce-constants-stubs.stub
         - vendor/mralaminahamed/storeengine-stubs/storeengine-stubs.stub
         - vendor/mralaminahamed/storeengine-stubs/storeengine-constants-stubs.stub
+        # WooCommerce's own published stubs rather than generated ones — the CRUD classes
+        # (WC_Product, WC_Order, WC_Customer) are the whole surface the driver writes
+        # through, and a wrong setter name there is exactly what this catches.
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-packages-stubs.php
+        # Subscriptions extends WooCommerce's classes, so it goes after them — the same
+        # ordering the Fluent Cart Pro stubs need for the same reason.
+        - vendor/mralaminahamed/woocommerce-subscriptions-stubs/woocommerce-subscriptions-stubs.php
+        - vendor/mralaminahamed/woocommerce-subscriptions-stubs/woocommerce-subscriptions-constants-stubs.php
         # Pro's classes extend the free plugin's, so it goes after them.
         - vendor/mralaminahamed/fluent-cart-pro-stubs/fluent-cart-pro-stubs.stub
         - vendor/mralaminahamed/fluent-cart-pro-stubs/fluent-cart-pro-constants-stubs.stub
