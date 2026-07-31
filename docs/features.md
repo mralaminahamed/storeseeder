@@ -22,18 +22,18 @@ generated records carry the same validation, relationships and money handling as
 | Generator | Writes | Needs first |
 |---|---|---|
 | **Product Variations** | Extra priced variations on existing products, with unique SKUs | Products |
-| **Shipping Plans** | Shipping methods (flat rate, free shipping) attached to a zone | — |
-| **Tax Classes** | A tax class plus the geographic rate rows that make it applicable | — |
-| **Transactions** | Payment transactions against real orders | Orders |
-| **Cart Sessions** | Abandoned and active carts containing real products | Products |
 | **Attributes** | Attribute groups (Colour, Size, Material…) with terms, bound to real variations | Products |
-| **Refunds** | Full and partial refunds against existing successful charges | Transactions |
-| **Logs** | Activity log entries across orders, products, customers, coupons and subscriptions | — |
-| **Shipping Classes** | Groups of products with shared shipping requirements | — |
-| **Labels** | Labels (tags) attached to existing orders and customers | Orders, Customers |
-| **Order Tax Lines** | Per-order tax lines linking an order to a tax rate | Orders, Tax Classes |
 | **Product Downloads** | Downloadable files on products, plus download permissions on existing orders | Products, Orders |
+| **Cart Sessions** | Abandoned and active carts containing real products | Products |
+| **Transactions** | Payment transactions against real orders | Orders |
+| **Refunds** | Full and partial refunds against existing successful charges | Transactions |
 | **Subscriptions** | Subscription records against existing orders | Orders, Products |
+| **Labels** | Labels (tags) attached to existing orders and customers | Orders, Customers |
+| **Tax Classes** | A tax class plus the geographic rate rows that make it applicable | — |
+| **Order Tax Lines** | Per-order tax lines linking an order to a tax rate | Orders, Tax Classes |
+| **Shipping Plans** | Shipping methods (flat rate, free shipping) attached to a zone | — |
+| **Shipping Classes** | Groups of products with shared shipping requirements | — |
+| **Logs** | Activity log entries across orders, products, customers, coupons and subscriptions | — |
 
 Generators that build on others say so when a prerequisite is missing, naming what to generate
 first rather than failing opaquely.

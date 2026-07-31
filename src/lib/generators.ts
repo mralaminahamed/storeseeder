@@ -5,6 +5,17 @@ import type { Generator } from "@/types";
 
 export type { Generator };
 
+/**
+ * Every generator the admin offers, in the order the sidebar and the dashboard grid show
+ * them (both sort on `order` within a category).
+ *
+ * Advanced is grouped by what a generator attaches to — products, then orders, then tax,
+ * then shipping, then the standalone log — because that is how someone scans for one. The
+ * grouping is also a valid generate-in-this-order sequence: Refunds follow Transactions
+ * and Order Tax Lines follow Tax Classes, so working down the list top to bottom never
+ * hits a missing prerequisite. Reordering has to preserve both, and the earlier order
+ * preserved only the second: Shipping Plans sat at 2 with Shipping Classes at 9.
+ */
 export const generators: Generator[] = [
   {
     name: __("Products", "storeseeder"),
@@ -397,7 +408,7 @@ export const generators: Generator[] = [
   {
     name: __("Shipping Plans", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 2,
+    order: 11,
     iconName: "truck",
     description: __(
       "Generate shipping methods, zones, and rate tables. Test delivery calculations and logistics workflows.",
@@ -446,7 +457,7 @@ export const generators: Generator[] = [
   {
     name: __("Tax Classes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 3,
+    order: 9,
     iconName: "landmark",
     description: __(
       "Create tax rules and classes for different regions and product types. Perfect for testing international tax compliance.",
@@ -512,7 +523,7 @@ export const generators: Generator[] = [
   {
     name: __("Transactions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 4,
+    order: 5,
     iconName: "card",
     description: __(
       "Generate payment transaction records with multiple gateways and statuses. Test financial reporting and reconciliation.",
@@ -574,7 +585,7 @@ export const generators: Generator[] = [
   {
     name: __("Cart Sessions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 5,
+    order: 4,
     iconName: "bag",
     description: __(
       "Create shopping cart abandonment scenarios and session data. Test cart recovery systems and analytics.",
@@ -640,7 +651,7 @@ export const generators: Generator[] = [
   {
     name: __("Attributes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 6,
+    order: 2,
     iconName: "listtree",
     description: __(
       "Generate product attributes such as Text, Color, and Image types. Attributes can be used to define product variations and filtering options.",
@@ -661,7 +672,7 @@ export const generators: Generator[] = [
   {
     name: __("Refunds", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 7,
+    order: 6,
     iconName: "coins",
     description: __(
       "Generate refund records against existing orders. Requires completed or processing orders. Returns refund IDs, amounts, statuses, and transaction IDs.",
@@ -688,7 +699,7 @@ export const generators: Generator[] = [
   {
     name: __("Logs", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 8,
+    order: 13,
     iconName: "scroll",
     description: __(
       "Generate activity log entries for orders, products, customers, and system events. Useful for testing log views and audit trails.",
@@ -715,7 +726,7 @@ export const generators: Generator[] = [
   {
     name: __("Shipping Classes", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 9,
+    order: 12,
     iconName: "boxes",
     description: __(
       "Generate shipping classes that group products with similar shipping requirements, each with a cost and per-item flag.",
@@ -729,7 +740,7 @@ export const generators: Generator[] = [
   {
     name: __("Labels", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 10,
+    order: 8,
     iconName: "tags",
     description: __(
       "Generate labels (tags) and attach them to existing orders and customers. Requires existing orders or customers to attach to.",
@@ -743,7 +754,7 @@ export const generators: Generator[] = [
   {
     name: __("Order Tax Lines", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 11,
+    order: 10,
     iconName: "percent",
     description: __(
       "Generate per-order tax lines linking orders to tax rates with the tax collected. Requires existing orders and tax rates.",
@@ -757,7 +768,7 @@ export const generators: Generator[] = [
   {
     name: __("Product Downloads", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 12,
+    order: 3,
     iconName: "download",
     description: __(
       "Generate downloadable files for products and grant download permissions on existing orders. Requires existing products.",
@@ -771,7 +782,7 @@ export const generators: Generator[] = [
   {
     name: __("Subscriptions", "storeseeder"),
     category: __("Advanced", "storeseeder"),
-    order: 13,
+    order: 7,
     iconName: "repeat",
     description: __(
       "Generate subscription records against existing orders. Records seed as fixtures; charging them is your platform's job and may need a paid add-on. Requires existing orders and products.",

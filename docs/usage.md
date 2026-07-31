@@ -108,7 +108,11 @@ flowchart LR
     classDef standalone stroke-dasharray: 4 4
 ```
 
-Dashed nodes need nothing first. Working left to right, a sensible order for a demo store is:
+Dashed nodes need nothing first. The simplest route is **down the sidebar, top to bottom**:
+the list is ordered so that nothing appears before what it needs — Core first, then Advanced
+grouped by what each generator attaches to (products, orders, tax, shipping, logs).
+
+Working from the graph instead, a sensible order for a demo store is:
 
 1. **Products**, **Customers** — everything else hangs off these
 2. **Coupons**, **Tax Classes**, **Shipping Plans**, **Shipping Classes**, **Logs** — independent

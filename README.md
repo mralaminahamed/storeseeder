@@ -95,17 +95,17 @@ transactions — and each one reports clearly when a prerequisite is missing.
 | Orders | Core | Complete orders with line items, addresses, applied coupons, payment, shipping, and tax |
 | Coupons | Core | Discount codes (fixed, percentage, free shipping) with usage limits and restrictions |
 | Product Variations | Advanced | Additional priced variations attached to existing products, with unique SKUs |
-| Shipping Plans | Advanced | Shipping methods and zones with fixed and free-shipping rates |
-| Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
-| Tax Classes | Advanced | Tax classes with the geographic rate rows the platform applies to orders |
-| Order Tax Lines | Advanced | Per-order tax lines linking orders to tax rates with collected tax |
+| Attributes | Advanced | Attribute groups and terms, linked to real product variations |
+| Product Downloads | Advanced | Downloadable files for products, with download permissions on existing orders |
+| Cart Sessions | Advanced | Abandoned and completed cart sessions with real product foreign keys |
 | Transactions | Advanced | Payment transactions tied to real orders, with gateways and statuses |
 | Refunds | Advanced | Full and partial refunds against existing charge transactions |
-| Attributes | Advanced | Attribute groups and terms, linked to real product variations |
-| Cart Sessions | Advanced | Abandoned and completed cart sessions with real product foreign keys |
-| Labels | Advanced | Labels (tags) attached to existing orders and customers |
-| Product Downloads | Advanced | Downloadable files for products, with download permissions on existing orders |
 | Subscriptions | Advanced | Subscription records against existing orders (on Fluent Cart, active billing requires Pro) |
+| Labels | Advanced | Labels (tags) attached to existing orders and customers |
+| Tax Classes | Advanced | Tax classes with the geographic rate rows the platform applies to orders |
+| Order Tax Lines | Advanced | Per-order tax lines linking orders to tax rates with collected tax |
+| Shipping Plans | Advanced | Shipping methods and zones with fixed and free-shipping rates |
+| Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
 | Logs | Advanced | Activity log entries across orders, products, customers, and system events |
 
 Full per-generator detail in [docs/features.md](docs/features.md).
