@@ -41,8 +41,6 @@ module.exports = {
 		// Mirrors the `@/*` path in tsconfig.json and webpack's resolve.alias. Three
 		// places have to agree; this is the third.
 		'^@/(.*)$': '<rootDir>/src/$1',
-		// Imported for their side effect on the bundle, meaningless in a test.
-		'\\.(css|scss)$': '<rootDir>/src/test/style-mock.js',
 	},
 
 	setupFilesAfterEnv: [ '<rootDir>/src/test/setup.ts' ],

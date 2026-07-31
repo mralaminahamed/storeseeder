@@ -77,6 +77,11 @@ Four things worth knowing before adding one:
   The bare entry augments the ambient `jest.Matchers` only, so `toBeInTheDocument` would work
   at runtime and fail `tsc --noEmit`.
 
+No CSS mapping in `jest.config.js`: stylesheets are imported once by `src/index.tsx` and by
+nothing else, so no module under test ever pulls one in. If a future test does import a
+stylesheet, Jest fails loudly with "Cannot find module" and the fix is a `moduleNameMapper`
+entry pointing `\\.(css|scss)$` at a stub that exports an empty object.
+
 `src/test/setup.ts` also calls RTL's `cleanup()` after each test — React 18 leaves mounted
 trees in place otherwise, so a query in one test can match an element the previous test
 rendered. It runs before every file and resets the two browser globals the modules
@@ -545,10 +550,12 @@ here.
 - [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
 - [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)
 - [ ] `docs/external-services.md` and `readme.txt` still agree about outbound requests
-- [ ] If a driver shipped this release, the platform is added to the `readme.txt` title and
-      the `Plugin Name` header — and **only** if it shipped. The title is the strongest
-      search signal WordPress.org has, and naming a platform with no driver behind it is a
-      claim the plugin cannot honour
+- [ ] If a driver shipped this release, the platform is added to the **`readme.txt` title
+      only** — and only if it shipped. That title is the strongest search signal
+      WordPress.org has, and naming a platform with no driver behind it is a claim the
+      plugin cannot honour. The `Plugin Name` header stays the bare product name: it is what
+      the Plugins screen, the admin menu and every activation notice repeat, and a sentence
+      reads badly in all three
 
 ## 🔍 Debugging & Troubleshooting
 
