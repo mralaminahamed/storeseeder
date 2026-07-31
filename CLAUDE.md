@@ -4,9 +4,9 @@ Guidance for Claude Code working in this repository. Facts here were verified ag
 code; where a statement is a rule rather than an observation, the reason is given, because a
 rule without a reason gets worked around.
 
-`AGENTS.md` also exists and covers general coding style. Where the two disagree, this file is
-the one that was checked against the source — see **Known contradictions in AGENTS.md** at
-the end.
+[`AGENTS.md`](AGENTS.md) covers coding style and conventions and is kept deliberately free of
+architecture, so the two files cannot drift into contradicting each other the way an earlier
+version did.
 
 ## What this plugin is
 
@@ -175,19 +175,3 @@ A resource needs five pieces:
 
 A driver that declares support but ships no writer is reported as
 `storeseeder_missing_writer` rather than failing once per item.
-
-## Known contradictions in AGENTS.md
-
-Flagged rather than silently corrected. Several statements there disagree with the code:
-
-- "Method/variable names: camelCase" — the codebase is snake_case throughout.
-- "File names: snake_case with hyphens (e.g. `product-generator.php`)" — filenames are
-  PascalCase with underscores.
-- "4 spaces indentation (PHP), tabs (JS)" — reversed: PHP uses tabs, TS uses 2 spaces.
-- "Use `wc_get_template*` functions" — a WooCommerce-ism; this plugin has no templates.
-- "Jest/React Testing Library for JS tests" — there are none; frontend testing is Playwright.
-- "GeneratorBase Component" and the "Recent Improvements (2025)" section describe code that
-  no longer exists.
-- The "Reference Plugins" section names `easycommerce-fakerpress` as authoritative. That
-  relationship is inverted now: it is a fork of this codebase, and the plan is to absorb it
-  as the EasyCommerce driver and retire it.

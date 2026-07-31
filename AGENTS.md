@@ -1,110 +1,103 @@
 # Agent Instructions for storeseeder
 
-## Reference Plugins
+Coding style and conventions. Every rule below was checked against the source; where the
+codebase is inconsistent that is stated rather than smoothed over.
 
-This plugin is based on and maintains compatibility with the following reference implementations:
+**Architecture, commands, invariants and traps live in [`CLAUDE.md`](CLAUDE.md).** This file
+deliberately does not repeat them — two documents describing the same architecture is how the
+previous version of this file came to contradict the code.
 
-- **easycommerce-fakerpress**: The primary reference plugin located at `/Users/alamin/Sites/woocommerce/wp-content/plugins/easycommerce-fakerpress/`. All architectural decisions, code patterns, and tooling configurations should align with this reference implementation.
+## Related plugins
 
-## Build/Lint/Test Commands
+`easycommerce-fakerpress` is a **fork of this codebase** retargeted at EasyCommerce, not a
+reference to follow. It shares the abstract layer, the MCP layer and `fieldsFromSchema.ts`,
+and it has already drifted into real bugs — its `generators.ts` ships routes its own PHP does
+not register. The plan is to absorb it as the EasyCommerce platform driver and retire it, so
+do not treat its patterns as authoritative or copy decisions from it.
 
-### JavaScript/React
+## Build / lint / test
 
-- Build: `yarn build` or `npm run build`
-- Dev server: `yarn start` or `npm run start`
-- Update packages: `yarn packages-update`
+Full command list and the local PHPUnit environment setup are in `CLAUDE.md`. Short version:
 
-### PHP
+```bash
+composer test          # needs WP_PHPUNIT__DIR, WP_DB_PASS, WP_PATH exported — see CLAUDE.md
+composer phpcs         # scans includes/ only
+composer phpstan
+yarn build
+yarn lint:js
+npx tsc --noEmit       # not wired to a script, still catches real errors
+```
 
-- Test all: `composer test` or `phpunit`
-- Test single file: `phpunit tests/php/src/SpecificTest.php`
-- Test single method: `phpunit --filter TestClassName::testMethodName`
-- Coverage: `composer test:coverage`
-- Lint: `composer lint` or `composer phpcs`
-- Static analysis: `composer analyse` or `composer phpstan`
-- Format: `composer format` or `composer phpcbf`
+## PHP style
 
-## Code Style Guidelines
+- WordPress Coding Standards (WPCS), enforced by `composer phpcs`.
+- PSR-4 under the `StoreSeeder\` namespace, mapped to `includes/`.
+- **PHP 7.4 floor.** No union return types, `match`, enums, constructor promotion or
+  `readonly`. Document `array|WP_Error` in a docblock and omit the return type, as the
+  abstracts do.
+- **Indent with tabs.** `.editorconfig` currently declares 4 spaces for every file; that entry
+  is wrong for PHP, and the code is tab-indented throughout. Follow the code.
+- **Class names are PascalCase, underscores allowed**: `Product`, `Order_Tax_Rate`,
+  `Platform_Driver`, `MCP_Server`. Names like `ProductGenerator` appear only as import
+  aliases, never as declarations.
+- **Filenames match the class**, so also PascalCase with underscores: `Order_Tax_Rate.php`.
+  This is a PSR-4/WPCS hybrid permitted by two sniff exclusions in `phpcs.xml` — do not
+  "correct" them to `class-*.php`.
+- **Methods and variables are `snake_case`**: `build_entity()`, `get_resource_type()`,
+  `$resource_type`. Not camelCase.
+- `$resource` is rejected by WPCS as a reserved name. Use `$resource_type`.
+- PHPDoc on every class, method and property. Single quotes for strings unless interpolating.
+- Errors are `WP_Error` with a specific code and a message that says what to do next;
+  `try/catch` around anything a platform model might throw from.
+- Singletons exist and are deliberate — `StoreSeeder`, `Platforms\Registry`. Everything below
+  them takes its collaborators as arguments (`Resolver` accepts a `Registry`, generators are
+  handed a platform, writers are handed a faker), so prefer that for new code rather than
+  reaching for global state.
 
-### PHP
+## TypeScript / React style
 
-- Follow WordPress coding standards (WPCS)
-- Use PSR-4 autoloading (`StoreSeeder\` namespace)
-- PHP 7.4+ minimum, support up to current WordPress requirements
-- Class names: PascalCase (e.g., `ProductGenerator`)
-- Method/variable names: camelCase
-- File names: snake_case with hyphens (e.g., `product-generator.php`)
-- Use `wc_get_template*` functions for loading templates, never create custom class or functions
-- PHPDoc comments for all classes, methods, and properties
-- Dependency injection over global state
-- Proper error handling with try/catch and WP_Error
+- TypeScript everywhere in `src/`. Functional components with hooks; no class components.
+- **Indent with 2 spaces.**
+- **Double quotes** for strings and import paths. A handful of older files use single quotes;
+  match the file you are editing rather than reformatting it.
+- Import order as observed: React and other external packages, then `@wordpress/*`, then local
+  `@/…` paths.
+- `camelCase` for variables and functions, `PascalCase` for components.
+- Tailwind CSS v4 for styling. Component styles that outgrow utilities go in
+  `src/components.css`, which is plain CSS scoped under `.fp-root`.
+- All user-facing strings through `@wordpress/i18n`, with `sprintf` for interpolation and a
+  `/* translators: */` comment for every placeholder.
+- `async`/`await` with `try/catch` for API calls.
+- No `console.log` in shipped code — ESLint has `no-console` at warn.
+- **Font weights are round hundreds only**: 400, 500, 600, 700. No 350/450/550.
 
-### JavaScript/React
+## Testing
 
-- ES6+ syntax with WordPress ESLint rules
-- Functional components with hooks (no class components)
-- Import order: WordPress core, external libraries, local components
-- camelCase for variables/functions, PascalCase for components
-- Use Tailwind CSS for styling
-- Proper i18n with `@wordpress/i18n`
-- Async/await for API calls with try/catch error handling
-- TypeScript for type safety in all files
+- **PHP: PHPUnit**, under `tests/php/src/`, mirroring the `includes/` layout. New behaviour
+  needs a test; a bug fix needs the test that would have caught it.
+- **Frontend: Playwright**, under `tests/e2e/`. There is no Jest and no React Testing Library
+  in this project — do not add imports assuming otherwise.
+- `tests/e2e/setup.sh` resets the admin password. Never run it, or `yarn test:e2e`, against a
+  site whose credentials matter without asking first.
+- The current baseline is **256 tests, 1052 assertions**. A refactor claiming no behaviour
+  change must return that number identically, not merely pass.
 
-### General
+## General
 
-- Conventional commits: `type(scope): description`
-- No console.log in production code (warn level in ESLint)
-- Prefer const over let/var, arrow functions
-- Single quotes for strings (PHP), template literals for JS
-- 4 spaces indentation (PHP), tabs (JS per WordPress standards)
+- Conventional commits: `type(scope): description`. Explain *why* in the body, not what the
+  diff already shows.
+- Prefer `const`; arrow functions for callbacks.
+- Keep functions and components small and single-purpose; extract shared logic to `src/lib/`
+  or a PHP abstract rather than duplicating it.
+- Update `README.md` for user-visible changes, `CHANGELOG.md` for releases, and
+  `docs/external-services.md` plus `readme.txt` together whenever outbound-request behaviour
+  changes — those two have contradicted each other before.
+- Match the surrounding code's comment density. Comments here explain *why* a value or
+  workaround exists, and several encode schema facts learned by debugging, so do not delete
+  them when moving code.
 
-## Project Structure & Architecture
+## Adding a generator
 
-### Generator System
-
-- **PHP Generators**: `includes/Generators/Resources/` - shape data; name no platform
-- **Controllers**: `includes/Controllers/Resources/` - REST endpoints, resolve the target platform
-- **Platform drivers**: `includes/Platforms/Drivers/<Platform>/` - writers that persist data
-- **React Components**: `src/components/` - Frontend UI
-- **Data Flow**: React → REST → Controller → Generator (canonical entity) → Writer → platform models
-
-### Key Patterns Established
-
-- **Generator Data Structures**: All generators now provide complete data structures matching Fluent Cart model expectations
-- **Dependency Injection**: Controllers use generator instances via `get_generator_instance()`
-- **Parameter Validation**: REST endpoints validate parameters using JSON Schema configurations
-- **Error Handling**: Consistent WP_Error usage with proper error codes and messages
-
-### Recent Improvements (2025)
-
-- **Order Generator**: Fixed data structure to include subtotal, tax_amount, shipping_amount, discount_amount, currency, addresses, notes, coupons
-- **GeneratorBase Component**: Added `dependsOn` support for conditional form fields
-- **API Consistency**: All React components now call correct REST endpoints matching PHP controllers
-- **Code Quality**: Fixed all PHP coding standard violations and short ternary operators
-
-## Copilot Instructions
-
-- Follow WordPress PHP coding standards for all PHP files
-- Use ES6+ syntax for JavaScript/React code in `src/` directory
-- Use Tailwind CSS for styling in frontend components
-- Ensure code is linted and formatted before committing
-- Write clear, self-documenting code and add comments where necessary
-- Prefer functional components and hooks in React
-- Use dependency injection and avoid global state in PHP classes
-- Keep functions and components small and focused
-- Avoid duplicating code; use shared utilities/components
-- Add or update tests for new features and bug fixes
-- Use PHPUnit for PHP tests and Jest/React Testing Library for JS/React tests
-- Update README.md for major changes or new features
-- Document public APIs and important functions/classes
-- Use Copilot to suggest code, but always review and test before committing
-- Do not accept Copilot suggestions that violate project standards or introduce security risks
-- Refactor Copilot-generated code to match project conventions if needed
-
-### Generator Development Guidelines
-
-- **Data Structure Alignment**: Ensure generator `create()` calls match Fluent Cart model expectations exactly
-- **Parameter Dependencies**: Use `dependsOn` in React parameter configs for conditional fields
-- **API Endpoint Naming**: REST bases should be plural (e.g., `products`, `customers`)
-- **Result Formatting**: Return consistent result arrays with `id`, `message`, and relevant metadata
-- **Error Handling**: Use WP_Error with descriptive error codes and user-friendly messages
+Five pieces, listed with paths in `CLAUDE.md`. The rule worth repeating: **a generator may not
+name a platform** — no models, no table names, no platform status strings, no database reads.
+Persistence belongs to a writer.
