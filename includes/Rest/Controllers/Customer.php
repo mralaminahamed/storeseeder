@@ -92,28 +92,82 @@ class Customer extends Controller {
 	 */
 	protected function get_resource_specific_params(): array {
 		return array(
-			'customer_type'      => array(
-				'description'       => __( 'Type of customers to generate.', 'storeseeder' ),
-				'type'              => 'string',
-				'enum'              => array( 'individual', 'business', 'mixed' ),
-				'default'           => 'mixed',
-				'sanitize_callback' => 'sanitize_text_field',
-			),
-			'country_focus'      => array(
-				'description' => __( 'Focus generation on specific countries.', 'storeseeder' ),
-				'type'        => 'array',
-				'items'       => array(
+			// `customer_type` — singular, and enumerating individual/business/mixed — used to live
+			// here while the admin and the MCP ability both declared `customer_types` with five
+			// entirely different values. Nothing read either. One name and one vocabulary now.
+			'customer_types'      => array(
+				'description'       => __( 'Customer segments to draw from.', 'storeseeder' ),
+				'type'              => 'array',
+				'items'             => array(
 					'type' => 'string',
+					'enum' => array( 'regular', 'vip', 'wholesale', 'guest', 'returning' ),
 				),
+				'default'           => array( 'regular', 'returning' ),
+				'sanitize_callback' => array( $this, 'sanitize_array' ),
+			),
+			'country_focus'       => array(
+				'description' => __( 'Two-letter country codes to draw addresses from.', 'storeseeder' ),
+				'type'        => 'array',
+				'items'       => array( 'type' => 'string' ),
 				'default'     => array(),
 			),
-			'include_history'    => array(
-				'description' => __( 'Include purchase history and loyalty data.', 'storeseeder' ),
+			'demographics'        => array(
+				'description' => __( 'Demographic distribution.', 'storeseeder' ),
+				'type'        => 'object',
+				'properties'  => array(
+					'age_groups' => array(
+						'description' => __( 'Age groups to draw birth dates from.', 'storeseeder' ),
+						'type'        => 'array',
+						'items'       => array(
+							'type' => 'string',
+							'enum' => array( '18-25', '26-35', '36-45', '46-55', '56-65', '65+' ),
+						),
+					),
+				),
+			),
+			'address_preferences' => array(
+				'description' => __( 'Address generation preferences.', 'storeseeder' ),
+				'type'        => 'object',
+				'properties'  => array(
+					'include_shipping'          => array(
+						'description' => __( 'Generate a shipping address. Off leaves it the same as billing.', 'storeseeder' ),
+						'type'        => 'boolean',
+						'default'     => true,
+					),
+					'different_addresses_ratio' => array(
+						'description' => __( 'Percentage whose shipping address differs from billing.', 'storeseeder' ),
+						'type'        => 'integer',
+						'minimum'     => 0,
+						'maximum'     => 100,
+						'default'     => 30,
+					),
+				),
+			),
+			'contact_preferences' => array(
+				'description' => __( 'Contact and communication preferences.', 'storeseeder' ),
+				'type'        => 'object',
+				'properties'  => array(
+					'phone_numbers'          => array(
+						'description' => __( 'Include phone numbers.', 'storeseeder' ),
+						'type'        => 'boolean',
+						'default'     => true,
+					),
+					'marketing_opt_in_ratio' => array(
+						'description' => __( 'Percentage opted in to marketing.', 'storeseeder' ),
+						'type'        => 'integer',
+						'minimum'     => 0,
+						'maximum'     => 100,
+						'default'     => 60,
+					),
+				),
+			),
+			'include_history'     => array(
+				'description' => __( 'Generate purchase-history metadata. This writes lifetime totals; it does not create orders.', 'storeseeder' ),
 				'type'        => 'boolean',
 				'default'     => true,
 			),
-			'loyalty_tier_focus' => array(
-				'description' => __( 'Focus on specific loyalty tiers.', 'storeseeder' ),
+			'loyalty_tier_focus'  => array(
+				'description' => __( 'Loyalty tiers to draw from. Where set, the tier is chosen from this list rather than derived from spend.', 'storeseeder' ),
 				'type'        => 'array',
 				'items'       => array(
 					'type' => 'string',
@@ -121,11 +175,11 @@ class Customer extends Controller {
 				),
 				'default'     => array(),
 			),
-			'account_status'     => array(
-				'description' => __( 'Account status for generated customers.', 'storeseeder' ),
+			'account_status'      => array(
+				'description' => __( 'Account status for generated customers. `mixed` spreads across all three.', 'storeseeder' ),
 				'type'        => 'string',
-				'enum'        => array( 'active', 'inactive', 'pending' ),
-				'default'     => 'active',
+				'enum'        => array( 'active', 'inactive', 'pending', 'mixed' ),
+				'default'     => 'mixed',
 			),
 		);
 	}
