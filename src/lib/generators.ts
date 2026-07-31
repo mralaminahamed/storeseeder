@@ -278,9 +278,11 @@ export const generators: Generator[] = [
     resource: "coupon",
     parameterConfig: {
       discount_types: {
+        // `products` was offered here and accepted by nothing — the endpoint's enum has never
+        // included it, so choosing it failed the request.
         description: __("Types of discount coupons to generate", "storeseeder"),
         type: "array",
-        items: { type: "string", enum: ["percentage", "fixed", "free_shipping", "products"] },
+        items: { type: "string", enum: ["percentage", "fixed", "free_shipping"] },
         default: ["percentage", "fixed"],
       },
       discount_range: {
