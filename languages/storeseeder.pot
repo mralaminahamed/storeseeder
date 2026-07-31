@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T22:11:10+00:00\n"
+"POT-Creation-Date: 2026-07-31T22:29:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -450,24 +450,24 @@ msgstr ""
 msgid "Generates realistic customer profiles with comprehensive personal information, billing/shipping addresses, preferences, purchase history, loyalty tiers, and engagement metrics for testing customer management systems."
 msgstr ""
 
-#: includes/Generation/Generators/Customer.php:631
+#: includes/Generation/Generators/Customer.php:905
 #: includes/Generation/Generators/Product.php:255
 msgid "Name"
 msgstr ""
 
-#: includes/Generation/Generators/Customer.php:635
+#: includes/Generation/Generators/Customer.php:909
 msgid "Email"
 msgstr ""
 
-#: includes/Generation/Generators/Customer.php:639
+#: includes/Generation/Generators/Customer.php:913
 msgid "City"
 msgstr ""
 
-#: includes/Generation/Generators/Customer.php:643
+#: includes/Generation/Generators/Customer.php:917
 msgid "Country"
 msgstr ""
 
-#: includes/Generation/Generators/Customer.php:647
+#: includes/Generation/Generators/Customer.php:921
 #: includes/Generation/Generators/Order.php:45
 #: build/admin-app.js:4
 #: build/admin-app.js:15
@@ -758,30 +758,46 @@ msgid "Generate realistic WordPress customer accounts with billing/shipping addr
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Customers.php:47
-msgid "Customer segment types to mix. Allowed values: regular, vip, wholesale, guest, returning. Default: [\"regular\",\"returning\"]."
+msgid "Customer segments to mix. Allowed: regular, vip, wholesale, guest, returning. A guest holds no account, a wholesale buyer always carries a company, a returning customer has definitely bought something. Default: [\"regular\",\"returning\"]."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:53
-msgid "Generate billing addresses. Default: true."
+#: includes/MCP/Abilities/Generate_Customers.php:56
+msgid "Two-letter country codes to draw addresses from. Default: the sample data's own spread."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:58
-msgid "Generate shipping addresses. Default: true."
+#: includes/MCP/Abilities/Generate_Customers.php:61
+msgid "Age groups to draw birth dates from. Allowed: 18-25, 26-35, 36-45, 46-55, 56-65, 65+. A third of customers give no birth date at all."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:63
-msgid "Percentage of customers with a different shipping address (0–100). Default: 30."
+#: includes/MCP/Abilities/Generate_Customers.php:69
+msgid "Generate a shipping address. False leaves it the same as billing. Default: true."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:70
-msgid "Populate realistic purchase history metadata (order counts, spend totals, loyalty tier). Default: true."
+#: includes/MCP/Abilities/Generate_Customers.php:74
+msgid "Percentage of customers whose shipping address differs from billing (0–100). Default: 30."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:75
-msgid "Percentage of customers opted into marketing emails (0–100). Default: 65."
+#: includes/MCP/Abilities/Generate_Customers.php:81
+msgid "Include phone numbers. Default: true."
 msgstr ""
 
-#: includes/MCP/Abilities/Generate_Customers.php:89
+#: includes/MCP/Abilities/Generate_Customers.php:86
+msgid "Percentage of customers opted into marketing (0–100). Default: 60."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:93
+msgid "Populate lifetime totals, loyalty tier and purchase dates. This is metadata, not orders — use generate-orders for those. Default: true."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:98
+msgid "Loyalty tiers to draw from. Where set, the tier is chosen from this list rather than derived from spend. Allowed: bronze, silver, gold, platinum."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:106
+msgid "Account status for generated customers. `mixed` spreads across all three. Default: mixed."
+msgstr ""
+
+#: includes/MCP/Abilities/Generate_Customers.php:119
 msgid "Array of generated customer objects with id, name, email, billing_country, loyalty_tier, total_orders, and total_spent."
 msgstr ""
 
@@ -1230,7 +1246,7 @@ msgstr ""
 msgid "A user with this email address already exists."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:90
+#: includes/Platforms/Drivers/Fluent_Cart/Writers/Customer.php:111
 msgid "Failed to create customer using Fluent Cart model."
 msgstr ""
 
@@ -1470,7 +1486,7 @@ msgstr ""
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:66
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Coupon.php:184
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:60
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:149
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:171
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:74
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Log.php:137
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Order.php:58
@@ -1513,7 +1529,7 @@ msgstr ""
 msgid "free shipping"
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:103
+#: includes/Platforms/Drivers/Woo_Commerce/Writers/Customer.php:106
 msgid "Failed to create the customer."
 msgstr ""
 
@@ -1637,21 +1653,21 @@ msgid "More than one supported platform is active. Choose which one to seed."
 msgstr ""
 
 #. translators: %s: canonical resource name, e.g. product.
-#: includes/Platforms/Writer.php:118
+#: includes/Platforms/Writer.php:161
 #, php-format
 msgid "This platform cannot remove generated %s records automatically."
 msgstr ""
 
 #. translators: %s: canonical resource name, e.g. license.
 #. translators: %s: canonical resource name, e.g. brand.
-#: includes/Platforms/Writer.php:150
-#: includes/Platforms/Writer.php:265
+#: includes/Platforms/Writer.php:193
+#: includes/Platforms/Writer.php:308
 #, php-format
 msgid "The plugin that stores generated %s records is no longer active."
 msgstr ""
 
 #. translators: 1: canonical resource name, 2: database error message.
-#: includes/Platforms/Writer.php:169
+#: includes/Platforms/Writer.php:212
 #, php-format
 msgid "Could not remove a generated %1$s record: %2$s"
 msgstr ""
@@ -1887,27 +1903,59 @@ msgstr ""
 msgid "Generated coupons data."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:96
-msgid "Type of customers to generate."
+#: includes/Rest/Controllers/Customer.php:99
+msgid "Customer segments to draw from."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:103
-msgid "Focus generation on specific countries."
+#: includes/Rest/Controllers/Customer.php:109
+msgid "Two-letter country codes to draw addresses from."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:111
-msgid "Include purchase history and loyalty data."
+#: includes/Rest/Controllers/Customer.php:115
+msgid "Demographic distribution."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:116
-msgid "Focus on specific loyalty tiers."
+#: includes/Rest/Controllers/Customer.php:119
+msgid "Age groups to draw birth dates from."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:125
-msgid "Account status for generated customers."
+#: includes/Rest/Controllers/Customer.php:129
+msgid "Address generation preferences."
 msgstr ""
 
-#: includes/Rest/Controllers/Customer.php:143
+#: includes/Rest/Controllers/Customer.php:133
+msgid "Generate a shipping address. Off leaves it the same as billing."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:138
+msgid "Percentage whose shipping address differs from billing."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:147
+msgid "Contact and communication preferences."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:151
+msgid "Include phone numbers."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:156
+msgid "Percentage opted in to marketing."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:165
+msgid "Generate purchase-history metadata. This writes lifetime totals; it does not create orders."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:170
+msgid "Loyalty tiers to draw from. Where set, the tier is chosen from this list rather than derived from spend."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:179
+msgid "Account status for generated customers. `mixed` spreads across all three."
+msgstr ""
+
+#: includes/Rest/Controllers/Customer.php:197
 msgid "Generated customers data."
 msgstr ""
 
@@ -2330,7 +2378,11 @@ msgid "Store owners, CRM developers, membership site testers"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Types of customers to generate"
+msgid "Customer segments to draw from"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Countries to draw addresses from"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2338,7 +2390,7 @@ msgid "Demographic distribution"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Age group distribution"
+msgid "Age groups to draw birth dates from"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2346,27 +2398,11 @@ msgid "Address generation preferences"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Include billing addresses"
+msgid "Generate a shipping address (off leaves it the same as billing)"
 msgstr ""
 
 #: build/admin-app.js:4
-msgid "Include shipping addresses"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Percentage with different billing/shipping (0–100)"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Purchase history simulation"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Generate purchase history metadata"
-msgstr ""
-
-#: build/admin-app.js:4
-msgid "Include loyalty tier assignments"
+msgid "Percentage whose shipping address differs from billing (0–100)"
 msgstr ""
 
 #: build/admin-app.js:4
@@ -2379,6 +2415,18 @@ msgstr ""
 
 #: build/admin-app.js:4
 msgid "Percentage opted in for marketing (0–100)"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Generate purchase-history metadata (lifetime totals, not orders)"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Loyalty tiers to draw from, instead of deriving the tier from spend"
+msgstr ""
+
+#: build/admin-app.js:4
+msgid "Account status for generated customers"
 msgstr ""
 
 #: build/admin-app.js:4
