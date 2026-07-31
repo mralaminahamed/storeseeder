@@ -21,6 +21,7 @@ use StoreSeeder\Generation\Purge;
 use StoreSeeder\MCP\MCP_Server;
 use StoreSeeder\MCP\Settings as MCP_Settings;
 use StoreSeeder\Platforms\Locale;
+use StoreSeeder\Platforms\Platform_Driver;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver as Platform_Resolver;
 use StoreSeeder\Rest\Registry as Rest_Registry;
@@ -1021,6 +1022,10 @@ class StoreSeeder {
 				'active'   => $platform->is_active(),
 				'version'  => $platform->version(),
 				'supports' => $supports,
+				// Keyed by resource, so the generator page can merge this platform's own
+				// parameters into the form when it is the target — and leave another
+				// platform's out rather than offering a control that would be ignored.
+				'fields'   => $platform instanceof Platform_Driver ? $platform->all_fields() : array(),
 			);
 		}
 

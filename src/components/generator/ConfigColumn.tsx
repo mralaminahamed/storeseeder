@@ -1,12 +1,12 @@
 import React from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 import { Icon } from "@/lib/icons";
 import { SectionLabel } from "@/components/ui/section-label";
 import { fieldsFromSchema, asParamValue } from "@/lib/fieldsFromSchema";
 import { getPath } from "@/lib/paths";
 import type { ParamBag } from "@/lib/paths";
 import { Field } from "@/components/generator/FieldSection";
-import type { Capability, Generator, ParamValue, PlatformInfo } from "@/types";
+import type { Capability, Generator, ParamValue, ParameterConfig, PlatformInfo } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Dependency notes keyed by generator route
@@ -37,6 +37,15 @@ interface ConfigColumnProps {
   onPickTarget?: (id: string) => void;
   /** Set when the chosen platform cannot represent this resource. */
   unsupported?: Capability | null;
+  /**
+   * Extra parameters the *target* platform understands, merged into the form.
+   *
+   * Only the target's. Rendering another platform's field would offer a control the run then
+   * ignores, which is the failure the whole seam exists to prevent.
+   */
+  platformFields?: Record<string, ParameterConfig>;
+  /** Canonical fields the target stores this resource without. */
+  ignoredFields?: string[];
 }
 
 /**
@@ -51,9 +60,17 @@ export function ConfigColumn({
   platforms = [],
   onPickTarget,
   unsupported = null,
+  platformFields = {},
+  ignoredFields = [],
 }: ConfigColumnProps): JSX.Element {
   const depNote = DEP[generator.route]?.();
-  const sections = fieldsFromSchema(generator.parameterConfig ?? {});
+  // The target's own parameters are merged last so a platform field is visible beside the
+  // canonical ones — and only the target's, because another platform's would be a control the
+  // run ignores. See Platform_Driver::fields().
+  const sections = fieldsFromSchema({
+    ...(generator.parameterConfig ?? {}),
+    ...platformFields,
+  });
   const hasFields =
     sections.length > 0 && sections.some((s) => s.fields.length > 0);
 
@@ -131,6 +148,21 @@ export function ConfigColumn({
       )}
 
       {/* Dependency note */}
+      {/* Supported but incomplete. The alternative is a control that appears to work, which is
+          the bug the capability's ignored-field list was added to stop. */}
+      {ignoredFields.length > 0 && (
+        <p className="fp-config-note" data-testid="ignored-fields">
+          {sprintf(
+            /* translators: %s: comma-separated list of field names. */
+            __(
+              "This platform stores %s differently, so those settings are ignored on a run.",
+              "storeseeder",
+            ),
+            ignoredFields.join(", "),
+          )}
+        </p>
+      )}
+
       {depNote && (
         <div className="fp-dep">
           <Icon name="info" size={15} />
