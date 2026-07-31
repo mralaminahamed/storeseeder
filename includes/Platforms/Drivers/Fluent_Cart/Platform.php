@@ -195,6 +195,11 @@ final class Platform extends Platform_Driver {
 		// nothing in its coupon validation knows about sale prices.
 		$matrix[ Resource::COUPON ] = Capability::supported_except( array( 'maximum_amount', 'exclude_sale_items' ) );
 
+		// `fct_order_transactions.order_id` is a NOT NULL foreign key into fct_orders, so a
+		// transaction that belongs to no order cannot exist here — which is what asking for
+		// `associate_with_orders` off would mean.
+		$matrix[ Resource::TRANSACTION ] = Capability::supported_except( array( 'associate_with_orders' ) );
+
 		if ( ! $this->is_pro_active() ) {
 			$matrix[ Resource::LICENSE ] = Capability::missing_extension(
 				self::PRO_SLUG,
