@@ -4,7 +4,6 @@ Tags: test data, dummy data, sample data, demo content, faker
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Requires Plugins: fluent-cart
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +16,7 @@ StoreSeeder generates realistic test data for the Fluent Cart e-commerce platfor
 
 All data is created through native Fluent Cart models, so generated records respect the same validation, relationships, and business logic as real data and stay compatible with Fluent Cart updates.
 
-**Sample data is optional and consent-based.** StoreSeeder can download locale-specific reference data (product names, addresses, customer tags) from GitHub to make generated content more realistic. This never happens automatically — it runs only after you accept a one-time consent prompt on the plugin's admin page, transmits no data about your site, and can be declined without losing any functionality (generators fall back to built-in defaults). You can change the decision at any time from Settings.
+**Sample data is optional and consent-based.** StoreSeeder can download locale-specific reference data (product names, addresses, customer tags) from GitHub to make generated content more realistic. Nothing is downloaded until you accept a one-time consent prompt on the plugin's admin page. After that, StoreSeeder will re-fetch the files if they go missing. No data about your site is ever transmitted, and declining costs you no functionality — generators fall back to built-in defaults. You can change the decision at any time from Settings.
 
 **Highlights**
 
@@ -141,7 +140,7 @@ StoreSeeder connects to two external services. Neither is contacted on activatio
 
 **1. GitHub — sample data repository**
 
-Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator accepts the consent prompt on the plugin admin page — that prompt is the only way permission is granted. Until it is, "Sync now" and "Force re-sync" on the Settings page open the prompt instead of downloading. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
+Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator accepts the consent prompt on the plugin admin page — that prompt is the only way permission is granted. Until it is, "Sync now" and "Force re-sync" on the Settings page open the prompt instead of downloading. Once permission is on record, opening the admin page re-fetches the files if they are missing. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
 
 **2. WordPress.org — plugin directory API**
 

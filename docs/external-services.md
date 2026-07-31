@@ -32,7 +32,7 @@ has no sample data.
 |---|---|
 | **Service** | GitHub |
 | **Endpoint** | `https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/trunk.zip` |
-| **When the request happens** | Only after an administrator has accepted the consent prompt on the plugin admin page: by the prompt's own approval button, or by **Sync now** / **Force re-sync** in Settings once permission is already on record. Never on activation, and never on a schedule. |
+| **When the request happens** | Only after an administrator has accepted the consent prompt on the plugin admin page. Three cases: the prompt's own approval button; **Sync now** / **Force re-sync** in Settings once permission is on record; and opening the plugin admin page when permission is already granted but the extracted files are missing, which re-downloads them silently. Never before permission is granted, never on activation, and never on a schedule. |
 | **Made by** | The site's PHP process, via the WordPress HTTP API |
 | **Data sent** | An unauthenticated HTTP `GET`. No site, user, or store data is included — only the request itself, plus the IP address and user agent inherent to any HTTP request. |
 | **Data received** | A ZIP archive of JSON reference files, extracted into `wp-content/uploads/storeseeder-sample-data-fluent-cart/` |

@@ -1,21 +1,21 @@
 # StoreSeeder Documentation
 
-Generate realistic test data for Fluent Cart stores. Start with the [project README](../README.md)
-for the overview; these pages go deeper.
+Generate realistic test data for WordPress e-commerce stores. Start with the
+[project README](../README.md) for the overview; these pages go deeper.
 
 ## Using StoreSeeder
 
 | Page | What it covers |
 |------|----------------|
-| [Installation](installation.md) | Requirements, install from a release zip or from source, activation with Fluent Cart |
-| [Usage](usage.md) | Running generators, live preview, batch queue, settings, and run history |
+| [Installation](installation.md) | Requirements, install from a release zip or from source, choosing a target platform |
+| [Usage](usage.md) | Running generators, live preview, the batch queue, settings, run history, and the REST API |
 | [Features](features.md) | The 17 generators and what each one writes into the store |
 
 ## Building on StoreSeeder
 
 | Page | What it covers |
 |------|----------------|
-| [Architecture](architecture.md) | Request flow from the React admin through REST controllers, generators, and Fluent Cart models |
+| [Architecture](architecture.md) | Request flow from the React admin through REST controllers and generators to a platform writer |
 | [Development](development.md) | Local setup, build and test commands, coding standards, adding a generator, release process |
 
 ## Project
@@ -31,10 +31,13 @@ for the overview; these pages go deeper.
 
 ## Reference
 
-- REST API — every generator at `storeseeder/v1/<resource>/generate`, plus a read-only preview route;
-  all endpoints require the `manage_options` capability
-- Hooks — filters and actions across the generation lifecycle, described in
-  [architecture.md](architecture.md) with copy-paste examples in the
+- **REST API** — every generator exposes `POST storeseeder/v1/<rest-base>/generate` and
+  `POST storeseeder/v1/<rest-base>/preview`, plus `GET /platforms`, `POST /platforms/target`,
+  and the sample-data routes. All require the `manage_options` capability. The REST base is
+  not always the resource name: `cart_session` is served at `cart-sessions` and `tax_class` at
+  `tax_classes`. [Usage](usage.md#rest-api) lists all seventeen.
+- **Hooks** — filters and actions across the generation lifecycle, described in
+  [architecture.md](architecture.md#extension-points) with copy-paste examples in the
   [README](../README.md#extensibility)
 - [`readme.txt`](../readme.txt) — WordPress plugin directory metadata; together with the plugin header
   it is the source of truth for version and compatibility numbers
