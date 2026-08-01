@@ -543,6 +543,22 @@
 .fp-root .fp-seg-btn { flex:1; height:calc(var(--ctl-h) - 6px); border:none; background:none; border-radius:var(--r-sm); font-size:var(--fs-ctl-sm); font-weight:500; color:var(--text-2); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
 .fp-root .fp-seg-btn.on { background:var(--surface); color:var(--text); box-shadow:var(--shadow-sm); }
 
+/* ===== page tabs =====
+   An underline strip, not a segmented pill. `.fp-seg` is a control for choosing a value and sits inside
+   a field; this navigates between regions of a page and sits under its heading, so it reads as part of
+   the page's structure rather than as something to set. The rule spans the measure so the panel below
+   is visibly attached to the selected tab. */
+.fp-root .fp-tabs { display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:var(--mb-section); }
+.fp-root .fp-tab { display:flex; align-items:center; gap:7px; padding:10px 14px; border:none; background:none; cursor:pointer; font-size:var(--fs-ctl); font-weight:500; color:var(--text-3); border-bottom:2px solid transparent; margin-bottom:-1px; }
+.fp-root .fp-tab:hover { color:var(--text); }
+.fp-root .fp-tab.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+.fp-root .fp-tab-ic { flex-shrink:0; }
+.fp-root .fp-tab-badge { font-size:var(--fs-micro); font-family:var(--font-mono); background:var(--surface-inset); color:var(--text-faint); padding:1px 6px; border-radius:var(--r-full); }
+.fp-root .fp-tab.on .fp-tab-badge { background:var(--accent-soft); color:var(--accent); }
+/* The panel is a focus destination, not a focus ring: the strip above already shows where you are. */
+.fp-root .fp-tabpanel:focus { outline:none; }
+.fp-root .fp-tabpanel:focus-visible { outline:2px solid var(--accent); outline-offset:4px; border-radius:var(--r-md); }
+
 /* ===== batch tray ===== */
 .fp-root .fp-batch { position:fixed; top:var(--fp-admin-bar, 32px); right:0; bottom:0; width:380px; background:var(--surface); border-left:1px solid var(--border); box-shadow:var(--shadow-pop); z-index:160; display:flex; flex-direction:column; animation:fp-slide-in .22s cubic-bezier(.2,.8,.2,1) both; }
 .fp-root .fp-batch-body { flex:1; overflow-y:auto; padding:calc(var(--pad-panel-y) - 4px) var(--pad-panel-x); }

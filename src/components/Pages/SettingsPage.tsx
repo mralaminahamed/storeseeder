@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useCallback, useEffect } from "@wordpress/element";
 import { __, _n, sprintf } from "@wordpress/i18n";
+import { useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Seg } from "@/components/ui/Seg";
@@ -47,6 +48,7 @@ import { fetchRecipesStatus, routeRows, syncRecipes } from "@/lib/recipes";
 import type { RecipesStatus } from "@/lib/recipes";
 import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { PageHead } from "@/components/ui/PageHead";
+import { TabPanel, Tabs } from "@/components/ui/Tabs";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { useTheme, type Density, type Theme } from "@/theme/useTheme";
@@ -162,7 +164,43 @@ function SetCard({
 // SettingsPage
 // ---------------------------------------------------------------------------
 
+/**
+ * The three scopes, as tabs.
+ *
+ * These are the scopes the page was already grouped by — who a change affects — so the tabs are the
+ * grouping made navigable rather than a new organisation invented on top of it. One long column meant
+ * 4,733px of scroll, five and a half screens, with the Danger zone at the very bottom: the most
+ * consequential controls were the furthest from where you land.
+ */
+const TABS = [
+  { id: "site", label: __("This site", "storeseeder"), ic: "globe" },
+  { id: "you", label: __("Your preferences", "storeseeder"), ic: "sliders" },
+  { id: "plugin", label: __("Plugin", "storeseeder"), ic: "plug" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+const TAB_IDS: readonly string[] = TABS.map((t) => t.id);
+
 export default function SettingsPage() {
+  /*
+   * In the URL, not in component state, so a tab is linkable and the browser's Back button works. The
+   * plugin's own action links and the documentation both point at `#/settings`, which still lands on
+   * the first tab.
+   */
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("tab") ?? "";
+  const tab: TabId = (TAB_IDS.includes(requested) ? requested : "site") as TabId;
+
+  const setTab = useCallback(
+    (next: TabId) => {
+      // `replace`, so arrowing along the strip does not bury the page you arrived from under three
+      // history entries.
+      setParams("site" === next ? {} : { tab: next }, { replace: true });
+    },
+    [setParams],
+  );
+
   const [settings, setSettings] = useState(getSettings);
   const [saved, setSaved] = useState(false);
   const { clearStats, discardRun, totalGenerated, recentRuns } = useStats();
@@ -820,7 +858,17 @@ export default function SettingsPage() {
         )}
       />
 
+      <Tabs
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        ariaLabel={__("Settings sections", "storeseeder")}
+        idPrefix="settings"
+      />
+
       <div className="fp-settings-col">
+        {"site" === tab && (
+        <TabPanel id="site" idPrefix="settings">
         <SetSection
           title={__("This site", "storeseeder")}
           desc={__("Stored on the server and shared by everyone who uses StoreSeeder here.", "storeseeder")}
@@ -1362,7 +1410,11 @@ export default function SettingsPage() {
         </SetCard>
 
         </SetSection>
+        </TabPanel>
+        )}
 
+        {"you" === tab && (
+        <TabPanel id="you" idPrefix="settings">
         <SetSection
           title={__("Your preferences", "storeseeder")}
           desc={__("Stored in this browser, for you alone. Nothing here changes what anyone else sees.", "storeseeder")}
@@ -1570,7 +1622,11 @@ export default function SettingsPage() {
             </div>          </div>
         </SetCard>
         </SetSection>
+        </TabPanel>
+        )}
 
+        {"plugin" === tab && (
+        <TabPanel id="plugin" idPrefix="settings">
         <SetSection
           title={__("Plugin", "storeseeder")}
           desc={__("Version, links, and the actions that cannot be undone.", "storeseeder")}
@@ -1749,7 +1805,8 @@ export default function SettingsPage() {
           </div>
         </SetCard>
         </SetSection>
-
+        </TabPanel>
+        )}
       </div>
 
       {/*
