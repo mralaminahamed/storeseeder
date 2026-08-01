@@ -35,6 +35,7 @@ import { requestTweaksPanel } from "@/lib/events";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
+import { PageHead } from "@/components/ui/PageHead";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { useTheme, type Density, type Theme } from "@/theme/useTheme";
@@ -713,17 +714,13 @@ export default function SettingsPage() {
 
   return (
     <div className="fp-page fp-enter">
-      <div className="fp-page-head">
-        <div>
-          <h1 className="fp-h1">{__("Settings", "storeseeder")}</h1>
-          <p className="fp-sub">
-            {__(
-              "What StoreSeeder writes, who may write it, and how this admin looks.",
-              "storeseeder",
-            )}
-          </p>
-        </div>
-      </div>
+      <PageHead
+        title={__("Settings", "storeseeder")}
+        description={__(
+          "What StoreSeeder writes, who may write it, and how this admin looks.",
+          "storeseeder",
+        )}
+      />
 
       <div className="fp-settings-col">
         <SetSection

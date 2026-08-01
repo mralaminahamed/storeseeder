@@ -23,6 +23,7 @@ import {
   type RecipeCall,
 } from "@/lib/recipes";
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/PageHead";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { RecipeSkeleton } from "@/components/recipes/RecipeSkeleton";
 import { usePlatform } from "@/providers/PlatformProvider";
@@ -264,20 +265,16 @@ export default function RecipesPage() {
   // layout does not jump when the cards arrive.
   if (loading) {
     return (
-      <>
-        <div className="fp-page-head">
-          <div>
-            <div className="fp-page-title">{__("Recipes", "storeseeder")}</div>
-          </div>
-        </div>
+      <div className="fp-recipes-page fp-enter">
+        <PageHead title={__("Recipes", "storeseeder")} />
         <RecipeSkeleton />
-      </>
+      </div>
     );
   }
 
   if (failed) {
     return (
-      <div className="fp-recipes-note">
+      <div className="fp-recipes-page fp-enter fp-recipes-note">
         {__("Could not load the recipes. Reload the page to try again.", "storeseeder")}
       </div>
     );
@@ -289,7 +286,8 @@ export default function RecipesPage() {
     const steps = runnableSteps(recipe);
 
     return (
-      <div className="fp-card fp-recipe-run">
+      <div className="fp-recipes-page fp-enter">
+        <div className="fp-card fp-recipe-run">
         <div className="fp-recipe-run-head">
           <div>
             <div className="fp-recipe-run-title">
@@ -362,6 +360,7 @@ export default function RecipesPage() {
             </div>
           ))}
         </div>
+        </div>
       </div>
     );
   }
@@ -371,7 +370,8 @@ export default function RecipesPage() {
     const written = Object.values(progress.rows).reduce((t, n) => t + n, 0);
 
     return (
-      <div className="fp-card fp-recipe-done">
+      <div className="fp-recipes-page fp-enter">
+        <div className="fp-card fp-recipe-done">
         <div className="fp-recipe-done-head">
           <span className={`fp-recipe-done-ic${undone ? " undone" : ""}`}>
             <Icon name={undone ? "refresh" : "check"} size={21} />
@@ -448,6 +448,7 @@ export default function RecipesPage() {
                 : __("Undo this recipe", "storeseeder")}
             </Button>
           )}
+        </div>
         </div>
       </div>
     );
@@ -533,18 +534,14 @@ export default function RecipesPage() {
   }
 
   return (
-    <>
-      <div className="fp-page-head">
-        <div>
-          <div className="fp-page-title">{__("Recipes", "storeseeder")}</div>
-          <div className="fp-page-sub">
-            {__(
-              "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order.",
-              "storeseeder",
-            )}
-          </div>
-        </div>
-      </div>
+    <div className="fp-recipes-page fp-enter">
+      <PageHead
+        title={__("Recipes", "storeseeder")}
+        description={__(
+          "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order.",
+          "storeseeder",
+        )}
+      />
 
       {body()}
 
@@ -634,6 +631,6 @@ export default function RecipesPage() {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

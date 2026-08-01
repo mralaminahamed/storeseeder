@@ -4,6 +4,7 @@ import { decodeEntities } from "@wordpress/html-entities";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
+import { PageHead } from "@/components/ui/PageHead";
 import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 
 interface WPPlugin {
@@ -48,19 +49,13 @@ export default function PluginsPage() {
 
   return (
     <div className="fp-page wide fp-enter">
-      <div className="fp-page-head">
-        <div>
-          <h1 className="fp-h1">
-            {__("Our Plugins", "storeseeder")}
-          </h1>
-          <p className="fp-sub">
-            {__(
-              "Other plugins by the same author on WordPress.org.",
-              "storeseeder",
-            )}
-          </p>
-        </div>
-      </div>
+      <PageHead
+        title={__("Our Plugins", "storeseeder")}
+        description={__(
+          "Other plugins by the same author on WordPress.org.",
+          "storeseeder",
+        )}
+      />
 
       {/* Placeholder cards in the real grid, so the layout does not jump when six
           plugins land. Uses the shared Skeleton rather than the flat grey boxes this

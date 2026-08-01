@@ -569,7 +569,7 @@
    for: an itemised count list, because there is no preview table on this page and the counts are
    what replaces it, and a hue of its own, because unlike the four stat tiles these really are
    different things. */
-.fp-root .fp-recipe-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--gap-grid); }
+.fp-root .fp-recipe-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:var(--gap-grid); }
 
 .fp-root .fp-recipe {
   --recipe-hue: var(--accent);
@@ -706,8 +706,32 @@
 
 .fp-root .fp-recipes-note { padding:40px; text-align:center; color:var(--text-faint); font-size:var(--fs-ctl-sm); }
 
-@media (max-width: 1100px) {
-  .fp-root .fp-recipe-grid { grid-template-columns:1fr; }
+/* Four across, matching the generator and stat grids — and then a ladder, because a recipe card
+   carries more than they do.
+
+   The count list inverts against the grid on purpose. At four columns a card is roughly 300px and
+   two columns of "Product categories  14" collide, so the counts stack; at one column the card is
+   the full width of the page and a single file of eight rows is a long thin ribbon, so they split.
+   The card is widest exactly where the grid is narrowest. */
+@media (max-width: 1500px) {
+  .fp-root .fp-recipe-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1180px) {
+  .fp-root .fp-recipe-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 782px) {
+  /* 782px is where WordPress itself switches the admin to its mobile layout, so the sidebar has
+     already gone by here — following core's breakpoint rather than inventing one keeps the two
+     from disagreeing halfway through a resize. */
+  .fp-root .fp-recipe-grid { grid-template-columns:minmax(0, 1fr); }
+  .fp-root .fp-recipe-bar { flex-direction:column; align-items:stretch; }
+  .fp-root .fp-recipe-actions { margin-left:0; }
+  .fp-root .fp-recipe-actions > * { flex:1; }
+}
+
+/* Counts: one file while the cards are narrow, two once they are not. */
+@media (min-width: 1181px) {
+  .fp-root .fp-recipe-counts { grid-template-columns:minmax(0, 1fr); }
 }
 /* A recipe's own mark. Sized rather than styled — the artwork is the archive's, and the only
    thing the admin imposes is how much room it gets. */
@@ -774,3 +798,9 @@
   color:color-mix(in oklab, var(--sky), black 16%);
 }
 .fp-root[data-theme="dark"] .fp-recipe-chip.third { color:var(--sky); }
+
+/* The Recipes page sets its own gutters rather than borrowing `.fp-page`. Its cards are a
+   full-width grid that wants the column padding, not the centred 1180px measure a reading page
+   uses — and `.fp-scroll` supplies none of its own, so without this the grid sits flush against
+   the sidebar. */
+.fp-root .fp-recipes-page { padding:var(--pad-col-y) var(--pad-col-x) var(--pad-col-b); }

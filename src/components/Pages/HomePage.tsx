@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { __, sprintf } from "@wordpress/i18n";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/ui/section-label";
+import { PageHead } from "@/components/ui/PageHead";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { GeneratorGrid } from "@/components/home/GeneratorGrid";
@@ -19,19 +20,18 @@ export default function HomePage() {
   return (
     <div className="fp-page wide fp-enter">
       {/* Page header */}
-      <div className="fp-page-head">
-        <div>
-          <h1 className="fp-h1">{__("StoreSeeder", "storeseeder")}</h1>
-          <p className="fp-sub">
-            {targetName
-              ? sprintf(
-                  /* translators: %s: e-commerce platform name. */
-                  __("Generate realistic test data for your %s store.", "storeseeder"),
-                  targetName,
-                )
-              : __("Generate realistic test data for your store.", "storeseeder")}
-          </p>
-        </div>
+      <PageHead
+        title={__("StoreSeeder", "storeseeder")}
+        description={
+          targetName
+            ? sprintf(
+                /* translators: %s: e-commerce platform name. */
+                __("Generate realistic test data for your %s store.", "storeseeder"),
+                targetName,
+              )
+            : __("Generate realistic test data for your store.", "storeseeder")
+        }
+      >
         <Button
           variant="primary"
           icon="plus"
@@ -39,7 +39,7 @@ export default function HomePage() {
         >
           {__("New generation", "storeseeder")}
         </Button>
-      </div>
+      </PageHead>
 
       {/* Stat cards */}
       <div className="fp-stat-row">
