@@ -128,6 +128,36 @@ final class Storage {
 	}
 
 	/**
+	 * Every directory a reference-data archive might be readable from, most current first.
+	 *
+	 * For readers only — a writer must use `sample_data()`, which names exactly one place.
+	 *
+	 * The legacy path is here because `migrate()` can fail: a site whose filesystem needs FTP or SSH
+	 * credentials that are not configured cannot move anything, and without this the reader would then
+	 * look in a new empty directory and fall silently back to each generator's inline word lists. The
+	 * symptom would be every product called "Premium Widget" again, with nothing logged — which is the
+	 * defect this whole class exists to prevent, reintroduced by the fix for it.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $archive Archive directory name. Defaults to the shipped one.
+	 *
+	 * @return string[] Absolute paths without trailing slashes. Never empty.
+	 */
+	public static function sample_data_dirs( string $archive = '' ): array {
+		$current = self::sample_data( $archive );
+		$dirs    = array( $current );
+
+		foreach ( self::legacy_paths() as $new => $legacy ) {
+			if ( $new === $current ) {
+				$dirs[] = $legacy;
+			}
+		}
+
+		return $dirs;
+	}
+
+	/**
 	 * Create a directory, and keep it from being listed.
 	 *
 	 * The blank `index.php` is what every WordPress upload directory carries: it costs nothing and it

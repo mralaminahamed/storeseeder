@@ -823,7 +823,11 @@ abstract class Generator {
 		// Asked of Storage, not built here. This and `class-storeseeder.php` were computing the same
 		// path independently, so moving the directory in one would have left the other reading an
 		// empty tree and falling back to the inline defaults without a word.
-		$remote = Storage::sample_data();
+		//
+		// Plural: the current location first, then the pre-1.2.0 one. `Storage::migrate()` can fail on
+		// a site whose filesystem needs credentials it does not have, and a reader that only knew the
+		// new path would then find nothing and fall silently back to the inline word lists.
+		$remotes = Storage::sample_data_dirs();
 
 		$locales = array_unique( array( $locale, Locale::DEFAULT_LOCALE ) );
 		$recipe  = $this->sample_data_recipe();
@@ -843,8 +847,12 @@ abstract class Generator {
 			}
 		}
 
+		// Locale before location: the requested locale in the legacy directory is a better answer than
+		// `en_US` in the current one, because a wrong language is more visible than a stale file.
 		foreach ( $locales as $code ) {
-			$candidates[] = "{$remote}/{$resource_type}/{$code}/{$filename}.json";
+			foreach ( $remotes as $remote ) {
+				$candidates[] = "{$remote}/{$resource_type}/{$code}/{$filename}.json";
+			}
 		}
 
 		return $candidates;

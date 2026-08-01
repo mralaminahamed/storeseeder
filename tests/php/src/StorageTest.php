@@ -134,6 +134,48 @@ class StorageTest extends StoreSeederUnitTestCase {
 	}
 
 	/**
+	 * A reader is offered the legacy directory as well as the current one.
+	 *
+	 * `migrate()` can fail — a site whose filesystem needs FTP or SSH credentials it does not have
+	 * cannot move anything — and a reader that knew only the new path would then find an empty
+	 * directory and fall back to each generator's inline word lists, silently, with every product
+	 * called "Premium Widget". That is the defect this class exists to prevent, so the fix for it must
+	 * not reintroduce it.
+	 */
+	public function test_readers_are_offered_the_legacy_directory_too(): void {
+		$dirs = Storage::sample_data_dirs();
+
+		$this->assertSame( Storage::sample_data(), $dirs[0], 'the current location comes first' );
+		$this->assertContains( Storage::legacy_paths()[ Storage::sample_data() ], $dirs );
+	}
+
+	/**
+	 * A generator looks in both, and prefers the requested locale over the newer directory.
+	 *
+	 * A wrong language is more visible than a stale file, so `fr_FR` in the legacy directory beats
+	 * `en_US` in the current one.
+	 */
+	public function test_generator_candidates_cover_both_locations(): void {
+		$generator = new \StoreSeeder\Generation\Generators\Product();
+
+		// `$locale` is a typed property with no default, so it has to be set before anything reads it.
+		$generator->set_locale( 'en_US' );
+
+		// No `setAccessible()`: it is a no-op since PHP 8.1 and deprecated on 8.5.
+		$method     = new \ReflectionMethod( $generator, 'sample_data_candidates' );
+		$candidates = $method->invoke( $generator, 'products', 'product_names' );
+
+		foreach ( Storage::sample_data_dirs() as $dir ) {
+			$matching = array_filter(
+				$candidates,
+				static fn( string $path ): bool => 0 === strpos( $path, $dir . '/' )
+			);
+
+			$this->assertNotEmpty( $matching, "no candidate under {$dir}" );
+		}
+	}
+
+	/**
 	 * The legacy paths are the ones that actually shipped.
 	 */
 	public function test_legacy_paths_are_the_pre_1_2_locations(): void {
