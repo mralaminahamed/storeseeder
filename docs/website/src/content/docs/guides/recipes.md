@@ -67,6 +67,12 @@ It reuses the consent decision the sample data already asked for — one record 
 Nothing is fetched on page load, on activation, or on a schedule. The only download is a button press.
 :::
 
+Once the archive is there, **Refresh** beside the page heading fetches it again — that is how a new shop
+type, or a new locale for an existing one, reaches an installed site without a plugin update. It deletes
+the local copy before downloading rather than writing over it, so a recipe that dropped a file between
+versions does not leave the old one behind. The same pair of controls lives in
+[Settings](/storeseeder/guides/settings/), with the date of the last fetch.
+
 ## Choosing
 
 Counts are itemised per resource and rescale as you switch **Small** (×0.25), **Medium** or **Large**

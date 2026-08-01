@@ -351,11 +351,11 @@ export default function SettingsPage() {
     if (syncStatus?.exists) {
       return (
         <>
-          <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+          <div className="fp-set-sync-title">
             {__("Sample data is synced", "storeseeder")}
           </div>
           {syncStatus.last_synced && (
-            <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+            <div className="fp-set-sync-sub">
               {sprintf(
                 /* translators: %s: date string */
                 __("Last updated: %s", "storeseeder"),
@@ -369,10 +369,10 @@ export default function SettingsPage() {
 
     return (
       <>
-        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+        <div className="fp-set-sync-title">
           {__("Sample data not found", "storeseeder")}
         </div>
-        <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+        <div className="fp-set-sync-sub">
           {__(
             "Sync to download locale-specific reference data.",
             "storeseeder",
@@ -1003,11 +1003,11 @@ export default function SettingsPage() {
                   <Icon name={mcpIcon()} size={19} />
                 </span>
                 <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+                  <div className="fp-set-sync-title">
                     {mcpSummary()}
                   </div>
                   {mcp.available && mcp.enabled && 0 < mcp.tools && (
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                    <div className="fp-set-sync-sub">
                       <code>{mcp.route}</code>
                     </div>
                   )}
@@ -1149,6 +1149,7 @@ export default function SettingsPage() {
             "Locale-specific reference data used by generators to produce realistic output.",
             "storeseeder",
           )}
+          testId="settings-sample-data"
         >
           <div>
             <div className="fp-set-sync">

@@ -383,11 +383,12 @@
 .fp-root .fp-entity-hint { margin-top:5px; color:var(--text-3); font-size:var(--fs-sm); }
 
 /* ===== settings ===== */
-/* Narrow on purpose — a column of labelled controls reads badly at 1120px — but centred in the
-   measure the other three pages fill, not left-aligned in it. Left-aligned, Settings put 680px of
-   content against 440px of empty page, so moving Overview → Settings shifted everything leftwards.
-   That is the horizontal lurch `.fp-page wide` exists to prevent, surviving one level further in. */
-.fp-root .fp-settings-col { max-width:680px; margin-inline:auto; }
+/* Full width, filling the same measure Overview, Recipes and Our Plugins use. It was capped at 680px
+   and left-aligned, which put 680px of content against 440px of empty page and made everything shift
+   leftwards on the way from any other page — the horizontal lurch `.fp-page wide` exists to prevent,
+   surviving one level further in. Centring it fixed the lurch; filling the measure removes the empty
+   band as well. */
+.fp-root .fp-settings-col { max-width:none; }
 
 /* Settings sections. Cards are grouped by who a change affects — the site, or just
    this browser — because that is the first thing worth knowing before touching one on
@@ -416,6 +417,13 @@
 .fp-root .fp-set-hint { font-size:12.3px; color:var(--text-3); margin:-1px 0 9px; }
 .fp-root .fp-set-sync { display:flex; align-items:center; gap:11px; padding:calc(var(--pad-row-y) + 1px) var(--pad-row-x); border-radius:var(--r-md); background:color-mix(in oklab,var(--green) 9%,var(--surface)); border:1px solid color-mix(in oklab,var(--green) 22%,var(--border)); margin-bottom:14px; }
 .fp-root .fp-set-sync-ic { color:var(--green); }
+/* The two lines inside a sync panel. Real classes because the Recipes card was written against these
+   names before they existed — invented class names are valid CSS selectors that match nothing, so the
+   text simply inherited body styles and looked close enough to pass review. The Sample data card
+   meanwhile carried the same two lines as inline `fontSize`/`fontWeight` literals. One definition, so
+   the two cards cannot look subtly different. */
+.fp-root .fp-set-sync-title { font-size:13.5px; font-weight:500; color:var(--text); }
+.fp-root .fp-set-sync-sub { font-size:12px; color:var(--text-3); }
 .fp-root .fp-set-about { display:flex; align-items:center; gap:13px; margin-bottom:16px; }
 .fp-root .fp-danger-card { border-color:color-mix(in oklab,var(--red) 30%,var(--border)); background:color-mix(in oklab,var(--red) 4%,var(--surface)); }
 .fp-root .fp-danger-label { color:var(--red); }

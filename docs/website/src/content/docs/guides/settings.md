@@ -56,6 +56,27 @@ promise can take.
 The green line is the endpoint and the live tool count. Full detail in
 [AI and MCP](/storeseeder/guides/mcp/).
 
+### Recipes
+
+![The Recipes card, showing how many recipes are present and when they were last updated](../../../assets/screenshots/settings-recipes.png)
+
+How many ready-made shops are downloaded, and when they were last fetched. **Sync now** pulls the
+archive; **Force re-sync** deletes the local copy first, which is what you want when a recipe has
+*dropped* a file between versions — a plain download writes over what is there and leaves anything the
+newer archive no longer ships.
+
+Recipes live in [their own repository](https://github.com/mralaminahamed/storeseeder-recipes), so a new
+shop type or a new locale for an existing one arrives without a plugin update. That is what the sync is
+for, and the [Recipes page](/storeseeder/guides/recipes/) has a **Refresh** button that does the same
+thing from where you would notice needing it.
+
+If the archive downloaded only partly, the recipes the index promises but that are not on disk are
+listed by name. A torn archive would otherwise present as a shorter list of recipes, and a shorter list
+looks like a decision somebody made.
+
+Consent is shared with the sample data below — one record covers both downloads, so revoking it stops
+both.
+
 ### Sample data
 
 ![The sample data card, showing sync status and the sync, re-sync and revoke controls](../../../assets/screenshots/settings-sample-data.png)
