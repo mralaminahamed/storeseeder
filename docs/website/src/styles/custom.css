@@ -98,16 +98,40 @@
 /* --------------------------------------------------------------------------
    The landing page's cards
 
-   Starlight centres a splash hero's actions; the cards below want the same
-   restraint the plugin's own tiles have — one accent, no gradients.
+   The cards want the same restraint the plugin's own tiles have — one accent,
+   no gradients.
+
+   Starlight tints each icon plate by *position*: `nth-child(4n+1)` orange,
+   `+3` green, `+4` red, the rest purple. So a section with one meaning showed
+   four unrelated hues, and reordering the cards would have recoloured them.
+   Worse, only the plate was positional — the glyph inside took the accent from
+   the rule below, so an indigo glyph sat on an amber plate.
+
+   Setting the two custom properties Starlight derives the plate from, rather
+   than the plate itself, so its border width, padding and radius stay its own.
+   Unlayered, which beats the higher-specificity `nth-child` rules inside
+   `@layer starlight.components`.
    -------------------------------------------------------------------------- */
 
 .card {
   border-color: var(--sl-color-gray-5);
+  --sl-card-border: var(--sl-color-accent);
+  --sl-card-bg: var(--sl-color-accent-low);
 }
 
 .card .icon {
   color: var(--sl-color-accent);
+}
+
+/* Starlight's card grid is exactly two columns above 50rem, so a grid of three
+   puts one card alone on a second row at half width. Three across instead, from
+   the width where three still hold their text. Matched on the child count so it
+   applies to the grids that need it and to any added later, rather than to a
+   class somebody has to remember. */
+@media (min-width: 60rem) {
+  .sl-markdown-content .card-grid:has(> :nth-child(3):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -128,44 +152,20 @@
 }
 
 /* --------------------------------------------------------------------------
-   Splash hero
+   Content images
 
-   Starlight lays the hero out as two columns on wide screens and constrains the
-   image to a square — it assumes a logo or an illustration beside the copy. Ours
-   is a 10:3 banner, so squared it comes out as a 400×400 crop of nothing.
+   Screenshots in the guides are captured at 2x from a real install, so they are
+   wider than the column and Astro scales them down. The rounding and border
+   are here rather than per-image because a screenshot of a bordered admin panel
+   needs an edge of its own to sit against the page background.
 
-   Stacked instead, image first and spanning the content column, which is what
-   "banner" means. The DOM order already puts the image first, so this only has
-   to stop the grid and let the intrinsic ratio through.
+   The splash banner is NOT styled here — it belongs to src/components/Hero.astro,
+   which owns the whole hero image because Starlight's own slot squares it.
    -------------------------------------------------------------------------- */
 
-.hero {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.5rem, 4vw, 2.5rem);
-  text-align: center;
-}
-
-.hero > img,
-.hero > .hero-html {
-  width: 100%;
-  max-width: none;
-  /* Overrides the `height` attribute Starlight sets; without this the attribute
-     wins and the banner is letterboxed inside a square. */
-  height: auto;
-  aspect-ratio: 10 / 3;
-  object-fit: cover;
-  border-radius: 0.75rem;
-  /* The banner's own field is indigo, so it needs separating from an indigo page
-     rather than from a white one. */
-  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.35);
-}
-
-/* The copy sits under the banner now, so it centres rather than aligning to a
-   column edge. */
-.hero .stack,
-.hero .copy {
-  align-items: center;
+.sl-markdown-content img {
+  border-radius: 0.5rem;
+  border: 1px solid var(--sl-color-gray-5);
 }
 
 .hero .actions {

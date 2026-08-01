@@ -33,6 +33,11 @@ export default defineConfig({
         },
       },
       customCss: ['./src/styles/custom.css'],
+      // The hero's image field is a logo slot — hardcoded 400×400. The override renders the home
+      // page's banner at the size it is displayed at, and delegates the rest back to Starlight.
+      components: {
+        Hero: './src/components/Hero.astro',
+      },
       sidebar: [
         {
           label: 'Getting Started',

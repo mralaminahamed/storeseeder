@@ -3,9 +3,6 @@ title: StoreSeeder
 description: Realistic test data for WordPress e-commerce — a whole coherent shop in one click, or one resource at a time.
 template: splash
 hero:
-  image:
-    file: ../../assets/banner.png
-    alt: StoreSeeder — realistic test data for WordPress e-commerce
   tagline: A corner grocer, a fashion boutique, a garden centre. One click fills nine resources in dependency order.
   actions:
     - text: Get started
@@ -26,11 +23,12 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## Two ways in
 
-<CardGrid stagger>
+{/* No `stagger`: it drops every second child 5rem, which reads as a deliberate offset across a
+    single row of three and as a misalignment across two rows of two. */}
+<CardGrid>
   <Card title="A whole shop, in one click" icon="star">
-    Pick a recipe — a corner grocer, a fashion boutique, a garden centre — and StoreSeeder fills the
-    store across nine resources in dependency order. Brands and categories before products, products
-    and customers before orders, so nothing points at nothing.
+    Pick a recipe — a corner grocer, a fashion boutique, a garden centre — and StoreSeeder fills nine
+    resources in dependency order, so nothing points at nothing.
   </Card>
   <Card title="Or one resource at a time" icon="setting">
     Twenty-one generators, each with a live preview and parameters that reach the output. Narrow a
@@ -41,7 +39,9 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
     direct database writes — so it respects the same schema, validation and money handling as real
     data.
   </Card>
-  <Card title="Removable, exactly" icon="trash">
+  {/* `notes`, because `trash` is not one of Starlight's icons and an unknown name renders the
+      tinted plate with nothing inside it. A ledger is a record, which is the card's actual claim. */}
+  <Card title="Removable, exactly" icon="notes">
     Every row is recorded in StoreSeeder's own ledger, so deleting the test data removes what it
     created and nothing that merely resembles it. No date ranges, no name matching.
   </Card>
