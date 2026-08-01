@@ -17,6 +17,7 @@ export default defineConfig({
       favicon: '/favicon.svg',
       logo: { src: './src/assets/logo.svg', alt: 'StoreSeeder' },
       social: [
+        { icon: 'external', label: 'WordPress.org', href: 'https://wordpress.org/plugins/storeseeder/' },
         { icon: 'github', label: 'GitHub', href: 'https://github.com/mralaminahamed/storeseeder' },
       ],
       editLink: {

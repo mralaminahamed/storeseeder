@@ -3,25 +3,26 @@ title: StoreSeeder
 description: Realistic test data for WordPress e-commerce — a whole coherent shop in one click, or one resource at a time.
 template: splash
 hero:
+  image:
+    file: ../../assets/banner.png
+    alt: StoreSeeder — realistic test data for WordPress e-commerce
   tagline: A corner grocer, a fashion boutique, a garden centre. One click fills nine resources in dependency order.
   actions:
     - text: Get started
       link: getting-started/introduction/
       icon: right-arrow
       variant: primary
+    - text: View on WordPress.org
+      link: https://wordpress.org/plugins/storeseeder/
+      icon: external
+      variant: secondary
     - text: On GitHub
       link: https://github.com/mralaminahamed/storeseeder
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-import { Image } from 'astro:assets';
-import overview from '../../assets/screenshots/overview.png';
-import products from '../../assets/screenshots/generator-products.png';
-import recipes from '../../assets/screenshots/recipes.png';
-
-<Image src={overview} alt="The StoreSeeder dashboard: four stat tiles, recent activity, and a grid of generator cards" />
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## Two ways in
 
@@ -46,15 +47,6 @@ import recipes from '../../assets/screenshots/recipes.png';
   </Card>
 </CardGrid>
 
-## The preview tells the truth
-
-<Image src={products} alt="The Products generator: parameters on the left, a live preview table on the right showing names, SKUs, types, prices, stock and status" />
-
-Every column a parameter governs comes from the same code the run uses. That sounds obvious and it is
-the part most test-data plugins get wrong: a control that moves, saves, and quietly changes nothing.
-
-<Image src={recipes} alt="The Recipes page: three cards — Fashion boutique, Corner grocer, Home and garden — each listing what it will create per resource" />
-
 ## A recipe is a vocabulary, not a dataset
 
 It supplies the words and numeric bands that make a grocer look like a grocer — product names, a
@@ -65,22 +57,44 @@ recipe cannot smuggle in a broken record: there are no records to smuggle.
 
 <CardGrid>
   <Card title="Corner grocer" icon="open-book">
-    Cheap lines, high order counts, weight-based variations. 1,794 rows at Medium.
+    Cheap lines, high order counts, weight-based variations. **1,794 rows** at Medium.
   </Card>
   <Card title="Fashion boutique" icon="open-book">
-    1,440 variations over 240 products — size × colour, two axes deep. 3,466 rows.
+    1,440 variations over 240 products — size × colour, two axes deep. **3,466 rows**.
   </Card>
   <Card title="Home &amp; garden" icon="open-book">
-    Shipping classes that genuinely differ, and the widest price band. 1,225 rows.
+    Shipping classes that genuinely differ, and the widest price band. **1,225 rows**.
   </Card>
 </CardGrid>
+
+## The preview tells the truth
+
+Every column a parameter governs comes from the same code the run uses. That sounds obvious and it is
+the part most test-data plugins get wrong: a control that moves, saves, and quietly changes nothing.
+
+<LinkCard
+  title="See the generators"
+  description="Parameters on the left, six rows built exactly the way the run will build them."
+  href="/storeseeder/guides/generators/"
+/>
 
 ## Honest about what it is
 
 StoreSeeder writes large volumes of data directly into your store. It is a development tool: use it on
 development and staging sites, and back up before a large run.
 
-There is no analytics, no licence check and no phone-home. The only outbound requests are two optional
-downloads from GitHub, each behind a consent prompt an administrator has to accept.
+No analytics, no licence check, no phone-home. The only outbound requests are two optional downloads
+from GitHub, each behind a consent prompt an administrator has to accept.
 
-[Get started →](/storeseeder/getting-started/introduction/)
+<CardGrid>
+  <LinkCard
+    title="Get started"
+    description="Requirements, installation, and choosing which store to write to."
+    href="/storeseeder/getting-started/introduction/"
+  />
+  <LinkCard
+    title="Platform support"
+    description="What each driver writes, what it refuses, and why."
+    href="/storeseeder/reference/platform-support/"
+  />
+</CardGrid>

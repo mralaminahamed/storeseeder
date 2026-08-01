@@ -51,6 +51,7 @@ export default defineConfig({
         'specs/screenshots.spec.ts',
         'specs/banners.spec.ts',
         'specs/docs-shots.spec.ts',
+        'specs/docs-banner.spec.ts',
       ],
       testMatch: 'specs/**/*.spec.ts',
     },

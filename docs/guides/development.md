@@ -141,6 +141,7 @@ yarn test:e2e:report
 yarn shots:wporg            # regenerates .wordpress-org screenshots
 yarn shots:banners          # regenerates .wordpress-org banners
 yarn shots:docs             # regenerates the documentation site's screenshots
+yarn shots:docs-banner      # regenerates the documentation site's hero banner
 ```
 
 > [!WARNING]

@@ -27,6 +27,12 @@ export default defineConfig({
   projects: [
     { name: 'setup', testMatch: 'auth.setup.ts', use: { channel: 'chrome' } },
     {
+      // Markup only — no WordPress, so no auth dependency.
+      name: 'banner',
+      testMatch: 'docs-banner.spec.ts',
+      use: { channel: 'chrome' },
+    },
+    {
       name: 'docs',
       testMatch: 'docs-shots.spec.ts',
       dependencies: ['setup'],

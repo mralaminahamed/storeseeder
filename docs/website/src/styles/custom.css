@@ -126,3 +126,56 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Splash hero
+
+   Starlight lays the hero out as two columns on wide screens and constrains the
+   image to a square — it assumes a logo or an illustration beside the copy. Ours
+   is a 10:3 banner, so squared it comes out as a 400×400 crop of nothing.
+
+   Stacked instead, image first and spanning the content column, which is what
+   "banner" means. The DOM order already puts the image first, so this only has
+   to stop the grid and let the intrinsic ratio through.
+   -------------------------------------------------------------------------- */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  text-align: center;
+}
+
+.hero > img,
+.hero > .hero-html {
+  width: 100%;
+  max-width: none;
+  /* Overrides the `height` attribute Starlight sets; without this the attribute
+     wins and the banner is letterboxed inside a square. */
+  height: auto;
+  aspect-ratio: 10 / 3;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  /* The banner's own field is indigo, so it needs separating from an indigo page
+     rather than from a white one. */
+  box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.35);
+}
+
+/* The copy sits under the banner now, so it centres rather than aligning to a
+   column edge. */
+.hero .stack,
+.hero .copy {
+  align-items: center;
+}
+
+.hero .actions {
+  justify-content: center;
+}
+
+@media (max-width: 50rem) {
+  /* Taller crop on a phone: at 10:3 across a 380px screen the cards are 40px
+     high and illegible, so it shows less of the width and more of the subject. */
+  .hero > img {
+    aspect-ratio: 16 / 9;
+  }
+}

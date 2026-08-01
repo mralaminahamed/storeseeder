@@ -14,6 +14,7 @@
     "shots:wporg": "playwright test --config=playwright.wporg-shots.config.ts --project=shots",
     "shots:banners": "playwright test --config=playwright.wporg-shots.config.ts --project=banners",
     "shots:docs": "playwright test --config=playwright.docs-shots.config.ts --project=docs",
+    "shots:docs-banner": "playwright test --config=playwright.docs-shots.config.ts --project=banner",
     "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
     "test:e2e:setup": "bash tests/e2e/setup.sh",

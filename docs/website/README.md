@@ -69,6 +69,23 @@ suspect.
 2. Add it to the matching `sidebar` group in `astro.config.mjs`.
 3. `yarn build` — it will tell you if the two disagree.
 
+## Images
+
+Both are generated, never hand-placed:
+
+```bash
+yarn shots:docs          # the seven admin screenshots, from a real install
+yarn shots:docs-banner   # the hero banner
+```
+
+The screenshots are raw captures — no branding plate, unlike the WordPress.org set, because here the
+caption is the prose beside the image.
+
+The banner is composed from markup in `tests/e2e/specs/docs-banner.spec.ts`, from the same
+`tests/e2e/brand.ts` the plugin icon and the listing banners use. It deliberately carries **no
+wordmark and no tagline**: the hero already prints both, and an image that repeats them says
+everything twice. It shows the idea instead — three recipes becoming a filled catalogue.
+
 ## Diagrams
 
 `astro-mermaid` is installed, so a ```mermaid fence renders. It follows the site's light/dark theme
