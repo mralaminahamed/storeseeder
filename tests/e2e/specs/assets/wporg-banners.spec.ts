@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import { join } from 'path';
 import { BRAND, glassField, markSvg } from '../../brand';
+import { RECIPES, recipeIcon } from '../../recipe-art';
 
 /**
  * Regenerates the two WordPress.org banners.
@@ -39,23 +40,34 @@ const BANNERS = [
  */
 const PILLS = ['21 generators', 'Recipes', 'Live preview'] as const;
 
-/** The product rows on the mock table. Names come from the products generator. */
-const ROWS = [
-  { name: 'Wireless Noise-Cancel<br>Headphones', type: 'Variable', price: '$199.00' },
-  { name: 'Organic Cotton T-Shirt', type: 'Simple', price: '$29.95' },
-  { name: 'Stainless Steel Water Bottle', type: 'Simple', price: '$34.50' },
-  { name: 'Mechanical Keyboard Kit', type: 'Variable', price: '$142.80' },
-] as const;
-
 function banner(scale: number): string {
-  const rows = ROWS.map(
-    (row) => `
-      <div class="row">
-        <div class="name">${row.name}</div>
-        <div><span class="chip ${'Variable' === row.type ? 'variable' : 'simple'}">${row.type}</span></div>
-        <div class="price">${row.price}</div>
-      </div>`,
-  ).join('');
+  /*
+   * Three recipe cards, where a mock product table used to be.
+   *
+   * The table showed four invented rows in a grid, which described a plugin that makes rows. It does,
+   * but so does every other test-data plugin in the directory; what only this one does is make two
+   * hundred products that look like one business. The cards name the three shops and the size of each,
+   * and they carry the recipes' own icons from the archive, so the listing, the documentation hero and
+   * the admin all show the same artwork.
+   *
+   * The icon sits *above* the name rather than beside it. Beside it, at a third of a 326px strip, the
+   * name had 68px to sit in and "Fashion boutique" wrapped onto two lines.
+   */
+  const cards = RECIPES.map((recipe, index) => {
+    // Fanned rather than aligned, as on the documentation hero: three flat cards read as a table,
+    // three at slight angles read as a choice being made.
+    const tilt = [-3, 0, 3][index];
+    const lift = [8, 0, 8][index];
+
+    return `
+      <div class="rc" style="--c: ${recipe.colour}; transform: rotate(${tilt}deg) translateY(${lift}px)">
+        <div class="rh">
+          <span class="ri">${recipeIcon(recipe.slug, 20)}</span>
+          <span class="rn">${recipe.name}</span>
+        </div>
+        <div class="rr"><b>${recipe.rows}</b> rows</div>
+      </div>`;
+  }).join('');
 
   return `<!doctype html>
 <html>
@@ -124,38 +136,47 @@ function banner(scale: number): string {
     background: rgba(255, 255, 255, .1);
   }
 
-  /* The mock table. Bleeds off the right edge, as in the previous banner — so
-     every column has to clear the cut: the price column ends at 756px, 16px
-     short of the canvas, while the card itself runs 20px past it. */
-  .card {
-    position: absolute; left: 420px; top: 20px; width: 372px; height: 210px;
-    background: #fff; border-radius: 12px; overflow: hidden;
-    box-shadow: 0 18px 40px -14px rgba(${BRAND.shadow}, .5), 0 6px 14px -8px rgba(${BRAND.shadow}, .34);
+  /* The three recipe cards.
+     Inside the canvas, unlike the table this replaced: that one deliberately bled 20px past the right
+     edge, and a card whose content is a grid survives being cut where a card whose content is a name
+     and a number does not. 404 + 326 ends at 730, leaving a 42px margin to match the 42px on the left. */
+  .cards {
+    position: absolute; left: 404px; top: 22px; width: 326px; height: 206px;
+    display: flex; align-items: center; gap: 9px;
   }
-  .thead, .row {
-    display: grid; grid-template-columns: 1fr 70px 70px; align-items: center;
-    padding: 0 36px 0 16px; gap: 8px;
+  /* Exactly a third of the strip each, minus the two gaps — not a bare flex-grow.
+     Growing from a zero basis with a nowrap name, the card holding the longest name (Fashion
+     boutique) took more than its share and the three came out unequal, so the gaps either side of
+     the middle one did not match. A stated basis makes them identical by construction.
+     No backticks in this comment: the whole stylesheet is a template literal. */
+  .rc {
+    flex: 0 0 calc((100% - 18px) / 3); min-width: 0;
+    background: #fff; border-radius: 12px; padding: 13px 10px 11px;
+    box-shadow: 0 16px 34px -12px rgba(${BRAND.shadow}, .45);
   }
-  .thead {
-    height: 30px; background: #f6f7f9; border-bottom: 1px solid #eceef1;
-    color: #8a8f98; font-size: 7.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
-  }
-  .thead div:last-child, .row .price { text-align: right; }
-  .row { height: 38px; border-bottom: 1px solid #f1f2f4; }
-  .name { color: #1f2329; font-size: 10.5px; line-height: 1.35; }
-  .price { color: #11141a; font-size: 11.5px; font-weight: 700; }
-  .chip {
-    display: inline-block; border-radius: 999px; padding: 3px 7px;
-    font-size: 8px; font-weight: 700;
-  }
-  .chip.variable { background: #e9e8fc; color: #4a47c4; }
-  .chip.simple { background: #dcfce7; color: #157f45; }
 
-  .pager { display: flex; align-items: center; gap: 6px; padding: 9px 36px 9px 16px; }
-  .pager i { height: 5px; border-radius: 999px; background: #eceef1; }
-  .pager i.wide { flex: 1; }
-  .pager i.short { width: 46px; }
-  .pager b { width: 13px; height: 13px; border-radius: 4px; background: ${BRAND.mid}; }
+  /* Icon above the name, not beside it. Beside it, at a third of a 326px strip, the name had 68px to
+     sit in and "Fashion boutique" wrapped onto two lines. */
+  .rh {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    margin-bottom: 11px;
+  }
+
+  /* No plate behind the icon: the archive's icons already carry a 14%-opacity wash of their own stroke
+     colour, and a tinted square under that is two backgrounds arguing. */
+  .ri { flex: none; display: flex; align-items: center; color: var(--c); }
+  .ri svg { display: block; }
+
+  .rn {
+    color: #1b1830; font-size: 10px; font-weight: 600; line-height: 1.2;
+    letter-spacing: -.012em; white-space: nowrap;
+  }
+
+  .rr {
+    border-top: 1px solid #eceaf5; padding-top: 8px;
+    font-size: 9.5px; color: #6f6a88;
+  }
+  .rr b { color: ${BRAND.deep}; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -172,11 +193,7 @@ function banner(scale: number): string {
       </div>
     </div>
 
-    <div class="card">
-      <div class="thead"><div>Product</div><div>Type</div><div>Price</div></div>
-      ${rows}
-      <div class="pager"><i class="wide"></i><b></b><i class="short"></i><i class="short"></i></div>
-    </div>
+    <div class="cards">${cards}</div>
   </div>
 </body>
 </html>`;

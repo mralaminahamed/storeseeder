@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import { join } from 'node:path';
 import { BRAND, glassField, markSvg } from '../../brand';
+import { RECIPES, recipeIcon } from '../../recipe-art';
 
 /**
  * Regenerates the documentation site's hero banner.
@@ -35,62 +36,11 @@ const OUT = join(__dirname, '..', '..', '..', '..', 'docs', 'website', 'src', 'a
 const BASE = { width: 1200, height: 360 };
 const SCALE = 3;
 
-/**
- * Each recipe's own icon, copied verbatim from `<recipe>/icon.svg` in the storeseeder-recipes
- * archive — the same file the admin renders beside the same name.
- *
- * The cards used to carry a gradient square, which said "a recipe" three times and named none of
- * them. These are also the one place colour means something here: the hue belongs to the recipe, so
- * a reader who has seen the Recipes screen recognises the row before reading the label. Unlike the
- * page's cards, whose plates Starlight was tinting by grid position.
- *
- * `currentColor` rather than the icons' literal hex, so one declaration per card colours all four
- * strokes and the wash — see the `--icon` custom property below.
+/*
+ * The recipes, their icons, their colours and their counts all come from `tests/e2e/recipe-art.ts`.
+ * The WordPress.org banner draws the same cards, and two copies of a recipe's identity is how one
+ * banner ends up green and the other teal.
  */
-const ICONS = {
-  grocery: `<svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
-    <rect x="6" y="16" width="36" height="26" rx="5" fill="currentColor" opacity=".14"/>
-    <path d="M12 16 15 8h18l3 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M6.5 16h35a1 1 0 0 1 1 1.1l-2.3 22a4 4 0 0 1-4 3.6H11.8a4 4 0 0 1-4-3.6l-2.3-22A1 1 0 0 1 6.5 16Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M18 24v5a6 6 0 0 0 12 0v-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
-  </svg>`,
-  fashion: `<svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
-    <path d="M18 8h12l11 7-4.5 8L33 21v19H15V21l-3.5 2L7 15Z" fill="currentColor" opacity=".14"/>
-    <path d="M18 8h12l11 7-4.5 8L33 21v19H15V21l-3.5 2L7 15Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M18 8a6 6 0 0 0 12 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
-  </svg>`,
-  'home-garden': `<svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
-    <path d="M24 6 43 21v19a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V21Z" fill="currentColor" opacity=".14"/>
-    <path d="M5 21 24 6l19 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9 19v21a2 2 0 0 0 2 2h26a2 2 0 0 0 2-2V19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M24 42V30c-4 0-6-2.4-6-5.5S20 19 24 19s6 2.4 6 5.5S28 30 24 42Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
-  </svg>`,
-} as const;
-
-/** The three shipped recipes, in the order the archive lists them. Colours are the icons' own. */
-const RECIPES = [
-  {
-    name: 'Corner grocer',
-    icon: ICONS.grocery,
-    colour: '#16a34a',
-    rows: '1,794',
-    items: ['Organic Rolled Oats', 'Salt-Cured Basmati Rice', 'Cheddar Wedge'],
-  },
-  {
-    name: 'Fashion boutique',
-    icon: ICONS.fashion,
-    colour: '#7c3aed',
-    rows: '3,466',
-    items: ['Boucle Trench Coat', 'Cashmere Jumper', 'Chelsea Boots'],
-  },
-  {
-    name: 'Home & garden',
-    icon: ICONS['home-garden'],
-    colour: '#d97706',
-    rows: '1,225',
-    items: ['Solid Oak Dining Table', 'Rattan Armchair', 'Cast Iron Planter'],
-  },
-] as const;
 
 function card(recipe: (typeof RECIPES)[number], index: number): string {
   const items = recipe.items
@@ -105,7 +55,7 @@ function card(recipe: (typeof RECIPES)[number], index: number): string {
   return `
     <div class="card" style="transform: rotate(${tilt}deg) translateY(${lift}px); --icon: ${recipe.colour}">
       <div class="card-head">
-        <span class="tile">${recipe.icon}</span>
+        <span class="tile">${recipeIcon(recipe.slug, 30)}</span>
         <span class="card-name">${recipe.name}</span>
       </div>
       <div class="lines">${items}</div>
