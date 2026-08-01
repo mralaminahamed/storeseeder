@@ -288,7 +288,7 @@ breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
   against a site whose credentials matter, without asking first.
 - **`playwright.config.ts` excludes `screenshots.spec.ts` and `banners.spec.ts`** from the
   default project so runs do not clobber the shipped WordPress.org PNGs. Those are driven
-  through `playwright.screenshots.config.ts`.
+  through `playwright.wporg-shots.config.ts`.
 - **The capability gate is `StoreSeeder\Access`, not a literal `manage_options`.** Four
   surfaces check it — admin menu, REST, MCP, AJAX — and a site that grants the routes but not
   the page has a broken plugin. It lives at the root of `includes/` rather than in a layer

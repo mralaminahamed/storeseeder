@@ -47,6 +47,8 @@ export default defineConfig({
             { label: 'Recipes', slug: 'guides/recipes' },
             { label: 'Running a generator', slug: 'guides/generators' },
             { label: 'Deleting generated data', slug: 'guides/cleanup' },
+            { label: 'Locales', slug: 'guides/locales' },
+            { label: 'AI and MCP', slug: 'guides/mcp' },
             { label: 'WP-CLI', slug: 'guides/wp-cli' },
             { label: 'Settings', slug: 'guides/settings' },
           ],
@@ -55,6 +57,8 @@ export default defineConfig({
           label: 'Reference',
           items: [
             { label: 'Architecture', slug: 'reference/architecture' },
+            { label: 'Platform support', slug: 'reference/platform-support' },
+            { label: 'Parameters', slug: 'reference/parameters' },
             { label: 'REST API', slug: 'reference/rest-api' },
             { label: 'Extension points', slug: 'reference/extension-points' },
             { label: 'External services', slug: 'reference/external-services' },

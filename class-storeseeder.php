@@ -284,7 +284,7 @@ class StoreSeeder {
 
 		$links[] = sprintf(
 			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-			esc_url( 'https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/guides/README.md' ),
+			esc_url( 'https://mralaminahamed.github.io/storeseeder/' ),
 			esc_html__( 'Documentation', 'storeseeder' )
 		);
 		$links[] = sprintf(

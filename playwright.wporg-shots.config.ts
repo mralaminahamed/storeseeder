@@ -4,8 +4,8 @@ import { defineConfig } from '@playwright/test';
 /**
  * Config for regenerating the WordPress.org listing assets.
  *
- *   npx playwright test --config=playwright.screenshots.config.ts --project=shots
- *   npx playwright test --config=playwright.screenshots.config.ts --project=banners
+ *   npx playwright test --config=playwright.wporg-shots.config.ts --project=shots
+ *   npx playwright test --config=playwright.wporg-shots.config.ts --project=banners
  *
  * Uses `channel: 'chrome'` so it drives an already-installed Chrome rather than
  * requiring `playwright install`, and pins the viewport to 1440x900 so every

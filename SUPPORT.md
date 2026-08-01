@@ -6,10 +6,10 @@ StoreSeeder is maintained by one developer, so a little triage on your side goes
 
 | Question | Where to look |
 |----------|---------------|
-| How do I install and activate it? | [docs/guides/installation.md](docs/guides/installation.md) |
-| How do I run a generator? | [docs/guides/usage.md](docs/guides/usage.md) |
-| What can each generator produce? | [docs/guides/features.md](docs/guides/features.md) |
-| How is the plugin put together? | [docs/guides/architecture.md](docs/guides/architecture.md) |
+| How do I install and activate it? | [Installation](https://mralaminahamed.github.io/storeseeder/getting-started/installation/) |
+| How do I run a generator? | [Generators](https://mralaminahamed.github.io/storeseeder/guides/generators/) |
+| What can each generator produce? | [Platform support](https://mralaminahamed.github.io/storeseeder/reference/platform-support/) |
+| How is the plugin put together? | [Architecture](https://mralaminahamed.github.io/storeseeder/reference/architecture/) |
 | How do I build from source or add a generator? | [docs/guides/development.md](docs/guides/development.md) |
 | What changed in this version? | [CHANGELOG.md](CHANGELOG.md) |
 

@@ -1,23 +1,128 @@
-/* StoreSeeder's own accent, so the site and the admin read as one product.
-   The same indigo the plugin ships as its default `--accent`. */
+/* ==========================================================================
+   StoreSeeder documentation theme
+
+   The accent is lifted from the plugin's own `src/styles.css` rather than
+   approximated in hex, so the site and the admin are literally the same
+   indigo. Mixed in `oklab` for the same reason the plugin does it: `oklch`
+   carries a hue channel, and mixing a chromatic colour with a near-grey drags
+   that hue toward zero — which turned every indigo tint pink.
+   ========================================================================== */
+
 :root {
-  --sl-color-accent-low: #1e1b4b;
-  --sl-color-accent: #4f46e5;
-  --sl-color-accent-high: #c7d2fe;
+  --ss-accent: oklch(0.55 0.205 277);
+
+  --sl-color-accent-low: color-mix(in oklab, var(--ss-accent) 22%, black);
+  --sl-color-accent: var(--ss-accent);
+  --sl-color-accent-high: color-mix(in oklab, var(--ss-accent) 45%, white);
+
+  /* Neutrals biased toward the accent's hue rather than a flat grey, matching
+     the plugin's `oklch(… 0.011 270)` family. A pure grey beside an indigo
+     accent reads as unconsidered. */
+  --sl-color-white: oklch(0.985 0.003 270);
+  --sl-color-gray-1: oklch(0.92 0.006 270);
+  --sl-color-gray-2: oklch(0.78 0.009 270);
+  --sl-color-gray-3: oklch(0.6 0.013 270);
+  --sl-color-gray-4: oklch(0.42 0.014 270);
+  --sl-color-gray-5: oklch(0.29 0.014 270);
+  --sl-color-gray-6: oklch(0.205 0.013 270);
+  --sl-color-black: oklch(0.145 0.011 270);
 }
 
 :root[data-theme='light'] {
-  --sl-color-accent-low: #e0e7ff;
-  --sl-color-accent: #4338ca;
-  --sl-color-accent-high: #1e1b4b;
+  --sl-color-accent-low: color-mix(in oklab, var(--ss-accent) 12%, white);
+  --sl-color-accent: color-mix(in oklab, var(--ss-accent), black 6%);
+  --sl-color-accent-high: color-mix(in oklab, var(--ss-accent), black 34%);
+
+  --sl-color-white: oklch(0.245 0.012 274);
+  --sl-color-gray-1: oklch(0.32 0.012 274);
+  --sl-color-gray-2: oklch(0.46 0.012 274);
+  --sl-color-gray-3: oklch(0.62 0.011 274);
+  --sl-color-gray-4: oklch(0.78 0.008 274);
+  --sl-color-gray-5: oklch(0.916 0.005 270);
+  --sl-color-gray-6: oklch(0.965 0.004 270);
+  --sl-color-gray-7: oklch(0.985 0.003 270);
+  --sl-color-black: oklch(1 0 0);
 }
 
-/* Tables carry most of the reference material here — capability matrices, parameter lists — so they
-   get room to breathe and a header that survives a long scroll. */
+/* --------------------------------------------------------------------------
+   Tables
+
+   Most of the reference here is tabular — capability matrices, parameter
+   lists, what each driver refuses. Starlight's default table is set for the
+   odd two-column aside, so it needs widening and a header that survives a
+   long scroll.
+   -------------------------------------------------------------------------- */
+
 .sl-markdown-content table {
-  font-size: 0.9rem;
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
 }
 
 .sl-markdown-content th {
   white-space: nowrap;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-2);
+}
+
+.sl-markdown-content :is(th, td) {
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+.sl-markdown-content tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+/* A tick and a cross carry the capability matrices, so they get the semantic
+   colours rather than inheriting body text. */
+.sl-markdown-content td:has(> :only-child) {
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Code and inline literals
+   -------------------------------------------------------------------------- */
+
+.sl-markdown-content :not(pre) > code {
+  font-size: 0.875em;
+  border-radius: 0.3rem;
+}
+
+/* --------------------------------------------------------------------------
+   The landing page's cards
+
+   Starlight centres a splash hero's actions; the cards below want the same
+   restraint the plugin's own tiles have — one accent, no gradients.
+   -------------------------------------------------------------------------- */
+
+.card {
+  border-color: var(--sl-color-gray-5);
+}
+
+.card .icon {
+  color: var(--sl-color-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+
+   Starlight animates the sidebar and the search modal. Anyone who has asked
+   for less should get less, and a docs site has nothing that motion explains.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

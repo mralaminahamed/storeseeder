@@ -117,7 +117,7 @@ transactions — and each one reports clearly when a prerequisite is missing.
 | Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
 | Logs | Advanced | Activity log entries across orders, products, customers, and system events |
 
-Full per-generator detail in [docs/guides/features.md](docs/guides/features.md).
+Full per-generator detail on [the documentation site](https://mralaminahamed.github.io/storeseeder/).
 
 ## Features
 
@@ -145,13 +145,14 @@ Full per-generator detail in [docs/guides/features.md](docs/guides/features.md).
 
 | Page | What it covers |
 |------|----------------|
-| [docs/](docs/guides/README.md) | Documentation index |
-| [Installation](docs/guides/installation.md) | Requirements, install paths, and choosing a target platform |
-| [Usage](docs/guides/usage.md) | Running generators, live preview, batch queue, settings, run history |
-| [Features](docs/guides/features.md) | The 21 generators, the platform matrix, locales, and what each generator writes |
-| [Architecture](docs/guides/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
+| [Documentation site](https://mralaminahamed.github.io/storeseeder/) | Everything below, rendered and searchable |
+| [Installation](https://mralaminahamed.github.io/storeseeder/getting-started/installation/) | Requirements, install paths, and choosing a target platform |
+| [Recipes](https://mralaminahamed.github.io/storeseeder/guides/recipes/) | Building a whole coherent shop in one click |
+| [Generators](https://mralaminahamed.github.io/storeseeder/guides/generators/) | One resource at a time, with a preview that tells the truth |
+| [Platform support](https://mralaminahamed.github.io/storeseeder/reference/platform-support/) | What each driver writes, and what it refuses |
+| [Architecture](https://mralaminahamed.github.io/storeseeder/reference/architecture/) | The driver layer, request flow, and where a decision is allowed to live |
+| [External services](https://mralaminahamed.github.io/storeseeder/reference/external-services/) | What is fetched, when, and on whose say-so |
 | [Development](docs/guides/development.md) | Local setup, build and test commands, adding a generator, release process |
-| [External Services](docs/guides/external-services.md) | The two outbound requests, what they send, and how to opt out |
 | [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commit conventions, quality gates, PR expectations |
 | [SECURITY.md](SECURITY.md) | Private vulnerability reporting and the plugin's security measures |
@@ -297,7 +298,7 @@ add_action( 'storeseeder_after_write_fluent-cart_product', function ( $result, $
 ```
 
 The full table — every filter and action, with what each receives — is in
-[docs/guides/architecture.md](docs/guides/architecture.md#extension-points).
+[the extension points reference](https://mralaminahamed.github.io/storeseeder/reference/extension-points/).
 
 ## External Services
 
@@ -311,7 +312,7 @@ neither fires on activation.
 
 Full disclosure — exactly what each request sends and receives, provider terms and privacy policies,
 and what StoreSeeder deliberately does not do — in
-[docs/guides/external-services.md](docs/guides/external-services.md).
+[the external services disclosure](https://mralaminahamed.github.io/storeseeder/reference/external-services/).
 
 ## Security
 

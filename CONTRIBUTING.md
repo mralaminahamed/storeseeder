@@ -149,7 +149,7 @@ install only.
 ### Regenerating the WordPress.org screenshots
 
 ```bash
-yarn test:e2e:screenshots
+yarn shots:wporg
 ```
 
 Writes `screenshot-1.png` … `screenshot-11.png` into `.wordpress-org/`, hiding the WordPress admin

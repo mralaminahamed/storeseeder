@@ -11,8 +11,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report tests/e2e/report",
-    "test:e2e:screenshots": "playwright test --config=playwright.screenshots.config.ts --project=shots",
-    "test:e2e:banners": "playwright test --config=playwright.screenshots.config.ts --project=banners",
+    "shots:wporg": "playwright test --config=playwright.wporg-shots.config.ts --project=shots",
+    "shots:banners": "playwright test --config=playwright.wporg-shots.config.ts --project=banners",
+    "shots:docs": "playwright test --config=playwright.docs-shots.config.ts --project=docs",
     "lint:js": "eslint .",
     "lint:js:fix": "eslint . --fix",
     "test:e2e:setup": "bash tests/e2e/setup.sh",
@@ -35,7 +36,7 @@
   ],
   "author": "Al Amin Ahamed <alamin.ahamed.dev@gmail.com> (https://github.com/mralaminahamed/)",
   "license": "GPL-2.0-or-later",
-  "homepage": "https://github.com/mralaminahamed/storeseeder",
+  "homepage": "https://mralaminahamed.github.io/storeseeder",
   "repository": {
     "type": "git",
     "url": "https://github.com/mralaminahamed/storeseeder.git"

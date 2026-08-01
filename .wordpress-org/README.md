@@ -50,7 +50,7 @@ layout in 772x250 units, scaled for the retina size, so the two files cannot
 disagree. Needs no WordPress:
 
 ```sh
-npm run test:e2e:banners
+yarn shots:banners
 ```
 
 **Screenshots** — real captures of the plugin, inset in a branded frame by
@@ -58,5 +58,5 @@ npm run test:e2e:banners
 the plugin active, Fluent Cart present, and credentials in `tests/e2e/.env.test`:
 
 ```sh
-npm run test:e2e:screenshots
+yarn shots:wporg
 ```

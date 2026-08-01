@@ -138,8 +138,9 @@ reference was missed.
 yarn test:e2e               # Playwright
 yarn test:e2e:ui            # interactive
 yarn test:e2e:report
-yarn test:e2e:screenshots   # regenerates .wordpress-org screenshots
-yarn test:e2e:banners       # regenerates .wordpress-org banners
+yarn shots:wporg            # regenerates .wordpress-org screenshots
+yarn shots:banners          # regenerates .wordpress-org banners
+yarn shots:docs             # regenerates the documentation site's screenshots
 ```
 
 > [!WARNING]
@@ -148,7 +149,7 @@ yarn test:e2e:banners       # regenerates .wordpress-org banners
 
 The screenshot and banner specs are excluded from the default Playwright project so ordinary
 runs cannot overwrite the shipped WordPress.org images; they run through
-`playwright.screenshots.config.ts`.
+`playwright.wporg-shots.config.ts`.
 
 ## 📋 Coding standards
 

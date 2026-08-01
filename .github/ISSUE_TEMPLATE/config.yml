@@ -4,7 +4,7 @@ contact_links:
     url: https://github.com/mralaminahamed/storeseeder/blob/trunk/SECURITY.md
     about: Do not file publicly. Email alamin.ahamed.dev@gmail.com — see the security policy.
   - name: Documentation
-    url: https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/guides/README.md
+    url: https://mralaminahamed.github.io/storeseeder/
     about: Installation, usage, features, architecture, and the development guide.
   - name: Usage question or help
     url: https://github.com/mralaminahamed/storeseeder/blob/trunk/SUPPORT.md

@@ -215,7 +215,7 @@ Store recipes: the vocabulary that makes every generator produce one coherent sh
 
 The full disclosure for each service — endpoint, exactly when the request is made, what is sent and received, and the provider's terms of service and privacy policy — is documented here:
 
-[Read the external services disclosure](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/guides/external-services.md)
+[Read the external services disclosure](https://mralaminahamed.github.io/storeseeder/reference/external-services/)
 
 == Source code ==
 
@@ -232,7 +232,7 @@ Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS,
 
 All generated data is stored in your own WordPress database and is never transmitted anywhere. Generated content is fictional and does not represent real individuals or transactions. The plugin does not collect analytics and does not phone home.
 
-The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [the external services disclosure](https://github.com/mralaminahamed/storeseeder/blob/trunk/docs/guides/external-services.md) for the full detail.
+The plugin makes two outbound requests, both administrator-initiated and both carrying no site data — see the "External services" section above, and [the external services disclosure](https://mralaminahamed.github.io/storeseeder/reference/external-services/) for the full detail.
 
 == Contributing ==
 

@@ -3,7 +3,7 @@ title: StoreSeeder
 description: Realistic test data for WordPress e-commerce — a whole coherent shop in one click, or one resource at a time.
 template: splash
 hero:
-  tagline: A corner grocer, a fashion boutique, a home & garden store. One click, nine resources, in dependency order.
+  tagline: A corner grocer, a fashion boutique, a garden centre. One click fills nine resources in dependency order.
   actions:
     - text: Get started
       link: getting-started/introduction/
@@ -16,33 +16,71 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import overview from '../../assets/screenshots/overview.png';
+import products from '../../assets/screenshots/generator-products.png';
+import recipes from '../../assets/screenshots/recipes.png';
 
-## What it does
+<Image src={overview} alt="The StoreSeeder dashboard: four stat tiles, recent activity, and a grid of generator cards" />
+
+## Two ways in
 
 <CardGrid stagger>
-  <Card title="A whole shop from a recipe" icon="star">
-    Pick a recipe and click once. StoreSeeder fills the store across nine resources in dependency
-    order — brands and categories before products, products and customers before orders — sharing one
-    coherent vocabulary.
+  <Card title="A whole shop, in one click" icon="star">
+    Pick a recipe — a corner grocer, a fashion boutique, a garden centre — and StoreSeeder fills the
+    store across nine resources in dependency order. Brands and categories before products, products
+    and customers before orders, so nothing points at nothing.
   </Card>
   <Card title="Or one resource at a time" icon="setting">
-    Twenty-one generators with a live preview, a batch queue, and parameters that actually change the
-    output. Every declared parameter reaches the entity or the writer, or it is not declared.
+    Twenty-one generators, each with a live preview and parameters that reach the output. Narrow a
+    price range and the preview narrows with it.
   </Card>
   <Card title="Whichever store you run" icon="puzzle">
-    A platform driver decides where data lands, and the same generators feed every driver. Fluent
-    Cart and WooCommerce ship; one filter adds another from a separate plugin.
+    WooCommerce and Fluent Cart ship. Every record goes through that platform's own models — not
+    direct database writes — so it respects the same schema, validation and money handling as real
+    data.
   </Card>
   <Card title="Removable, exactly" icon="trash">
-    Every row StoreSeeder writes is recorded in its own ledger, so deleting the test data removes
-    what it created and nothing that merely resembles it.
+    Every row is recorded in StoreSeeder's own ledger, so deleting the test data removes what it
+    created and nothing that merely resembles it. No date ranges, no name matching.
   </Card>
 </CardGrid>
 
-## Not a dataset
+## The preview tells the truth
 
-A recipe is a **vocabulary** — the words and numeric bands that make a grocer look like a grocer —
-never a dump of records. The generators still build every row, so money stays in integer minor units,
-statuses stay canonical, and a fixed seed reproduces the same store on every platform.
+<Image src={products} alt="The Products generator: parameters on the left, a live preview table on the right showing names, SKUs, types, prices, stock and status" />
 
-That is the whole design. Shipping records would bypass the layer where those guarantees live.
+Every column a parameter governs comes from the same code the run uses. That sounds obvious and it is
+the part most test-data plugins get wrong: a control that moves, saves, and quietly changes nothing.
+
+<Image src={recipes} alt="The Recipes page: three cards — Fashion boutique, Corner grocer, Home and garden — each listing what it will create per resource" />
+
+## A recipe is a vocabulary, not a dataset
+
+It supplies the words and numeric bands that make a grocer look like a grocer — product names, a
+category tree, brand names, a price band, variation axes. The generators still build every row.
+
+That is why a fixed seed reproduces the same store on any platform, why money stays exact, and why a
+recipe cannot smuggle in a broken record: there are no records to smuggle.
+
+<CardGrid>
+  <Card title="Corner grocer" icon="open-book">
+    Cheap lines, high order counts, weight-based variations. 1,794 rows at Medium.
+  </Card>
+  <Card title="Fashion boutique" icon="open-book">
+    1,440 variations over 240 products — size × colour, two axes deep. 3,466 rows.
+  </Card>
+  <Card title="Home &amp; garden" icon="open-book">
+    Shipping classes that genuinely differ, and the widest price band. 1,225 rows.
+  </Card>
+</CardGrid>
+
+## Honest about what it is
+
+StoreSeeder writes large volumes of data directly into your store. It is a development tool: use it on
+development and staging sites, and back up before a large run.
+
+There is no analytics, no licence check and no phone-home. The only outbound requests are two optional
+downloads from GitHub, each behind a consent prompt an administrator has to accept.
+
+[Get started →](/storeseeder/getting-started/introduction/)
