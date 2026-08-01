@@ -213,11 +213,11 @@ final class Recipe extends Command {
 		if ( ! $recipe->has_locale( $locale ) ) {
 			\WP_CLI::warning(
 				sprintf(
-					/* translators: 1: requested locale, 2: recipe name, 3: fallback locale. */
+					/* translators: 1: requested locale name and code. 2: recipe name. 3: fallback locale name and code. */
 					__( '%2$s ships no vocabulary for %1$s; names and addresses will be local but product titles come from %3$s.', 'storeseeder' ),
-					$locale,
+					Locale::label( $locale ) . ' (' . $locale . ')',
 					$recipe->name(),
-					Locale::DEFAULT_LOCALE
+					Locale::label( Locale::DEFAULT_LOCALE ) . ' (' . Locale::DEFAULT_LOCALE . ')'
 				)
 			);
 		}

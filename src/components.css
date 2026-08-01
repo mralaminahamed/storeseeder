@@ -582,13 +582,19 @@
 .fp-root .fp-recipe:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:var(--accent-line); }
 .fp-root .fp-recipe.on { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow-md); }
 /* The tick is the selection, so it is drawn rather than implied by the border alone — a border
-   colour shift is invisible to anyone who cannot separate indigo from grey. */
+   colour shift is invisible to anyone who cannot separate indigo from grey.
+
+   A background-image, not a mask. A mask shows the accent only where the artwork is opaque, so a
+   stroked check masked this way is an accent-coloured tick floating with no disc behind it —
+   which is what this was doing. Painting the disc and laying a white check over it is the mock's
+   own approach and the one that reads as a control. */
 .fp-root .fp-recipe.on::after {
   content:""; position:absolute; top:15px; right:15px; width:18px; height:18px;
   border-radius:var(--r-full); background:var(--accent);
-  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center / 18px no-repeat;
-  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center / 18px no-repeat;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  background-size:12px; background-position:center; background-repeat:no-repeat;
 }
+
 
 .fp-root .fp-recipe-top { display:flex; align-items:flex-start; gap:12px; }
 .fp-root .fp-recipe-ic {
@@ -618,8 +624,17 @@
   border-top:1px solid var(--border); padding-top:12px;
   display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:3px 18px;
 }
-.fp-root .fp-recipe-count { display:flex; align-items:baseline; gap:8px; font-size:var(--fs-hint); color:var(--text-2); padding:2px 0; }
-.fp-root .fp-recipe-count-n { margin-left:auto; font-size:var(--fs-micro); color:var(--text); }
+.fp-root .fp-recipe-count {
+  display:flex; align-items:baseline; gap:8px; font-size:var(--fs-hint); color:var(--text-2);
+  padding:2px 0;
+  /* A grid track will not shrink below its content unless told to, so without this a long label
+     pushes its column wider and the two stop being equal. */
+  min-width:0;
+}
+/* The label yields, the number never does. "Product Variations" ellipses at a quarter-width card
+   rather than wrapping to two lines and making one row taller than its neighbour. */
+.fp-root .fp-recipe-count-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.fp-root .fp-recipe-count-n { margin-left:auto; flex:none; font-size:var(--fs-micro); color:var(--text); }
 .fp-root .fp-recipe-count.off { color:var(--text-faint); }
 .fp-root .fp-recipe-count.off .fp-recipe-count-label { text-decoration:line-through; }
 .fp-root .fp-recipe-count.off .fp-recipe-count-n { color:var(--text-faint); }
@@ -716,6 +731,11 @@
    two columns of "Product categories  14" collide, so the counts stack; at one column the card is
    the full width of the page and a single file of eight rows is a long thin ribbon, so they split.
    The card is widest exactly where the grid is narrowest. */
+@media (min-width: 1501px) {
+  /* Four across is where a column is tightest; the counts keep both columns and give back the
+     gutter instead. */
+  .fp-root .fp-recipe-counts { gap:3px 12px; }
+}
 @media (max-width: 1500px) {
   .fp-root .fp-recipe-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
 }
@@ -732,10 +752,6 @@
   .fp-root .fp-recipe-actions > * { flex:1; }
 }
 
-/* Counts: one file while the cards are narrow, two once they are not. */
-@media (min-width: 1181px) {
-  .fp-root .fp-recipe-counts { grid-template-columns:minmax(0, 1fr); }
-}
 /* A recipe's own mark. Sized rather than styled — the artwork is the archive's, and the only
    thing the admin imposes is how much room it gets. */
 .fp-root .fp-recipe-mark { width:26px; height:26px; display:block; }
@@ -801,6 +817,12 @@
   color:color-mix(in oklab, var(--sky), black 16%);
 }
 .fp-root[data-theme="dark"] .fp-recipe-chip.third { color:var(--sky); }
+
+/* Where a recipe came from, in both directions. The absence of a badge used to mean "official",
+   which is a signal nobody can see — and it made a plugin-registered recipe and a shipped one
+   indistinguishable at a glance. Accent for ours, sky for somebody else's: neither is a warning,
+   so neither borrows the amber. */
+.fp-root .fp-recipe-chip.official { background:var(--accent-soft); color:var(--accent); }
 
 /* The Recipes page sets its own gutters rather than borrowing `.fp-page`. Its cards are a
    full-width grid that wants the column padding, not the centred 1180px measure a reading page

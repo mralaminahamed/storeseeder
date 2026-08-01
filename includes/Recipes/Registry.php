@@ -19,6 +19,8 @@
 
 namespace StoreSeeder\Recipes;
 
+use StoreSeeder\Platforms\Locale;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -338,9 +340,9 @@ final class Registry {
 			$issues[] = array(
 				'code'     => 'storeseeder_recipe_locale_incomplete',
 				'message'  => sprintf(
-					/* translators: 1: locale code, 2: comma-separated resource names. */
+					/* translators: 1: locale name and code, e.g. German (de_DE). 2: comma-separated resource names. */
 					__( 'This recipe lists %1$s but ships none for %2$s, so those fall back to English.', 'storeseeder' ),
-					$locale,
+					self::locale_name( $locale ),
 					implode( ', ', $without_locale )
 				),
 				'blocking' => false,
@@ -374,6 +376,31 @@ final class Registry {
 		}
 
 		return $issues;
+	}
+
+	/**
+	 * A locale named the way a person reads it — "German (de_DE)", not "de_DE".
+	 *
+	 * `Locale::label()` returns "German (Germany)", which repeats the country and drops the code
+	 * the manifest is actually keyed by. Both halves matter here: the name answers "will this be in
+	 * my language" and the code is what someone adding a translation has to create a directory for.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $locale Locale code.
+	 *
+	 * @return string
+	 */
+	private static function locale_name( string $locale ): string {
+		$label = Locale::label( $locale );
+
+		if ( $label === $locale ) {
+			return $locale;
+		}
+
+		$language = explode( ' (', $label )[0];
+
+		return $language . ' (' . $locale . ')';
 	}
 
 	/**
