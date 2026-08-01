@@ -5,6 +5,7 @@ import {
   asParamValue,
   fieldsFromSchema,
   humanize,
+  countryLabel,
   optionLabel,
 } from "./fieldsFromSchema";
 import { generators } from "./generators";
@@ -14,6 +15,21 @@ import { generators } from "./generators";
  * comes out of here, so a mapping mistake is seventeen broken forms rather than one. The
  * tests are the mapping table from its own docblock, asserted.
  */
+describe("countryLabel", () => {
+  it("names the country a code stands for", () => {
+    expect(countryLabel("NL")).toBe("Netherlands");
+    expect(countryLabel("JP")).toBe("Japan");
+  });
+
+  /**
+   * `QQ` is unassigned in CLDR. (`ZZ` is not a good test: it is a real code meaning
+   * "Unknown Region", and resolving it to that string is correct.)
+   */
+  it("returns an unassigned code unchanged", () => {
+    expect(countryLabel("QQ")).toBe("QQ");
+  });
+});
+
 describe("optionLabel", () => {
   /**
    * The bug: selects and chips drew the raw schema value, so a payment method read
@@ -40,9 +56,19 @@ describe("optionLabel", () => {
     expect(optionLabel("250g")).toBe("250g");
   });
 
-  it("leaves a two-letter country code alone", () => {
-    expect(optionLabel("US")).toBe("US");
-    expect(optionLabel("GB")).toBe("GB");
+  /**
+   * A country picker offering "US" and "GB" is asking the reader to know the codes. The value sent
+   * to the API is still the code.
+   */
+  it("resolves a two-letter country code to its country name", () => {
+    expect(optionLabel("US")).toBe("United States");
+    expect(optionLabel("GB")).toBe("United Kingdom");
+    expect(optionLabel("DE")).toBe("Germany");
+    expect(optionLabel("BR")).toBe("Brazil");
+  });
+
+  it("falls back to the code when it names no country", () => {
+    expect(optionLabel("QQ")).toBe("QQ");
   });
 
   it("leaves a value the schema already wrote as a label", () => {
