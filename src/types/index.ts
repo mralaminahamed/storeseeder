@@ -9,6 +9,16 @@ declare global {
       ajaxUrl?: string;
       /** The site's front page, for a link to the store that was just built. */
       homeUrl?: string;
+      /**
+       * What the Recipes page can assume before its own fetch returns.
+       *
+       * A first-paint hint, not the truth: the archive can be removed between page load and the
+       * request, and the response overrides this.
+       */
+      recipes?: {
+        downloaded?: boolean;
+        count?: number;
+      };
       adminColors?: Record<string, string>;
       colorScheme?: string;
       locale?: {

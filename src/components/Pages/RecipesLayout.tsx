@@ -59,8 +59,13 @@ export default function RecipesLayout() {
     getSettings().defaultLocale ?? window.storeseederApi?.locale?.faker ?? "en_US";
   const homeUrl = window.storeseederApi?.homeUrl ?? "";
 
+  // Seeded from the inlined payload rather than assumed. `true` was a guess that showed four card
+  // skeletons on a site that had never synced, then collapsed to a single empty panel — a skeleton
+  // standing in for a layout that was never coming.
+  const inlined = window.storeseederApi?.recipes;
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [downloaded, setDownloaded] = useState(true);
+  const [downloaded, setDownloaded] = useState(false !== inlined?.downloaded);
   const [resolved, setResolved] = useState(true);
   const [incomplete, setIncomplete] = useState<string[]>([]);
   const [adminUrls, setAdminUrls] = useState<Record<string, string>>({});
@@ -266,13 +271,18 @@ export default function RecipesLayout() {
     }
   }, [progress, undoing, discardRun, toast]);
 
-  // A skeleton, not a spinner: this wait has a known shape, so standing in for it means the
-  // layout does not jump when the cards arrive.
-  if (loading) {
+  // A skeleton, not a spinner: this wait has a known shape, so standing in for it means the layout
+  // does not jump when the cards arrive.
+  //
+  // Only when cards are actually coming, though. On a site that has never synced there is nothing
+  // to stand in for — the fetch will produce a single empty panel — so the screen renders straight
+  // away and the request happens behind it. It still runs, because it is what resolves the target
+  // and the admin URLs; it just has no layout to hold open.
+  if (loading && downloaded) {
     return (
       <div className="fp-recipes-page fp-enter">
         <PageHead title={__("Recipes", "storeseeder")} description={DESCRIPTION} />
-        <RecipeSkeleton />
+        <RecipeSkeleton cards={inlined?.count} />
       </div>
     );
   }

@@ -585,6 +585,18 @@ class StoreSeeder {
 			// guesses wrong is worse than one that lands on the front page.
 			'homeUrl'     => home_url( '/' ),
 			'platforms'   => $this->rest_platforms()->get_data(),
+			// Inlined so the Recipes page knows on first paint which state it is in. Without it the
+			// page has to guess what the fetch will return, and on a site that has never synced it
+			// guessed wrong: four card skeletons, then a collapse to a single empty panel. A
+			// skeleton can only stand in for a layout it knows is coming.
+			//
+			// The count too, so the skeleton draws the right number of cards rather than a fixed
+			// four. Both are a first-paint hint and not the truth — the archive can be deleted
+			// between page load and the fetch, and the response still corrects this.
+			'recipes'     => array(
+				'downloaded' => Recipe_Registry::downloaded(),
+				'count'      => count( Recipe_Registry::instance()->all() ),
+			),
 			// Inlined for the same reason, and because it cannot change while the page is
 			// open: MCP availability depends on which plugins are active.
 			'mcp'         => MCP_Server::status(),
