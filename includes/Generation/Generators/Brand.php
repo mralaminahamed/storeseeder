@@ -181,11 +181,13 @@ class Brand extends Generator {
 				'kind' => 'mono',
 			),
 			'products' => array(
-				'v'    => $faker->numberBetween( 1, 5 ),
+				// `products_per_brand()`, so narrowing the parameter shows here too.
+				'v'    => $this->products_per_brand(),
 				'kind' => 'num',
 			),
 			'nested'   => array(
-				'v'    => $faker->boolean( 25 ) ? __( 'yes', 'storeseeder' ) : __( 'no', 'storeseeder' ),
+				// The recipe's own ratio, not a fixed 25%.
+				'v'    => $faker->boolean( $this->nested_ratio() ) ? __( 'yes', 'storeseeder' ) : __( 'no', 'storeseeder' ),
 				'kind' => 'text',
 			),
 		);
