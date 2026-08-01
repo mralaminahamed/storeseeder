@@ -482,6 +482,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_recipes` | filter | Register a store recipe from your own plugin. Append a manifest array; a malformed one is dropped with a debug line rather than thrown |
 | `storeseeder_recipe_directories` | filter | Where one recipe's vocabulary lives, keyed by id. The other half of `storeseeder_recipes`, which registers the manifest but not the words |
 | `storeseeder_recipes_source` | filter | Where the recipe archive is downloaded from. Change both URLs, for the same reason as the sample data |
+| `storeseeder_platform_admin_url_{id}` | filter | Where one platform keeps a resource in wp-admin, so a finished run can link to what it made |
 | `storeseeder_rest_message` / `storeseeder_rest_response` | filter | Shape the REST response |
 | `storeseeder_{resource}_generation_result` | filter | Per-resource result payload |
 

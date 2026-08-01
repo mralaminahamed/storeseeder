@@ -34,7 +34,7 @@ Manual check:
 - [ ] New PHP has PHPDoc; REST routes validate input against JSON Schema and gate on `StoreSeeder\Access`
 - [ ] New user-facing strings are translatable; `composer makepot` re-run if strings changed
 - [ ] Docs updated where relevant (`README.md`, `docs/`, `CHANGELOG.md`)
-- [ ] Any new outbound HTTP request is documented in `docs/external-services.md`, and summarised in
+- [ ] Any new outbound HTTP request is documented in `docs/guides/external-services.md`, and summarised in
       `README.md` and `readme.txt`
 - [ ] No `console.log` or debug output left behind
 

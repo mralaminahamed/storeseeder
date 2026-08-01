@@ -1,6 +1,6 @@
 # StoreSeeder Documentation
 
-Generate realistic test data for WordPress e-commerce stores. Start with the
+Generate realistic test data for WordPress e-commerce stores — a whole coherent shop from a recipe, or one resource at a time. Start with the
 [project README](../README.md) for the overview; these pages go deeper.
 
 ## Using StoreSeeder
@@ -8,8 +8,8 @@ Generate realistic test data for WordPress e-commerce stores. Start with the
 | Page | What it covers |
 |------|----------------|
 | [Installation](installation.md) | Requirements, install from a release zip or from source, choosing a target platform |
-| [Usage](usage.md) | Running generators, live preview, the batch queue, settings, run history, and the REST API |
-| [Features](features.md) | The 21 generators and what each one writes into the store |
+| [Usage](usage.md) | Building a shop from a recipe, running generators, live preview, the batch queue, settings, run history, and the REST API |
+| [Features](features.md) | Recipes, the 21 generators and what each one writes into the store |
 
 ## Building on StoreSeeder
 

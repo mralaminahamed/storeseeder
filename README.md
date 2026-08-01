@@ -5,9 +5,9 @@
 # StoreSeeder
 
 **Realistic test data for WordPress e-commerce platforms.**
-21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
+Whole shops from a recipe, 21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
 [![Tested up to 7.0](https://img.shields.io/badge/tested%20up%20to-7.0-blue?style=flat-square)](readme.txt)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-8892BF?style=flat-square)](https://php.net/)
@@ -23,9 +23,13 @@
 
 ## What It Does
 
-Pick a generator, configure its parameters, click **Generate**. Every record is created through the
-target platform's own models, so it respects the same schema, relationships, validation, and money
-handling as real data — and stays compatible across that platform's updates.
+Pick a **recipe** and click once for a whole coherent shop — a corner grocer, a fashion boutique, a
+home & garden store — filled across nine resources in dependency order. Or pick a single generator,
+configure its parameters, and click **Generate**.
+
+Either way, every record is created through the target platform's own models, so it respects the same
+schema, relationships, validation, and money handling as real data — and stays compatible across that
+platform's updates.
 
 Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
 that, and the same twenty-one generators feed every driver. Fluent Cart and WooCommerce ship today.
@@ -113,7 +117,7 @@ transactions — and each one reports clearly when a prerequisite is missing.
 | Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
 | Logs | Advanced | Activity log entries across orders, products, customers, and system events |
 
-Full per-generator detail in [docs/features.md](docs/features.md).
+Full per-generator detail in [docs/guides/features.md](docs/guides/features.md).
 
 ## Features
 
@@ -141,13 +145,13 @@ Full per-generator detail in [docs/features.md](docs/features.md).
 
 | Page | What it covers |
 |------|----------------|
-| [docs/](docs/README.md) | Documentation index |
-| [Installation](docs/installation.md) | Requirements, install paths, and choosing a target platform |
-| [Usage](docs/usage.md) | Running generators, live preview, batch queue, settings, run history |
-| [Features](docs/features.md) | The 21 generators, the platform matrix, locales, and what each generator writes |
-| [Architecture](docs/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
-| [Development](docs/development.md) | Local setup, build and test commands, adding a generator, release process |
-| [External Services](docs/external-services.md) | The two outbound requests, what they send, and how to opt out |
+| [docs/](docs/guides/README.md) | Documentation index |
+| [Installation](docs/guides/installation.md) | Requirements, install paths, and choosing a target platform |
+| [Usage](docs/guides/usage.md) | Running generators, live preview, batch queue, settings, run history |
+| [Features](docs/guides/features.md) | The 21 generators, the platform matrix, locales, and what each generator writes |
+| [Architecture](docs/guides/architecture.md) | The platform driver layer, request flow, extension points, and honest scale limits |
+| [Development](docs/guides/development.md) | Local setup, build and test commands, adding a generator, release process |
+| [External Services](docs/guides/external-services.md) | The two outbound requests, what they send, and how to opt out |
 | [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commit conventions, quality gates, PR expectations |
 | [SECURITY.md](SECURITY.md) | Private vulnerability reporting and the plugin's security measures |
@@ -293,7 +297,7 @@ add_action( 'storeseeder_after_write_fluent-cart_product', function ( $result, $
 ```
 
 The full table — every filter and action, with what each receives — is in
-[docs/architecture.md](docs/architecture.md#extension-points).
+[docs/guides/architecture.md](docs/guides/architecture.md#extension-points).
 
 ## External Services
 
@@ -307,7 +311,7 @@ neither fires on activation.
 
 Full disclosure — exactly what each request sends and receives, provider terms and privacy policies,
 and what StoreSeeder deliberately does not do — in
-[docs/external-services.md](docs/external-services.md).
+[docs/guides/external-services.md](docs/guides/external-services.md).
 
 ## Security
 
@@ -338,7 +342,7 @@ most recent releases in the WordPress plugin format.
 
 Bug reports, feature requests, and pull requests are all welcome. Read
 [CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the checks a pull request needs to
-pass, and [docs/development.md](docs/development.md) for architecture detail. File issues on the
+pass, and [docs/guides/development.md](docs/guides/development.md) for architecture detail. File issues on the
 [issue tracker](https://github.com/mralaminahamed/storeseeder/issues); for help using the plugin, see
 [SUPPORT.md](SUPPORT.md). Participation is covered by the
 [Code of Conduct](CODE_OF_CONDUCT.md).

@@ -613,7 +613,7 @@ here.
 - [ ] `composer phpcs:plugin-review` for the WordPress.org ruleset
 - [ ] `yarn build` committed assets fresh; `composer makepot` run after the build
 - [ ] Plugin activates on a site with **no** platform installed (the menu hides, nothing fatals)
-- [ ] `docs/external-services.md` and `readme.txt` still agree about outbound requests
+- [ ] `docs/guides/external-services.md` and `readme.txt` still agree about outbound requests
 - [ ] If a driver shipped this release, the platform is added to the **`readme.txt` title
       only** — and only if it shipped. That title is the strongest search signal
       WordPress.org has, and naming a platform with no driver behind it is a claim the

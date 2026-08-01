@@ -280,7 +280,7 @@ export default function RecipesLayout() {
   // and the admin URLs; it just has no layout to hold open.
   if (loading && downloaded) {
     return (
-      <div className="fp-recipes-page fp-enter">
+      <div className="fp-page wide fp-enter fp-recipes-page">
         <PageHead title={__("Recipes", "storeseeder")} description={DESCRIPTION} />
         <RecipeSkeleton cards={inlined?.count} />
       </div>
@@ -289,7 +289,7 @@ export default function RecipesLayout() {
 
   if (failed) {
     return (
-      <div className="fp-recipes-page fp-enter fp-recipes-note">
+      <div className="fp-page wide fp-enter fp-recipes-page fp-recipes-note">
         {__("Could not load the recipes. Reload the page to try again.", "storeseeder")}
       </div>
     );
@@ -314,7 +314,7 @@ export default function RecipesLayout() {
   };
 
   return (
-    <div className="fp-recipes-page fp-enter">
+    <div className="fp-page wide fp-enter fp-recipes-page">
       <Outlet context={context} />
     </div>
   );

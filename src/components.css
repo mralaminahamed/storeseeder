@@ -427,7 +427,7 @@
 .fp-root .fp-rating-empty { color:var(--border-strong); letter-spacing:1px; font-size:var(--fs-body); }
 .fp-root .fp-rating-count { color:var(--text-faint); }
 .fp-root .fp-plugin-active { color:var(--text-3); font-family:var(--font-mono); }
-@media (max-width:1100px){ .fp-root .fp-plugins-grid{ grid-template-columns:repeat(2,1fr); } .fp-root .fp-stat-row,.fp-root .fp-gen-grid{ grid-template-columns:repeat(2,1fr);} }
+@media (max-width:1100px){ .fp-root .fp-plugins-grid,.fp-root .fp-recipe-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } .fp-root .fp-stat-row,.fp-root .fp-gen-grid{ grid-template-columns:repeat(2,1fr);} }
 
 .fp-root .fp-btn.full-w { width:100%; }
 
@@ -569,7 +569,7 @@
    for: an itemised count list, because there is no preview table on this page and the counts are
    what replaces it, and a hue of its own, because unlike the four stat tiles these really are
    different things. */
-.fp-root .fp-recipe-grid { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:var(--gap-grid); }
+.fp-root .fp-recipe-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--pad-card); }
 
 .fp-root .fp-recipe {
   --recipe-hue: var(--accent);
@@ -724,24 +724,12 @@
 
 .fp-root .fp-recipes-note { padding:40px; text-align:center; color:var(--text-faint); font-size:var(--fs-ctl-sm); }
 
-/* Four across, matching the generator and stat grids — and then a ladder, because a recipe card
-   carries more than they do.
+/* Three across with `--pad-card` between them, the same as Our Plugins — a recipe card and a plugin
+   card carry about the same amount, so making them agree means the two pages read as one product
+   rather than two.
 
-   The count list inverts against the grid on purpose. At four columns a card is roughly 300px and
-   two columns of "Product categories  14" collide, so the counts stack; at one column the card is
-   the full width of the page and a single file of eight rows is a long thin ribbon, so they split.
-   The card is widest exactly where the grid is narrowest. */
-@media (min-width: 1501px) {
-  /* Four across is where a column is tightest; the counts keep both columns and give back the
-     gutter instead. */
-  .fp-root .fp-recipe-counts { gap:3px 12px; }
-}
-@media (max-width: 1500px) {
-  .fp-root .fp-recipe-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 1180px) {
-  .fp-root .fp-recipe-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
-}
+   It steps down at 1100px with the plugins grid, in the same media query below, so the two never
+   disagree mid-resize. */
 @media (max-width: 782px) {
   /* 782px is where WordPress itself switches the admin to its mobile layout, so the sidebar has
      already gone by here — following core's breakpoint rather than inventing one keeps the two
@@ -824,11 +812,12 @@
    so neither borrows the amber. */
 .fp-root .fp-recipe-chip.official { background:var(--accent-soft); color:var(--accent); }
 
-/* The Recipes page sets its own gutters rather than borrowing `.fp-page`. Its cards are a
-   full-width grid that wants the column padding, not the centred 1180px measure a reading page
-   uses — and `.fp-scroll` supplies none of its own, so without this the grid sits flush against
-   the sidebar. */
-.fp-root .fp-recipes-page { padding:var(--pad-col-y) var(--pad-col-x) var(--pad-col-b); }
+/* Recipes uses `.fp-page wide`, the same measure and gutters as Overview and Our Plugins. It had
+   its own full-width padding, which made it the one screen whose content did not line up with the
+   others as you moved between them — the cards started further left than the stat tiles above them
+   on the previous page. Four pages, one measure.
+
+   The class stays for what is genuinely its own, below. */
 
 /* A disabled button here has to be able to say why it is disabled.
    The global rule sets `pointer-events:none`, which is right almost everywhere — it stops a dead

@@ -751,7 +751,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="fp-page fp-enter">
+    <div className="fp-page wide fp-enter">
       <PageHead
         title={__("Settings", "storeseeder")}
         description={__(

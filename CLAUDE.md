@@ -155,9 +155,9 @@ AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_re
 all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
 `storeseeder_platform_fields_{id}`, `storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`,
 `storeseeder_purge_order`, `storeseeder_recipes`, `storeseeder_recipe_directories`,
-`storeseeder_recipes_source`,
+`storeseeder_recipes_source`, `storeseeder_platform_admin_url_{id}`,
 `storeseeder_admin_payload`,
-`storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
+`storeseeder_sample_data_source`. Full table in `docs/guides/architecture.md`.
 
 ### A declared parameter must change the output
 
@@ -197,6 +197,31 @@ Declaring a field the writer does not read recreates the `include_images` bug, w
 reason this seam exists. `Capability::supported_except( array $fields )` is the other half: a
 platform that stores a resource but not all of its canonical fields says which, and the admin
 prints it instead of dropping them silently.
+
+### Recipes: one path, computed once
+
+A recipe is a vocabulary — words and numeric bands — downloaded to
+`uploads/storeseeder-recipes/`, never bundled. Three things in this area have already broken once
+each, all in the same way: **two computations of one value that silently stopped matching.**
+
+- `Generator::sample_data_candidates()` built the recipe path itself while `Recipes\Registry`
+  built another. When recipes moved out of the plugin the registry followed and the generator did
+  not, so every recipe ran to completion on default vocabulary and the audit — reading the *correct*
+  path — reported no issues. Ask the registry; never derive the path.
+- `Product::build_entity()` named products from vocabulary and `build_preview_row()` from
+  `words( 3 )`, so the preview showed Lorem for a run that produced real names. A shown value that a
+  parameter governs must come from the same helper the entity uses.
+- `apply_recipe_params()` used `$params + $recipe`, which loses to any parameter with a schema
+  default — and `price_range` has one. Compare against what the request **sent**, the way the
+  `ignored` report does.
+
+None of the three crashed. All produced plausible data, which is why a test that asserts the
+*agreement* rather than a particular value is the only kind that catches them —
+`Recipes\VocabularyPathTest` is the shape.
+
+`WP_Filesystem::move()` defaults to `$overwrite = false`, so an archive re-sync silently kept every
+stale file until this was passed explicitly. That is also why the sample data grew a "Force re-sync"
+that deletes directories first.
 
 ### Deleting generated data means the ledger, never a heuristic
 
@@ -291,10 +316,23 @@ breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
   the other's files, and a Playwright spec under Jest fails with a confusing error about
   `test.describe`. Jest tests sit **beside their source** (`src/lib/locales.test.ts`), not
   in a parallel tree; PHP tests stay under `tests/php/`, mirroring `includes/`.
+- **Four pages share one measure.** Overview, Recipes, Our Plugins and Settings all wrap in
+  `.fp-page wide fp-enter`. Settings was 1180 and Recipes was full-width, so content jumped
+  horizontally as you moved between them. A page-level wrapper is not optional: `.fp-scroll`
+  carries no padding of its own.
+- **Headings go through `<PageHead>`.** Four pages had hand-rolled
+  `fp-page-head > h1.fp-h1 + p.fp-sub` and a fifth invented `fp-page-title` / `fp-page-sub`, which
+  match nothing — so the heading rendered as 13px body text and no linter noticed.
+- **`<Button>` with no `variant` is `outline`, not primary.** `toFpVariant(undefined)` returns
+  `"outline"`, so a page's main action drew as a secondary. State the variant, the size and
+  `type="button"`; pass the icon through the `icon` prop so the component sizes it.
+- **A destructive action gets `<ConfirmDialog>`.** Cancel takes focus, Tab is trapped, and Escape
+  is refused while the action runs. Two actions in the danger zone previously had no confirmation
+  at all.
 - **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
 - **Sample data and recipes live in separate repos** and download only after an administrator
   accepts the consent prompt. That prompt is the only thing granting permission — see
-  `docs/external-services.md`, and keep readme.txt in agreement with the code. One consent record
+  `docs/guides/external-services.md`, and keep readme.txt in agreement with the code. One consent record
   covers both; asking twice for the same answer trains people to click through prompts.
 - **A test method may not narrow a WordPress base method.** `WP_UnitTestCase_Base` declares a
   public `rmdir()`, and `tearDown()` is final — redeclaring either is a *compile-time* fatal that
