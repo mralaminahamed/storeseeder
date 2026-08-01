@@ -87,20 +87,32 @@ export default function RecipeDoneView() {
           <Button
             variant="outline"
             size="sm"
+            icon="external"
+            type="button"
             onClick={() => window.open(homeUrl, "_blank", "noopener,noreferrer")}
           >
-            <Icon name="external" size={13} />
             {__("View the store", "storeseeder")}
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={() => void navigate("/recipes")}>
+        <Button
+          variant="outline"
+          size="sm"
+          type="button"
+          onClick={() => void navigate("/recipes")}
+        >
           {__("Build another", "storeseeder")}
         </Button>
         <span className="fp-recipe-spacer" />
         <span className="fp-recipe-runid mono">{runId}</span>
         {!undone && (
-          <Button variant="outline" size="sm" disabled={undoing} onClick={() => void undo()}>
-            <Icon name="undo" size={13} />
+          <Button
+            variant="outline"
+            size="sm"
+            icon="undo"
+            type="button"
+            disabled={undoing}
+            onClick={() => void undo()}
+          >
             {undoing ? __("Undoing…", "storeseeder") : __("Undo this recipe", "storeseeder")}
           </Button>
         )}
