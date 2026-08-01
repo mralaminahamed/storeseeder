@@ -11,23 +11,22 @@ interface StatCardProps {
   empty: boolean;
   delta: number;
   spark: number[];
-  accentVar?: string;
   testId?: string;
 }
 
-export function StatCard({ iconName, label, value, empty, delta, spark, accentVar, testId }: StatCardProps) {
-  const chipStyle = accentVar
-    ? {
-        background: `color-mix(in oklch, ${accentVar} 14%, var(--surface))`,
-        color: accentVar,
-      }
-    : undefined;
-
+/**
+ * The tile and the sparkline carried a per-card hue — indigo, violet, sky, green. It read as a
+ * category the data does not have: the four cards count the same kind of thing, and the generator
+ * tiles a section below are all one accent, so the stat row looked like a different component.
+ * Both now take the accent, which is what `.fp-stat-ic` declared all along before an inline style
+ * overrode it.
+ */
+export function StatCard({ iconName, label, value, empty, delta, spark, testId }: StatCardProps) {
   return (
     <div className="fp-card fp-stat" data-testid={testId}>
       <div className="fp-stat-top">
-        <span className="fp-stat-ic" style={chipStyle}>
-          <Icon name={iconName} size={17} />
+        <span className="fp-stat-ic">
+          <Icon name={iconName} size={19} />
         </span>
         {label}
       </div>
@@ -50,9 +49,7 @@ export function StatCard({ iconName, label, value, empty, delta, spark, accentVa
             {delta > 0 ? `+${delta} this week` : __("steady", "storeseeder")}
           </span>
         )}
-        {spark && (
-          <Sparkline data={spark} color={accentVar ?? "var(--accent)"} />
-        )}
+        {spark && <Sparkline data={spark} />}
       </div>
     </div>
   );
