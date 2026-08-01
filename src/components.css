@@ -604,6 +604,9 @@
 .fp-root .fp-recipe-chip {
   display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-micro); font-weight:500;
   padding:3px 9px; border-radius:var(--r-full); background:var(--surface-inset); color:var(--text-2);
+  /* Transparent, not absent: a toned chip that gains a border would sit a pixel taller than a
+     plain one beside it. */
+  border:1px solid transparent;
 }
 .fp-root .fp-recipe-chip.warn {
   background:color-mix(in oklab, var(--amber) 16%, var(--surface));

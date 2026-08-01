@@ -68,7 +68,7 @@ export function RecipeCard({ recipe, size, selected, onSelect }: RecipeCardProps
         */}
         {!recipe.bundled && (
           <span className="fp-recipe-chip third">
-            <Icon name="plug" size={11} />
+            <Icon name="star" size={11} />
             {__("From a plugin", "storeseeder")}
           </span>
         )}

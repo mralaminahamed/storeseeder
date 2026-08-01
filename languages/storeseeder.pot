@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T09:46:11+00:00\n"
+"POT-Creation-Date: 2026-08-01T10:03:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -69,59 +69,59 @@ msgstr ""
 msgid "GitHub"
 msgstr ""
 
-#: class-storeseeder.php:693
+#: class-storeseeder.php:697
 msgid "Which kind of record to look for."
 msgstr ""
 
-#: class-storeseeder.php:704
+#: class-storeseeder.php:708
 msgid "What the user typed. Empty returns the first few."
 msgstr ""
 
-#: class-storeseeder.php:710
+#: class-storeseeder.php:714
 msgid "Which platform to read. Defaults to the resolved target."
 msgstr ""
 
-#: class-storeseeder.php:715
+#: class-storeseeder.php:719
 msgid "Maximum results."
 msgstr ""
 
-#: class-storeseeder.php:738
+#: class-storeseeder.php:742
 msgid "Which platform to answer for. Defaults to the resolved target."
 msgstr ""
 
-#: class-storeseeder.php:743
+#: class-storeseeder.php:747
 msgid "Locale the run would use, so each recipe can say whether it carries vocabulary for it."
 msgstr ""
 
-#: class-storeseeder.php:1130
+#: class-storeseeder.php:1134
 msgid "No target platform to search. Choose one first."
 msgstr ""
 
-#: class-storeseeder.php:1717
+#: class-storeseeder.php:1721
 msgid "Recipes are downloaded from GitHub, which needs an administrator to accept the prompt on the Settings screen first."
 msgstr ""
 
-#: class-storeseeder.php:1727
+#: class-storeseeder.php:1731
 msgid "Could not download the recipes. Check that the site can reach github.com."
 msgstr ""
 
-#: class-storeseeder.php:1738
+#: class-storeseeder.php:1742
 msgid "The recipe archive downloaded but holds no index. It may be a fork without a recipes.json."
 msgstr ""
 
 #. translators: %s: comma-separated list of supported e-commerce platforms.
-#: class-storeseeder.php:1977
+#: class-storeseeder.php:1981
 #, php-format
 msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1997
+#: class-storeseeder.php:2001
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:2075
+#: class-storeseeder.php:2079
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -3450,6 +3450,10 @@ msgstr ""
 msgid "Loading recipes…"
 msgstr ""
 
+#: build/admin-app.js:17
+msgid "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order."
+msgstr ""
+
 #. translators: 1: resource name, 2: error message.
 #: build/admin-app.js:18
 #, js-format
@@ -3538,6 +3542,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: build/admin-app.js:24
+msgid "View the store"
+msgstr ""
+
+#: build/admin-app.js:24
 msgid "Build another"
 msgstr ""
 
@@ -3547,10 +3555,6 @@ msgstr ""
 
 #: build/admin-app.js:24
 msgid "Undo this recipe"
-msgstr ""
-
-#: build/admin-app.js:24
-msgid "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order."
 msgstr ""
 
 #. translators: %s: comma-separated recipe ids.
@@ -3592,7 +3596,7 @@ msgstr ""
 #. translators: 1: row count, 2: resource count, 3: recipe name.
 #: build/admin-app.js:26
 #, js-format
-msgid "%1$s rows across %2$s resources · %3$s"
+msgid "<b>%1$s</b> rows across %2$s resources · <n>%3$s</n>"
 msgstr ""
 
 #: build/admin-app.js:26

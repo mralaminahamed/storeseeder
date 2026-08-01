@@ -580,6 +580,10 @@ class StoreSeeder {
 			),
 			// Inlined so the topbar renders its target on first paint. Fetching it
 			// would flash "Auto" with no platform beside it, then correct itself.
+			// Where a freshly built store can be looked at. `home_url()` rather than a per-driver
+			// storefront route: every platform puts its shop somewhere different, and a link that
+			// guesses wrong is worse than one that lands on the front page.
+			'homeUrl'     => home_url( '/' ),
 			'platforms'   => $this->rest_platforms()->get_data(),
 			// Inlined for the same reason, and because it cannot change while the page is
 			// open: MCP availability depends on which plugins are active.
