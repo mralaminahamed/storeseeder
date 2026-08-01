@@ -1,7 +1,12 @@
 import { describe, expect, it } from "@jest/globals";
 
 import type { ParameterConfig } from "@/types";
-import { asParamValue, fieldsFromSchema, humanize } from "./fieldsFromSchema";
+import {
+  asParamValue,
+  fieldsFromSchema,
+  humanize,
+  optionLabel,
+} from "./fieldsFromSchema";
 import { generators } from "./generators";
 
 /**
@@ -9,6 +14,57 @@ import { generators } from "./generators";
  * comes out of here, so a mapping mistake is seventeen broken forms rather than one. The
  * tests are the mapping table from its own docblock, asserted.
  */
+describe("optionLabel", () => {
+  /**
+   * The bug: selects and chips drew the raw schema value, so a payment method read
+   * `bank_transfer` and an order status `on_hold`.
+   */
+  it("turns an underscored value into words", () => {
+    expect(optionLabel("bank_transfer")).toBe("Bank Transfer");
+    expect(optionLabel("on_hold")).toBe("On Hold");
+    expect(optionLabel("free_shipping")).toBe("Free Shipping");
+  });
+
+  it("capitalises a single word", () => {
+    expect(optionLabel("percentage")).toBe("Percentage");
+    expect(optionLabel("refunded")).toBe("Refunded");
+  });
+
+  /**
+   * Age bands and sizes start with a digit and are already readable. Splitting them the way an
+   * underscored value is split would turn "18-25" into "18 25".
+   */
+  it("leaves a value that starts with a digit alone", () => {
+    expect(optionLabel("18-25")).toBe("18-25");
+    expect(optionLabel("65+")).toBe("65+");
+    expect(optionLabel("250g")).toBe("250g");
+  });
+
+  it("leaves a two-letter country code alone", () => {
+    expect(optionLabel("US")).toBe("US");
+    expect(optionLabel("GB")).toBe("GB");
+  });
+
+  it("leaves a value the schema already wrote as a label", () => {
+    expect(optionLabel("Color")).toBe("Color");
+    expect(optionLabel("Image")).toBe("Image");
+  });
+
+  /**
+   * The handful Title Case gets wrong. "Cod" is a fish; "Paypal" is not how the brand is spelled.
+   */
+  it("uses the override for values Title Case would mangle", () => {
+    expect(optionLabel("cod")).toBe("Cash on Delivery");
+    expect(optionLabel("paypal")).toBe("PayPal");
+    expect(optionLabel("vip")).toBe("VIP");
+    expect(optionLabel("authorize_net")).toBe("Authorize.Net");
+  });
+
+  it("does not choke on an empty value", () => {
+    expect(optionLabel("")).toBe("");
+  });
+});
+
 describe("humanize", () => {
   it.each([
     ["price_range", "Price Range"],

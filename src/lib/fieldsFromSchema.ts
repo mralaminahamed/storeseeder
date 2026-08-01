@@ -1,3 +1,5 @@
+import { __ } from "@wordpress/i18n";
+
 import type { ParameterConfig, ParamValue } from "@/types";
 
 export type FieldType =
@@ -45,6 +47,50 @@ export interface FieldSection {
 export function humanize(key: string): string {
   return key
     .split(/[_\-]/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * Option values that Title Case gets wrong.
+ *
+ * Everything else in the enums reads correctly once the underscores are spaces, so this stays
+ * short on purpose — a lookup table of every value would be a second copy of the schema, and the
+ * next person to add an enum would have to know to update it.
+ */
+const OPTION_LABELS: Record<string, string> = {
+  cod: __("Cash on Delivery", "storeseeder"),
+  // Proper nouns, through gettext anyway: a locale that transliterates them should be able to.
+  paypal: __("PayPal", "storeseeder"),
+  authorize_net: __("Authorize.Net", "storeseeder"),
+  vip: __("VIP", "storeseeder"),
+};
+
+/**
+ * The label to show for one option value.
+ *
+ * Selects and chips were rendering the raw value: a payment method read `bank_transfer`, an order
+ * status `on_hold`, a coupon type `free_shipping`. The value still travels to the API — only what
+ * is drawn changes.
+ *
+ * Three things are left alone rather than titled:
+ * - anything starting with a digit, because `18-25` and `65+` are already readable and splitting
+ *   them on the hyphen would produce "18 25";
+ * - two-letter uppercase codes, which are countries (`US`, `GB`) and not words;
+ * - values that already carry a capital, which the schema author wrote as a label.
+ *
+ * Only underscores separate words here. Hyphens do not, for the age-band reason above.
+ */
+export function optionLabel(value: string): string {
+  if (OPTION_LABELS[value]) return OPTION_LABELS[value];
+
+  if (/^\d/.test(value)) return value;
+  if (/^[A-Z]{2}$/.test(value)) return value;
+  if (/[A-Z]/.test(value)) return value;
+
+  return value
+    .split("_")
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
