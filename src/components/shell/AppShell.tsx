@@ -31,7 +31,8 @@ function getNavCollapsedInit(): boolean {
 
 function deriveCrumb(pathname: string): string {
   if (pathname === "/") return "Overview";
-  if (pathname === "/recipes") return "Recipes";
+  // startsWith, not equality: the run and result screens are subroutes of the same page.
+  if (pathname.startsWith("/recipes")) return "Recipes";
   if (pathname === "/settings") return "Settings";
   if (pathname === "/plugins") return "Our Plugins";
   if (pathname.startsWith("/generator/")) {
