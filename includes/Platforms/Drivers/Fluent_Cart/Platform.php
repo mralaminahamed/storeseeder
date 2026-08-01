@@ -8,6 +8,8 @@
 
 namespace StoreSeeder\Platforms\Drivers\Fluent_Cart;
 
+use FluentCart\App\Models\Customer as CustomerModel;
+use FluentCart\App\Models\ProductDetail as ProductDetailModel;
 use StoreSeeder\Platforms\Capability;
 use StoreSeeder\Platforms\Platform_Driver;
 use StoreSeeder\Platforms\Resource;
@@ -208,6 +210,128 @@ final class Platform extends Platform_Driver {
 		}
 
 		return $matrix;
+	}
+
+	/**
+	 * Products and customers a Fluent Cart store already has.
+	 *
+	 * Through its Eloquent models, which is where the data lives — a product is a `wp_posts` row
+	 * paired with a detail row, and a customer is its own table rather than a WordPress user.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 * @param string $query         The search term.
+	 * @param int    $limit         Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	protected function platform_search( string $resource_type, string $query, int $limit ): array {
+		if ( Resource::PRODUCT === $resource_type ) {
+			return $this->search_products( $query, $limit );
+		}
+
+		if ( Resource::CUSTOMER === $resource_type ) {
+			return $this->search_customers( $query, $limit );
+		}
+
+		return array();
+	}
+
+	/**
+	 * Published products, newest matching first.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $query The search term.
+	 * @param int    $limit Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function search_products( string $query, int $limit ): array {
+		if ( ! class_exists( ProductDetailModel::class ) ) {
+			return array();
+		}
+
+		$builder = ProductDetailModel::query()->with( 'product' )->limit( $limit );
+
+		// A term that is only digits is an id as often as it is part of a name — and it is the only
+		// way a picker restoring a saved value can turn that value back into a name to show.
+		if ( '' !== $query && ctype_digit( $query ) ) {
+			$builder->where( 'post_id', (int) $query );
+		} elseif ( '' !== $query ) {
+			// Through the relation, because the title lives on the post rather than the detail row.
+			$builder->whereHas(
+				'product',
+				static function ( $posts ) use ( $query ) {
+					$posts->where( 'post_title', 'LIKE', '%' . $query . '%' );
+				}
+			);
+		}
+
+		$results = array();
+
+		foreach ( $builder->get() as $detail ) {
+			$post = $detail->product;
+
+			if ( ! $post || 'publish' !== $post->post_status ) {
+				continue;
+			}
+
+			$results[] = array(
+				// The post id: it is what `product_id` means to every writer here, and what the
+				// variation writer looks a parent up by.
+				'id'    => (int) $detail->post_id,
+				'label' => $this->product_label( (string) $post->post_title, '', (int) $detail->post_id ),
+			);
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Customers, matched on either name or email.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $query The search term.
+	 * @param int    $limit Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function search_customers( string $query, int $limit ): array {
+		if ( ! class_exists( CustomerModel::class ) ) {
+			return array();
+		}
+
+		$builder = CustomerModel::query()->limit( $limit );
+
+		if ( '' !== $query && ctype_digit( $query ) ) {
+			$builder->where( 'id', (int) $query );
+		} elseif ( '' !== $query ) {
+			$builder->where(
+				static function ( $where ) use ( $query ) {
+					$like = '%' . $query . '%';
+
+					$where->where( 'first_name', 'LIKE', $like )
+						->orWhere( 'last_name', 'LIKE', $like )
+						->orWhere( 'email', 'LIKE', $like );
+				}
+			);
+		}
+
+		$results = array();
+
+		foreach ( $builder->get() as $customer ) {
+			$name = trim( (string) $customer->first_name . ' ' . (string) $customer->last_name );
+
+			$results[] = array(
+				'id'    => (int) $customer->id,
+				'label' => $this->customer_label( $name, (string) $customer->email, (int) $customer->id ),
+			);
+		}
+
+		return $results;
 	}
 
 	/**

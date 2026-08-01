@@ -174,6 +174,170 @@ abstract class Platform_Driver implements Platform_Interface {
 	}
 
 	/**
+	 * Existing records in the store, for a control that has to name one.
+	 *
+	 * Parameters like `customer_id` and `product_id` are foreign keys into the target platform, and
+	 * the admin rendered them as a number box — usable only by someone who already knew the id. To
+	 * offer a list instead, something has to read the store, and only the driver knows how: an
+	 * Eloquent model on Fluent Cart, a CRUD query on WooCommerce.
+	 *
+	 * Concrete and empty by default, like `Writer::delete()`, rather than a new method on
+	 * `Platform_Interface`. A third-party driver written against the interface must keep loading;
+	 * one that does not implement this simply offers no suggestions, and the control falls back to
+	 * accepting a plain id.
+	 *
+	 * Read-only, and never called during generation — this exists for the admin's benefit.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name, e.g. Resource::CUSTOMER.
+	 * @param string $query         What the user typed. Empty means "the first few".
+	 * @param int    $limit         How many to return at most.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	public function search( string $resource_type, string $query = '', int $limit = 20 ): array {
+		$results = $this->platform_search( $resource_type, $query, max( 1, min( 50, $limit ) ) );
+
+		/**
+		 * Filters one platform's search results for one resource.
+		 *
+		 * For a driver that stores a resource somewhere its own author did not anticipate, and for
+		 * changing what a result is labelled with.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param array<int, array{id: int|string, label: string}> $results       The results.
+		 * @param string                                           $resource_type Canonical resource name.
+		 * @param string                                           $query         The search term.
+		 */
+		// Cast rather than checked: a filter returns whatever it likes, and PHPStan reads the
+		// documented type above as a guarantee. `fields()` casts its own filter result the same way.
+		$filtered = (array) apply_filters( "storeseeder_platform_search_{$this->id()}", $results, $resource_type, $query );
+
+		return $this->clean_results( $filtered );
+	}
+
+	/**
+	 * One driver's own search. Overridden by drivers that can offer suggestions.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 * @param string $query         The search term.
+	 * @param int    $limit         Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	protected function platform_search( string $resource_type, string $query, int $limit ): array {
+		unset( $resource_type, $query, $limit );
+
+		return array();
+	}
+
+	/**
+	 * How a product reads in a suggestion list.
+	 *
+	 * Shared so both drivers format alike: the SKU when there is one, because that is what a
+	 * shopkeeper recognises, and the id always, because the id is what the field sends and what a
+	 * support conversation ends up quoting.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string     $name Product name.
+	 * @param string     $sku  SKU, or '' when it has none.
+	 * @param int|string $id   Product id.
+	 *
+	 * @return string
+	 */
+	protected function product_label( string $name, string $sku, $id ): string {
+		$name = '' !== trim( $name ) ? $name : __( '(untitled)', 'storeseeder' );
+
+		if ( '' !== trim( $sku ) ) {
+			return sprintf(
+				/* translators: 1: product name, 2: SKU, 3: product id. */
+				__( '%1$s — %2$s (#%3$s)', 'storeseeder' ),
+				$name,
+				$sku,
+				(string) $id
+			);
+		}
+
+		return sprintf(
+			/* translators: 1: product name, 2: product id. */
+			__( '%1$s (#%2$s)', 'storeseeder' ),
+			$name,
+			(string) $id
+		);
+	}
+
+	/**
+	 * How a customer reads in a suggestion list.
+	 *
+	 * The email carries the weight here: two customers share a name far more often than an address.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string     $name  Display name.
+	 * @param string     $email Email address.
+	 * @param int|string $id    Customer id.
+	 *
+	 * @return string
+	 */
+	protected function customer_label( string $name, string $email, $id ): string {
+		$name = '' !== trim( $name ) ? $name : __( '(no name)', 'storeseeder' );
+
+		if ( '' !== trim( $email ) ) {
+			return sprintf(
+				/* translators: 1: customer name, 2: email address. */
+				__( '%1$s — %2$s', 'storeseeder' ),
+				$name,
+				$email
+			);
+		}
+
+		return sprintf(
+			/* translators: 1: customer name, 2: customer id. */
+			__( '%1$s (#%2$s)', 'storeseeder' ),
+			$name,
+			(string) $id
+		);
+	}
+
+	/**
+	 * Drop anything from a filtered result set that is not a usable suggestion.
+	 *
+	 * A filter returns whatever it likes, and a malformed entry would reach the admin as an option
+	 * with no id to send back — the same defensive shape `fields()` uses on its own filter.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<mixed> $results Raw results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function clean_results( array $results ): array {
+		$clean = array();
+
+		foreach ( $results as $result ) {
+			if ( ! is_array( $result ) || ! isset( $result['id'], $result['label'] ) ) {
+				continue;
+			}
+
+			if ( ! is_scalar( $result['id'] ) || ! is_scalar( $result['label'] ) ) {
+				continue;
+			}
+
+			$clean[] = array(
+				'id'    => is_numeric( $result['id'] ) ? (int) $result['id'] : (string) $result['id'],
+				'label' => (string) $result['label'],
+			);
+		}
+
+		return $clean;
+	}
+
+	/**
 	 * Every extra field this platform declares, keyed by resource.
 	 *
 	 * @since 1.1.0

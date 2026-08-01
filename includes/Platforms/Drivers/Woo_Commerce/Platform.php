@@ -225,6 +225,191 @@ final class Platform extends Platform_Driver {
 	}
 
 	/**
+	 * Products and customers a WooCommerce store already has.
+	 *
+	 * Through the CRUD layer rather than a direct query, for the same reason the writers use it:
+	 * `wc_get_products()` honours the same visibility and status rules the shop does, so nothing is
+	 * suggested that the store itself would not show.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 * @param string $query         The search term.
+	 * @param int    $limit         Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	protected function platform_search( string $resource_type, string $query, int $limit ): array {
+		if ( Resource::PRODUCT === $resource_type ) {
+			return $this->search_products( $query, $limit );
+		}
+
+		if ( Resource::CUSTOMER === $resource_type ) {
+			return $this->search_customers( $query, $limit );
+		}
+
+		return array();
+	}
+
+	/**
+	 * Published products, by title and then by SKU.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $query The search term.
+	 * @param int    $limit Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function search_products( string $query, int $limit ): array {
+		if ( ! function_exists( 'wc_get_products' ) ) {
+			return array();
+		}
+
+		$args = array(
+			'limit'   => $limit,
+			'status'  => 'publish',
+			'orderby' => 'title',
+			'order'   => 'ASC',
+			'return'  => 'objects',
+		);
+
+		if ( '' !== $query ) {
+			// `s` searches the title; a shopkeeper looking for a specific product is as likely to
+			// know its SKU, and WooCommerce matches that only through this separate argument.
+			$args['s'] = $query;
+		}
+
+		$results = array();
+
+		// A term that is only digits is an id as often as it is part of a name — and it is the only
+		// way a picker restoring a saved value can turn that value back into a name to show.
+		if ( '' !== $query && ctype_digit( $query ) ) {
+			$exact = wc_get_product( (int) $query );
+
+			if ( $exact instanceof \WC_Product ) {
+				$results[] = array(
+					'id'    => (int) $exact->get_id(),
+					'label' => $this->product_label( $exact->get_name(), $exact->get_sku(), $exact->get_id() ),
+				);
+			}
+		}
+
+		foreach ( (array) wc_get_products( $args ) as $product ) {
+			if ( ! $product instanceof \WC_Product || (string) $product->get_id() === $query ) {
+				continue;
+			}
+
+			$results[] = array(
+				'id'    => (int) $product->get_id(),
+				'label' => $this->product_label( $product->get_name(), $product->get_sku(), $product->get_id() ),
+			);
+		}
+
+		if ( '' !== $query && count( $results ) < $limit ) {
+			$results = array_merge( $results, $this->search_products_by_sku( $query, $limit - count( $results ), $results ) );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * A second pass matching the SKU, since `wc_get_products( 's' => … )` searches the title only.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string                                           $query    The search term.
+	 * @param int                                              $limit    How many more to find.
+	 * @param array<int, array{id: int|string, label: string}> $existing Already-found results, not to repeat.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function search_products_by_sku( string $query, int $limit, array $existing ): array {
+		$seen = array();
+
+		foreach ( $existing as $result ) {
+			$seen[ (int) $result['id'] ] = true;
+		}
+
+		$found = array();
+
+		foreach ( (array) wc_get_products(
+			array(
+				'limit'  => $limit + count( $seen ),
+				'status' => 'publish',
+				'sku'    => $query,
+				'return' => 'objects',
+			)
+		) as $product ) {
+			if ( ! $product instanceof \WC_Product || isset( $seen[ (int) $product->get_id() ] ) ) {
+				continue;
+			}
+
+			$found[] = array(
+				'id'    => (int) $product->get_id(),
+				'label' => $this->product_label( $product->get_name(), $product->get_sku(), $product->get_id() ),
+			);
+
+			if ( count( $found ) >= $limit ) {
+				break;
+			}
+		}
+
+		return $found;
+	}
+
+	/**
+	 * Users in a shopping role, matched on login, email, display name or nicename.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param string $query The search term.
+	 * @param int    $limit Maximum results.
+	 *
+	 * @return array<int, array{id: int|string, label: string}>
+	 */
+	private function search_customers( string $query, int $limit ): array {
+		$args = array(
+			'role__in' => array( 'customer', 'subscriber' ),
+			'number'   => $limit,
+			'orderby'  => 'display_name',
+			'order'    => 'ASC',
+		);
+
+		if ( '' !== $query ) {
+			// Wildcarded both sides: someone typing "ada" should find "ada@example.test".
+			$args['search']         = '*' . $query . '*';
+			$args['search_columns'] = array( 'user_login', 'user_email', 'display_name', 'user_nicename' );
+		}
+
+		$results = array();
+
+		if ( '' !== $query && ctype_digit( $query ) ) {
+			$exact = get_userdata( (int) $query );
+
+			if ( $exact ) {
+				$results[] = array(
+					'id'    => (int) $exact->ID,
+					'label' => $this->customer_label( $exact->display_name, $exact->user_email, (int) $exact->ID ),
+				);
+			}
+		}
+
+		foreach ( get_users( $args ) as $user ) {
+			if ( (string) $user->ID === $query ) {
+				continue;
+			}
+
+			$results[] = array(
+				'id'    => (int) $user->ID,
+				'label' => $this->customer_label( $user->display_name, $user->user_email, (int) $user->ID ),
+			);
+		}
+
+		return $results;
+	}
+
+	/**
 	 * WooCommerce-only generation parameters.
 	 *
 	 * Three product properties WooCommerce stores and no canonical entity carries, because no

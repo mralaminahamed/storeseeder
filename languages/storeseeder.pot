@@ -9,15 +9,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T06:00:28+00:00\n"
+"POT-Creation-Date: 2026-08-01T06:48:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:226
-#: class-storeseeder.php:227
+#: class-storeseeder.php:228
+#: class-storeseeder.php:229
 #: includes/MCP/MCP_Server.php:89
 #: includes/MCP/MCP_Server.php:156
 #: build/admin-app.js:13
@@ -44,44 +44,64 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:254
+#: class-storeseeder.php:256
 msgid "Generate Data"
 msgstr ""
 
-#: class-storeseeder.php:259
+#: class-storeseeder.php:261
 #: build/admin-app.js:17
 #: build/admin-app.js:24
 msgid "Settings"
 msgstr ""
 
-#: class-storeseeder.php:285
+#: class-storeseeder.php:287
 #: build/admin-app.js:36
 msgid "Documentation"
 msgstr ""
 
-#: class-storeseeder.php:290
+#: class-storeseeder.php:292
 #: build/admin-app.js:36
 msgid "Support"
 msgstr ""
 
-#: class-storeseeder.php:295
+#: class-storeseeder.php:297
 #: build/admin-app.js:36
 msgid "GitHub"
 msgstr ""
 
+#: class-storeseeder.php:692
+msgid "Which kind of record to look for."
+msgstr ""
+
+#: class-storeseeder.php:703
+msgid "What the user typed. Empty returns the first few."
+msgstr ""
+
+#: class-storeseeder.php:709
+msgid "Which platform to read. Defaults to the resolved target."
+msgstr ""
+
+#: class-storeseeder.php:714
+msgid "Maximum results."
+msgstr ""
+
+#: class-storeseeder.php:1078
+msgid "No target platform to search. Choose one first."
+msgstr ""
+
 #. translators: %s: comma-separated list of supported e-commerce platforms.
-#: class-storeseeder.php:1590
+#: class-storeseeder.php:1687
 #, php-format
 msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1610
+#: class-storeseeder.php:1707
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:1688
+#: class-storeseeder.php:1785
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -1281,20 +1301,20 @@ msgstr ""
 msgid "Not supported by this platform."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:72
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:74
 msgid "Fluent Cart"
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:137
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:206
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:139
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:208
 msgid "Fluent Cart Pro"
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:174
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:176
 msgid "Fluent Cart has product categories and brands but no product tags — there is no tag taxonomy to write to."
 msgstr ""
 
-#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:234
+#: includes/Platforms/Drivers/Fluent_Cart/Platform.php:358
 msgid "Fluent Cart only. Whether generated variations are bought once or on a subscription."
 msgstr ""
 
@@ -1585,15 +1605,15 @@ msgstr ""
 msgid "Licensing is not a WooCommerce core concept, and the extensions that add it each use their own storage."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:249
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:434
 msgid "WooCommerce only. Percentage of products marked featured (0–100)."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:257
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:442
 msgid "WooCommerce only. Where generated products appear."
 msgstr ""
 
-#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:264
+#: includes/Platforms/Drivers/Woo_Commerce/Platform.php:449
 msgid "WooCommerce only. Whether generated products are taxable."
 msgstr ""
 
@@ -1751,6 +1771,36 @@ msgstr ""
 
 #: includes/Platforms/Drivers/Woo_Commerce/Writers/Subscription.php:178
 msgid "WooCommerce Subscriptions is not active on this site."
+msgstr ""
+
+#: includes/Platforms/Platform_Driver.php:254
+msgid "(untitled)"
+msgstr ""
+
+#. translators: 1: product name, 2: SKU, 3: product id.
+#: includes/Platforms/Platform_Driver.php:259
+#, php-format
+msgid "%1$s — %2$s (#%3$s)"
+msgstr ""
+
+#. translators: 1: product name, 2: product id.
+#. translators: 1: customer name, 2: customer id.
+#: includes/Platforms/Platform_Driver.php:268
+#: includes/Platforms/Platform_Driver.php:301
+#, php-format
+msgid "%1$s (#%2$s)"
+msgstr ""
+
+#: includes/Platforms/Platform_Driver.php:288
+msgid "(no name)"
+msgstr ""
+
+#. translators: 1: customer name, 2: email address.
+#. translators: 1: resource name, e.g. Products. 2: number of rows.
+#: includes/Platforms/Platform_Driver.php:293
+#: build/admin-app.js:41
+#, php-format,js-format
+msgid "%1$s — %2$s"
 msgstr ""
 
 #. translators: %s: the platform identifier that was requested.
@@ -2971,6 +3021,30 @@ msgid "Enhanced"
 msgstr ""
 
 #: build/admin-app.js:3
+msgid "Search products, or type an ID"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Search customers, or type an ID"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Clear"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Searching…"
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "Could not reach the store. Type an ID instead."
+msgstr ""
+
+#: build/admin-app.js:3
+msgid "No matches."
+msgstr ""
+
+#: build/admin-app.js:3
 msgid "Targets existing completed / processing orders"
 msgstr ""
 
@@ -3907,12 +3981,6 @@ msgstr ""
 
 #: build/admin-app.js:40
 msgid "Permanently removes the products, orders, customers and other rows StoreSeeder created, along with what hangs off them. Only rows StoreSeeder recorded creating are touched — your own data is never matched on."
-msgstr ""
-
-#. translators: 1: resource name, e.g. Products. 2: number of rows.
-#: build/admin-app.js:41
-#, js-format
-msgid "%1$s — %2$s"
 msgstr ""
 
 #. translators: %s: number of records dropped.

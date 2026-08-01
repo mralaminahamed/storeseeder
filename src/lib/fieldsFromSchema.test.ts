@@ -235,6 +235,7 @@ describe("fieldsFromSchema", () => {
    */
   it("renders every shipped generator's schema without producing a malformed field", () => {
     const known = new Set([
+      "entity",
       "select",
       "chips",
       "range",

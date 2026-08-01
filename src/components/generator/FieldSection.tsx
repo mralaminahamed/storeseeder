@@ -7,6 +7,7 @@ import { RangeField } from "@/components/generator/fields/RangeField";
 import { FieldSelect } from "@/components/generator/fields/FieldSelect";
 import { NumberField } from "@/components/generator/fields/NumberField";
 import { TextField } from "@/components/generator/fields/TextField";
+import { EntityField } from "@/components/generator/fields/EntityField";
 
 interface FieldProps {
   f: FieldDescriptor;
@@ -51,6 +52,26 @@ export function Field({
     return (
       <div className="fp-field" data-param={f.key}>
         <Toggle checked={!!value} onChange={onChange} label={f.label} />
+      </div>
+    );
+  }
+
+  // Grouped with the inputs below rather than the buttons: the picker's control is a native
+  // <input>, so the caption binds to it by id like the other two.
+  if ("entity" === f.type) {
+    return (
+      <div className="fp-field" data-param={f.key}>
+        {!hideLabel && (
+          <label className="fp-field-label" htmlFor={controlId}>
+            {f.label}
+          </label>
+        )}
+        <EntityField
+          id={controlId}
+          value={asText(value)}
+          entity={f.entity ?? "product"}
+          onChange={onChange}
+        />
       </div>
     );
   }
