@@ -10,8 +10,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
  * real card's own classes — same tile, same two-column count grid, same run bar beneath — so
  * nothing moves when the data lands. That reflow is the cost a centred spinner hides.
  *
- * Four cards and eight count rows because that is what the shipped archive actually holds. A
- * skeleton that guesses low still jumps.
+ * Four cards and eight count rows: four fills exactly one row of the grid at its widest, and eight
+ * is what every shipped recipe plans. A skeleton that guesses low still jumps.
  *
  * The boxes are `aria-hidden` by `Skeleton` itself; the live region below carries the news to a
  * screen reader, which would otherwise be read two dozen empty spans.
