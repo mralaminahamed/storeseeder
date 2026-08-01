@@ -354,7 +354,7 @@ export default function RecipesPage() {
                 className={`fp-recipe-step${done ? " done" : ""}${active ? " on" : ""}`}
               >
                 <span className="fp-recipe-step-dot">
-                  {done && <Icon name="check" size={11} />}
+                  {done && <Icon name="check" size={11} stroke={3.6} />}
                 </span>
                 <span>{labelFor(step.resource)}</span>
                 {/*
@@ -400,7 +400,7 @@ export default function RecipesPage() {
         <div className="fp-card fp-recipe-done">
         <div className="fp-recipe-done-head">
           <span className={`fp-recipe-done-ic${undone ? " undone" : ""}`}>
-            <Icon name={undone ? "refresh" : "check"} size={21} />
+            <Icon name={undone ? "undo" : "check"} size={21} stroke={2.2} />
           </span>
           <div>
             <div className="fp-recipe-run-title">
