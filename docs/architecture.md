@@ -141,10 +141,10 @@ line, and Fluent Cart is one driver of two.
 
 The second one, WooCommerce, is where the abstraction earned itself. Two things it forced:
 
-**A driver may refuse.** Fluent Cart stores all eighteen resources, so nothing until now had to
-answer "this platform has no such thing". WooCommerce has no transaction record (payment lives
-on the order), no order or customer labels, and no licensing — and none of those is a missing
-plugin. `Capability::unsupported( $reason )` says so and names nothing to install;
+**A driver may refuse.** Fluent Cart stores twenty of the twenty-one resources, so almost nothing
+until now had to answer "this platform has no such thing". WooCommerce has no transaction record
+(payment lives on the order), no order or customer labels, and no licensing — and none of those is a
+missing plugin. `Capability::unsupported( $reason )` says so and names nothing to install;
 `Capability::missing_extension()` is for subscriptions, which a plugin does provide. The
 distinction is what the admin renders as a dead end versus a link.
 
@@ -388,7 +388,7 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_purge_order` | filter | The order generated resources are deleted in when clearing test data. Children must come before their parents; entries that name no known resource are dropped and anything omitted is appended, so nothing becomes undeletable by a careless filter |
 | `storeseeder_mcp_settings` | filter | Decide the three MCP switches — the AI surface, the preview tools, the generate tools — in code. Every gate reads through it, so `false` withdraws those tools wherever they are registered. A dropped key reads as off rather than as null |
 | `storeseeder_cli_commands` | filter | Add or remove a `wp storeseeder` subcommand |
-| `storeseeder_{resource}_generation_result` | filter | Inspect or reshape what one write reports — `storeseeder_product_generation_result` and so on, for all eighteen. The name is derived from the writer's resource by `Writer::filter_result()`, so it cannot drift from it |
+| `storeseeder_{resource}_generation_result` | filter | Inspect or reshape what one write reports — `storeseeder_product_generation_result` and so on, for all twenty-one. The name is derived from the writer's resource by `Writer::filter_result()`, so it cannot drift from it |
 | `storeseeder_shipping_method_generation_result` | filter | **Deprecated in 1.1.0.** The shipping-plan writer's old hook, kept firing after the correctly named one so existing callbacks keep working. Use `storeseeder_shipping_plan_generation_result` |
 | `storeseeder_customer_data_before_create` | filter | The customer entity immediately before the write. Predates `storeseeder_canonical_entity`, which does the same job for every resource and is the one to reach for |
 | `storeseeder_after_customer_created` | action | Fires after a customer row exists. Resource-specific, for the same historical reason; `storeseeder_after_write_{platform}_{resource}` covers all of them |

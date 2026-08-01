@@ -7,18 +7,47 @@ the WordPress plugin directory format, and links back here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-08-01
 
 ### Added
 
 - **StoreSeeder is no longer a Fluent Cart plugin.** Where data lands is now decided by a
-  *platform driver*, and the same seventeen generators feed every driver — a generator names no
-  platform, so a fixed seed produces identical data wherever it is written. Fluent Cart is the
-  driver shipped; `storeseeder_platforms` is the whole surface needed to add another from a
+  *platform driver*, and the same twenty-one generators feed every driver — a generator names no
+  platform, so a fixed seed produces identical data wherever it is written. Fluent Cart and
+  WooCommerce both ship; `storeseeder_platforms` is the whole surface needed to add another from a
   separate plugin. The target is chosen in the topbar and in Settings, stored site-wide so two
   administrators cannot unknowingly seed different stores, and with more than one platform active
   the generator page asks rather than guessing — writing rows into the wrong store is not a
   failure anyone would notice afterwards.
+- **A WooCommerce driver**, covering eighteen of the twenty-one resources through the platform's own
+  CRUD objects — `WC_Product`, `WC_Order`, `WC_Customer`, `WC_Coupon` — rather than direct writes, so
+  generated rows go through the same validation real ones do. Subscriptions need WooCommerce
+  Subscriptions and say so; transactions, labels and licences are reported unsupported with the
+  reason, because WooCommerce has no equivalent and no plugin changes that.
+- **Four new resources**: product categories (nested where asked), product tags, brands (optionally
+  nested as sub-brands), and licences. Fluent Cart has categories and brands but no tag taxonomy at
+  all, and refuses tags rather than registering one of its own — terms that were real and unreachable
+  from any Fluent Cart screen would be worse than none.
+- **A cleanup that works from a ledger, not a guess.** Every successful write records
+  `(platform, resource, id)` in `{prefix}storeseeder_generated`, and Settings → Danger zone (or
+  `wp storeseeder cleanup delete`) walks that list, children before parents, with a per-resource
+  breakdown before anything goes. Nothing is ever matched on for *resembling* test data: on a staging
+  site restored from production that guess eventually deletes a real catalogue.
+- **Two MCP tools per generator instead of one** — a read-only `preview-<resource>` beside
+  `generate-<resource>` — with three switches in Settings (surface, preview, generate) applied at
+  *registration*, so a withdrawn tool is never offered rather than offered-and-refusing.
+- **Every declared parameter now reaches the generator or a writer.** Across the eight resources
+  audited, forty-nine parameters were declared on the admin, the REST schema or the MCP ability and
+  read by nothing: a price range that never moved a price, an item count that never changed an order,
+  a guest ratio fixed at 30%, a loyalty tier that ignored the tier asked for. Where a parameter could
+  not be honoured it was removed rather than left decorative — `order_value_range` and
+  `cart_value_range` cannot be met once line items are priced from the catalogue, and
+  `calculation_methods` named three shipping calculations neither platform has. Where three surfaces
+  had drifted into three vocabularies for one idea, they now share one; the names that shipped keep
+  working as synonyms.
+- Canonical vocabularies for transaction states and types and for cart stages, beside the order
+  statuses already in `Platforms\Status`, each mapped per writer — Fluent Cart spells completed
+  `succeeded`, disputed `dispute_lost`, and an abandoned cart `intended`.
 - Capability support is **computed per request, never cached**, because it is conditional:
   WooCommerce has no subscriptions until WooCommerce Subscriptions is active, and StoreEngine
   gates resources behind addons. An unsupported resource reports which plugin would enable it
@@ -99,6 +128,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Every generated WooCommerce tax class taxed orders twice.** The writer prepended a duplicate of
+  the primary rate to a list that already opened with it, and WooCommerce applies one rate per
+  priority level — so a priority-1 copy sat beside the real row and both applied.
+- **Generated WooCommerce customers had no billing name, company or email.** The address setter read a
+  `name` key that a *customer* address has never carried; it has `first_name` and `last_name`. Those
+  fields are on the profile screen and in the admin's customer list.
+- **Lifetime spend reached Fluent Cart's `ltv` as a float of dollars** where the column is a BIGINT of
+  cents, so $1,234.56 was truncated to 1234 and displayed as $12.34. `purchase_value` likewise
+  received a bare number where Fluent Cart's own migrator writes a per-currency map.
+- **WooCommerce discarded shipping on every generated order.** `calculate_totals()` sums the order's
+  shipping *lines*, so a total set before it was overwritten; shipping is a line item now, and the
+  discount is applied after the totals run for the same reason.
+- **Fluent Cart priced order and cart lines from generated data** rather than the variation each line
+  points at, so an order line could read $412 for a product the catalogue sells at $19 — and every
+  revenue figure disagreed with the store it came from.
+- **Fluent Cart's coupon `stackable` was hardcoded `'no'`**, so no generated coupon could ever combine
+  with another, and `start_date` was never set although its own validation requires one whenever an
+  end date is present.
+- **`created_at` is absent from three Fluent Cart models' fillable lists**, so mass assignment dropped
+  it and Eloquent stamped today: a customer "since 2021" registered this morning, a cart abandoned two
+  weeks ago was abandoned today, and every transaction on an old order settled now.
+- **A SKU-less product variation failed the whole run on Fluent Cart** — `fct_product_variations` has a
+  unique index on `sku`, so the second empty string collided. The column is nullable and MySQL allows
+  any number of NULLs under a unique index.
+- **Every Fluent Cart shipping method went into one "Worldwide Shipping" zone**, so a method was
+  available everywhere whatever coverage was asked for. Its zones take `all`, a bare country code, or
+  a `selection` with the country list in meta; all three are used now.
+- **City and postcode silently failed the whole WooCommerce tax-rate insert.** They are not columns on
+  the rate row — they live in `woocommerce_tax_rate_locations` — and passing them to
+  `_insert_tax_rate()` errors with "Unknown column 'tax_rate_city'" while the response still reports
+  success with zero rates written.
+- A converted cart pointed at no order and carried no completion date, so it was marked completed and
+  appeared in no revenue figure. A tax rate's priority was a counter in generation order, so the first
+  region listed outranked every other regardless of precision. A tax state was two random letters,
+  producing codes like "QK" that match nothing at checkout. And
+  `price_variation_range.min_percentage` was capped at a maximum of zero, so an all-positive range —
+  every variation dearer than the base — was rejected as an invalid parameter.
 - **Three writers offered no result filter, and one was named after a resource that no longer
   exists.** Attributes, logs and refunds returned their result with no hook at all, while the
   other fifteen resources had one — so integration code written against "every writer fires
