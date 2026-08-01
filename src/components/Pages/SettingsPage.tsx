@@ -35,6 +35,7 @@ import { requestTweaksPanel } from "@/lib/events";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
+import { routeRows } from "@/lib/recipes";
 import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { PageHead } from "@/components/ui/PageHead";
 import { useStats } from "@/providers/StatsProvider";
@@ -162,7 +163,7 @@ function SetCard({
 export default function SettingsPage() {
   const [settings, setSettings] = useState(getSettings);
   const [saved, setSaved] = useState(false);
-  const { clearStats } = useStats();
+  const { clearStats, discardRun, totalGenerated, recentRuns } = useStats();
   const { toast } = useToast();
   const { theme, setTheme, density, setDensity } = useTheme();
   const {
@@ -628,6 +629,15 @@ export default function SettingsPage() {
         ),
       );
 
+      // Take the deleted rows back off the dashboard. Without this a full purge left the counts
+      // describing a store that no longer had any of it — "Products 180" over an empty catalogue.
+      //
+      // The counts, not the run history: a count describes what exists and is now wrong, while
+      // "you generated 50 products at 14:32" describes what happened and is still true. The same
+      // split `discardRun` makes when a recipe is undone, and the same conversion — the purge
+      // answers by resource and the stats are keyed by route.
+      discardRun(routeRows(result.byResource));
+
       setPurgeErrors(result.errors);
       setPurgeNote("");
       toast(
@@ -670,6 +680,28 @@ export default function SettingsPage() {
       setPurging(false);
       refreshGenerated();
     }
+  };
+
+  /**
+   * Whether there is any local history to clear.
+   *
+   * Both halves, because they empty independently: the counters can be non-zero with no runs left
+   * after a trim, and a run can be recorded that incremented nothing when it failed.
+   */
+  const hasHistory = totalGenerated > 0 || recentRuns.length > 0;
+
+  /**
+   * What the history button says.
+   *
+   * Named rather than left as "Clear run history & stats" when there is nothing to clear, the same
+   * way the purge button above says "No generated data to delete" — a disabled button with an
+   * inviting label makes the user wonder what is broken, where one that states the reason answers
+   * the question before it is asked.
+   */
+  const clearHistoryLabel = (): string => {
+    if (!hasHistory) return __("No run history to clear", "storeseeder");
+
+    return __("Clear run history & stats", "storeseeder");
   };
 
   /** What the delete button says, which depends on whether there is anything to delete. */
@@ -1459,19 +1491,23 @@ export default function SettingsPage() {
                   variant="danger"
                   icon="trash"
                   type="button"
+                  disabled={!hasHistory}
                   onClick={() => setConfirmClear(true)}
+                  data-testid="clear-history"
                 >
-                  {__(
-                    "Clear run history & stats",
-                    "storeseeder",
-                  )}
+                  {clearHistoryLabel()}
                 </Button>
               </div>
               <p className="fp-set-hint" style={{ marginTop: 7 }}>
-                {__(
-                  "Removes locally stored generation stats and run history. Does not delete data in your database.",
-                  "storeseeder",
-                )}
+                {hasHistory
+                  ? __(
+                      "Removes locally stored generation stats and run history. Does not delete data in your database.",
+                      "storeseeder",
+                    )
+                  : __(
+                      "Nothing recorded locally. The dashboard counts and the recent-activity list are stored in this browser, so they are already empty here — note that another browser may still have its own.",
+                      "storeseeder",
+                    )}
               </p>
             </div>
             <div className="fp-danger-act mb-0">
