@@ -7,7 +7,7 @@ the WordPress plugin directory format, and links back here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2026-08-01
+## [1.2.0] - 2026-08-02
 
 ### Added
 
@@ -30,6 +30,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Undo a whole recipe.** Every row a run writes carries a run id in the ledger, so removing one
   is a single button rather than nine separate purges. `wp storeseeder cleanup --run_id=` does the
   same from the command line.
+
+- **Refresh the recipes without waiting for a plugin update.** A **Refresh** button on the Recipes
+  page and a **Recipes** card in Settings — count, last-updated, Sync now, Force re-sync — so a new
+  shop type or a new locale reaches an installed site the moment the archive has it. The archive was
+  reachable exactly once before this: the only control that fetched it was the empty state's download
+  button, which made the separate repository's whole purpose unreachable.
+- **`GET /storeseeder/v1/recipes/status`**, read-only, reporting what is on disk without fetching. And
+  `force` on `/recipes/sync`, which deletes the local copy rather than writing over it.
+- **Settings is three tabs** — this site, your preferences, the plugin — over the scopes the page was
+  already grouped by. It was 4,733px, five and a half screens, with the Danger zone at the very bottom;
+  the worst tab is now about two. The tab is in the URL, so `#/settings?tab=plugin` is linkable, and the
+  strip is a real tablist with arrow-key navigation rather than a row of toggle buttons.
+- **Settings fields flow into columns.** Fourteen role toggles occupied fourteen full-width rows, 18% of
+  the entire page; they are a grid now, 867px down to 221px. The width cap moved from the field to the
+  control, so an explanation no longer wraps to four lines with 700px empty beside it.
+
+### Changed
+
+- **Downloaded files live under `uploads/storeseeder/`** — `recipes/` and `sample-data/<archive>/` —
+  instead of two directories at the uploads root, one of them named after its repository. Existing
+  installs are moved once, automatically; a site whose filesystem needs credentials it does not have
+  keeps reading the old location rather than silently falling back to placeholder product names.
+
+  The path is decided in one place now, `StoreSeeder\Storage`. It was computed in five, two of which
+  were the same value — the download path and the read path, built independently, which is how 72 of 73
+  locales came to be generating "Widget" in the first place.
+
+  `sample-data/<archive>/` is keyed on the archive rather than the resolved platform, so a platform that
+  ships reference data of its own through `storeseeder_sample_data_source` no longer overwrites the
+  shipped set.
 
 ### Fixed
 

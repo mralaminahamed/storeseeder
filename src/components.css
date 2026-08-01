@@ -383,11 +383,12 @@
 .fp-root .fp-entity-hint { margin-top:5px; color:var(--text-3); font-size:var(--fs-sm); }
 
 /* ===== settings ===== */
-/* Narrow on purpose — a column of labelled controls reads badly at 1120px — but centred in the
-   measure the other three pages fill, not left-aligned in it. Left-aligned, Settings put 680px of
-   content against 440px of empty page, so moving Overview → Settings shifted everything leftwards.
-   That is the horizontal lurch `.fp-page wide` exists to prevent, surviving one level further in. */
-.fp-root .fp-settings-col { max-width:680px; margin-inline:auto; }
+/* Full width, filling the same measure Overview, Recipes and Our Plugins use. It was capped at 680px
+   and left-aligned, which put 680px of content against 440px of empty page and made everything shift
+   leftwards on the way from any other page — the horizontal lurch `.fp-page wide` exists to prevent,
+   surviving one level further in. Centring it fixed the lurch; filling the measure removes the empty
+   band as well. */
+.fp-root .fp-settings-col { max-width:none; }
 
 /* Settings sections. Cards are grouped by who a change affects — the site, or just
    this browser — because that is the first thing worth knowing before touching one on
@@ -410,12 +411,35 @@
 .fp-root .fp-set-card-ic { width:calc(var(--tile) - 2px); height:calc(var(--tile) - 2px); border-radius:9px; flex-shrink:0; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
 .fp-root .fp-set-card-title { font-size:15px; font-weight:600; color:var(--text); }
 .fp-root .fp-set-card-desc { font-size:12.8px; color:var(--text-3); margin-top:2px; }
-.fp-root .fp-set-field { margin-bottom:var(--pad-card); max-width:340px; }
-.fp-root .fp-set-field.full { max-width:none; }
+/* The cap belongs on the control, not on the field.
+   `.fp-set-field { max-width: 340px }` capped the label and the hint too, so in a card spanning the
+   1120px measure a two-line explanation wrapped to four lines with 700px empty beside it — Target
+   platform spent 270px of height on one select for exactly that reason. The field runs to the measure
+   now and the controls inside it keep a sensible width of their own. */
+.fp-root .fp-set-field { margin-bottom:var(--pad-card); }
+.fp-root .fp-set-field > .fp-set-label, .fp-root .fp-set-field > .fp-set-hint { max-width:52ch; }
+.fp-root .fp-set-field > .fp-input-wrap, .fp-root .fp-set-field > .fp-select, .fp-root .fp-set-field > .fp-seg { max-width:340px; }
+/* Fields flowed into columns instead of stacked one per row.
+   `.fp-set-field` is capped at 340px, so in a card that spans the 1120px measure a stack of three left
+   two thirds of every row empty and cost 130px of height each. `auto-fit` rather than a fixed count:
+   the same wrapper then collapses to one column on a narrow window without a media query, and the
+   cards do not need to know how wide they are. */
+.fp-root .fp-set-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0 var(--pad-card); align-items:start; }
+.fp-root .fp-set-grid > .fp-set-field { max-width:none; }
+/* Denser still for a long list of one-line toggles — fourteen roles were fourteen rows. */
+.fp-root .fp-set-grid.tight { grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:0 32px; }
+.fp-root .fp-set-grid.tight > .fp-set-field { margin-bottom:6px; }
 .fp-root .fp-set-label { font-size:var(--fs-body); font-weight:500; display:block; margin-bottom:5px; }
 .fp-root .fp-set-hint { font-size:12.3px; color:var(--text-3); margin:-1px 0 9px; }
 .fp-root .fp-set-sync { display:flex; align-items:center; gap:11px; padding:calc(var(--pad-row-y) + 1px) var(--pad-row-x); border-radius:var(--r-md); background:color-mix(in oklab,var(--green) 9%,var(--surface)); border:1px solid color-mix(in oklab,var(--green) 22%,var(--border)); margin-bottom:14px; }
 .fp-root .fp-set-sync-ic { color:var(--green); }
+/* The two lines inside a sync panel. Real classes because the Recipes card was written against these
+   names before they existed — invented class names are valid CSS selectors that match nothing, so the
+   text simply inherited body styles and looked close enough to pass review. The Sample data card
+   meanwhile carried the same two lines as inline `fontSize`/`fontWeight` literals. One definition, so
+   the two cards cannot look subtly different. */
+.fp-root .fp-set-sync-title { font-size:13.5px; font-weight:500; color:var(--text); }
+.fp-root .fp-set-sync-sub { font-size:12px; color:var(--text-3); }
 .fp-root .fp-set-about { display:flex; align-items:center; gap:13px; margin-bottom:16px; }
 .fp-root .fp-danger-card { border-color:color-mix(in oklab,var(--red) 30%,var(--border)); background:color-mix(in oklab,var(--red) 4%,var(--surface)); }
 .fp-root .fp-danger-label { color:var(--red); }
@@ -534,6 +558,22 @@
 .fp-root .fp-seg { display:flex; gap:4px; background:var(--surface-inset); padding:3px; border-radius:var(--r-md); }
 .fp-root .fp-seg-btn { flex:1; height:calc(var(--ctl-h) - 6px); border:none; background:none; border-radius:var(--r-sm); font-size:var(--fs-ctl-sm); font-weight:500; color:var(--text-2); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
 .fp-root .fp-seg-btn.on { background:var(--surface); color:var(--text); box-shadow:var(--shadow-sm); }
+
+/* ===== page tabs =====
+   An underline strip, not a segmented pill. `.fp-seg` is a control for choosing a value and sits inside
+   a field; this navigates between regions of a page and sits under its heading, so it reads as part of
+   the page's structure rather than as something to set. The rule spans the measure so the panel below
+   is visibly attached to the selected tab. */
+.fp-root .fp-tabs { display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:var(--mb-section); }
+.fp-root .fp-tab { display:flex; align-items:center; gap:7px; padding:10px 14px; border:none; background:none; cursor:pointer; font-size:var(--fs-ctl); font-weight:500; color:var(--text-3); border-bottom:2px solid transparent; margin-bottom:-1px; }
+.fp-root .fp-tab:hover { color:var(--text); }
+.fp-root .fp-tab.on { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+.fp-root .fp-tab-ic { flex-shrink:0; }
+.fp-root .fp-tab-badge { font-size:var(--fs-micro); font-family:var(--font-mono); background:var(--surface-inset); color:var(--text-faint); padding:1px 6px; border-radius:var(--r-full); }
+.fp-root .fp-tab.on .fp-tab-badge { background:var(--accent-soft); color:var(--accent); }
+/* The panel is a focus destination, not a focus ring: the strip above already shows where you are. */
+.fp-root .fp-tabpanel:focus { outline:none; }
+.fp-root .fp-tabpanel:focus-visible { outline:2px solid var(--accent); outline-offset:4px; border-radius:var(--r-md); }
 
 /* ===== batch tray ===== */
 .fp-root .fp-batch { position:fixed; top:var(--fp-admin-bar, 32px); right:0; bottom:0; width:380px; background:var(--surface); border-left:1px solid var(--border); box-shadow:var(--shadow-pop); z-index:160; display:flex; flex-direction:column; animation:fp-slide-in .22s cubic-bezier(.2,.8,.2,1) both; }

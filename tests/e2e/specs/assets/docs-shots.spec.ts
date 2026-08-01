@@ -174,10 +174,11 @@ async function shotRegion(
   });
 }
 
-/** A settings card, found by its heading — the cards without a test id have no other handle. */
-function settingsCard(heading: string): string {
-  return `.fp-set-card:has-text("${heading}")`;
-}
+/*
+ * There is no `settingsCard( heading )` helper any more. It existed because the Sample data card was the
+ * only one of the four without a test id, found by its heading text instead; it has one now, so every
+ * card is addressed the same way and a heading rewrite cannot break a capture.
+ */
 
 /**
  * Choose the site-wide target platform through the topbar.
@@ -440,11 +441,33 @@ test.describe('documentation screenshots', () => {
     await shot(page, 'settings-mcp.png', '[data-testid="settings-mcp"]');
   });
 
+  test('settings — recipes', async ({ page }) => {
+    await page.goto(`${PLUGIN_URL}#/settings`, { waitUntil: 'domcontentloaded' });
+    await ready(page, 'settings-recipes');
+
+    // The status line arrives from `/recipes/status`, so the card renders a skeleton first — waiting on
+    // the card alone would photograph two grey bars where the count and the date belong.
+    await expect(page.locator('[data-testid="settings-recipes"] .fp-set-sync-title')).toBeVisible({
+      timeout: 20_000,
+    });
+    await page.waitForTimeout(400);
+
+    await shot(page, 'settings-recipes.png', '[data-testid="settings-recipes"]');
+  });
+
   test('settings — sample data', async ({ page }) => {
     await page.goto(`${PLUGIN_URL}#/settings`, { waitUntil: 'domcontentloaded' });
-    await ready(page, 'settings-mcp');
 
-    await shot(page, 'settings-sample-data.png', settingsCard('Sample data'));
+    // Its own card, and its own status line. This waited on `settings-mcp` — a different card — so
+    // nothing here guaranteed the sample-data status had arrived, and the capture could have been of
+    // the skeleton. Same class of mistake as waiting on `preview-table` for the preview.
+    await ready(page, 'settings-sample-data');
+    await expect(
+      page.locator('[data-testid="settings-sample-data"] .fp-set-sync-title'),
+    ).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(400);
+
+    await shot(page, 'settings-sample-data.png', '[data-testid="settings-sample-data"]');
   });
 
   /*

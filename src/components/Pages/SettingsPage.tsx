@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useCallback, useEffect } from "@wordpress/element";
-import { __, sprintf } from "@wordpress/i18n";
+import { __, _n, sprintf } from "@wordpress/i18n";
+import { useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Seg } from "@/components/ui/Seg";
@@ -37,14 +38,17 @@ import {
   DOCS_URL,
   GITHUB_URL,
   ISSUES_URL,
+  RECIPES_REPO_URL,
   SAMPLE_DATA_REPO_URL,
 } from "@/lib/links";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
-import { routeRows } from "@/lib/recipes";
+import { fetchRecipesStatus, routeRows, syncRecipes } from "@/lib/recipes";
+import type { RecipesStatus } from "@/lib/recipes";
 import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { PageHead } from "@/components/ui/PageHead";
+import { TabPanel, Tabs } from "@/components/ui/Tabs";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
 import { useTheme, type Density, type Theme } from "@/theme/useTheme";
@@ -160,7 +164,43 @@ function SetCard({
 // SettingsPage
 // ---------------------------------------------------------------------------
 
+/**
+ * The three scopes, as tabs.
+ *
+ * These are the scopes the page was already grouped by — who a change affects — so the tabs are the
+ * grouping made navigable rather than a new organisation invented on top of it. One long column meant
+ * 4,733px of scroll, five and a half screens, with the Danger zone at the very bottom: the most
+ * consequential controls were the furthest from where you land.
+ */
+const TABS = [
+  { id: "site", label: __("This site", "storeseeder"), ic: "globe" },
+  { id: "you", label: __("Your preferences", "storeseeder"), ic: "sliders" },
+  { id: "plugin", label: __("Plugin", "storeseeder"), ic: "plug" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+const TAB_IDS: readonly string[] = TABS.map((t) => t.id);
+
 export default function SettingsPage() {
+  /*
+   * In the URL, not in component state, so a tab is linkable and the browser's Back button works. The
+   * plugin's own action links and the documentation both point at `#/settings`, which still lands on
+   * the first tab.
+   */
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("tab") ?? "";
+  const tab: TabId = (TAB_IDS.includes(requested) ? requested : "site") as TabId;
+
+  const setTab = useCallback(
+    (next: TabId) => {
+      // `replace`, so arrowing along the strip does not bury the page you arrived from under three
+      // history entries.
+      setParams("site" === next ? {} : { tab: next }, { replace: true });
+    },
+    [setParams],
+  );
+
   const [settings, setSettings] = useState(getSettings);
   const [saved, setSaved] = useState(false);
   const { clearStats, discardRun, totalGenerated, recentRuns } = useStats();
@@ -181,6 +221,13 @@ export default function SettingsPage() {
   const [accessFailed, setAccessFailed] = useState(false);
   const [savingRoles, setSavingRoles] = useState(false);
 
+  // Recipes sync state. Separate from the sample data's even though one consent record covers both
+  // downloads: they are two archives, either can be present without the other, and a single spinner
+  // would disable both cards while one of them worked.
+  const [recipesStatus, setRecipesStatus] = useState<RecipesStatus | null>(null);
+  const [recipesLoading, setRecipesLoading] = useState(true);
+  const [recipesSyncing, setRecipesSyncing] = useState(false);
+
   // Sample data sync state
   const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -189,6 +236,57 @@ export default function SettingsPage() {
     ok: boolean;
     message: string;
   } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const status = await fetchRecipesStatus();
+
+      if (!cancelled) {
+        setRecipesStatus(status);
+        setRecipesLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /**
+   * Fetch the recipe archive.
+   *
+   * `force` deletes the local copy first. Without it the download writes over what is there, and a
+   * recipe that dropped a file between releases would keep the old one — the same reason the sample
+   * data grew a force of its own.
+   */
+  const handleRecipesSync = useCallback(
+    async (force: boolean) => {
+      setRecipesSyncing(true);
+
+      try {
+        await syncRecipes(force);
+        setRecipesStatus(await fetchRecipesStatus());
+        toast(
+          force
+            ? __("Recipes refreshed", "storeseeder")
+            : __("Recipes synced", "storeseeder"),
+        );
+      } catch (err) {
+        // The endpoint answers 403 when consent has not been given, and its message says so — passed
+        // through rather than replaced, because "Could not sync" would send somebody looking for a
+        // network problem when the answer is the prompt above.
+        toast(
+          __("Could not sync the recipes", "storeseeder"),
+          err instanceof Error ? err.message : "",
+        );
+      } finally {
+        setRecipesSyncing(false);
+      }
+    },
+    [toast],
+  );
 
   const nonce = window.storeseederApi?.restNonce ?? "";
   const restUrl = window.storeseederApi?.restUrl ?? "";
@@ -291,11 +389,11 @@ export default function SettingsPage() {
     if (syncStatus?.exists) {
       return (
         <>
-          <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+          <div className="fp-set-sync-title">
             {__("Sample data is synced", "storeseeder")}
           </div>
           {syncStatus.last_synced && (
-            <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+            <div className="fp-set-sync-sub">
               {sprintf(
                 /* translators: %s: date string */
                 __("Last updated: %s", "storeseeder"),
@@ -309,10 +407,10 @@ export default function SettingsPage() {
 
     return (
       <>
-        <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+        <div className="fp-set-sync-title">
           {__("Sample data not found", "storeseeder")}
         </div>
-        <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+        <div className="fp-set-sync-sub">
           {__(
             "Sync to download locale-specific reference data.",
             "storeseeder",
@@ -760,7 +858,17 @@ export default function SettingsPage() {
         )}
       />
 
+      <Tabs
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        ariaLabel={__("Settings sections", "storeseeder")}
+        idPrefix="settings"
+      />
+
       <div className="fp-settings-col">
+        {"site" === tab && (
+        <TabPanel id="site" idPrefix="settings">
         <SetSection
           title={__("This site", "storeseeder")}
           desc={__("Stored on the server and shared by everyone who uses StoreSeeder here.", "storeseeder")}
@@ -878,6 +986,9 @@ export default function SettingsPage() {
                 </p>
               )}
 
+              {/* A grid, not fourteen rows. This card was 867px — 18% of the whole page — for fourteen
+                  one-line toggles, because each sat in its own full-width row. */}
+              <div className="fp-set-grid tight">
               {Object.entries(access.roles).map(([slug, name]) => (
                 <div className="fp-set-field full" key={slug}>
                   <Toggle
@@ -897,6 +1008,7 @@ export default function SettingsPage() {
                   />
                 </div>
               ))}
+              </div>
 
               {!access.canManage && (
                 <p className="fp-set-hint mb-0">
@@ -943,11 +1055,11 @@ export default function SettingsPage() {
                   <Icon name={mcpIcon()} size={19} />
                 </span>
                 <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 500 }}>
+                  <div className="fp-set-sync-title">
                     {mcpSummary()}
                   </div>
                   {mcp.available && mcp.enabled && 0 < mcp.tools && (
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                    <div className="fp-set-sync-sub">
                       <code>{mcp.route}</code>
                     </div>
                   )}
@@ -1089,6 +1201,7 @@ export default function SettingsPage() {
             "Locale-specific reference data used by generators to produce realistic output.",
             "storeseeder",
           )}
+          testId="settings-sample-data"
         >
           <div>
             <div className="fp-set-sync">
@@ -1172,8 +1285,140 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
-        </SetSection>
 
+        {/* Recipes. Its own card rather than a line in the sample-data one: they are two archives,
+            downloaded separately, and either can be present without the other — a single control would
+            make "synced" ambiguous about which. */}
+        <SetCard
+          icon="store"
+          scope="site"
+          title={__( "Recipes", "storeseeder" )}
+          desc={__(
+            "Ready-made shops — a corner grocer, a fashion boutique, a home & garden store — built across nine resources in one click.",
+            "storeseeder",
+          )}
+          testId="settings-recipes"
+        >
+          <div>
+            <div className="fp-set-sync">
+              <span className="fp-set-sync-ic">
+                <Icon
+                  name={recipesStatus?.exists ? "check" : "alert"}
+                  size={19}
+                />
+              </span>
+              <div>
+                {recipesLoading ? (
+                  <SkeletonText lines={2} />
+                ) : (
+                  <>
+                    <div className="fp-set-sync-title">
+                      {recipesStatus?.exists
+                        ? sprintf(
+                            /* translators: %s: number of recipes available. */
+                            _n(
+                              "%s recipe available",
+                              "%s recipes available",
+                              recipesStatus.recipes,
+                              "storeseeder",
+                            ),
+                            String( recipesStatus.recipes ),
+                          )
+                        : __( "No recipes downloaded yet", "storeseeder" )}
+                    </div>
+                    <div className="fp-set-sync-sub">
+                      {recipesStatus?.last_synced
+                        ? sprintf(
+                            /* translators: %s: date and time of the last sync. */
+                            __( "Last updated: %s", "storeseeder" ),
+                            new Date( recipesStatus.last_synced ).toLocaleString(),
+                          )
+                        : __(
+                            "About 90 KB, fetched once. The Recipes page works offline afterwards.",
+                            "storeseeder",
+                          )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Named, not swallowed. A fetch that dropped half the archive would otherwise present as
+                a shorter list of recipes, and a shorter list looks like a decision somebody made. */}
+            {undefined !== recipesStatus?.incomplete && recipesStatus.incomplete.length > 0 && (
+              <p className="fp-set-hint" style={{ marginBottom: 12, color: "var(--red)" }}>
+                {sprintf(
+                  /* translators: %s: comma-separated recipe ids. */
+                  __(
+                    "The index lists these but they are not on disk: %s. Force a re-sync.",
+                    "storeseeder",
+                  ),
+                  recipesStatus.incomplete.join( ", " ),
+                )}
+              </p>
+            )}
+
+            <p className="fp-set-hint" style={{ marginBottom: 12 }}>
+              {"granted" === recipesStatus?.consent
+                ? __(
+                    "Downloads are allowed. Recipes and sample data share one consent record, so revoking it above stops both.",
+                    "storeseeder",
+                  )
+                : __(
+                    "Needs the same consent the sample data uses. Accept it above and this will download.",
+                    "storeseeder",
+                  )}
+            </p>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button
+                variant="primary"
+                icon="refresh"
+                type="button"
+                onClick={() => void handleRecipesSync( false )}
+                disabled={recipesSyncing}
+                data-testid="recipes-sync"
+              >
+                {recipesSyncing
+                  ? __( "Syncing…", "storeseeder" )
+                  : __( "Sync now", "storeseeder" )}
+              </Button>
+              <Button
+                variant="outline"
+                icon="refresh"
+                type="button"
+                onClick={() => void handleRecipesSync( true )}
+                disabled={recipesSyncing}
+              >
+                {__( "Force re-sync", "storeseeder" )}
+              </Button>
+            </div>
+
+            <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <a
+                href={recipesStatus?.repo_url || RECIPES_REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="sm" icon="external" type="button">
+                  {__( "View recipes repository", "storeseeder" )}
+                </Button>
+              </a>
+              <a href={DOCS.recipes} target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm" icon="book" type="button">
+                  {__( "How recipes work", "storeseeder" )}
+                </Button>
+              </a>
+            </div>
+          </div>
+        </SetCard>
+
+        </SetSection>
+        </TabPanel>
+        )}
+
+        {"you" === tab && (
+        <TabPanel id="you" idPrefix="settings">
         <SetSection
           title={__("Your preferences", "storeseeder")}
           desc={__("Stored in this browser, for you alone. Nothing here changes what anyone else sees.", "storeseeder")}
@@ -1197,6 +1442,9 @@ export default function SettingsPage() {
           )}
         >
           <div>
+            {/* Three values, side by side. Stacked, each cost about 130px of height and left two
+                thirds of its row empty — `.fp-set-field` caps at 340px inside a 1120px card. */}
+            <div className="fp-set-grid">
             <div className="fp-set-field">
               <label className="fp-set-label" htmlFor="ss-default-count">
                 {__("Default count", "storeseeder")}
@@ -1261,6 +1509,7 @@ export default function SettingsPage() {
                   onChange={(v) => set("defaultSeed", v)}
                 />
               </div>
+            </div>
             </div>
 
             <div className="fp-set-field full">
@@ -1381,7 +1630,11 @@ export default function SettingsPage() {
             </div>          </div>
         </SetCard>
         </SetSection>
+        </TabPanel>
+        )}
 
+        {"plugin" === tab && (
+        <TabPanel id="plugin" idPrefix="settings">
         <SetSection
           title={__("Plugin", "storeseeder")}
           desc={__("Version, links, and the actions that cannot be undone.", "storeseeder")}
@@ -1560,7 +1813,8 @@ export default function SettingsPage() {
           </div>
         </SetCard>
         </SetSection>
-
+        </TabPanel>
+        )}
       </div>
 
       {/*

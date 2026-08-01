@@ -171,11 +171,14 @@ Only the four most recent releases are listed here. The complete history, in Kee
 * A recipe is a vocabulary, not a dataset: product names, category tree, brand names, price band and variation axes. Every generator invariant still holds and every parameter still works on top of one.
 * Recipes download once from a separate repository, behind the consent prompt that already governs the sample data, so a new shop type needs no plugin update.
 * **Undo a whole recipe** in one action — every row it wrote is tagged with a run id in the ledger.
+* **Refresh recipes without updating the plugin** — a Refresh button on the Recipes page and a Recipes card in Settings, so a new shop type or locale arrives as soon as the archive has it.
+* **Settings is three tabs** — this site, your preferences, the plugin — instead of one page five screens long, with denser fields and the role switches in a grid.
 * **`wp storeseeder recipe list` / `run`**, and `wp storeseeder cleanup --run_id=` to undo.
 * **Fixed: a run of more than 100 items failed outright.** The endpoint accepts 100 per request and the admin sent whatever the count box said — which allowed up to 100,000 — so anything larger returned "Invalid parameter(s): count" and created nothing. Larger counts are split automatically now, and the progress bar counts real requests instead of animating against a guess.
 * **Fixed: "Add to batch" ignored the settings on the page.** A queued generator kept only its count, so parameters, the seed and the metadata switch were dropped and the run used defaults. Two queues of the same generator also merged into one.
 * **Fixed: 72 of 73 locales were generating "Widget" and "Gadget".** Vocabulary had no locale fallback, so any locale without a data file silently used each generator's inline defaults.
 * Fixed: the topbar's platform list showed one store twice and no longer offered "Auto" by name once a platform was chosen.
+* Changed: downloaded recipes and sample data now live under `uploads/storeseeder/`. Existing files are moved for you.
 * Settings is centred in the same measure the other pages use, instead of sitting against the left edge.
 * Dashboard stat tiles now match the generator tiles, including in dark mode.
 

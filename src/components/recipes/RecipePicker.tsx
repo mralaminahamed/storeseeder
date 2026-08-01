@@ -137,7 +137,33 @@ export default function RecipePicker() {
 
   return (
     <>
-      <PageHead title={__("Recipes", "storeseeder")} description={DESCRIPTION} />
+      <PageHead title={__("Recipes", "storeseeder")} description={DESCRIPTION}>
+        {/*
+          Only once there is something to refresh. Before the first sync the empty state already
+          carries the button that fetches the archive, and a second control for the same thing —
+          one saying "Download", one saying "Refresh" — would read as two different operations.
+
+          `force`, so it deletes the local copy rather than writing over it: the archive is the only
+          way a new shop type or a new locale reaches an installed site, and an overwrite keeps any
+          file the newer archive dropped.
+        */}
+        {downloaded && (
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            icon="refresh"
+            onClick={() => void sync(true)}
+            disabled={syncing}
+            data-testid="recipes-refresh"
+            title={__("Fetch the latest recipes from the archive", "storeseeder")}
+          >
+            {syncing
+              ? __("Refreshing…", "storeseeder")
+              : __("Refresh", "storeseeder")}
+          </Button>
+        )}
+      </PageHead>
 
       {body()}
 
