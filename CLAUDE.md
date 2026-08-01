@@ -22,7 +22,7 @@ a third party can add one from their own plugin.
 composer test                 # PHPUnit — needs env, see below
 composer phpcs                # WPCS. Scans includes/ ONLY
 composer phpcbf               # autofix
-composer phpstan              # level max over includes/ + class-storeseeder.php
+composer phpstan              # level 7 over includes/ + the two root PHP files
 composer makepot              # requires build/admin-app.js to exist first
 
 # Frontend

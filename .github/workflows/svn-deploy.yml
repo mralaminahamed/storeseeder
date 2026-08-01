@@ -3,7 +3,10 @@ name: Release Plugin to WP.org
 on:
   push:
     tags:
-      - "*"
+      # `v1.2.0` is the convention. Bare `1.0.0` and `1.1.0` shipped before it and stay valid,
+      # since the meta job strips a leading `v` and compares against the plugin header either way.
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "[0-9]+.[0-9]+.[0-9]+*"
 
 permissions:
   contents: write # Required to create a GitHub release
@@ -19,17 +22,17 @@ defaults:
 # ---------------------------------------------------------------------------
 # Pipeline DAG (StoreSeeder — no Freemius):
 #
-#   meta ──┬── lint ────────────────┐
-#          ├── phpstan ──────────────┤
-#          └── assets ──┬── i18n ────┼── package ── deploy
-#                       └────────────┘
+#   meta ──┬── lint ──────────┐
+#          ├── phpstan ───────┤
+#          └── assets ── i18n ┴── package ── deploy
 #
 #   meta     : resolve slug, validate tag == header version, prerelease flag
 #   lint     : PHP syntax + sensitive scan + PHPCS (WPCS)  — gate, parallel
 #   phpstan  : PHPStan (level 7)                           — gate, parallel
 #   assets   : wp-scripts build -> build/                  — producer, parallel
 #   i18n     : wp i18n make-pot -> languages/              — producer, after assets
-#   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip
+#   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip — waits on the
+#              gates too, so a rejected commit is never packaged
 #   deploy   : 10up SVN deploy (BUILD_DIR) + .wordpress-org assets + GH release
 # ---------------------------------------------------------------------------
 jobs:
@@ -40,6 +43,7 @@ jobs:
   meta:
     name: "Meta: validate version"
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       plugin_slug: ${{ steps.info.outputs.plugin_slug }}
       version:     ${{ steps.info.outputs.version }}
@@ -74,6 +78,7 @@ jobs:
   lint:
     name: "Lint: PHPCS"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: meta
     steps:
       - uses: actions/checkout@v6
@@ -118,6 +123,7 @@ jobs:
   phpstan:
     name: "PHPStan: static analysis"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: meta
     steps:
       - uses: actions/checkout@v6
@@ -146,19 +152,22 @@ jobs:
   assets:
     name: "Assets: build bundles"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: meta
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          # Matches ci.yml. These drifted apart, so the bundle shipped to WordPress.org was built
+          # on a runtime no CI job had ever run `yarn build` on.
+          node-version: "24"
       - name: Cache Yarn + node_modules
         if: ${{ env.ACT != 'true' }}
         uses: actions/cache@v5
         with:
-          path: |
-            .yarn/cache
-            node_modules
+          # `node_modules` only: .yarnrc.yml sets `nodeLinker: node-modules` and leaves Yarn 4's
+          # global cache enabled, so no `.yarn/cache` is ever written in the workspace.
+          path: node_modules
           key: yarn-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-${{ runner.os }}-
       - name: Yarn install
@@ -183,6 +192,7 @@ jobs:
   i18n:
     name: "i18n: translations"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [meta, assets]
     steps:
       - uses: actions/checkout@v6
@@ -220,7 +230,12 @@ jobs:
   package:
     name: "Package: assemble + zip"
     runs-on: ubuntu-latest
-    needs: [meta, assets, i18n]
+    timeout-minutes: 20
+    # The gates are in `needs` as well as the producers: packaging is the expensive half of the
+    # run — a production install, an rsync of the whole tree and a zip — and there is no reason to
+    # spend it on a commit PHPCS or PHPStan has already rejected. `deploy` waited on them before,
+    # so a failure could never ship; it could only waste the packaging first.
+    needs: [meta, lint, phpstan, assets, i18n]
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
@@ -299,6 +314,7 @@ jobs:
   deploy:
     name: "Deploy: WP.org SVN + GitHub release"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [meta, lint, phpstan, package]
     steps:
       - name: Checkout (provides .wordpress-org for SVN assets/)
@@ -314,10 +330,20 @@ jobs:
         with:
           generate-zip: true
         env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          # A repository *variable*, not a secret. The wp.org username is public — readme.txt
+          # publishes it as `Contributors:` and it is on the plugin's directory page — and while it
+          # was a secret Actions redacted every occurrence of that string in logs and job
+          # summaries. Since it is also the GitHub owner name, the release link in the summary came
+          # out as `https://github.com/***/storeseeder/releases/tag/1.1.0`. The password stays a
+          # secret; a username is not a credential on its own.
+          SVN_USERNAME: ${{ vars.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG:         ${{ needs.meta.outputs.plugin_slug }}
           BUILD_DIR:    ./dist/${{ needs.meta.outputs.plugin_slug }}
+          # The stripped version, not the git ref. Without this the action names the SVN tag
+          # after the git tag verbatim, so `v1.2.0` would publish to `tags/v1.2.0` while
+          # readme.txt points `Stable tag` at `1.2.0` — and wp.org would serve nothing.
+          VERSION:      ${{ needs.meta.outputs.version }}
           ASSETS_DIR:   .wordpress-org
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
