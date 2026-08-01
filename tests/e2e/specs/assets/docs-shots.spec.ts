@@ -174,10 +174,11 @@ async function shotRegion(
   });
 }
 
-/** A settings card, found by its heading — the cards without a test id have no other handle. */
-function settingsCard(heading: string): string {
-  return `.fp-set-card:has-text("${heading}")`;
-}
+/*
+ * There is no `settingsCard( heading )` helper any more. It existed because the Sample data card was the
+ * only one of the four without a test id, found by its heading text instead; it has one now, so every
+ * card is addressed the same way and a heading rewrite cannot break a capture.
+ */
 
 /**
  * Choose the site-wide target platform through the topbar.
