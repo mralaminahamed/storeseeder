@@ -38,6 +38,15 @@ export default defineConfig({
       dependencies: ['setup'],
       use: {
         channel: 'chrome',
+        /*
+         * The ordinary viewport. Shell-level captures are viewport-height by definition, so a tall
+         * one here would make every one of them a screenshot with a screen of empty page below the
+         * content — which is what happened when this was 2600 for the whole project.
+         *
+         * The two captures that genuinely need more (a generator page is ~2,450px, and Playwright
+         * cannot capture an element taller than the scroller it sits in) raise it themselves with
+         * `test.use` in the spec.
+         */
         viewport: { width: 1600, height: 1000 },
         // 2× so the images stay sharp on the displays most people read documentation on. Astro
         // downscales and fingerprints them at build time, so the source being large costs nothing at
