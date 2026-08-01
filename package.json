@@ -27,7 +27,7 @@
     "data-generation",
     "react",
     "admin-interface",
-    "fake-data",
+    "test-data",
     "products",
     "customers",
     "orders",

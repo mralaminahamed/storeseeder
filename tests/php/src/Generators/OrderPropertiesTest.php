@@ -359,8 +359,8 @@ class OrderPropertiesTest extends StoreSeederUnitTestCase {
 	}
 
 	/**
-	 * A US state abbreviation on a French address is the detail that makes a generated order
-	 * obviously fake.
+	 * A US state abbreviation on a French address is the detail that gives a generated order
+	 * away.
 	 */
 	public function test_a_state_only_accompanies_the_country_it_belongs_to(): void {
 		$this->with( array( 'geographical_distribution' => array( 'countries' => array( 'FR' ) ) ) );

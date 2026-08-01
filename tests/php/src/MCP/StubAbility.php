@@ -10,7 +10,7 @@ namespace StoreSeeder\Tests\MCP;
 use StoreSeeder\MCP\Ability;
 
 /**
- * Minimal fake ability.
+ * Minimal stub ability.
  */
 class StubAbility extends Ability {
 

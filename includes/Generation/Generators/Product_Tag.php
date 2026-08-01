@@ -34,7 +34,7 @@ class Product_Tag extends Generator {
 	 * Tag labels, as a shop would apply them.
 	 *
 	 * Attributes of a product rather than departments — the distinction that makes a tag a tag.
-	 * Fixed rather than faked for the same reason the category names are: `word()` returns Lorem,
+	 * Fixed rather than generated for the same reason the category names are: `word()` returns Lorem,
 	 * and a shop tagged "voluptatem" tells a tester nothing.
 	 *
 	 * @var string[]

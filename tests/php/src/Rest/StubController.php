@@ -16,7 +16,7 @@ use StoreSeeder\Generation\Generators\Product;
 use StoreSeeder\Rest\Controller;
 
 /**
- * Minimal fake controller.
+ * Minimal stub controller.
  */
 class StubController extends Controller {
 

@@ -44,5 +44,5 @@ Generate realistic test data for WordPress e-commerce stores. Start with the
   it is the source of truth for version and compatibility numbers
 
 > [!WARNING]
-> StoreSeeder writes large volumes of fake data directly into your store. Use it on development or
+> StoreSeeder writes large volumes of test data directly into your store. Use it on development or
 > staging sites only, and back up the database before generating large datasets.

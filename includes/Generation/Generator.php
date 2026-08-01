@@ -44,7 +44,7 @@ abstract class Generator {
 	 * FakerPHP generator instance
 	 *
 	 * Holds the FakerPHP generator instance configured with the appropriate locale
-	 * and providers for generating realistic fake data. Initialized in set_faker().
+	 * and providers for generating realistic test data. Initialized in set_faker().
 	 *
 	 * @since 1.0.0
 	 * @var Faker_Generator
@@ -175,7 +175,7 @@ abstract class Generator {
 	 * Get FakerPHP instance
 	 *
 	 * Returns the configured FakerPHP generator instance for generating
-	 * realistic fake data. Ensures the generator is properly initialized
+	 * realistic test data. Ensures the generator is properly initialized
 	 * with locale and providers before use.
 	 *
 	 * @since 1.0.0
@@ -190,7 +190,7 @@ abstract class Generator {
 	 * Set locale for FakerPHP generator
 	 *
 	 * Configures the locale for the FakerPHP generator to produce locale-specific
-	 * fake data. The locale affects names, addresses, phone numbers, and other
+	 * test data. The locale affects names, addresses, phone numbers, and other
 	 * culturally-specific data patterns.
 	 *
 	 * @since 1.0.0
@@ -219,7 +219,7 @@ abstract class Generator {
 	}
 
 	/**
-	 * Generate fake data
+	 * Generate test data
 	 *
 	 * Orchestrates the complete data generation process using the Template Method pattern.
 	 * Handles parameter validation, dependency checking, batch processing, and error handling.
