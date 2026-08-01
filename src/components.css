@@ -223,7 +223,11 @@
 .fp-root .fp-stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap-grid); margin-bottom:var(--mb-section); }
 .fp-root .fp-stat { padding:calc(var(--pad-card) - 2px) var(--pad-card); position:relative; overflow:hidden; }
 .fp-root .fp-stat-top { display:flex; align-items:center; gap:9px; color:var(--text-3); font-size:var(--fs-hint); font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
-.fp-root .fp-stat-ic { width:var(--tile-sm); height:var(--tile-sm); border-radius:8px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
+/* One rule, two selectors: the stat tile and the generator tile sit one section apart on the same
+   screen, so a size or radius that differs between them reads as a mistake. Grouped rather than
+   duplicated, because two identical declarations are how they came to differ in the first place. */
+.fp-root .fp-stat-ic,
+.fp-root .fp-gen-ic { width:var(--tile); height:var(--tile); border-radius:10px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
 .fp-root .fp-stat-num { font-size:var(--fs-stat); font-weight:700; letter-spacing:-.02em; margin:calc(var(--pad-card) - 6px) 0 2px; line-height:1; }
 .fp-root .fp-stat-foot { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
 .fp-root .fp-stat-delta { font-size:var(--fs-hint); font-weight:600; display:inline-flex; align-items:center; gap:3px; }
@@ -239,7 +243,8 @@
 .fp-root .fp-gen-card { padding:var(--pad-card); cursor:pointer; transition:transform .14s cubic-bezier(.2,.7,.2,1), box-shadow .14s, border-color .14s; display:flex; flex-direction:column; text-align:left; border:1px solid var(--border); background:var(--surface); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); min-height:var(--card-min-h); }
 .fp-root .fp-gen-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); border-color:var(--accent-line); }
 .fp-root .fp-gen-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:calc(var(--pad-card) - 4px); }
-.fp-root .fp-gen-ic { width:var(--tile); height:var(--tile); border-radius:10px; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
+/* `.fp-gen-ic` itself is declared with `.fp-stat-ic` above. Only the hover belongs here: the
+   generator tile is a card you click, the stat tile is not. */
 .fp-root .fp-gen-card:hover .fp-gen-ic { background:var(--accent); color:var(--accent-contrast); }
 .fp-root .fp-gen-name { font-size:15px; font-weight:600; letter-spacing:-.01em; margin-bottom:5px; }
 .fp-root .fp-gen-desc { font-size:12.8px; line-height:1.5; color:var(--text-3); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }

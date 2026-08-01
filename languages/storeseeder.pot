@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T06:51:50+00:00\n"
+"POT-Creation-Date: 2026-08-01T07:11:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -1296,7 +1296,7 @@ msgid "Requires %s."
 msgstr ""
 
 #: includes/Platforms/Capability.php:166
-#: includes/Rest/Controller.php:411
+#: includes/Rest/Controller.php:531
 #: build/admin-app.js:1
 msgid "Not supported by this platform."
 msgstr ""
@@ -1844,12 +1844,12 @@ msgstr ""
 msgid "Could not remove a generated %1$s record: %2$s"
 msgstr ""
 
-#: includes/Rest/Controller.php:264
+#: includes/Rest/Controller.php:384
 msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Rest/Controller.php:317
+#: includes/Rest/Controller.php:437
 #, php-format
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
@@ -1857,7 +1857,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of items that could not be created.
-#: includes/Rest/Controller.php:324
+#: includes/Rest/Controller.php:444
 #, php-format
 msgid "%s could not be created."
 msgid_plural "%s could not be created."
@@ -1865,92 +1865,92 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: resource label, 2: platform display name, 3: reason.
-#: includes/Rest/Controller.php:418
+#: includes/Rest/Controller.php:538
 #, php-format
 msgid "%1$s cannot be generated for %2$s. %3$s"
 msgstr ""
 
 #. translators: 1: platform display name, 2: resource name.
-#: includes/Rest/Controller.php:441
+#: includes/Rest/Controller.php:561
 #, php-format
 msgid "%1$s reports that it can generate %2$s but provides no writer for it. This is a fault in the platform driver."
 msgstr ""
 
-#: includes/Rest/Controller.php:500
+#: includes/Rest/Controller.php:620
 msgid "Sorry, you are not allowed to generate fake data."
 msgstr ""
 
-#: includes/Rest/Controller.php:523
+#: includes/Rest/Controller.php:643
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Rest/Controller.php:535
+#: includes/Rest/Controller.php:655
 msgid "Locale for generated data (e.g., en_US, fr_FR, ja_JP)."
 msgstr ""
 
-#: includes/Rest/Controller.php:542
+#: includes/Rest/Controller.php:662
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Rest/Controller.php:552
+#: includes/Rest/Controller.php:672
 msgid "Target e-commerce platform to seed. Defaults to the site setting, or the only active platform."
 msgstr ""
 
-#: includes/Rest/Controller.php:558
+#: includes/Rest/Controller.php:678
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Rest/Controller.php:564
+#: includes/Rest/Controller.php:684
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Rest/Controller.php:568
+#: includes/Rest/Controller.php:688
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Rest/Controller.php:575
+#: includes/Rest/Controller.php:695
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Rest/Controller.php:584
+#: includes/Rest/Controller.php:704
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Rest/Controller.php:588
+#: includes/Rest/Controller.php:708
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Rest/Controller.php:593
+#: includes/Rest/Controller.php:713
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Rest/Controller.php:600
+#: includes/Rest/Controller.php:720
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Rest/Controller.php:604
+#: includes/Rest/Controller.php:724
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Rest/Controller.php:609
+#: includes/Rest/Controller.php:729
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Rest/Controller.php:738
+#: includes/Rest/Controller.php:858
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Rest/Controller.php:764
+#: includes/Rest/Controller.php:884
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Rest/Controller.php:786
+#: includes/Rest/Controller.php:906
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Rest/Controller.php:790
+#: includes/Rest/Controller.php:910
 msgid "Number of items generated."
 msgstr ""
 
