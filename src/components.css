@@ -411,8 +411,24 @@
 .fp-root .fp-set-card-ic { width:calc(var(--tile) - 2px); height:calc(var(--tile) - 2px); border-radius:9px; flex-shrink:0; display:grid; place-items:center; background:var(--accent-soft); color:var(--accent); }
 .fp-root .fp-set-card-title { font-size:15px; font-weight:600; color:var(--text); }
 .fp-root .fp-set-card-desc { font-size:12.8px; color:var(--text-3); margin-top:2px; }
-.fp-root .fp-set-field { margin-bottom:var(--pad-card); max-width:340px; }
-.fp-root .fp-set-field.full { max-width:none; }
+/* The cap belongs on the control, not on the field.
+   `.fp-set-field { max-width: 340px }` capped the label and the hint too, so in a card spanning the
+   1120px measure a two-line explanation wrapped to four lines with 700px empty beside it — Target
+   platform spent 270px of height on one select for exactly that reason. The field runs to the measure
+   now and the controls inside it keep a sensible width of their own. */
+.fp-root .fp-set-field { margin-bottom:var(--pad-card); }
+.fp-root .fp-set-field > .fp-set-label, .fp-root .fp-set-field > .fp-set-hint { max-width:52ch; }
+.fp-root .fp-set-field > .fp-input-wrap, .fp-root .fp-set-field > .fp-select, .fp-root .fp-set-field > .fp-seg { max-width:340px; }
+/* Fields flowed into columns instead of stacked one per row.
+   `.fp-set-field` is capped at 340px, so in a card that spans the 1120px measure a stack of three left
+   two thirds of every row empty and cost 130px of height each. `auto-fit` rather than a fixed count:
+   the same wrapper then collapses to one column on a narrow window without a media query, and the
+   cards do not need to know how wide they are. */
+.fp-root .fp-set-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:0 var(--pad-card); align-items:start; }
+.fp-root .fp-set-grid > .fp-set-field { max-width:none; }
+/* Denser still for a long list of one-line toggles — fourteen roles were fourteen rows. */
+.fp-root .fp-set-grid.tight { grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:0 32px; }
+.fp-root .fp-set-grid.tight > .fp-set-field { margin-bottom:6px; }
 .fp-root .fp-set-label { font-size:var(--fs-body); font-weight:500; display:block; margin-bottom:5px; }
 .fp-root .fp-set-hint { font-size:12.3px; color:var(--text-3); margin:-1px 0 9px; }
 .fp-root .fp-set-sync { display:flex; align-items:center; gap:11px; padding:calc(var(--pad-row-y) + 1px) var(--pad-row-x); border-radius:var(--r-md); background:color-mix(in oklab,var(--green) 9%,var(--surface)); border:1px solid color-mix(in oklab,var(--green) 22%,var(--border)); margin-bottom:14px; }

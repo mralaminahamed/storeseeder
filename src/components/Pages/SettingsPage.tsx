@@ -986,6 +986,9 @@ export default function SettingsPage() {
                 </p>
               )}
 
+              {/* A grid, not fourteen rows. This card was 867px — 18% of the whole page — for fourteen
+                  one-line toggles, because each sat in its own full-width row. */}
+              <div className="fp-set-grid tight">
               {Object.entries(access.roles).map(([slug, name]) => (
                 <div className="fp-set-field full" key={slug}>
                   <Toggle
@@ -1005,6 +1008,7 @@ export default function SettingsPage() {
                   />
                 </div>
               ))}
+              </div>
 
               {!access.canManage && (
                 <p className="fp-set-hint mb-0">
@@ -1438,6 +1442,9 @@ export default function SettingsPage() {
           )}
         >
           <div>
+            {/* Three values, side by side. Stacked, each cost about 130px of height and left two
+                thirds of its row empty — `.fp-set-field` caps at 340px inside a 1120px card. */}
+            <div className="fp-set-grid">
             <div className="fp-set-field">
               <label className="fp-set-label" htmlFor="ss-default-count">
                 {__("Default count", "storeseeder")}
@@ -1502,6 +1509,7 @@ export default function SettingsPage() {
                   onChange={(v) => set("defaultSeed", v)}
                 />
               </div>
+            </div>
             </div>
 
             <div className="fp-set-field full">
