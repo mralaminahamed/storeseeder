@@ -62,6 +62,18 @@ export function RecipeCard({ recipe, size, selected, onSelect }: RecipeCardProps
         <span className="fp-recipe-chip mono">{recipe.locales.join(" · ")}</span>
 
         {/*
+          A recipe somebody's plugin registered, not one from the archive. Marked because it is
+          not held to the archive's completeness bar, and because a user wondering where odd
+          product names came from should be able to see the answer on the card.
+        */}
+        {!recipe.bundled && (
+          <span className="fp-recipe-chip third">
+            <Icon name="plug" size={11} />
+            {__("From a plugin", "storeseeder")}
+          </span>
+        )}
+
+        {/*
           Said before the click, not after. A recipe that ships no vocabulary for the chosen locale
           still runs — FakerPHP produces local names and addresses either way — but the product
           titles come from the fallback, and staying quiet about that is how the locale picker came

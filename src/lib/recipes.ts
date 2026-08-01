@@ -38,6 +38,8 @@ export interface Recipe {
    * archive ships none and the icon registry should answer instead.
    */
   icon_uri: string;
+  /** False when a plugin registered this recipe rather than the downloaded archive shipping it. */
+  bundled: boolean;
   /** Whether it ships vocabulary for the locale the run would use. */
   locale_shipped: boolean;
   /** What it falls back to when it does not. */

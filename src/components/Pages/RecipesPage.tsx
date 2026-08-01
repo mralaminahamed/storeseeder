@@ -24,6 +24,7 @@ import {
 } from "@/lib/recipes";
 import { Button } from "@/components/ui/button";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
+import { RecipeSkeleton } from "@/components/recipes/RecipeSkeleton";
 import { usePlatform } from "@/providers/PlatformProvider";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -61,6 +62,7 @@ export default function RecipesPage() {
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [downloaded, setDownloaded] = useState(true);
+  const [resolved, setResolved] = useState(true);
   const [incomplete, setIncomplete] = useState<string[]>([]);
   const [syncing, setSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -90,6 +92,8 @@ export default function RecipesPage() {
         setRecipes(data.recipes ?? []);
         setDownloaded(Boolean(data.downloaded));
         setIncomplete(data.incomplete ?? []);
+        // '' means Auto could not decide — more than one store is active and none was chosen.
+        setResolved("" !== data.platform);
       } catch {
         if (!cancelled) setFailed(true);
       } finally {
@@ -202,6 +206,7 @@ export default function RecipesPage() {
       setRecipes(data.recipes ?? []);
       setDownloaded(Boolean(data.downloaded));
       setIncomplete(data.incomplete ?? []);
+      setResolved("" !== data.platform);
       toast(
         __("Recipes ready", "storeseeder"),
         sprintf(
@@ -255,9 +260,18 @@ export default function RecipesPage() {
     }
   }, [runId, undoing, progress, discardRun, toast]);
 
+  // A skeleton, not a spinner: this wait has a known shape, so standing in for it means the
+  // layout does not jump when the cards arrive.
   if (loading) {
     return (
-      <div className="fp-recipes-note">{__("Loading recipes…", "storeseeder")}</div>
+      <>
+        <div className="fp-page-head">
+          <div>
+            <div className="fp-page-title">{__("Recipes", "storeseeder")}</div>
+          </div>
+        </div>
+        <RecipeSkeleton />
+      </>
     );
   }
 
@@ -573,13 +587,30 @@ export default function RecipesPage() {
             </Button>
             <Button
               data-testid="recipe-run"
-              disabled={isBlocked(recipe)}
+              disabled={isBlocked(recipe) || !resolved}
               onClick={() => void run()}
             >
               <Icon name="play" size={14} />
               {__("Create the store", "storeseeder")}
             </Button>
           </div>
+
+          {/*
+            With more than one store active and none chosen, `Auto` is deliberately ambiguous —
+            guessing which one to write to is the failure nobody notices afterwards. Said here
+            rather than discovered as nine consecutive 409s after the click.
+          */}
+          {!resolved && (
+            <div className="fp-recipe-guard">
+              <Icon name="alert" size={14} />
+              <span>
+                {__(
+                  "More than one store is active and no target is chosen, so StoreSeeder cannot tell where these rows should go. Pick one in the topbar first.",
+                  "storeseeder",
+                )}
+              </span>
+            </div>
+          )}
 
           {/*
             Building onto a store that already holds generated rows gives two shops interleaved.

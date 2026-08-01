@@ -1179,6 +1179,14 @@ class StoreSeeder {
 		$supports = $platform instanceof Platform_Interface ? $platform->supports() : array();
 		$locale   = (string) $request->get_param( 'locale' );
 
+		$archived = array();
+
+		foreach ( Recipe_Registry::index() as $entry ) {
+			if ( isset( $entry['id'] ) ) {
+				$archived[] = (string) $entry['id'];
+			}
+		}
+
 		$recipes = array();
 
 		foreach ( Recipe_Registry::instance()->all() as $recipe ) {
@@ -1210,6 +1218,10 @@ class StoreSeeder {
 			$payload['fallback_locale'] = Locale::DEFAULT_LOCALE;
 			// '' when the archive ships no mark, and the admin falls back to the icon registry.
 			$payload['icon_uri']        = Recipe_Registry::icon_uri( $recipe->id() );
+			// Whether this came from the downloaded archive or from somebody's plugin. Worth
+			// saying: a third-party recipe is not held to the archive's completeness bar, and a
+			// user debugging odd product names should be able to see where they came from.
+			$payload['bundled']         = in_array( $recipe->id(), $archived, true );
 			// What the manifest claims, checked against the files beside it. Every failure this
 			// finds produces data rather than an error, which is exactly why it is worth finding.
 			$payload['issues']          = Recipe_Registry::audit( $recipe, $locale );
