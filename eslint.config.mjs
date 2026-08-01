@@ -26,6 +26,10 @@ export default [
       'tests/e2e/report/**',
       'test-results/**',
       '**/*.min.js',
+      // The docs site is its own package with its own dependencies and its own build. Linting it
+      // from here resolves `astro/config` against the plugin's node_modules and fails on three
+      // imports that are correct where they live.
+      'docs/website/**',
       // Local, gitignored scratch directories that happen to contain .ts files.
       '.remember/**',
       '.claude/**',

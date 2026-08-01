@@ -1,7 +1,7 @@
 # Contributing to StoreSeeder
 
 Bug reports, feature requests, and pull requests are all welcome. This page covers the practical
-details; the [development guide](docs/development.md) goes deeper on architecture and generator
+details; the [development guide](docs/guides/development.md) goes deeper on architecture and generator
 internals.
 
 By taking part in this project you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -200,7 +200,7 @@ tests under `tests/php/`.
 - Update the docs you touched: [`docs/`](docs/), [`README.md`](README.md), and
   [`CHANGELOG.md`](CHANGELOG.md) for user-visible changes. `CHANGELOG.md` is the full history;
   `readme.txt` carries only the four most recent releases.
-- Note any new outbound HTTP request in [`docs/external-services.md`](docs/external-services.md), and
+- Note any new outbound HTTP request in [`docs/guides/external-services.md`](docs/guides/external-services.md), and
   in the External Services summaries in `README.md` and `readme.txt` — WordPress.org review depends on
   that disclosure being complete.
 - Say plainly what you did not test.

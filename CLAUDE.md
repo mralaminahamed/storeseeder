@@ -157,7 +157,7 @@ all-resources counterparts of the `_{resource}` / `_{base}` filters, running bef
 `storeseeder_purge_order`, `storeseeder_recipes`, `storeseeder_recipe_directories`,
 `storeseeder_recipes_source`, `storeseeder_platform_admin_url_{id}`,
 `storeseeder_admin_payload`,
-`storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
+`storeseeder_sample_data_source`. Full table in `docs/guides/architecture.md`.
 
 ### A declared parameter must change the output
 
@@ -332,7 +332,7 @@ breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
 - **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
 - **Sample data and recipes live in separate repos** and download only after an administrator
   accepts the consent prompt. That prompt is the only thing granting permission — see
-  `docs/external-services.md`, and keep readme.txt in agreement with the code. One consent record
+  `docs/guides/external-services.md`, and keep readme.txt in agreement with the code. One consent record
   covers both; asking twice for the same answer trains people to click through prompts.
 - **A test method may not narrow a WordPress base method.** `WP_UnitTestCase_Base` declares a
   public `rmdir()`, and `tearDown()` is final — redeclaring either is a *compile-time* fatal that

@@ -117,7 +117,7 @@ npx tsc --noEmit       # not wired to a script, still catches real errors
 - Keep functions and components small and single-purpose; extract shared logic to `src/lib/`
   or a PHP abstract rather than duplicating it.
 - Update `README.md` for user-visible changes, `CHANGELOG.md` for releases, and
-  `docs/external-services.md` plus `readme.txt` together whenever outbound-request behaviour
+  `docs/guides/external-services.md` plus `readme.txt` together whenever outbound-request behaviour
   changes — those two have contradicted each other before.
 - Match the surrounding code's comment density. Comments here explain *why* a value or
   workaround exists, and several encode schema facts learned by debugging, so do not delete

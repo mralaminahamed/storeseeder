@@ -6,11 +6,11 @@ StoreSeeder is maintained by one developer, so a little triage on your side goes
 
 | Question | Where to look |
 |----------|---------------|
-| How do I install and activate it? | [docs/installation.md](docs/installation.md) |
-| How do I run a generator? | [docs/usage.md](docs/usage.md) |
-| What can each generator produce? | [docs/features.md](docs/features.md) |
-| How is the plugin put together? | [docs/architecture.md](docs/architecture.md) |
-| How do I build from source or add a generator? | [docs/development.md](docs/development.md) |
+| How do I install and activate it? | [docs/guides/installation.md](docs/guides/installation.md) |
+| How do I run a generator? | [docs/guides/usage.md](docs/guides/usage.md) |
+| What can each generator produce? | [docs/guides/features.md](docs/guides/features.md) |
+| How is the plugin put together? | [docs/guides/architecture.md](docs/guides/architecture.md) |
+| How do I build from source or add a generator? | [docs/guides/development.md](docs/guides/development.md) |
 | What changed in this version? | [CHANGELOG.md](CHANGELOG.md) |
 
 ## Bugs and Feature Requests
