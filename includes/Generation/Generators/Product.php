@@ -53,6 +53,29 @@ class Product extends Generator {
 	}
 
 	/**
+	 * The words a product is named from.
+	 *
+	 * This override was missing, and its absence is why every product in every locale was called
+	 * "Premium Widget". `build_entity()` has always asked for `adjectives` and `products` and always
+	 * fallen through to the four-and-five inline literals beside the request, because the abstract's
+	 * `load_sample_data()` returns an empty array and nothing here replaced it. The sample-data
+	 * repository has shipped `products/<locale>/product_names.json` the whole time, read by nobody.
+	 *
+	 * It matters more now than it did: product names are the most visible thing a recipe changes, so
+	 * a grocer whose catalogue says "Deluxe Gadget" is a recipe that did nothing anyone can see.
+	 *
+	 * Cast because `load_json_file()` answers null on a miss, and the two `??` in `build_entity()`
+	 * already handle a file that is present but missing a list.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function load_sample_data(): array {
+		return (array) $this->load_json_file( $this->get_sample_data_path( 'products', 'product_names' ) );
+	}
+
+	/**
 	 * Build a canonical product
 	 *
 	 * FakerPHP and sample data only. The SKU here is a *candidate*: the unique index
@@ -325,11 +348,15 @@ class Product extends Generator {
 				'kind' => 'text',
 			),
 			'price'  => array(
-				'v'    => '$' . number_format( $faker->randomFloat( 2, 5, 500 ), 2 ),
+				// `price()`, not a fresh literal range. This row hardcoded 5–500 and so showed a
+				// price unrelated to `price_range` on every preview — the parameter appeared to do
+				// nothing, which is the one thing a preview must not say about a parameter that
+				// works. Divided by a hundred because `price()` answers in minor units.
+				'v'    => '$' . number_format( $this->price() / 100, 2 ),
 				'kind' => 'money',
 			),
 			'stock'  => array(
-				'v'    => $faker->numberBetween( 0, 250 ),
+				'v'    => $this->stock(),
 				'kind' => 'num',
 			),
 			'status' => array(

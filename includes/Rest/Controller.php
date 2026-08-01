@@ -231,7 +231,7 @@ abstract class Controller extends WP_REST_Controller {
 	 */
 	public function preview_items( WP_REST_Request $request ) {
 		$generator = $this->get_generator_instance();
-		$params    = $this->apply_recipe_params( $request->get_params() );
+		$params    = $this->apply_recipe_params( $request->get_params(), $request );
 
 		$generator->set_locale( $this->resolve_locale( $params, $generator ) );
 		$generator->set_faker();
@@ -255,11 +255,12 @@ abstract class Controller extends WP_REST_Controller {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param array<string, mixed> $params Request parameters.
+	 * @param array<string, mixed> $params  Request parameters, schema defaults included.
+	 * @param WP_REST_Request      $request The request, read for what the caller actually sent.
 	 *
-	 * @return array<string, mixed> Parameters with the recipe's defaults filled in.
+	 * @return array<string, mixed> Parameters with the recipe's own filled in.
 	 */
-	protected function apply_recipe_params( array $params ): array {
+	protected function apply_recipe_params( array $params, WP_REST_Request $request ): array {
 		$requested = isset( $params['recipe'] ) ? (string) $params['recipe'] : '';
 
 		if ( '' === $requested ) {
@@ -275,10 +276,27 @@ abstract class Controller extends WP_REST_Controller {
 			return $params;
 		}
 
-		// Union, not array_merge: the request wins. A recipe proposes a price band; a caller who
-		// set one meant it, and silently overriding them would make the parameter they declared
-		// stop changing the output — the exact defect the parameter campaign existed to remove.
-		return $params + $recipe->params_for( $this->get_resource_type() );
+		// What the caller *sent*, not what the schema resolved — the same distinction the ignored
+		// -field report makes, and for the same reason. `price_range` declares a default, so it is
+		// present in `$params` on every request whether or not anyone asked for it; a union against
+		// those would have kept the schema's 10–1000 and dropped the grocer's 0.79–42.50 every
+		// time, which is exactly what it did.
+		$sent = array_merge(
+			(array) $request->get_json_params(),
+			(array) $request->get_body_params(),
+			(array) $request->get_query_params()
+		);
+
+		// The caller still wins where they actually spoke. A recipe proposes a price band; someone
+		// who set one meant it, and overriding them would make a parameter they declared stop
+		// changing the output — the defect the parameter campaign existed to remove.
+		foreach ( $recipe->params_for( $this->get_resource_type() ) as $name => $value ) {
+			if ( ! array_key_exists( $name, $sent ) ) {
+				$params[ $name ] = $value;
+			}
+		}
+
+		return $params;
 	}
 
 	/**
@@ -428,7 +446,7 @@ abstract class Controller extends WP_REST_Controller {
 		}
 
 		// Pass all request parameters to the generator.
-		$params    = $this->apply_recipe_params( $request->get_params() );
+		$params    = $this->apply_recipe_params( $request->get_params(), $request );
 		$generator = $this->get_generator_instance();
 
 		// Which store the rows land in is a property of the request, not of the

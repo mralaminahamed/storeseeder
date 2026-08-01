@@ -274,8 +274,15 @@ class Coupon extends Generator {
 	 * @return array<string, array{v: mixed, kind: string}>
 	 */
 	protected function build_preview_row(): array {
-		$faker      = $this->get_faker();
-		$percentage = (bool) $faker->boolean();
+		$faker = $this->get_faker();
+
+		// The generator's own helpers, not a second set of literals. This row invented its type
+		// from a coin toss, its percentage from 5–50 and its cash amount from 5–100, so a caller
+		// who narrowed `discount_range` — or picked a recipe that did — watched the preview ignore
+		// them and reasonably concluded the parameter was decoration.
+		$type     = $this->type();
+		$discount = $this->discount( $type );
+		$limits   = (array) ( $this->generation_params['usage_limits'] ?? array() );
 
 		return array(
 			'code'   => array(
@@ -283,15 +290,19 @@ class Coupon extends Generator {
 				'kind' => 'mono',
 			),
 			'type'   => array(
-				'v'    => $percentage ? 'percentage' : 'fixed',
+				'v'    => $type,
 				'kind' => 'badge',
 			),
 			'amount' => array(
-				'v'    => $percentage ? $faker->numberBetween( 5, 50 ) . '%' : '$' . number_format( $faker->randomFloat( 2, 5, 100 ), 2 ),
+				// `discount()` answers a whole percentage for one type and minor units for the
+				// other, so the two are formatted apart rather than divided the same way.
+				'v'    => 'percentage' === $type
+					? $discount . '%'
+					: '$' . number_format( $discount / 100, 2 ),
 				'kind' => 'money',
 			),
 			'limit'  => array(
-				'v'    => $faker->numberBetween( 1, 500 ),
+				'v'    => $this->max_uses( $limits ),
 				'kind' => 'num',
 			),
 			'status' => array(

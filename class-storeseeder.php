@@ -1950,8 +1950,13 @@ class StoreSeeder {
 				}
 				$this->move_directory_contents( $source_path, $dest_path );
 			} else {
-				// File.
-				$wp_filesystem->move( $source_path, $dest_path );
+				// Overwrite. `WP_Filesystem::move()` defaults to leaving an existing file alone, so
+				// a second sync unpacked the archive and then silently kept every stale file it
+				// already had — a recipe fix could never arrive, which makes the whole reason the
+				// content lives in its own repository untrue. It is also why the sample data needed
+				// a "Force re-sync" that deletes the directories first: not because a plain sync was
+				// wasteful, but because a plain sync did nothing.
+				$wp_filesystem->move( $source_path, $dest_path, true );
 			}
 		}
 	}
