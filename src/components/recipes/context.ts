@@ -41,7 +41,11 @@ export interface RecipesContext {
   /** Where each resource lives in wp-admin on the resolved target, so a result can link to it. */
   adminUrls: Record<string, string>;
   syncing: boolean;
-  sync: () => Promise<void>;
+  /**
+   * Fetch the archive. `force` deletes the local copy first rather than writing over it, which is what
+   * Refresh needs: an overwrite keeps any file a newer archive dropped.
+   */
+  sync: (force?: boolean) => Promise<void>;
 
   /** The chosen size, shared so the run screen can label its steps with the same counts. */
   size: string;

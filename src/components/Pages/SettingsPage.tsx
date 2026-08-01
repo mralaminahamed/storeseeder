@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useCallback, useEffect } from "@wordpress/element";
-import { __, sprintf } from "@wordpress/i18n";
+import { __, _n, sprintf } from "@wordpress/i18n";
 
 import { Button } from "@/components/ui/button";
 import { Seg } from "@/components/ui/Seg";
@@ -37,12 +37,14 @@ import {
   DOCS_URL,
   GITHUB_URL,
   ISSUES_URL,
+  RECIPES_REPO_URL,
   SAMPLE_DATA_REPO_URL,
 } from "@/lib/links";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
-import { routeRows } from "@/lib/recipes";
+import { fetchRecipesStatus, routeRows, syncRecipes } from "@/lib/recipes";
+import type { RecipesStatus } from "@/lib/recipes";
 import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { PageHead } from "@/components/ui/PageHead";
 import { useStats } from "@/providers/StatsProvider";
@@ -181,6 +183,13 @@ export default function SettingsPage() {
   const [accessFailed, setAccessFailed] = useState(false);
   const [savingRoles, setSavingRoles] = useState(false);
 
+  // Recipes sync state. Separate from the sample data's even though one consent record covers both
+  // downloads: they are two archives, either can be present without the other, and a single spinner
+  // would disable both cards while one of them worked.
+  const [recipesStatus, setRecipesStatus] = useState<RecipesStatus | null>(null);
+  const [recipesLoading, setRecipesLoading] = useState(true);
+  const [recipesSyncing, setRecipesSyncing] = useState(false);
+
   // Sample data sync state
   const [syncStatus, setSyncStatus] = useState<SampleDataStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -189,6 +198,57 @@ export default function SettingsPage() {
     ok: boolean;
     message: string;
   } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const status = await fetchRecipesStatus();
+
+      if (!cancelled) {
+        setRecipesStatus(status);
+        setRecipesLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /**
+   * Fetch the recipe archive.
+   *
+   * `force` deletes the local copy first. Without it the download writes over what is there, and a
+   * recipe that dropped a file between releases would keep the old one — the same reason the sample
+   * data grew a force of its own.
+   */
+  const handleRecipesSync = useCallback(
+    async (force: boolean) => {
+      setRecipesSyncing(true);
+
+      try {
+        await syncRecipes(force);
+        setRecipesStatus(await fetchRecipesStatus());
+        toast(
+          force
+            ? __("Recipes refreshed", "storeseeder")
+            : __("Recipes synced", "storeseeder"),
+        );
+      } catch (err) {
+        // The endpoint answers 403 when consent has not been given, and its message says so — passed
+        // through rather than replaced, because "Could not sync" would send somebody looking for a
+        // network problem when the answer is the prompt above.
+        toast(
+          __("Could not sync the recipes", "storeseeder"),
+          err instanceof Error ? err.message : "",
+        );
+      } finally {
+        setRecipesSyncing(false);
+      }
+    },
+    [toast],
+  );
 
   const nonce = window.storeseederApi?.restNonce ?? "";
   const restUrl = window.storeseederApi?.restUrl ?? "";
@@ -1172,6 +1232,134 @@ export default function SettingsPage() {
             </div>
           </div>
         </SetCard>
+
+        {/* Recipes. Its own card rather than a line in the sample-data one: they are two archives,
+            downloaded separately, and either can be present without the other — a single control would
+            make "synced" ambiguous about which. */}
+        <SetCard
+          icon="store"
+          scope="site"
+          title={__( "Recipes", "storeseeder" )}
+          desc={__(
+            "Ready-made shops — a corner grocer, a fashion boutique, a home & garden store — built across nine resources in one click.",
+            "storeseeder",
+          )}
+          testId="settings-recipes"
+        >
+          <div>
+            <div className="fp-set-sync">
+              <span className="fp-set-sync-ic">
+                <Icon
+                  name={recipesStatus?.exists ? "check" : "alert"}
+                  size={19}
+                />
+              </span>
+              <div>
+                {recipesLoading ? (
+                  <SkeletonText lines={2} />
+                ) : (
+                  <>
+                    <div className="fp-set-sync-title">
+                      {recipesStatus?.exists
+                        ? sprintf(
+                            /* translators: %s: number of recipes available. */
+                            _n(
+                              "%s recipe available",
+                              "%s recipes available",
+                              recipesStatus.recipes,
+                              "storeseeder",
+                            ),
+                            String( recipesStatus.recipes ),
+                          )
+                        : __( "No recipes downloaded yet", "storeseeder" )}
+                    </div>
+                    <div className="fp-set-sync-sub">
+                      {recipesStatus?.last_synced
+                        ? sprintf(
+                            /* translators: %s: date and time of the last sync. */
+                            __( "Last updated: %s", "storeseeder" ),
+                            new Date( recipesStatus.last_synced ).toLocaleString(),
+                          )
+                        : __(
+                            "About 90 KB, fetched once. The Recipes page works offline afterwards.",
+                            "storeseeder",
+                          )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Named, not swallowed. A fetch that dropped half the archive would otherwise present as
+                a shorter list of recipes, and a shorter list looks like a decision somebody made. */}
+            {undefined !== recipesStatus?.incomplete && recipesStatus.incomplete.length > 0 && (
+              <p className="fp-set-hint" style={{ marginBottom: 12, color: "var(--red)" }}>
+                {sprintf(
+                  /* translators: %s: comma-separated recipe ids. */
+                  __(
+                    "The index lists these but they are not on disk: %s. Force a re-sync.",
+                    "storeseeder",
+                  ),
+                  recipesStatus.incomplete.join( ", " ),
+                )}
+              </p>
+            )}
+
+            <p className="fp-set-hint" style={{ marginBottom: 12 }}>
+              {"granted" === recipesStatus?.consent
+                ? __(
+                    "Downloads are allowed. Recipes and sample data share one consent record, so revoking it above stops both.",
+                    "storeseeder",
+                  )
+                : __(
+                    "Needs the same consent the sample data uses. Accept it above and this will download.",
+                    "storeseeder",
+                  )}
+            </p>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button
+                variant="primary"
+                icon="refresh"
+                type="button"
+                onClick={() => void handleRecipesSync( false )}
+                disabled={recipesSyncing}
+                data-testid="recipes-sync"
+              >
+                {recipesSyncing
+                  ? __( "Syncing…", "storeseeder" )
+                  : __( "Sync now", "storeseeder" )}
+              </Button>
+              <Button
+                variant="outline"
+                icon="refresh"
+                type="button"
+                onClick={() => void handleRecipesSync( true )}
+                disabled={recipesSyncing}
+              >
+                {__( "Force re-sync", "storeseeder" )}
+              </Button>
+            </div>
+
+            <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <a
+                href={recipesStatus?.repo_url || RECIPES_REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="sm" icon="external" type="button">
+                  {__( "View recipes repository", "storeseeder" )}
+                </Button>
+              </a>
+              <a href={DOCS.recipes} target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm" icon="book" type="button">
+                  {__( "How recipes work", "storeseeder" )}
+                </Button>
+              </a>
+            </div>
+          </div>
+        </SetCard>
+
         </SetSection>
 
         <SetSection

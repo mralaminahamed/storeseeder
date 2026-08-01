@@ -229,9 +229,37 @@ export async function fetchRecipes(locale: string): Promise<RecipesResponse> {
  * A POST rather than a parameter on the read: a GET that downloads eighty kilobytes from GitHub is
  * a GET a browser prefetcher will fire on its own.
  */
-export async function syncRecipes(): Promise<{ recipes: number }> {
+export async function syncRecipes(force = false): Promise<{ recipes: number }> {
   return apiFetch<{ recipes: number }>({
     path: "/storeseeder/v1/recipes/sync",
     method: "POST",
+    data: { force },
   });
+}
+
+/** What the recipes archive on disk looks like. The same shape as the sample-data status. */
+export interface RecipesStatus {
+  exists: boolean;
+  last_synced: string | null;
+  repo_url: string;
+  consent: "granted" | "declined" | null;
+  recipes: number;
+  incomplete: string[];
+}
+
+/**
+ * Read the archive's state without fetching anything.
+ *
+ * Separate from `fetchRecipes()`, which resolves every manifest against the target platform and is
+ * what the Recipes page needs. Settings only wants to know whether there is an archive and how old it
+ * is, and a card that had to load the whole annotated catalogue to say "synced" would be waiting on
+ * the platform resolver to render a date.
+ */
+export async function fetchRecipesStatus(): Promise<RecipesStatus | null> {
+  try {
+    return await apiFetch<RecipesStatus>({ path: "/storeseeder/v1/recipes/status" });
+  } catch {
+    // A card that cannot read its own status says so; it does not block the page around it.
+    return null;
+  }
 }

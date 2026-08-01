@@ -777,6 +777,26 @@ class StoreSeeder {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'rest_sync_recipes' ),
 				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'force' => array(
+						'description' => __( 'Delete the local copy before fetching, rather than writing over it.', 'storeseeder' ),
+						'type'        => 'boolean',
+						'default'     => false,
+					),
+				),
+			)
+		);
+
+		// Read-only, so Settings can report what is on disk without fetching anything. Separate from
+		// `/recipes`, which resolves and annotates every manifest against the target platform — this
+		// answers only "is there an archive, and how old is it".
+		register_rest_route(
+			'storeseeder/v1',
+			'/recipes/status',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_recipes_status' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
 			)
 		);
 
@@ -1281,9 +1301,15 @@ class StoreSeeder {
 	 *
 	 * @since 1.2.0
 	 *
+	 * @param WP_REST_Request $request The REST request; `force` deletes the local copy first.
+	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function rest_sync_recipes() {
+	public function rest_sync_recipes( WP_REST_Request $request ) {
+		if ( (bool) $request->get_param( 'force' ) ) {
+			$this->delete_recipes_directory();
+		}
+
 		$result = $this->ensure_recipes();
 
 		if ( is_wp_error( $result ) ) {
@@ -1296,6 +1322,71 @@ class StoreSeeder {
 				'downloaded' => Recipe_Registry::downloaded(),
 				'recipes'    => count( Recipe_Registry::instance()->all() ),
 				'incomplete' => Recipe_Registry::missing(),
+			),
+			200
+		);
+	}
+
+	/**
+	 * Delete the local recipe archive.
+	 *
+	 * The whole directory, not a list of subdirectories the way the sample-data force does. Everything
+	 * under it arrived in one archive, so there is nothing of the user's to preserve — and a hardcoded
+	 * list of resource directories is a list that goes stale the moment a recipe ships a new one, which
+	 * is how a "force" re-sync comes to leave the stale files it was pressed to remove.
+	 *
+	 * A plain overwrite is not enough on its own either: `WP_Filesystem::move()` defaults to leaving an
+	 * existing file alone, so a recipe that dropped a file between releases would keep the old copy
+	 * forever.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return void
+	 */
+	private function delete_recipes_directory(): void {
+		global $wp_filesystem;
+
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( ! $wp_filesystem ) {
+			return;
+		}
+
+		$wp_filesystem->delete( untrailingslashit( Recipe_Registry::directory() ), true );
+
+		// The registry caches what it resolved, and it has just been told a lie by the filesystem.
+		Recipe_Registry::instance()->reset();
+	}
+
+	/**
+	 * REST: what recipe archive is on disk.
+	 *
+	 * Deliberately the same shape as the sample-data status, because the Settings card that reads it is
+	 * the same card with different words — two payloads that differ only in spelling would make the two
+	 * cards diverge for no reason.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function rest_recipes_status(): WP_REST_Response {
+		$dir        = untrailingslashit( Recipe_Registry::directory() );
+		$downloaded = Recipe_Registry::downloaded();
+		$consent    = $this->get_sample_data_consent();
+
+		return new WP_REST_Response(
+			array(
+				'exists'      => $downloaded,
+				'last_synced' => $downloaded && is_dir( $dir ) ? gmdate( 'c', (int) filemtime( $dir ) ) : null,
+				'repo_url'    => $this->get_recipes_source()['repo_url'],
+				// One consent record covers both archives — asking twice for the same answer trains
+				// people to click through prompts.
+				'consent'     => '' === $consent ? null : $consent,
+				'recipes'     => count( Recipe_Registry::instance()->all() ),
+				'incomplete'  => Recipe_Registry::missing(),
 			),
 			200
 		);

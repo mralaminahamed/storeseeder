@@ -200,38 +200,53 @@ export default function RecipesLayout() {
     [size, locale, target, recordRun, navigate],
   );
 
-  const sync = useCallback(async () => {
-    if (syncing) return;
+  /**
+   * Fetch the archive and re-read the catalogue.
+   *
+   * `force` deletes the local copy first, which is what the Refresh button uses. Without it the
+   * download writes over what is there, and a recipe that *dropped* a file between releases would keep
+   * the old one — `WP_Filesystem::move()` leaves an existing file alone by default, which is how the
+   * sample data came to need a force of its own.
+   */
+  const sync = useCallback(
+    async (force = false) => {
+      if (syncing) return;
 
-    setSyncing(true);
+      setSyncing(true);
 
-    try {
-      await syncRecipes();
+      try {
+        await syncRecipes(force);
 
-      const data = await fetchRecipes(locale);
+        const data = await fetchRecipes(locale);
 
-      setRecipes(data.recipes ?? []);
-      setDownloaded(Boolean(data.downloaded));
-      setIncomplete(data.incomplete ?? []);
-      setAdminUrls(data.adminUrls ?? {});
-      setResolved("" !== data.platform);
-      toast(
-        __("Recipes ready", "storeseeder"),
-        sprintf(
-          /* translators: %s: number of recipes. */
-          __("%s available.", "storeseeder"),
-          String((data.recipes ?? []).length),
-        ),
-      );
-    } catch (err) {
-      toast(
-        __("Could not download the recipes", "storeseeder"),
-        err instanceof Error ? err.message : "",
-      );
-    } finally {
-      setSyncing(false);
-    }
-  }, [syncing, locale, toast]);
+        setRecipes(data.recipes ?? []);
+        setDownloaded(Boolean(data.downloaded));
+        setIncomplete(data.incomplete ?? []);
+        setAdminUrls(data.adminUrls ?? {});
+        setResolved("" !== data.platform);
+        toast(
+          force
+            ? __("Recipes refreshed", "storeseeder")
+            : __("Recipes ready", "storeseeder"),
+          sprintf(
+            /* translators: %s: number of recipes. */
+            __("%s available.", "storeseeder"),
+            String((data.recipes ?? []).length),
+          ),
+        );
+      } catch (err) {
+        toast(
+          force
+            ? __("Could not refresh the recipes", "storeseeder")
+            : __("Could not download the recipes", "storeseeder"),
+          err instanceof Error ? err.message : "",
+        );
+      } finally {
+        setSyncing(false);
+      }
+    },
+    [syncing, locale, toast],
+  );
 
   const undo = useCallback(async () => {
     if (!progress?.runId || undoing) return;
