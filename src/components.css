@@ -379,7 +379,11 @@
 .fp-root .fp-entity-hint { margin-top:5px; color:var(--text-3); font-size:var(--fs-sm); }
 
 /* ===== settings ===== */
-.fp-root .fp-settings-col { max-width:680px; }
+/* Narrow on purpose — a column of labelled controls reads badly at 1120px — but centred in the
+   measure the other three pages fill, not left-aligned in it. Left-aligned, Settings put 680px of
+   content against 440px of empty page, so moving Overview → Settings shifted everything leftwards.
+   That is the horizontal lurch `.fp-page wide` exists to prevent, surviving one level further in. */
+.fp-root .fp-settings-col { max-width:680px; margin-inline:auto; }
 
 /* Settings sections. Cards are grouped by who a change affects — the site, or just
    this browser — because that is the first thing worth knowing before touching one on
@@ -669,7 +673,7 @@
   width:100%; display:flex; gap:9px; padding:10px 12px; border-radius:var(--r-md);
   font-size:var(--fs-hint); line-height:1.55; color:var(--text-2);
   background:color-mix(in oklab, var(--amber) 10%, var(--surface));
-  border:1px solid color-mix(in oklab, var(--amber) 26%, var(--border));
+  border:1px solid color-mix(in oklab, var(--amber) 26%, var(--border)); margin-bottom:16px;
 }
 .fp-root .fp-recipe-guard svg { flex:none; margin-top:2px; color:var(--amber); }
 

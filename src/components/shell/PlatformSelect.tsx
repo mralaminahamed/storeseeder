@@ -21,7 +21,7 @@ import { usePlatform } from "@/providers/PlatformProvider";
  * draws its list in the operating system's chrome — a light menu over a dark app.
  */
 export function PlatformSelect() {
-  const { active, selected, label, setTarget, ambiguous, state } = usePlatform();
+  const { active, selected, setTarget, ambiguous, state } = usePlatform();
 
   if (active.length < 2) return null;
 
@@ -47,8 +47,15 @@ export function PlatformSelect() {
       // Auto is always first and always reads "Auto" — it is a mode, and a mode renamed
       // after whichever store it currently resolves to reads as a different option every
       // time the list is opened. What it resolved to is on the tooltip.
+      //
+      // The literal word, not `targetLabel( state, selected )`. That returns the *selected*
+      // platform's name whenever one is chosen, so picking WooCommerce relabelled this entry
+      // "WooCommerce" and the list read "WooCommerce · Fluent Cart · WooCommerce" — Auto still
+      // there, no longer reachable by name, and one store apparently listed twice. The trigger
+      // is unaffected: `FieldSelect` draws it from whichever option matches the value, so with
+      // Auto selected it renders this label and reads "Auto".
       options={[
-        { value: AUTO, label },
+        { value: AUTO, label: __("Auto", "storeseeder") },
         ...active.map((platform) => ({
           value: platform.id,
           label: platform.label,

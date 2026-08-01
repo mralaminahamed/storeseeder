@@ -118,6 +118,27 @@ describe("PlatformSelect", () => {
       ).not.toBeInTheDocument();
     });
 
+    /**
+     * The half the earlier fix missed, found by the documentation screenshot run rather than by
+     * this suite: it asserted the Auto option against `resolved`, and the defect was in `stored`.
+     *
+     * The Auto entry took its label from `targetLabel( state, selected )`, which returns the
+     * *selected* platform's name whenever one is chosen. So picking Stub Cart relabelled the Auto
+     * entry "Stub Cart" and the list read "Stub Cart · Fluent Cart · Stub Cart" — Auto still
+     * present, no longer reachable by name, and one store apparently offered twice.
+     */
+    it("keeps the first option named Auto after a platform is chosen", async () => {
+      mount({ ...two, stored: "stub-cart", resolved: "stub-cart", ambiguous: false });
+
+      await userEvent.click(screen.getByRole("combobox"));
+
+      expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual([
+        "Auto",
+        "Fluent Cart",
+        "Stub Cart",
+      ]);
+    });
+
     it("sends the platform id when one is chosen", async () => {
       const apiFetch = (await import("@wordpress/api-fetch"))
         .default as unknown as ReturnType<typeof jest.fn>;
