@@ -17,6 +17,7 @@ export default defineConfig({
       favicon: '/favicon.svg',
       logo: { src: './src/assets/logo.svg', alt: 'StoreSeeder' },
       social: [
+        { icon: 'external', label: 'WordPress.org', href: 'https://wordpress.org/plugins/storeseeder/' },
         { icon: 'github', label: 'GitHub', href: 'https://github.com/mralaminahamed/storeseeder' },
       ],
       editLink: {
@@ -32,6 +33,11 @@ export default defineConfig({
         },
       },
       customCss: ['./src/styles/custom.css'],
+      // The hero's image field is a logo slot — hardcoded 400×400. The override renders the home
+      // page's banner at the size it is displayed at, and delegates the rest back to Starlight.
+      components: {
+        Hero: './src/components/Hero.astro',
+      },
       sidebar: [
         {
           label: 'Getting Started',
@@ -46,7 +52,10 @@ export default defineConfig({
           items: [
             { label: 'Recipes', slug: 'guides/recipes' },
             { label: 'Running a generator', slug: 'guides/generators' },
+            { label: 'The batch queue', slug: 'guides/batch' },
             { label: 'Deleting generated data', slug: 'guides/cleanup' },
+            { label: 'Locales', slug: 'guides/locales' },
+            { label: 'AI and MCP', slug: 'guides/mcp' },
             { label: 'WP-CLI', slug: 'guides/wp-cli' },
             { label: 'Settings', slug: 'guides/settings' },
           ],
@@ -55,9 +64,16 @@ export default defineConfig({
           label: 'Reference',
           items: [
             { label: 'Architecture', slug: 'reference/architecture' },
+            { label: 'Platform support', slug: 'reference/platform-support' },
+            { label: 'Parameters', slug: 'reference/parameters' },
             { label: 'REST API', slug: 'reference/rest-api' },
             { label: 'Extension points', slug: 'reference/extension-points' },
             { label: 'External services', slug: 'reference/external-services' },
+            { label: 'Support & troubleshooting', slug: 'reference/support' },
+            { label: 'Contributing', slug: 'reference/contributing' },
+            // Generated from the repository's CHANGELOG.md on predev/prebuild — see
+            // scripts/sync-changelog.mjs. Listed last because it is the longest page on the site.
+            { label: 'Changelog', slug: 'reference/changelog' },
           ],
         },
       ],

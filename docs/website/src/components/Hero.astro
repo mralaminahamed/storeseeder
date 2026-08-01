@@ -1,0 +1,109 @@
+---
+/**
+ * Hero override — renders the splash page's banner at its real size.
+ *
+ * Starlight's hero image field is a *logo* slot, not a banner slot: its `Hero.astro` hardcodes
+ * `width: 400, height: 400` on the `<Image>`, so declaring a 2400×720 banner as `hero.image.file`
+ * has Astro emit a 400×400 derivative — a squashed square. CSS could then stretch it back to 10:3,
+ * and did, which is why the shipped page had `naturalWidth: 400` rendered 1080 across: two and a
+ * half times upscaled, from a bitmap that had already lost the aspect ratio.
+ *
+ * No amount of CSS fixes that, because the wrong thing is the file the browser was sent. So the
+ * banner is rendered here, with `widths` that match the column it lands in, and the frontmatter no
+ * longer declares `hero.image` at all.
+ *
+ * Everything else — title, tagline, actions — still comes from Starlight's own Hero via `Default`,
+ * so this owns the one thing it needs to and does not fork markup that would then drift on upgrade.
+ */
+import Default from '@astrojs/starlight/components/Hero.astro';
+import { Image } from 'astro:assets';
+import banner from '../assets/banner.png';
+
+const { entry } = Astro.locals.starlightRoute;
+
+/** Only the splash home page. A future hero elsewhere gets Starlight's behaviour untouched. */
+const showBanner = 'splash' === entry.data.template;
+
+const alt =
+  'Three StoreSeeder recipe cards — a corner grocer, a fashion boutique and a home & garden ' +
+  'store — each listing sample products and the number of rows it creates';
+---
+
+{
+  showBanner && (
+    <Image
+      src={banner}
+      alt={alt}
+      /*
+       * The banner breaks out of the content column and displays up to 1600 CSS pixels, so the
+       * largest candidate is that at 2×. Not the source's full 3600 — nothing renders it that wide,
+       * and shipping it would be a megabyte to display 1600.
+       */
+      widths={[640, 960, 1280, 1920, 2560, 3200]}
+      sizes="(min-width: 103rem) 100rem, calc(100vw - 3rem)"
+      fetchpriority="high"
+      loading="eager"
+      class="site-banner"
+    />
+  )
+}
+<Default><slot /></Default>
+
+<style>
+  /*
+   * Wider than the column it sits in. The splash template has no sidebar, so the content column is
+   * centred in the viewport and an item centred in that column is centred in the viewport too.
+   * Capped at 100rem so it stops growing on an ultrawide display instead of becoming a letterbox
+   * strip, and the 3rem of slack keeps a scrollbar from turning `100vw` into a horizontal scroll.
+   *
+   * Negative margins, which is the part that took three tries. `left: 50%` + `translateX(-50%)`
+   * measured a 1900px scroll width in a 1680px viewport with no element visibly out of bounds — a
+   * relative `left` offset contributes to scrollable overflow and the transform pulling it back does
+   * not take that away. `justify-self: center` then did nothing at all, because Starlight's own
+   * `.hero > img { margin-inline: auto }` still applied and an auto margin resolves to zero when the
+   * free space is negative, which silently wins over `justify-self`. Stating the margins leaves
+   * neither mechanism room to disagree.
+   */
+  .site-banner {
+    /* Declared once: both the width and the margins that centre it are derived from it. */
+    --banner-width: min(100vw - 3rem, 100rem);
+
+    width: var(--banner-width);
+    max-width: none;
+    height: auto;
+    margin-inline: calc((100% - var(--banner-width)) / 2);
+    border-radius: 0.75rem;
+    /* The banner's own field is indigo, so it needs separating from an indigo page rather than from
+       a white one. */
+    box-shadow: 0 18px 44px -16px rgb(0 0 0 / 0.4);
+  }
+
+  /*
+   * Starlight's hero keeps its `7fr 4fr` grid above 50rem whether or not it has an image, so with
+   * the image lifted out the copy would left-align into seven columns and leave four empty. One
+   * column, centred — the banner above is what the second column would have held.
+   *
+   * The padding goes with it. Starlight's `clamp(2.5rem, calc(1rem + 10vmin), 10rem)` is 160px top
+   * *and* bottom on a desktop, which frames a logo; above a full-width banner it is just a screen
+   * of empty page before anything appears. Less above than below, because the banner is the first
+   * thing on the page and the copy beneath it needs separating from the cards that follow.
+   *
+   * `:global` because these are Starlight's own class names, and unlayered so they win against
+   * `@layer starlight.core`.
+   */
+  :global(.hero) {
+    grid-template-columns: 100%;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    padding-block: clamp(1rem, 3vmin, 2.5rem) clamp(2rem, 6vmin, 4.5rem);
+  }
+
+  :global(.hero .stack) {
+    text-align: center;
+  }
+
+  :global(.hero .copy),
+  :global(.hero .actions) {
+    align-items: center;
+    justify-content: center;
+  }
+</style>

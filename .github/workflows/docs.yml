@@ -1,0 +1,96 @@
+name: Docs
+
+# Builds the Astro Starlight site in docs/website/ and deploys it to GitHub Pages.
+#
+# docs/website/ is an isolated yarn project with its own yarn.lock and its own
+# dependency set, so it is installed and built independently of the plugin's.
+# Linting it from the plugin resolves `astro/config` against the wrong
+# node_modules, which is why eslint.config.mjs ignores it too.
+#
+# One-time setup: repo Settings → Pages → Source = "GitHub Actions".
+# Site: https://mralaminahamed.github.io/storeseeder/
+#
+# The path filter matters more than it looks. Without it every plugin commit
+# would redeploy an unchanged site, and `concurrency: pages` would then queue
+# deploys behind each other for no reason.
+
+on:
+  push:
+    branches: [trunk]
+    paths:
+      - "docs/website/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/website/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Not cancel-in-progress: a half-finished deploy leaves Pages serving a
+  # partial site, which is worse than waiting for the one ahead to finish.
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      # Corepack pins yarn from package.json's `packageManager`, so CI uses the
+      # same version the lock file was written by.
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: yarn
+          cache-dependency-path: docs/website/yarn.lock
+
+      - name: Install
+        working-directory: docs/website
+        # --immutable: a lock file that would have to change is a lock file that
+        # was not committed, and CI should say so rather than quietly resolve
+        # something the author never built against.
+        run: corepack yarn install --immutable
+
+      - name: Build
+        working-directory: docs/website
+        run: corepack yarn build
+
+      # Only on a push to trunk. A pull request builds to prove the site still
+      # compiles; uploading its artifact would let a fork's branch reach the
+      # deploy job.
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/website/dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Scoped to this job rather than the workflow: only the deploy needs to
+    # write Pages and mint an id token, and the build step handles untrusted
+    # pull-request content.
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deploy
+        uses: actions/deploy-pages@v4

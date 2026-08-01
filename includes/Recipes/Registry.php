@@ -21,6 +21,8 @@ namespace StoreSeeder\Recipes;
 
 use StoreSeeder\Platforms\Locale;
 
+use StoreSeeder\Storage;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -176,9 +178,7 @@ final class Registry {
 	 * @return string Absolute path, with a trailing slash.
 	 */
 	public static function directory(): string {
-		$upload_dir = wp_upload_dir();
-
-		return $upload_dir['basedir'] . '/storeseeder-recipes/';
+		return Storage::recipes();
 	}
 
 	/**

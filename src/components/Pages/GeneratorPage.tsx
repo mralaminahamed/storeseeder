@@ -11,6 +11,7 @@ import type { ParamBag } from "@/lib/paths";
 import { getSettings } from "@/lib/settings";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
+import { chunkCounts } from "@/lib/chunk";
 import { useBatch } from "@/providers/BatchProvider";
 import { usePlatform } from "@/providers/PlatformProvider";
 import { AUTO } from "@/lib/platform";
@@ -131,29 +132,24 @@ export default function GeneratorPage() {
     setGenerating(true);
     setProgress(0);
 
-    const t0 = Date.now();
-    const dur = 1000 + Math.min(count, 200) * 4;
-
-    let raf: number;
-
-    const tick = () => {
-      const p = Math.min(1, (Date.now() - t0) / dur);
-      setProgress(p);
-      if (p < 1) {
-        raf = requestAnimationFrame(tick);
-      }
-    };
-
-    raf = requestAnimationFrame(tick);
+    /*
+     * The requested count, split into requests the endpoint will take. `count` is capped at 100 by the
+     * route's own schema and the cap is enforced during argument validation, so this used to send the
+     * whole number and anything above 100 came back as `Invalid parameter(s): count` with nothing
+     * written — while the stepper beside it allowed up to 100,000.
+     *
+     * The progress bar is driven by completed chunks now. It used to be a `requestAnimationFrame`
+     * animation against a guessed duration — `1000 + min( count, 200 ) * 4` ms — which reached 100%
+     * and stopped while the request was still in flight. That was survivable for one request and is
+     * not for nine: a 900-row run would have shown a full bar for most of its life. The recipe runner
+     * has always counted completed requests instead, for exactly this reason.
+     */
+    const chunks = chunkCounts(count);
 
     // Named rather than inlined into setTimeout: an async callback there returns a
     // promise nothing can await, so the timer would swallow a rejection.
     const finish = async () => {
-      cancelAnimationFrame(raf);
-      setProgress(1);
-
       const body: Record<string, unknown> = {
-        count,
         locale,
         include_meta: meta,
         // Always explicit. Letting the server fall back to auto would mean the row
@@ -167,11 +163,17 @@ export default function GeneratorPage() {
       }
 
       try {
-        const data = await apiFetch<GeneratorResult>({
-          path: `/storeseeder/v1/${generator.route}/generate`,
-          method: "POST",
-          data: body,
-        });
+        let data: GeneratorResult = {} as GeneratorResult;
+
+        for (let i = 0; i < chunks.length; i++) {
+          data = await apiFetch<GeneratorResult>({
+            path: `/storeseeder/v1/${generator.route}/generate`,
+            method: "POST",
+            data: { ...body, count: chunks[i] },
+          });
+
+          setProgress((i + 1) / chunks.length);
+        }
 
         recordRun(generator.route, count, true, data.message ?? "", {
           locale,
@@ -199,18 +201,16 @@ export default function GeneratorPage() {
       }
     };
 
-    // setTimeout guarantees completion even if rAF is throttled in a background tab
-    const timer = setTimeout(() => void finish(), dur);
-
-    // Cleanup if component unmounts mid-flight (React StrictMode / navigation)
-    return () => {
-      clearTimeout(timer);
-      cancelAnimationFrame(raf);
-    };
+    // Straight away. This used to be `setTimeout( finish, dur )`, which held the request back for the
+    // length of the animation — so pressing Generate waited up to 1.8 seconds before asking for
+    // anything, to keep a bar that was measuring nothing in step with a request it preceded.
+    void finish();
   };
 
   const onAddBatch = () => {
-    addToBatch(generator.route, count);
+    // Everything the Generate button would have sent. Passing only the route and the count made the
+    // parameter column, the seed and the metadata switch work on one button and not the other.
+    addToBatch(generator.route, count, params, seed, meta);
     toast(
       sprintf(
         /* translators: %1$s: count, %2$s: generator name */

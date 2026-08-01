@@ -4,8 +4,14 @@ name: Plugin asset/readme update
 # the WordPress.org SVN, without touching the plugin code in trunk. It fires on a merge to trunk, so
 # the directory listing can be corrected without cutting a release.
 #
-# Worth knowing: this publishes `Stable tag` too. Bumping the version in readme.txt before the
-# matching tag exists therefore points the directory at a release that has not been deployed yet.
+# This publishes `Stable tag` too, which is why it reads readme.txt from the latest release tag rather
+# than from trunk. Trunk's readme describes the version being developed; the directory has to describe
+# the version people can install. Syncing trunk's copy pointed the listing at 1.2.0 while only 1.0.0
+# and 1.1.0 existed as tags — and WordPress serves downloads from /tags/<stable tag>/, so the listing
+# resolved to nothing until it was reverted by hand.
+#
+# Assets under .wordpress-org/ still come from trunk. Artwork has no version to be wrong about, and
+# fixing a banner should not need a release.
 
 on:
   push:
@@ -35,8 +41,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          # Tags are needed to find the latest release; a shallow clone has none.
+          fetch-depth: 0
+
+      - name: Take readme.txt from the latest release tag
+        run: |
+          set -euo pipefail
+
+          TAG="$(git tag --list --sort=-v:refname | head -n1)"
+
+          if [ -z "$TAG" ]; then
+            echo "::notice::No release tag yet — nothing to publish, leaving the directory alone."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "::notice::Publishing readme.txt from tag ${TAG}"
+          git show "${TAG}:readme.txt" > readme.txt
+
+          # State it in the log, because a mismatch here is the whole failure mode this guards.
+          grep -m1 '^Stable tag:' readme.txt
+        id: readme
 
       - name: WordPress.org plugin asset/readme update
+        if: steps.readme.outputs.skip != 'true'
         uses: 10up/action-wordpress-plugin-asset-update@stable
         env:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

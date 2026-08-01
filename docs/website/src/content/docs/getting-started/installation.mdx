@@ -1,0 +1,128 @@
+---
+title: Installation
+description: From the WordPress plugin directory, from a release zip, or from source.
+---
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Requirements
+
+| | |
+|---|---|
+| WordPress | 6.5 or later |
+| PHP | 7.4 or later |
+| A store plugin | [WooCommerce](https://wordpress.org/plugins/woocommerce/) or [Fluent Cart](https://wordpress.org/plugins/fluent-cart/), active |
+| Tested up to | WordPress 7.0 |
+
+StoreSeeder needs at least one supported store plugin active, because it writes through that
+platform's own models rather than into the database directly.
+
+<Tabs>
+<TabItem label="From WordPress admin">
+
+The way most people should install it.
+
+<Steps>
+
+1. In your WordPress admin, go to **Plugins → Add New**.
+
+2. Search for **StoreSeeder**.
+
+3. Press **Install Now** on *StoreSeeder – eCommerce Test Data Generator*, then **Activate**.
+
+4. A new **StoreSeeder** item appears in the admin menu.
+
+</Steps>
+
+</TabItem>
+<TabItem label="From a zip">
+
+For a specific version, or a release not yet on the directory.
+
+<Steps>
+
+1. Download the zip from [Releases](https://github.com/mralaminahamed/storeseeder/releases).
+
+2. Go to **Plugins → Add New → Upload Plugin**.
+
+3. Choose the file, press **Install Now**, then **Activate**.
+
+</Steps>
+
+</TabItem>
+<TabItem label="From source">
+
+For contributing, or running an unreleased branch.
+
+```bash
+git clone https://github.com/mralaminahamed/storeseeder.git
+cd storeseeder
+composer install --no-dev
+yarn install && yarn build
+```
+
+The admin app is TypeScript and is not committed built, so `yarn build` is required —
+`build/admin-app.js` is what WordPress enqueues.
+
+:::note[Why the bundle is called `admin-app`]
+Not `admin`. WP-CLI mangles any bundle whose name ends in `min.js`, turning `admin.js` into `a.js`,
+which breaks core's `load_script_textdomain()` lookup and silently loses every translation.
+:::
+
+</TabItem>
+<TabItem label="WP-CLI">
+
+```bash
+wp plugin install storeseeder --activate
+```
+
+Or from a local checkout:
+
+```bash
+wp plugin activate storeseeder
+```
+
+</TabItem>
+</Tabs>
+
+## There is no `Requires Plugins` header
+
+Deliberately, and it is worth knowing if you were expecting WordPress to enforce a dependency.
+
+That header made WordPress refuse activation without one particular store plugin — which meant no
+other platform could ever be reached, including on a site with a perfectly good one installed.
+
+StoreSeeder checks for a usable platform at runtime instead, and tells you what it found.
+
+## After activating
+
+<Steps>
+
+1. **StoreSeeder → Settings** — choose a target platform if more than one store plugin is active.
+   With several active and none chosen, StoreSeeder asks rather than guessing, because writing rows
+   into the wrong store is the one failure nobody notices afterwards.
+
+2. **StoreSeeder → Recipes** — download the recipe archive if you want whole-shop generation. About
+   90 KB, once, then it works offline.
+
+3. Build a recipe, or pick a generator from the sidebar.
+
+</Steps>
+
+Both downloads — recipes and the optional locale vocabulary — need an administrator to accept a
+consent prompt first. Declining costs you nothing structural: every generator keeps working from
+built-in defaults.
+
+:::caution
+StoreSeeder writes large volumes of data directly into your store. Use it on development and staging
+sites, and back up your database before generating large datasets.
+:::
+
+## Uninstalling
+
+Deactivating leaves generated data in place — it is real data in your store, and removing it silently
+on deactivation would be a surprise.
+
+To remove it, use **Settings → Danger zone → Delete generated data** *before* deactivating. That walks
+StoreSeeder's own ledger, so it removes what the plugin created and nothing that merely resembles it.
+See [Deleting generated data](/storeseeder/guides/cleanup/).
