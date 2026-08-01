@@ -3,6 +3,14 @@ import { __ } from "@wordpress/i18n";
 
 import { Skeleton } from "@/components/ui/Skeleton";
 
+interface RecipeSkeletonProps {
+  /**
+   * How many cards to stand in for. The server inlines what it has, so this is the real number
+   * rather than a guess — a skeleton that shows four and delivers three still moves the layout.
+   */
+  cards?: number;
+}
+
 /**
  * The shape of the page while the recipes are still coming.
  *
@@ -10,13 +18,13 @@ import { Skeleton } from "@/components/ui/Skeleton";
  * real card's own classes — same tile, same two-column count grid, same run bar beneath — so
  * nothing moves when the data lands. That reflow is the cost a centred spinner hides.
  *
- * Four cards and eight count rows: four fills exactly one row of the grid at its widest, and eight
- * is what every shipped recipe plans. A skeleton that guesses low still jumps.
+ * The card count comes from the server, which knows how many the archive holds. Eight count rows is
+ * what every shipped recipe plans; a skeleton that guesses low still jumps.
  *
  * The boxes are `aria-hidden` by `Skeleton` itself; the live region below carries the news to a
  * screen reader, which would otherwise be read two dozen empty spans.
  */
-export function RecipeSkeleton() {
+export function RecipeSkeleton({ cards = 4 }: RecipeSkeletonProps) {
   return (
     <div aria-busy="true">
       <span className="sr-only" role="status">
@@ -24,7 +32,7 @@ export function RecipeSkeleton() {
       </span>
 
       <div className="fp-recipe-grid" aria-hidden="true">
-        {[0, 1, 2, 3].map((card) => (
+        {Array.from({ length: Math.max(1, Math.min(12, cards)) }, (_, card) => (
           <div key={card} className="fp-recipe is-skeleton">
             <div className="fp-recipe-top">
               <Skeleton width={44} height={44} radius={11} />
