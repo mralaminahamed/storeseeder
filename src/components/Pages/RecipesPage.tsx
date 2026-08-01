@@ -52,6 +52,20 @@ interface RunProgress {
 type Stage = "pick" | "running" | "done";
 
 /**
+ * Why "Create the store" is disabled, or undefined when it is not.
+ *
+ * Why, not just that. Both reasons are fixable — choose a target, sync the recipes — and a greyed
+ * button with no explanation is a dead end where an instruction belongs.
+ */
+function blockedReason(recipe: Recipe, resolved: boolean): string | undefined {
+  if (!resolved) {
+    return __("Choose a target platform in the topbar first.", "storeseeder");
+  }
+
+  return recipe.issues.find((i) => i.blocking)?.message;
+}
+
+/**
  * The page's own description.
  *
  * A constant because the loading state shows it too — it is known before any request, so
@@ -632,6 +646,7 @@ export default function RecipesPage() {
             <Button
               data-testid="recipe-run"
               disabled={isBlocked(recipe) || !resolved}
+              title={blockedReason(recipe, resolved)}
               onClick={() => void run()}
             >
               <Icon name="play" size={14} />

@@ -829,3 +829,12 @@
    uses — and `.fp-scroll` supplies none of its own, so without this the grid sits flush against
    the sidebar. */
 .fp-root .fp-recipes-page { padding:var(--pad-col-y) var(--pad-col-x) var(--pad-col-b); }
+
+/* A disabled button here has to be able to say why it is disabled.
+   The global rule sets `pointer-events:none`, which is right almost everywhere — it stops a dead
+   control eating a click. But it also kills hover, and with it the `title` and the cursor, so
+   "Create the store" greys out with no way to ask what is wrong. The reasons are specific and
+   fixable (no target chosen, no vocabulary downloaded), so on this page the button stays hoverable
+   and shows `not-allowed`, the way the mock did. The click is a no-op regardless: `disabled`
+   already prevents activation, `pointer-events` only prevented the pointer. */
+.fp-root .fp-recipes-page .fp-btn[disabled] { pointer-events:auto; cursor:not-allowed; }
