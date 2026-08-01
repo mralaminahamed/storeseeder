@@ -20,6 +20,7 @@ use StoreSeeder\Platforms\Platform_Driver;
 use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver;
+use StoreSeeder\Platforms\Resource;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -236,7 +237,126 @@ abstract class Controller extends WP_REST_Controller {
 
 		$count = isset( $params['count'] ) ? (int) $params['count'] : 10;
 
-		return rest_ensure_response( $generator->preview( $count ) );
+		return rest_ensure_response( $this->name_pinned_entities( $generator->preview( $count ), $params ) );
+	}
+
+	/**
+	 * Show the record a run is pinned to, rather than three invented ones.
+	 *
+	 * A preview row comes from FakerPHP — it must, because it runs on every keystroke and may not
+	 * touch the database. So a run pinned to one customer previewed three different names, which
+	 * says the opposite of what the run will do.
+	 *
+	 * The substitution happens here rather than in the generator for the same reason the pinning
+	 * does: naming the record means reading the store, and only the driver knows how. One lookup
+	 * per preview request, and only when a pin is actually set.
+	 *
+	 * A column the generator does not have is left alone, so this is a no-op for every resource
+	 * without one.
+	 *
+	 * @since 1.1.0
+	 *
+	 * The shape is `Generator::preview()`'s and is documented there; it is loose here because the
+	 * substitution writes into a nested cell, and pinning the exact array shape through that only
+	 * buys an argument with the analyser.
+	 *
+	 * @param array<string, mixed> $preview The preview as built.
+	 * @param array<string, mixed> $params  Request parameters.
+	 *
+	 * @return array<string, mixed>
+	 */
+	protected function name_pinned_entities( array $preview, array $params ): array {
+		// Which id parameter fills which preview column.
+		$pins = array(
+			'customer_id' => array( Resource::CUSTOMER, 'customer' ),
+			'product_id'  => array( Resource::PRODUCT, 'product' ),
+		);
+
+		foreach ( $pins as $param => $target ) {
+			list( $resource_type, $column ) = $target;
+
+			$id = isset( $params[ $param ] ) ? (int) $params[ $param ] : 0;
+
+			if ( $id < 1 ) {
+				continue;
+			}
+
+			if ( ! $this->preview_has_column( $preview, $column ) ) {
+				continue;
+			}
+
+			$label = $this->pinned_label( $params, $resource_type, $id );
+
+			if ( null === $label ) {
+				continue;
+			}
+
+			$rows = array();
+
+			foreach ( (array) $preview['rows'] as $row ) {
+				if ( is_array( $row ) && isset( $row[ $column ] ) && is_array( $row[ $column ] ) ) {
+					$row[ $column ]['v'] = $label;
+				}
+
+				$rows[] = $row;
+			}
+
+			$preview['rows'] = $rows;
+		}
+
+		return $preview;
+	}
+
+	/**
+	 * Whether the preview carries a column, so a substitution has somewhere to land.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $preview The preview.
+	 * @param string               $column  Column key.
+	 *
+	 * @return bool
+	 */
+	private function preview_has_column( array $preview, string $column ): bool {
+		foreach ( (array) ( $preview['columns'] ?? array() ) as $definition ) {
+			if ( is_array( $definition ) && isset( $definition['key'] ) && $column === $definition['key'] ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * What the pinned record is called, according to the target platform.
+	 *
+	 * Null when the platform cannot be resolved, cannot search, or does not know the id — all of
+	 * which leave the faker name in place rather than blanking the column.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param array<string, mixed> $params        Request parameters.
+	 * @param string               $resource_type Canonical resource name.
+	 * @param int                  $id            The pinned id.
+	 *
+	 * @return string|null
+	 */
+	private function pinned_label( array $params, string $resource_type, int $id ) {
+		$platform = $this->resolve_platform( $params );
+
+		// A preview is not the place to refuse: an unresolved platform already shows as an error on
+		// the run itself, and blanking the table on top of that helps nobody.
+		if ( is_wp_error( $platform ) || ! $platform instanceof Platform_Driver ) {
+			return null;
+		}
+
+		foreach ( $platform->search( $resource_type, (string) $id, 5 ) as $result ) {
+			if ( (int) $result['id'] === $id ) {
+				return $result['label'];
+			}
+		}
+
+		return null;
 	}
 
 	/**
