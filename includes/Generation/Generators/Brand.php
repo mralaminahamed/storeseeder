@@ -229,8 +229,8 @@ class Brand extends Generator {
 	 * @return string
 	 */
 	private function brand_name(): string {
-		$stem   = $this->get_faker()->randomElement( self::STEMS );
-		$suffix = $this->get_faker()->randomElement( self::SUFFIXES );
+		$stem   = $this->get_faker()->randomElement( $this->vocabulary( 'brands', 'stems', self::STEMS ) );
+		$suffix = $this->get_faker()->randomElement( $this->vocabulary( 'brands', 'suffixes', self::SUFFIXES ) );
 
 		return '' === $suffix ? $stem : $stem . ' ' . $suffix;
 	}

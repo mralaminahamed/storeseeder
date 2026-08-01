@@ -4,7 +4,7 @@ Tags: test data, dummy data, demo content, woocommerce, faker
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,15 @@ Only the four most recent releases are listed here. The complete history, in Kee
 
 [Read the full changelog on GitHub](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
 
+= 1.2.0 =
+* **Recipes.** One click builds a whole shop — a corner grocer, a fashion boutique, a home & garden store — across nine resources in dependency order, instead of a generator at a time.
+* A recipe is a vocabulary, not a dataset: product names, category tree, brand names, price band and variation axes. Every generator invariant still holds and every parameter still works on top of one.
+* Recipes download once from a separate repository, behind the consent prompt that already governs the sample data, so a new shop type needs no plugin update.
+* **Undo a whole recipe** in one action — every row it wrote is tagged with a run id in the ledger.
+* **`wp storeseeder recipe list` / `run`**, and `wp storeseeder cleanup --run_id=` to undo.
+* **Fixed: 72 of 73 locales were generating "Widget" and "Gadget".** Vocabulary had no locale fallback, so any locale without a data file silently used each generator's inline defaults.
+* Dashboard stat tiles now match the generator tiles, including in dark mode.
+
 = 1.1.0 =
 * **Multi-platform.** Where data lands is decided by a platform driver; Fluent Cart and WooCommerce both ship, and `storeseeder_platforms` registers another from a separate plugin. The same generators feed every driver, so a fixed seed produces identical data wherever it is written.
 * **WooCommerce driver** — 18 of 21 resources through WC_Product, WC_Order, WC_Customer and WC_Coupon rather than direct database writes.
@@ -179,6 +188,9 @@ Only the four most recent releases are listed here. The complete history, in Kee
 
 == Upgrade Notice ==
 
+= 1.2.0 =
+Adds Recipes, which build a coherent shop in one click. Also fixes a locale bug: 72 of the 73 offered locales were silently generating placeholder product names, so a non-English run will now produce different data than it did on 1.1.0.
+
 = 1.1.0 =
 Adds WooCommerce support, four new generators, ledger-based cleanup and WP-CLI. Parameters that were previously accepted and ignored now take effect, so a saved configuration can produce different data than it did on 1.0.0 — review your presets before a large run.
 
@@ -187,7 +199,7 @@ Initial release.
 
 == External services ==
 
-StoreSeeder connects to two external services. Neither is contacted on activation, both are administrator-initiated, and no personal or store data is ever transmitted to either one.
+StoreSeeder connects to GitHub and to WordPress.org. Nothing is contacted on activation, every request is administrator-initiated, and no personal or store data is ever transmitted.
 
 **1. GitHub — sample data repository**
 
@@ -196,6 +208,10 @@ Locale-specific reference data (product names, addresses, customer tags) used to
 **2. WordPress.org — plugin directory API**
 
 The "Our Plugins" admin page lists the plugin author's other WordPress.org plugins with live ratings and install counts. Requested by the browser, only when an administrator opens that page.
+
+**3. GitHub — recipe repository**
+
+Store recipes: the vocabulary that makes every generator produce one coherent shop. Downloaded only when an administrator presses "Download the recipes" on the Recipes page, and only once the consent prompt above has already been accepted — one consent record covers both, because asking twice for the same answer trains people to click through prompts. Unlike the sample data this is never fetched implicitly. Declining or ignoring it leaves the rest of the plugin unaffected.
 
 The full disclosure for each service — endpoint, exactly when the request is made, what is sent and received, and the provider's terms of service and privacy policy — is documented here:
 

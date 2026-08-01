@@ -75,6 +75,12 @@ final class Cleanup extends Command {
 			),
 			array(
 				'type'        => 'assoc',
+				'name'        => 'run_id',
+				'description' => __( 'Undo one recipe run rather than everything, e.g. rcp_grocery_ab12cd.', 'storeseeder' ),
+				'optional'    => true,
+			),
+			array(
+				'type'        => 'assoc',
 				'name'        => 'limit',
 				'description' => __( 'Rows per batch (1–500). The command loops until nothing is left.', 'storeseeder' ),
 				'optional'    => true,
@@ -142,7 +148,8 @@ final class Cleanup extends Command {
 		$this->delete(
 			isset( $assoc_args['resource'] ) ? (string) $assoc_args['resource'] : '',
 			isset( $assoc_args['limit'] ) ? (int) $assoc_args['limit'] : 100,
-			isset( $assoc_args['yes'] )
+			isset( $assoc_args['yes'] ),
+			isset( $assoc_args['run_id'] ) ? (string) $assoc_args['run_id'] : ''
 		);
 	}
 
@@ -183,20 +190,29 @@ final class Cleanup extends Command {
 	 * @param string $only    Canonical resource, or '' for everything.
 	 * @param int    $limit   Rows per batch.
 	 * @param bool   $assumed Whether --yes was passed.
+	 * @param string $run_id  One recipe run, or '' for every recorded row.
 	 *
 	 * @return void
 	 */
-	private function delete( string $only, int $limit, bool $assumed ): void {
+	private function delete( string $only, int $limit, bool $assumed, string $run_id = '' ): void {
 		if ( ! $assumed ) {
-			\WP_CLI::confirm(
-				'' === $only
-					? __( 'Permanently delete every row StoreSeeder generated on this site?', 'storeseeder' )
-					: sprintf(
-						/* translators: %s: canonical resource name. */
-						__( 'Permanently delete every generated %s row on this site?', 'storeseeder' ),
-						$only
-					)
-			);
+			if ( '' !== $run_id ) {
+				$prompt = sprintf(
+					/* translators: %s: recipe run id. */
+					__( 'Permanently delete every row written by run %s?', 'storeseeder' ),
+					$run_id
+				);
+			} elseif ( '' === $only ) {
+				$prompt = __( 'Permanently delete every row StoreSeeder generated on this site?', 'storeseeder' );
+			} else {
+				$prompt = sprintf(
+					/* translators: %s: canonical resource name. */
+					__( 'Permanently delete every generated %s row on this site?', 'storeseeder' ),
+					$only
+				);
+			}
+
+			\WP_CLI::confirm( $prompt );
 		}
 
 		$deleted  = 0;
@@ -209,6 +225,7 @@ final class Cleanup extends Command {
 				array(
 					'resource' => $only,
 					'limit'    => $limit,
+					'run_id'   => $run_id,
 				)
 			);
 

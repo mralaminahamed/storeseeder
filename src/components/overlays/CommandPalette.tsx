@@ -31,6 +31,7 @@ export function CommandPalette({ onClose }: CommandPaletteProps) {
 
   const items: CmdItem[] = [
     { key: "dashboard", name: __("Overview", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "dashboard", path: "/" },
+    { key: "recipes", name: __("Recipes", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "store", path: "/recipes" },
     { key: "settings", name: __("Settings", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "settings", path: "/settings" },
     { key: "plugins", name: __("Our Plugins", "storeseeder"), grp: __("Pages", "storeseeder"), ic: "plug", path: "/plugins" },
     // Sorted, not declaration order: the sidebar sorts on category and `order`, and a

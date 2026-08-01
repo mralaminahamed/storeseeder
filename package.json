@@ -1,6 +1,6 @@
 {
   "name": "@mralaminahamed/storeseeder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Test data generator for WordPress e-commerce platforms: 17 platform-neutral generators behind a driver layer, live preview, schema-driven parameter configuration, WordPress admin colour integration, and a modern React Router v7 interface.",
   "scripts": {
     "build": "wp-scripts build",

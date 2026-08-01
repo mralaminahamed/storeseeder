@@ -2,22 +2,22 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StoreSeeder 1.1.0\n"
+"Project-Id-Version: StoreSeeder 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/storeseeder\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T07:14:56+00:00\n"
+"POT-Creation-Date: 2026-08-01T08:55:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
 
 #. Plugin Name of the plugin
 #: storeseeder.php
-#: class-storeseeder.php:228
 #: class-storeseeder.php:229
+#: class-storeseeder.php:230
 #: includes/MCP/MCP_Server.php:89
 #: includes/MCP/MCP_Server.php:156
 #: build/admin-app.js:13
@@ -44,64 +44,84 @@ msgstr ""
 msgid "https://github.com/mralaminahamed/"
 msgstr ""
 
-#: class-storeseeder.php:256
+#: class-storeseeder.php:257
 msgid "Generate Data"
 msgstr ""
 
-#: class-storeseeder.php:261
-#: build/admin-app.js:17
-#: build/admin-app.js:24
+#: class-storeseeder.php:262
+#: build/admin-app.js:29
+#: build/admin-app.js:36
 msgid "Settings"
 msgstr ""
 
-#: class-storeseeder.php:287
-#: build/admin-app.js:36
+#: class-storeseeder.php:288
+#: build/admin-app.js:48
 msgid "Documentation"
 msgstr ""
 
-#: class-storeseeder.php:292
-#: build/admin-app.js:36
+#: class-storeseeder.php:293
+#: build/admin-app.js:48
 msgid "Support"
 msgstr ""
 
-#: class-storeseeder.php:297
-#: build/admin-app.js:36
+#: class-storeseeder.php:298
+#: build/admin-app.js:48
 msgid "GitHub"
 msgstr ""
 
-#: class-storeseeder.php:692
+#: class-storeseeder.php:693
 msgid "Which kind of record to look for."
 msgstr ""
 
-#: class-storeseeder.php:703
+#: class-storeseeder.php:704
 msgid "What the user typed. Empty returns the first few."
 msgstr ""
 
-#: class-storeseeder.php:709
+#: class-storeseeder.php:710
 msgid "Which platform to read. Defaults to the resolved target."
 msgstr ""
 
-#: class-storeseeder.php:714
+#: class-storeseeder.php:715
 msgid "Maximum results."
 msgstr ""
 
-#: class-storeseeder.php:1078
+#: class-storeseeder.php:738
+msgid "Which platform to answer for. Defaults to the resolved target."
+msgstr ""
+
+#: class-storeseeder.php:743
+msgid "Locale the run would use, so each recipe can say whether it carries vocabulary for it."
+msgstr ""
+
+#: class-storeseeder.php:1130
 msgid "No target platform to search. Choose one first."
 msgstr ""
 
+#: class-storeseeder.php:1705
+msgid "Recipes are downloaded from GitHub, which needs an administrator to accept the prompt on the Settings screen first."
+msgstr ""
+
+#: class-storeseeder.php:1715
+msgid "Could not download the recipes. Check that the site can reach github.com."
+msgstr ""
+
+#: class-storeseeder.php:1726
+msgid "The recipe archive downloaded but holds no index. It may be a fork without a recipes.json."
+msgstr ""
+
 #. translators: %s: comma-separated list of supported e-commerce platforms.
-#: class-storeseeder.php:1687
+#: class-storeseeder.php:1965
 #, php-format
 msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1707
+#: class-storeseeder.php:1985
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:1785
+#: class-storeseeder.php:2063
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -136,48 +156,58 @@ msgid "Limit to one canonical resource, e.g. product or cart_session."
 msgstr ""
 
 #: includes/CLI/Commands/Cleanup.php:79
-msgid "Rows per batch (1–500). The command loops until nothing is left."
+msgid "Undo one recipe run rather than everything, e.g. rcp_grocery_ab12cd."
 msgstr ""
 
 #: includes/CLI/Commands/Cleanup.php:85
+msgid "Rows per batch (1–500). The command loops until nothing is left."
+msgstr ""
+
+#: includes/CLI/Commands/Cleanup.php:91
 msgid "Skip the confirmation prompt."
 msgstr ""
 
-#: includes/CLI/Commands/Cleanup.php:131
-#: includes/CLI/Commands/Cleanup.php:162
+#: includes/CLI/Commands/Cleanup.php:137
+#: includes/CLI/Commands/Cleanup.php:169
 msgid "Nothing recorded — StoreSeeder has generated no data on this site."
 msgstr ""
 
 #. translators: %d: number of recorded rows.
-#: includes/CLI/Commands/Cleanup.php:172
+#: includes/CLI/Commands/Cleanup.php:179
 #, php-format
 msgid "%d rows recorded in total."
 msgstr ""
 
-#: includes/CLI/Commands/Cleanup.php:193
+#. translators: %s: recipe run id.
+#: includes/CLI/Commands/Cleanup.php:202
+#, php-format
+msgid "Permanently delete every row written by run %s?"
+msgstr ""
+
+#: includes/CLI/Commands/Cleanup.php:206
 msgid "Permanently delete every row StoreSeeder generated on this site?"
 msgstr ""
 
 #. translators: %s: canonical resource name.
-#: includes/CLI/Commands/Cleanup.php:196
+#: includes/CLI/Commands/Cleanup.php:210
 #, php-format
 msgid "Permanently delete every generated %s row on this site?"
 msgstr ""
 
 #. translators: %d: number of rows left recorded.
-#: includes/CLI/Commands/Cleanup.php:242
+#: includes/CLI/Commands/Cleanup.php:259
 #, php-format
 msgid "%d recorded rows could not be deleted and are still listed. Run `wp storeseeder cleanup forget` to drop the records if the rows are already gone."
 msgstr ""
 
 #. translators: 1: rows deleted so far, 2: rows left.
-#: includes/CLI/Commands/Cleanup.php:252
+#: includes/CLI/Commands/Cleanup.php:269
 #, php-format
 msgid "Deleted %1$d, %2$d to go…"
 msgstr ""
 
 #. translators: %d: number of rows deleted.
-#: includes/CLI/Commands/Cleanup.php:262
+#: includes/CLI/Commands/Cleanup.php:279
 #, php-format
 msgid "Deleted %d generated row."
 msgid_plural "Deleted %d generated rows."
@@ -185,7 +215,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of records.
-#: includes/CLI/Commands/Cleanup.php:283
+#: includes/CLI/Commands/Cleanup.php:300
 #, php-format
 msgid "Forget %d records without deleting the rows they point at? The data stays in the store and StoreSeeder will no longer offer to remove it."
 msgstr ""
@@ -276,7 +306,7 @@ msgstr ""
 #: includes/CLI/Commands/Platforms.php:187
 #: includes/CLI/Commands/Sample_Data.php:176
 #: includes/Generation/Generators/Brand.php:188
-#: includes/Generation/Generators/Product_Category.php:193
+#: includes/Generation/Generators/Product_Category.php:219
 msgid "yes"
 msgstr ""
 
@@ -287,7 +317,7 @@ msgstr ""
 #: includes/CLI/Commands/Platforms.php:187
 #: includes/CLI/Commands/Sample_Data.php:176
 #: includes/Generation/Generators/Brand.php:188
-#: includes/Generation/Generators/Product_Category.php:193
+#: includes/Generation/Generators/Product_Category.php:219
 msgid "no"
 msgstr ""
 
@@ -307,6 +337,59 @@ msgstr ""
 msgid "The preview returned no rows."
 msgstr ""
 
+#: includes/CLI/Commands/Recipe.php:59
+msgid "List the store recipes, or build one."
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:77
+msgid "list or run."
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:85
+msgid "Recipe id, when running one."
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:91
+msgid "small, medium or large. Scales the recipe's declared counts."
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:99
+msgid "Platform to write to. Defaults to the resolved target."
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:105
+msgid "Locale for generated data."
+msgstr ""
+
+#. translators: 1: requested recipe id, 2: comma-separated list of ids.
+#: includes/CLI/Commands/Recipe.php:145
+#, php-format
+msgid "No recipe called \"%1$s\". Available: %2$s"
+msgstr ""
+
+#: includes/CLI/Commands/Recipe.php:186
+#: build/admin-app.js:24
+msgid "No recipes are registered."
+msgstr ""
+
+#. translators: 1: requested locale, 2: recipe name, 3: fallback locale.
+#: includes/CLI/Commands/Recipe.php:217
+#, php-format
+msgid "%2$s ships no vocabulary for %1$s; names and addresses will be local but product titles come from %3$s."
+msgstr ""
+
+#. translators: 1: resource name, 2: how many rows.
+#: includes/CLI/Commands/Recipe.php:241
+#, php-format
+msgid "%1$s — %2$d"
+msgstr ""
+
+#. translators: 1: recipe name, 2: rows written, 3: ledger run id.
+#: includes/CLI/Commands/Recipe.php:281
+#, php-format
+msgid "%1$s built — %2$d rows. Undo with: wp storeseeder cleanup --run_id=%3$s"
+msgstr ""
+
 #: includes/CLI/Commands/Sample_Data.php:37
 msgid "Report or sync the optional sample data."
 msgstr ""
@@ -324,7 +407,7 @@ msgid "Sample data has not been consented to on this site. An administrator has 
 msgstr ""
 
 #: includes/CLI/Commands/Sample_Data.php:148
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Sample data synced."
 msgstr ""
 
@@ -365,35 +448,35 @@ msgid "Source:      %s"
 msgstr ""
 
 #. translators: %s: Error message
-#: includes/Generation/Generator.php:356
+#: includes/Generation/Generator.php:358
 #, php-format
 msgid "Generation failed: %s"
 msgstr ""
 
-#: includes/Generation/Generator.php:498
+#: includes/Generation/Generator.php:500
 msgid "No target platform was set for this run."
 msgstr ""
 
 #. translators: 1: resource name, 2: platform display name.
-#: includes/Generation/Generator.php:509
+#: includes/Generation/Generator.php:511
 #, php-format
 msgid "%1$s cannot be generated for %2$s."
 msgstr ""
 
-#: includes/Generation/Generator.php:639
+#: includes/Generation/Generator.php:641
 msgid "ID"
 msgstr ""
 
-#: includes/Generation/Generator.php:643
+#: includes/Generation/Generator.php:645
 msgid "Value"
 msgstr ""
 
-#: includes/Generation/Generator.php:688
+#: includes/Generation/Generator.php:690
 msgid "Count must be a positive number."
 msgstr ""
 
 #. translators: %d: Maximum batch size
-#: includes/Generation/Generator.php:697
+#: includes/Generation/Generator.php:699
 #, php-format
 msgid "Count cannot exceed %d items per batch."
 msgstr ""
@@ -412,14 +495,14 @@ msgid "Brand"
 msgstr ""
 
 #: includes/Generation/Generators/Brand.php:150
-#: includes/Generation/Generators/Product_Category.php:152
-#: includes/Generation/Generators/Product_Tag.php:130
+#: includes/Generation/Generators/Product_Category.php:178
+#: includes/Generation/Generators/Product_Tag.php:141
 msgid "Slug"
 msgstr ""
 
 #: includes/Generation/Generators/Brand.php:154
-#: includes/Generation/Generators/Product_Category.php:156
-#: includes/Generation/Generators/Product_Tag.php:134
+#: includes/Generation/Generators/Product_Category.php:182
+#: includes/Generation/Generators/Product_Tag.php:145
 #: build/admin-app.js:3
 #: build/admin-app.js:14
 msgid "Products"
@@ -509,7 +592,7 @@ msgid "Info"
 msgstr ""
 
 #: includes/Generation/Generators/Log.php:81
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Warning"
 msgstr ""
 
@@ -520,7 +603,7 @@ msgstr ""
 
 #: includes/Generation/Generators/Log.php:83
 #: build/admin-app.js:12
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Success"
 msgstr ""
 
@@ -539,7 +622,7 @@ msgid "Items"
 msgstr ""
 
 #: includes/Generation/Generators/Order.php:322
-#: build/admin-app.js:21
+#: build/admin-app.js:33
 msgid "Total"
 msgstr ""
 
@@ -565,11 +648,11 @@ msgstr ""
 msgid "Product Categories"
 msgstr ""
 
-#: includes/Generation/Generators/Product_Category.php:148
+#: includes/Generation/Generators/Product_Category.php:174
 msgid "Category"
 msgstr ""
 
-#: includes/Generation/Generators/Product_Category.php:160
+#: includes/Generation/Generators/Product_Category.php:186
 msgid "Sub-category"
 msgstr ""
 
@@ -583,7 +666,7 @@ msgstr ""
 msgid "Product Tags"
 msgstr ""
 
-#: includes/Generation/Generators/Product_Tag.php:126
+#: includes/Generation/Generators/Product_Tag.php:137
 msgid "Tag"
 msgstr ""
 
@@ -676,13 +759,13 @@ msgid "Transactions"
 msgstr ""
 
 #. translators: %s: platform id, e.g. fluent-cart.
-#: includes/Generation/Purge.php:67
+#: includes/Generation/Purge.php:68
 #, php-format
 msgid "No driver is active for %s, so rows generated for it were left alone."
 msgstr ""
 
 #. translators: 1: resource name, 2: platform label.
-#: includes/Generation/Purge.php:89
+#: includes/Generation/Purge.php:90
 #, php-format
 msgid "%1$s records cannot be removed from %2$s automatically."
 msgstr ""
@@ -1296,7 +1379,7 @@ msgid "Requires %s."
 msgstr ""
 
 #: includes/Platforms/Capability.php:166
-#: includes/Rest/Controller.php:531
+#: includes/Rest/Controller.php:581
 #: build/admin-app.js:1
 msgid "Not supported by this platform."
 msgstr ""
@@ -1798,7 +1881,7 @@ msgstr ""
 #. translators: 1: customer name, 2: email address.
 #. translators: 1: resource name, e.g. Products. 2: number of rows.
 #: includes/Platforms/Platform_Driver.php:293
-#: build/admin-app.js:41
+#: build/admin-app.js:53
 #, php-format,js-format
 msgid "%1$s — %2$s"
 msgstr ""
@@ -1844,12 +1927,30 @@ msgstr ""
 msgid "Could not remove a generated %1$s record: %2$s"
 msgstr ""
 
-#: includes/Rest/Controller.php:384
+#. translators: %s: recipe name.
+#: includes/Recipes/Registry.php:316
+#, php-format
+msgid "%s has no vocabulary files. It would build a store with generic product names — sync the recipes again."
+msgstr ""
+
+#. translators: 1: locale code, 2: comma-separated resource names.
+#: includes/Recipes/Registry.php:338
+#, php-format
+msgid "This recipe lists %1$s but ships none for %2$s, so those fall back to English."
+msgstr ""
+
+#. translators: %s: comma-separated resource names.
+#: includes/Recipes/Registry.php:365
+#, php-format
+msgid "No words shipped for %s, so those keep the default vocabulary."
+msgstr ""
+
+#: includes/Rest/Controller.php:425
 msgid "Count parameter is required and must be greater than 0."
 msgstr ""
 
 #. translators: Total output.
-#: includes/Rest/Controller.php:437
+#: includes/Rest/Controller.php:487
 #, php-format
 msgid "%1$s item successfully created."
 msgid_plural "%1$s items successfully created."
@@ -1857,7 +1958,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of items that could not be created.
-#: includes/Rest/Controller.php:444
+#: includes/Rest/Controller.php:494
 #, php-format
 msgid "%s could not be created."
 msgid_plural "%s could not be created."
@@ -1865,92 +1966,100 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: resource label, 2: platform display name, 3: reason.
-#: includes/Rest/Controller.php:538
+#: includes/Rest/Controller.php:588
 #, php-format
 msgid "%1$s cannot be generated for %2$s. %3$s"
 msgstr ""
 
 #. translators: 1: platform display name, 2: resource name.
-#: includes/Rest/Controller.php:561
+#: includes/Rest/Controller.php:611
 #, php-format
 msgid "%1$s reports that it can generate %2$s but provides no writer for it. This is a fault in the platform driver."
 msgstr ""
 
-#: includes/Rest/Controller.php:620
+#: includes/Rest/Controller.php:670
 msgid "Sorry, you are not allowed to generate test data."
 msgstr ""
 
-#: includes/Rest/Controller.php:643
+#: includes/Rest/Controller.php:693
 msgid "Number of items to generate."
 msgstr ""
 
-#: includes/Rest/Controller.php:655
+#: includes/Rest/Controller.php:705
 msgid "Locale for generated data (e.g., en_US, fr_FR, ja_JP)."
 msgstr ""
 
-#: includes/Rest/Controller.php:662
+#: includes/Rest/Controller.php:712
 msgid "Random seed for reproducible data generation."
 msgstr ""
 
-#: includes/Rest/Controller.php:672
+#: includes/Rest/Controller.php:722
+msgid "Store recipe whose vocabulary this run should use, e.g. grocery. Falls back to the default vocabulary when unknown."
+msgstr ""
+
+#: includes/Rest/Controller.php:731
+msgid "Groups the rows written by one recipe run so they can be removed together."
+msgstr ""
+
+#: includes/Rest/Controller.php:740
 msgid "Target e-commerce platform to seed. Defaults to the site setting, or the only active platform."
 msgstr ""
 
-#: includes/Rest/Controller.php:678
+#: includes/Rest/Controller.php:746
 msgid "Status filter for generated items."
 msgstr ""
 
-#: includes/Rest/Controller.php:684
+#: includes/Rest/Controller.php:752
 msgid "Date range for generated items."
 msgstr ""
 
-#: includes/Rest/Controller.php:688
+#: includes/Rest/Controller.php:756
 msgid "Start date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Rest/Controller.php:695
+#: includes/Rest/Controller.php:763
 msgid "End date (YYYY-MM-DD format)."
 msgstr ""
 
-#: includes/Rest/Controller.php:704
+#: includes/Rest/Controller.php:772
 msgid "Control relationship creation with existing data."
 msgstr ""
 
-#: includes/Rest/Controller.php:708
+#: includes/Rest/Controller.php:776
 msgid "Create missing related items if needed."
 msgstr ""
 
-#: includes/Rest/Controller.php:713
+#: includes/Rest/Controller.php:781
 msgid "Link to existing items when possible."
 msgstr ""
 
-#: includes/Rest/Controller.php:720
+#: includes/Rest/Controller.php:788
 msgid "Metadata generation options."
 msgstr ""
 
-#: includes/Rest/Controller.php:724
+#: includes/Rest/Controller.php:792
 msgid "Include additional metadata."
 msgstr ""
 
-#: includes/Rest/Controller.php:729
+#: includes/Rest/Controller.php:797
 msgid "Generate custom fields."
 msgstr ""
 
-#: includes/Rest/Controller.php:858
+#: includes/Rest/Controller.php:926
 msgid "Date must be in YYYY-MM-DD format."
 msgstr ""
 
-#: includes/Rest/Controller.php:884
+#: includes/Rest/Controller.php:952
 msgid "Count must be a number between 1 and 100."
 msgstr ""
 
 #. translators: Resource type.
-#: includes/Rest/Controller.php:906
+#: includes/Rest/Controller.php:974
 #, php-format
 msgid "%s Generation Response"
 msgstr ""
 
-#: includes/Rest/Controller.php:910
+#: includes/Rest/Controller.php:978
 msgid "Number of items generated."
 msgstr ""
 
@@ -3045,6 +3154,7 @@ msgid "Search customers, or type an ID"
 msgstr ""
 
 #: build/admin-app.js:3
+#: build/admin-app.js:26
 msgid "Clear"
 msgstr ""
 
@@ -3234,7 +3344,7 @@ msgstr ""
 
 #. translators: %s: category name, e.g. Core.
 #: build/admin-app.js:13
-#: build/admin-app.js:16
+#: build/admin-app.js:28
 #, js-format
 msgid "%s generators"
 msgstr ""
@@ -3278,7 +3388,7 @@ msgid "Could not load plugins. Check your internet connection."
 msgstr ""
 
 #: build/admin-app.js:14
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Our Plugins"
 msgstr ""
 
@@ -3305,734 +3415,916 @@ msgid "View on WordPress.org"
 msgstr ""
 
 #: build/admin-app.js:15
-msgid "Where generated data is written"
+msgid "Small"
 msgstr ""
 
 #: build/admin-app.js:15
-msgid "Choose a target"
+msgid "Medium"
 msgstr ""
 
 #: build/admin-app.js:15
-msgid "No platform active"
+msgid "Large"
 msgstr ""
 
-#: build/admin-app.js:15
-msgid "No target chosen"
+#. translators: %s: locale code, e.g. en_US.
+#: build/admin-app.js:16
+#, js-format
+msgid "Product names stay %s"
 msgstr ""
 
 #: build/admin-app.js:16
+msgid "cannot be created on the selected platform."
+msgstr ""
+
+#. translators: %s: plugin name that would enable the resource.
+#: build/admin-app.js:17
+#, js-format
+msgid "Install %s to enable it."
+msgstr ""
+
+#. translators: 1: resource name, 2: error message.
+#: build/admin-app.js:18
+#, js-format
+msgid "%1$s: %2$s"
+msgstr ""
+
+#: build/admin-app.js:18
+msgid "failed."
+msgstr ""
+
+#: build/admin-app.js:18
+msgid "Recipes ready"
+msgstr ""
+
+#. translators: %s: number of recipes.
+#: build/admin-app.js:19
+#, js-format
+msgid "%s available."
+msgstr ""
+
+#: build/admin-app.js:19
+msgid "Could not download the recipes"
+msgstr ""
+
+#: build/admin-app.js:19
+#: build/admin-app.js:22
+msgid "Recipe undone"
+msgstr ""
+
+#: build/admin-app.js:19
+msgid "Every row it created is gone."
+msgstr ""
+
+#: build/admin-app.js:19
+msgid "Could not undo the recipe"
+msgstr ""
+
+#: build/admin-app.js:19
+msgid "Loading recipes…"
+msgstr ""
+
+#: build/admin-app.js:19
+msgid "Could not load the recipes. Reload the page to try again."
+msgstr ""
+
+#. translators: %s: recipe name, e.g. Corner grocer.
+#: build/admin-app.js:20
+#, js-format
+msgid "Building %s"
+msgstr ""
+
+#: build/admin-app.js:20
+msgid "Resources run in order — an order needs its products and customers to exist first."
+msgstr ""
+
+#. translators: 1: calls completed, 2: total calls.
+#: build/admin-app.js:21
+#, js-format
+msgid "%1$s / %2$s"
+msgstr ""
+
+#. translators: %s: resource name, e.g. Transactions.
+#: build/admin-app.js:22
+#, js-format
+msgid "%s — not on this platform"
+msgstr ""
+
+#. translators: %s: recipe name.
+#: build/admin-app.js:23
+#, js-format
+msgid "%s built"
+msgstr ""
+
+#: build/admin-app.js:23
+msgid "Every row it created has been removed."
+msgstr ""
+
+#. translators: 1: row count, 2: resource count.
 #: build/admin-app.js:24
+#, js-format
+msgid "%1$s row across %2$s resource."
+msgid_plural "%1$s rows across %2$s resources."
+msgstr[0] ""
+msgstr[1] ""
+
+#: build/admin-app.js:24
+msgid "Build another"
+msgstr ""
+
+#: build/admin-app.js:24
+msgid "Undoing…"
+msgstr ""
+
+#: build/admin-app.js:24
+msgid "Undo this recipe"
+msgstr ""
+
+#: build/admin-app.js:24
+#: build/admin-app.js:29
+msgid "Recipes"
+msgstr ""
+
+#: build/admin-app.js:24
+msgid "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order."
+msgstr ""
+
+#. translators: %s: comma-separated recipe ids.
+#: build/admin-app.js:25
+#, js-format
+msgid "The archive lists %s but they did not arrive — the download was interrupted. Sync again."
+msgstr ""
+
+#: build/admin-app.js:25
+#: build/admin-app.js:46
+msgid "Syncing…"
+msgstr ""
+
+#: build/admin-app.js:25
+msgid "Sync"
+msgstr ""
+
+#: build/admin-app.js:25
+msgid "Recipes are not downloaded yet"
+msgstr ""
+
+#: build/admin-app.js:25
+msgid "Recipes live in a separate repository so a new shop type does not need a plugin update. StoreSeeder fetches about 90 KB from github.com once, then works offline."
+msgstr ""
+
+#: build/admin-app.js:25
+#: build/admin-app.js:29
+msgid "Downloading…"
+msgstr ""
+
+#: build/admin-app.js:25
+msgid "Download the recipes"
+msgstr ""
+
+#: build/admin-app.js:25
+msgid "Size"
+msgstr ""
+
+#. translators: 1: row count, 2: resource count, 3: recipe name.
+#: build/admin-app.js:26
+#, js-format
+msgid "%1$s rows across %2$s resources · %3$s"
+msgstr ""
+
+#: build/admin-app.js:26
+msgid "Create the store"
+msgstr ""
+
+#. translators: %s: number of rows already generated.
+#: build/admin-app.js:27
+#, js-format
+msgid "This store already holds %s generated rows. Building on top of them leaves two shops interleaved — purge first, or continue and both will exist."
+msgstr ""
+
+#: build/admin-app.js:27
+msgid "Pick a recipe to continue."
+msgstr ""
+
+#: build/admin-app.js:27
+msgid "Where generated data is written"
+msgstr ""
+
+#: build/admin-app.js:27
+msgid "Choose a target"
+msgstr ""
+
+#: build/admin-app.js:27
+msgid "No platform active"
+msgstr ""
+
+#: build/admin-app.js:27
+msgid "No target chosen"
+msgstr ""
+
+#: build/admin-app.js:28
+#: build/admin-app.js:36
 msgid "Target platform"
 msgstr ""
 
 #. translators: %s: name of the platform Auto currently resolves to.
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 #, js-format
 msgid "Which store generated data is written to — currently %s"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Which store generated data is written to"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Dismiss"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Sample data downloaded"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Download failed — you can retry from Settings."
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Could not save your choice — please try again."
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Download sample data?"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "StoreSeeder can download locale-specific reference data (product names, addresses and customer tags for 75+ locales) from GitHub to make generated content more realistic. No data about your site is sent."
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "You can decline and still generate data using built-in defaults, or change this later in Settings."
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "View the sample data repository"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Not now"
 msgstr ""
 
-#: build/admin-app.js:17
-msgid "Downloading…"
-msgstr ""
-
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Allow & download"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Overview"
 msgstr ""
 
-#: build/admin-app.js:17
+#: build/admin-app.js:29
 msgid "Pages"
 msgstr ""
 
 #. translators: %s: category name, e.g. Core.
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 #, js-format
 msgid "%s generator"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "Command palette"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "Search generators and pages…"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "No matches"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "navigate"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "open"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "Generation locale"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "Search locales…"
 msgstr ""
 
-#: build/admin-app.js:18
+#: build/admin-app.js:30
 msgid "Search locales"
 msgstr ""
 
 #. translators: %s: the search term the user typed.
-#: build/admin-app.js:19
+#: build/admin-app.js:31
 #, js-format
 msgid "No locale matches “%s”."
 msgstr ""
 
 #. translators: %d: number of locales available.
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 #, js-format
 msgid "%d locales available"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Accent"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Background"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Surface"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Text"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Border"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Danger"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Tweaks"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Close"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Appearance"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Light"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Dark"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Accent color"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Density"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Comfortable"
 msgstr ""
 
-#: build/admin-app.js:20
-#: build/admin-app.js:35
+#: build/admin-app.js:32
+#: build/admin-app.js:47
 msgid "Compact"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Custom colors"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Reset"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Revert"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "These controls preview how the StoreSeeder admin would adapt to store-owner theme preferences."
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Batch queue"
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Queue is empty."
 msgstr ""
 
-#: build/admin-app.js:20
+#: build/admin-app.js:32
 msgid "Add generators with “Add to batch” to run them together."
 msgstr ""
 
 #. translators: %s: item count
 #. translators: %s: total item count
-#: build/admin-app.js:21
-#: build/admin-app.js:22
+#: build/admin-app.js:33
+#: build/admin-app.js:34
 #, js-format
 msgid "%s items"
 msgstr ""
 
-#: build/admin-app.js:21
+#: build/admin-app.js:33
 msgid "Remove"
 msgstr ""
 
-#: build/admin-app.js:22
+#: build/admin-app.js:34
 msgid "Generating…"
 msgstr ""
 
 #. translators: %s: number of queued generators
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 #, js-format
 msgid "Run batch (%s)"
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Site-wide"
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "This browser"
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Sync failed."
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Automatic download allowed."
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Automatic download declined."
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Update failed."
 msgstr ""
 
-#: build/admin-app.js:23
+#: build/admin-app.js:35
 msgid "Auto — whichever platform is active"
 msgstr ""
 
 #. translators: %s: platform id stored in the site option.
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 #, js-format
 msgid "%s (not active)"
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "Could not save the AI tool settings"
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "What StoreSeeder writes, who may write it, and how this admin looks."
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "This site"
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "Stored on the server and shared by everyone who uses StoreSeeder here."
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "Where generated data is written. Applies to every user on this site."
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "Platform"
 msgstr ""
 
-#: build/admin-app.js:24
+#: build/admin-app.js:36
 msgid "More than one platform is active, so Auto cannot decide. Pick one here, or you will be asked on each generator page."
 msgstr ""
 
 #. translators: %s: platform name Auto currently resolves to.
-#: build/admin-app.js:25
+#: build/admin-app.js:37
 #, js-format
 msgid "Auto currently resolves to %s."
 msgstr ""
 
-#: build/admin-app.js:25
+#: build/admin-app.js:37
 msgid "No supported platform is active yet. Activate one and it appears here."
 msgstr ""
 
-#: build/admin-app.js:25
+#: build/admin-app.js:37
 msgid "Target platform set to Auto"
 msgstr ""
 
 #. translators: %s: platform name.
-#: build/admin-app.js:26
+#: build/admin-app.js:38
 #, js-format
 msgid "Target platform set to %s"
 msgstr ""
 
 #. translators: %s: comma-separated platform names with versions.
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 #, js-format
 msgid "Active: %s"
 msgstr ""
 
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 msgid "Who can generate data"
 msgstr ""
 
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 msgid "Administrators always can. Grant other roles here — the same access covers the admin screen, the REST API, and the AI tools."
 msgstr ""
 
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 msgid "Loading roles…"
 msgstr ""
 
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 msgid "Could not load who has access. Reload the page to try again."
 msgstr ""
 
-#: build/admin-app.js:27
+#: build/admin-app.js:39
 msgid "This site defines no roles other than Administrator."
 msgstr ""
 
 #. translators: %s: role name.
-#: build/admin-app.js:28
+#: build/admin-app.js:40
 #, js-format
 msgid "%s can now generate data"
 msgstr ""
 
 #. translators: %s: role name.
-#: build/admin-app.js:29
+#: build/admin-app.js:41
 #, js-format
 msgid "%s can no longer generate data"
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:41
 msgid "Could not save who has access"
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:41
 msgid "Can generate data, and can write it into the live store."
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:41
 msgid "No access."
 msgstr ""
 
-#: build/admin-app.js:29
+#: build/admin-app.js:41
 msgid "Only administrators can change who has access, so that a role granted here cannot widen it further."
 msgstr ""
 
 #. translators: %s: capability name, e.g. edit_shop_orders.
-#: build/admin-app.js:30
+#: build/admin-app.js:42
 #, js-format
 msgid "Code on this site also grants access through the %s capability, via the storeseeder_capability filter."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:42
 msgid "AI tools (MCP)"
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:42
 msgid "Exposes the generators as tools an AI client can call, so test data can be asked for in words rather than clicked."
 msgstr ""
 
-#: build/admin-app.js:30
+#: build/admin-app.js:42
 msgid "On, but neither kind of tool is allowed — nothing is exposed"
 msgstr ""
 
 #. translators: 1: number of tools exposed, 2: number of generators.
-#: build/admin-app.js:31
+#: build/admin-app.js:43
 #, js-format
 msgid "Active — %1$d tools across %2$d generators"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:43
 msgid "Off — no tools are exposed"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:43
 msgid "Not available on this site"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:43
 msgid "Enable AI tools"
 msgstr ""
 
-#: build/admin-app.js:31
+#: build/admin-app.js:43
 msgid "Serves the MCP endpoint. Off means no tools at all, and a client can no longer connect."
 msgstr ""
 
 #. translators: %d: number of generators.
-#: build/admin-app.js:32
+#: build/admin-app.js:44
 #, js-format
 msgid "Allow preview tools (%d)"
 msgstr ""
 
-#: build/admin-app.js:32
+#: build/admin-app.js:44
 msgid "Read-only. Shows the rows a run would create, and writes nothing."
 msgstr ""
 
 #. translators: %d: number of generators.
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 #, js-format
 msgid "Allow generating (%d, writes rows)"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Lets an agent insert data into the store. Off leaves it able to preview only."
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Only administrators can change what an AI client may do."
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "WordPress Abilities API — bundled with WordPress 6.9 and later, or installable as a plugin"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "The mcp-adapter plugin, which serves the tools to a client"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Optional. Nothing else changes when it is absent — the admin, the REST API and WP-CLI all work the same. The same tools are also reachable through mcp-adapter's own default server, under whatever these switches allow."
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "How to connect a client"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Sample data"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Locale-specific reference data used by generators to produce realistic output."
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Checking status…"
 msgstr ""
 
-#: build/admin-app.js:33
+#: build/admin-app.js:45
 msgid "Sample data is synced"
 msgstr ""
 
 #. translators: %s: date string
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 #, js-format
 msgid "Last updated: %s"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Sample data not found"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Sync to download locale-specific reference data."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Automatic download is allowed. Revoke to stop downloading on visit."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Automatic download is declined. Sync now reopens the consent prompt so you can allow it."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Nothing has been downloaded yet. Sync now asks for your permission first."
 msgstr ""
 
-#: build/admin-app.js:34
-msgid "Syncing…"
-msgstr ""
-
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Sync now"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Force re-sync"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Revoke"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "View sample data repository"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Your preferences"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Stored in this browser, for you alone. Nothing here changes what anyone else sees."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Saved"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Generation defaults"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Pre-fill values on every generator page."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Default count"
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Number of items pre-filled on every generator page."
 msgstr ""
 
-#: build/admin-app.js:34
+#: build/admin-app.js:46
 msgid "Default locale"
 msgstr ""
 
 #. translators: %d: number of available locales.
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 #, js-format
 msgid "Locale used when generating data — %d available, all accepted by the REST API."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Default seed"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Fixed seed for reproducible runs. Leave blank for random output."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "random (leave blank)"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Include metadata by default"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Pre-check the Include Metadata toggle on every generator."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "How the admin looks. Saved in this browser, per user."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Theme"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Independent of the WordPress admin colour scheme."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Compact tightens row heights and padding across every page."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Accent & custom colours…"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Run history"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Control how much history is retained."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Max runs per generator"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "How many recent runs to store in history per generator type."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Plugin"
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "Version, links, and the actions that cannot be undone."
 msgstr ""
 
-#: build/admin-app.js:35
+#: build/admin-app.js:47
 msgid "About"
 msgstr ""
 
 #. translators: %s: version number
-#: build/admin-app.js:36
+#: build/admin-app.js:48
 #, js-format
 msgid "StoreSeeder · Version %s"
 msgstr ""
 
-#: build/admin-app.js:36
+#: build/admin-app.js:48
 msgid "Danger zone"
 msgstr ""
 
-#: build/admin-app.js:36
+#: build/admin-app.js:48
 msgid "These actions cannot be undone."
 msgstr ""
 
 #. translators: 1: rows deleted so far, 2: rows still to go.
-#: build/admin-app.js:37
+#: build/admin-app.js:49
 #, js-format
 msgid "Deleted %1$s, %2$s to go…"
 msgstr ""
 
 #. translators: %s: number of rows deleted.
-#: build/admin-app.js:38
+#: build/admin-app.js:50
 #, js-format
 msgid "Deleted %s generated rows"
 msgstr ""
 
-#: build/admin-app.js:38
+#: build/admin-app.js:50
 msgid "Could not delete the generated data"
 msgstr ""
 
 #. translators: %s: number of rows.
-#: build/admin-app.js:39
+#: build/admin-app.js:51
 #, js-format
 msgid "Yes, delete %s rows"
 msgstr ""
 
-#: build/admin-app.js:39
+#: build/admin-app.js:51
 msgid "Cancel"
 msgstr ""
 
-#: build/admin-app.js:39
+#: build/admin-app.js:51
 msgid "Deleting…"
 msgstr ""
 
-#: build/admin-app.js:39
+#: build/admin-app.js:51
 msgid "No generated data to delete"
 msgstr ""
 
 #. translators: %s: number of rows.
-#: build/admin-app.js:40
+#: build/admin-app.js:52
 #, js-format
 msgid "Delete generated data (%s rows)"
 msgstr ""
 
-#: build/admin-app.js:40
+#: build/admin-app.js:52
 msgid "Nothing recorded yet. Rows created by StoreSeeder are logged so they can be removed later; anything generated before this version was released is not in that log."
 msgstr ""
 
-#: build/admin-app.js:40
+#: build/admin-app.js:52
 msgid "Permanently removes the products, orders, customers and other rows StoreSeeder created, along with what hangs off them. Only rows StoreSeeder recorded creating are touched — your own data is never matched on."
 msgstr ""
 
 #. translators: %s: number of records dropped.
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 #, js-format
 msgid "Forgot %s records; the rows are untouched"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Could not clear the records"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Forget the remaining records"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Run history cleared"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Clear run history & stats"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Removes locally stored generation stats and run history. Does not delete data in your database."
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Settings reset to defaults"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Reset settings to defaults"
 msgstr ""
 
-#: build/admin-app.js:42
+#: build/admin-app.js:54
 msgid "Resets all settings to their default values."
 msgstr ""

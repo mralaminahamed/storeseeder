@@ -562,3 +562,201 @@
 .fp-root .fp-nav-item.unavailable { opacity:.5; }
 .fp-root .fp-gen-card.unavailable:hover,
 .fp-root .fp-nav-item.unavailable:hover { opacity:.75; }
+
+/* ===== recipes =====
+   A recipe card is a generator card that promises nine of them, so it borrows that card's
+   geometry — tile, radius, lift on hover — and adds the two things a generator tile has no need
+   for: an itemised count list, because there is no preview table on this page and the counts are
+   what replaces it, and a hue of its own, because unlike the four stat tiles these really are
+   different things. */
+.fp-root .fp-recipe-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--gap-grid); }
+
+.fp-root .fp-recipe {
+  --recipe-hue: var(--accent);
+  position:relative; display:flex; flex-direction:column; gap:13px; padding:17px;
+  text-align:left; font-family:inherit; color:inherit; cursor:pointer;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm);
+  transition:transform .14s cubic-bezier(.2,.7,.2,1), box-shadow .14s, border-color .14s;
+}
+.fp-root .fp-recipe:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:var(--accent-line); }
+.fp-root .fp-recipe.on { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow-md); }
+/* The tick is the selection, so it is drawn rather than implied by the border alone — a border
+   colour shift is invisible to anyone who cannot separate indigo from grey. */
+.fp-root .fp-recipe.on::after {
+  content:""; position:absolute; top:15px; right:15px; width:18px; height:18px;
+  border-radius:var(--r-full); background:var(--accent);
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center / 18px no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>") center / 18px no-repeat;
+}
+
+.fp-root .fp-recipe-top { display:flex; align-items:flex-start; gap:12px; }
+.fp-root .fp-recipe-ic {
+  width:var(--tile-lg); height:var(--tile-lg); flex:none; border-radius:11px;
+  display:grid; place-items:center;
+  background:color-mix(in oklab, var(--recipe-hue) 14%, var(--surface)); color:var(--recipe-hue);
+}
+.fp-root .fp-recipe-head { display:flex; flex-direction:column; min-width:0; }
+.fp-root .fp-recipe-name { font-size:15px; font-weight:600; letter-spacing:-.01em; }
+.fp-root .fp-recipe-desc { font-size:var(--fs-hint); color:var(--text-3); line-height:1.5; margin-top:3px; }
+
+.fp-root .fp-recipe-meta { display:flex; flex-wrap:wrap; gap:6px; }
+.fp-root .fp-recipe-chip {
+  display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-micro); font-weight:500;
+  padding:3px 9px; border-radius:var(--r-full); background:var(--surface-inset); color:var(--text-2);
+}
+.fp-root .fp-recipe-chip.warn {
+  background:color-mix(in oklab, var(--amber) 16%, var(--surface));
+  color:color-mix(in oklab, var(--amber), black 30%);
+}
+.fp-root[data-theme="dark"] .fp-recipe-chip.warn { color:var(--amber); }
+
+.fp-root .fp-recipe-counts {
+  border-top:1px solid var(--border); padding-top:12px;
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:3px 18px;
+}
+.fp-root .fp-recipe-count { display:flex; align-items:baseline; gap:8px; font-size:var(--fs-hint); color:var(--text-2); padding:2px 0; }
+.fp-root .fp-recipe-count-n { margin-left:auto; font-size:var(--fs-micro); color:var(--text); }
+.fp-root .fp-recipe-count.off { color:var(--text-faint); }
+.fp-root .fp-recipe-count.off .fp-recipe-count-label { text-decoration:line-through; }
+.fp-root .fp-recipe-count.off .fp-recipe-count-n { color:var(--text-faint); }
+
+.fp-root .fp-recipe-skip {
+  grid-column:1 / -1; display:flex; gap:8px; margin-top:7px; padding:9px 11px;
+  border-radius:var(--r-md); font-size:var(--fs-micro); line-height:1.5; color:var(--text-2);
+  background:color-mix(in oklab, var(--amber) 10%, var(--surface));
+  border:1px solid color-mix(in oklab, var(--amber) 26%, var(--border));
+}
+.fp-root .fp-recipe-skip svg { flex:none; margin-top:1px; color:var(--amber); }
+
+/* run bar */
+.fp-root .fp-recipe-bar {
+  margin-top:18px; padding:15px 17px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow-sm);
+}
+.fp-root .fp-recipe-bar.idle { justify-content:center; padding:22px; color:var(--text-faint); font-size:var(--fs-ctl-sm); }
+.fp-root .fp-recipe-sizes { display:flex; align-items:center; gap:8px; }
+.fp-root .fp-recipe-sizes-label { font-size:var(--fs-nano); font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); }
+.fp-root .fp-seg { display:flex; gap:2px; padding:3px; background:var(--surface-inset); border-radius:var(--r-md); }
+.fp-root .fp-seg button {
+  border:none; background:none; font-family:inherit; font-size:var(--fs-ctl-sm); font-weight:500;
+  color:var(--text-2); padding:5px 13px; border-radius:6px; cursor:pointer;
+}
+.fp-root .fp-seg button:hover { color:var(--text); }
+.fp-root .fp-seg button[aria-pressed="true"] { background:var(--surface); color:var(--text); box-shadow:var(--shadow-sm); }
+.fp-root .fp-recipe-summary { font-size:var(--fs-ctl-sm); color:var(--text-2); }
+.fp-root .fp-recipe-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+
+.fp-root .fp-recipe-guard {
+  width:100%; display:flex; gap:9px; padding:10px 12px; border-radius:var(--r-md);
+  font-size:var(--fs-hint); line-height:1.55; color:var(--text-2);
+  background:color-mix(in oklab, var(--amber) 10%, var(--surface));
+  border:1px solid color-mix(in oklab, var(--amber) 26%, var(--border));
+}
+.fp-root .fp-recipe-guard svg { flex:none; margin-top:2px; color:var(--amber); }
+
+/* run + completion */
+.fp-root .fp-recipe-run, .fp-root .fp-recipe-done { padding:20px 22px; }
+.fp-root .fp-recipe-run-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.fp-root .fp-recipe-run-title { font-size:var(--fs-h2); font-weight:600; letter-spacing:-.01em; }
+.fp-root .fp-recipe-run-sub { font-size:var(--fs-ctl-sm); color:var(--text-3); margin-top:3px; line-height:1.55; max-width:62ch; }
+.fp-root .fp-recipe-run-step { font-size:var(--fs-ctl-sm); color:var(--text-3); }
+.fp-root .fp-recipe-run .fp-progress-track { width:100%; margin:14px 0 18px; }
+.fp-root .fp-recipe-run .fp-progress-fill { transition:width .35s cubic-bezier(.3,.8,.3,1); }
+
+.fp-root .fp-recipe-steps { display:flex; flex-direction:column; gap:1px; }
+.fp-root .fp-recipe-step {
+  display:flex; align-items:center; gap:11px; padding:8px 10px; border-radius:var(--r-sm);
+  font-size:var(--fs-ctl-sm); color:var(--text-faint);
+}
+.fp-root .fp-recipe-step-dot {
+  width:17px; height:17px; flex:none; border-radius:var(--r-full);
+  border:1.5px solid var(--border-strong); display:grid; place-items:center;
+}
+.fp-root .fp-recipe-step-n { margin-left:auto; font-size:var(--fs-micro); }
+.fp-root .fp-recipe-step.done { color:var(--text-2); }
+.fp-root .fp-recipe-step.done .fp-recipe-step-dot { border-color:var(--green); background:var(--green); color:#fff; }
+.fp-root .fp-recipe-step.on { background:var(--accent-soft); color:var(--accent); font-weight:500; }
+.fp-root .fp-recipe-step.on .fp-recipe-step-dot { border-color:var(--accent); border-right-color:transparent; animation:fp-recipe-spin .7s linear infinite; }
+
+@keyframes fp-recipe-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .fp-root .fp-recipe-step.on .fp-recipe-step-dot { animation:none; border-right-color:var(--accent); }
+  .fp-root .fp-recipe { transition:none; }
+  .fp-root .fp-recipe-run .fp-progress-fill { transition:none; }
+}
+
+.fp-root .fp-recipe-done-head { display:flex; align-items:flex-start; gap:14px; margin-bottom:18px; }
+.fp-root .fp-recipe-done-ic {
+  width:var(--tile-lg); height:var(--tile-lg); flex:none; border-radius:11px; display:grid; place-items:center;
+  background:color-mix(in oklab, var(--green) 14%, var(--surface)); color:var(--green);
+}
+.fp-root .fp-recipe-done-ic.undone { background:var(--surface-inset); color:var(--text-3); }
+.fp-root .fp-recipe-tally {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:1px;
+  background:var(--border); border:1px solid var(--border); border-radius:var(--r-md);
+  overflow:hidden; margin-bottom:16px;
+}
+.fp-root .fp-recipe-tally > div { background:var(--surface); padding:12px 14px; }
+.fp-root .fp-recipe-tally-k { font-size:var(--fs-nano); font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); }
+.fp-root .fp-recipe-tally-v { font-size:var(--fs-title); font-weight:600; letter-spacing:-.02em; margin-top:4px; }
+.fp-root .fp-recipe-done-foot { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.fp-root .fp-recipe-spacer { flex:1; }
+.fp-root .fp-recipe-runid { font-size:var(--fs-micro); color:var(--text-faint); }
+
+.fp-root .fp-recipes-note { padding:40px; text-align:center; color:var(--text-faint); font-size:var(--fs-ctl-sm); }
+
+@media (max-width: 1100px) {
+  .fp-root .fp-recipe-grid { grid-template-columns:1fr; }
+}
+/* A recipe's own mark. Sized rather than styled — the artwork is the archive's, and the only
+   thing the admin imposes is how much room it gets. */
+.fp-root .fp-recipe-mark { width:26px; height:26px; display:block; }
+
+/* Not-downloaded is a state with an action in it, so it gets a shape rather than a line of
+   grey text — an empty page would leave the one button that fixes it undiscoverable. */
+.fp-root .fp-recipes-empty {
+  display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+  padding:52px 30px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow-sm);
+}
+.fp-root .fp-recipes-empty-ic {
+  width:var(--tile-lg); height:var(--tile-lg); border-radius:12px; display:grid; place-items:center;
+  background:var(--accent-soft); color:var(--accent);
+}
+.fp-root .fp-recipes-empty-title { font-size:var(--fs-h2); font-weight:600; letter-spacing:-.01em; }
+.fp-root .fp-recipes-empty-body { margin:0; max-width:52ch; font-size:var(--fs-ctl-sm); line-height:1.6; color:var(--text-3); }
+
+/* Claims the files do not bear out. Blocking ones read as a warning; the rest are notes, because
+   a recipe with generic categories is still more useful than no recipe. */
+.fp-root .fp-recipe-issues { display:flex; flex-direction:column; gap:6px; }
+.fp-root .fp-recipe-issue {
+  display:flex; gap:8px; padding:8px 10px; border-radius:var(--r-md);
+  font-size:var(--fs-micro); line-height:1.5; color:var(--text-2);
+  background:var(--surface-inset); border:1px solid var(--border);
+}
+.fp-root .fp-recipe-issue svg { flex:none; margin-top:1px; color:var(--text-3); }
+.fp-root .fp-recipe-issue.blocking {
+  background:color-mix(in oklab, var(--red) 9%, var(--surface));
+  border-color:color-mix(in oklab, var(--red) 26%, var(--border));
+}
+.fp-root .fp-recipe-issue.blocking svg { color:var(--red); }
+
+/* The same warning shape, used above the grid where it is about the archive rather than a card. */
+.fp-root .fp-recipe-guard.standalone { align-items:center; margin-bottom:var(--gap-grid); }
+.fp-root .fp-recipe-guard.standalone svg { margin-top:0; }
+.fp-root .fp-recipe-guard.standalone > span { flex:1; }
+
+/* A word where the count usually sits. Same slot, so the two can never collide — a nav item
+   showing "New 12" would read as neither. */
+.fp-root .fp-nav-badge {
+  margin-left:auto; font-size:var(--fs-nano); font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--accent); background:var(--accent-soft);
+  padding:1px 6px; border-radius:var(--r-full);
+}
+.fp-root .fp-nav-item.active .fp-nav-badge { background:color-mix(in oklab, var(--accent) 20%, transparent); }
+/* A step the driver refused. Dashed rather than absent, so the run list and the card that was
+   just read agree with each other. */
+.fp-root .fp-recipe-step.skip { color:var(--text-faint); }
+.fp-root .fp-recipe-step.skip .fp-recipe-step-dot { border-style:dashed; }
+.fp-root .fp-recipe-step.skip .fp-recipe-step-n { text-decoration:line-through; }

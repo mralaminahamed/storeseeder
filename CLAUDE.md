@@ -53,7 +53,7 @@ The suite loads real platform plugins from sibling directories. A platform is lo
 when StoreSeeder ships a driver for it — see `tests/php/bootstrap.php`. Tests needing an
 absent platform skip via `require_platform( $id )`.
 
-**Current baselines: 640 PHP tests and 215 Jest tests (`yarn test:unit`).** For any refactor
+**Current baselines: 700 PHP tests and 251 Jest tests (`yarn test:unit`).** For any refactor
 claiming no behaviour change, the *test* count must come back identical, not merely green — a changed
 count means a reference was missed.
 
@@ -63,8 +63,9 @@ unchanged code: three consecutive runs of `tests/php/src/Generators` gave 5126, 
 an assertion figure invites chasing a difference that means nothing.
 
 The PHP figure is the sum of per-directory runs — `vendor/bin/phpunit tests/php/src/<dir>` for
-each of `Generators`, `Rest`, `Platform`, `MCP`, `CLI`, `Generation`, `Controllers`, plus the
-nine files at the root of `tests/php/src/`. One invocation over the whole tree stalls on this
+each of `Generators`, `Rest`, `Platform`, `MCP`, `CLI`, `Generation`, `Controllers`, `Recipes`,
+plus the nine files at the root of `tests/php/src/` — which have to be run one at a time, because
+one invocation over several of them stalls the same way the whole tree does. One invocation over the whole tree stalls on this
 machine once both platform plugins are loaded; the per-directory blocks cover the same files and
 take about two minutes.
 
@@ -87,6 +88,8 @@ includes/
                   Registry.php               owns storeseeder_mcp_abilities
                   Settings.php               three switches, gate at registration
                   Ability.php (abstract)     + Abilities/*     21 abilities, 42 tools
+  Recipes/        Recipe.php    one validated manifest
+                  Registry.php  owns storeseeder_recipes; audits a download against its claims
   Platforms/      Platform_Interface.php  Platform_Driver.php  Writer.php
                   Registry.php  Resolver.php  Capability.php
                   Resource.php  Status.php  Locale.php
@@ -151,7 +154,8 @@ generators, REST API and admin pick it up. Also: `storeseeder_platform_writers_{
 AJAX), `storeseeder_locales`, `storeseeder_canonical_entity` and `storeseeder_rest_params` (the
 all-resources counterparts of the `_{resource}` / `_{base}` filters, running before them),
 `storeseeder_platform_fields_{id}`, `storeseeder_mcp_ability_definition`, `storeseeder_mcp_settings`,
-`storeseeder_purge_order`,
+`storeseeder_purge_order`, `storeseeder_recipes`, `storeseeder_recipe_directories`,
+`storeseeder_recipes_source`,
 `storeseeder_admin_payload`,
 `storeseeder_sample_data_source`. Full table in `docs/architecture.md`.
 
@@ -288,9 +292,14 @@ breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
   `test.describe`. Jest tests sit **beside their source** (`src/lib/locales.test.ts`), not
   in a parallel tree; PHP tests stay under `tests/php/`, mirroring `includes/`.
 - **`docs/superpowers/` is gitignored.** Specs and plans written there are local only.
-- **Sample data lives in a separate repo** and downloads only after an administrator accepts
-  the consent prompt. That prompt is the only thing granting permission — see
-  `docs/external-services.md`, and keep readme.txt in agreement with the code.
+- **Sample data and recipes live in separate repos** and download only after an administrator
+  accepts the consent prompt. That prompt is the only thing granting permission — see
+  `docs/external-services.md`, and keep readme.txt in agreement with the code. One consent record
+  covers both; asking twice for the same answer trains people to click through prompts.
+- **A test method may not narrow a WordPress base method.** `WP_UnitTestCase_Base` declares a
+  public `rmdir()`, and `tearDown()` is final — redeclaring either is a *compile-time* fatal that
+  PHPUnit reports as exit 255 with no message, no failure list and nothing in the error log.
+  Override `set_up()` / `tear_down()`, and give helpers names the base does not already use.
 
 ## When changing a generator
 

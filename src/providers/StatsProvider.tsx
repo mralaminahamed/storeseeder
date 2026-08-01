@@ -25,6 +25,13 @@ interface StatsState {
     message: string,
     opts?: { locale?: string; seed?: string }
   ) => void;
+  /**
+   * Take back rows that have been deleted from the store.
+   *
+   * Undoing a recipe removes its rows, and a dashboard that still counted them would disagree
+   * with the store it is describing. Keyed by REST route, the way `recordRun` is.
+   */
+  discardRun: (rows: Record<string, number>) => void;
   clearStats: () => void;
 }
 
@@ -61,13 +68,23 @@ export function StatsProvider({ children }: { children: React.ReactNode }) {
     [refresh]
   );
 
+  const discardRun = useCallback(
+    (rows: Record<string, number>) => {
+      // A negative increment. Floored at zero inside the storage layer's read, so a count that
+      // was already wrong cannot go negative and render as "-40 products".
+      Object.entries(rows).forEach(([route, count]) => incrementStats(route, -count));
+      refresh();
+    },
+    [refresh]
+  );
+
   const clearStats = useCallback(() => {
     storageClearStats();
     refresh();
   }, [refresh]);
 
   return (
-    <StatsContext.Provider value={{ counts, totalGenerated, recentRuns, recordRun, clearStats }}>
+    <StatsContext.Provider value={{ counts, totalGenerated, recentRuns, recordRun, discardRun, clearStats }}>
       {children}
     </StatsContext.Provider>
   );

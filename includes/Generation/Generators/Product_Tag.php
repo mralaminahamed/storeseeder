@@ -90,6 +90,17 @@ class Product_Tag extends Generator {
 	}
 
 	/**
+	 * Tag labels, from the recipe's vocabulary or the shipped default.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string[]
+	 */
+	protected function labels(): array {
+		return $this->vocabulary( 'product_tags', 'labels', self::LABELS );
+	}
+
+	/**
 	 * Build a canonical product tag
 	 *
 	 * @since 1.1.0
@@ -97,7 +108,7 @@ class Product_Tag extends Generator {
 	 * @return array<string, mixed>
 	 */
 	protected function build_entity() {
-		$name = $this->get_faker()->randomElement( self::LABELS );
+		$name = $this->get_faker()->randomElement( $this->labels() );
 
 		return array(
 			'name'        => $name,
@@ -144,7 +155,7 @@ class Product_Tag extends Generator {
 	 * @return array<string, array{v: mixed, kind: string}>
 	 */
 	protected function build_preview_row(): array {
-		$name = $this->get_faker()->randomElement( self::LABELS );
+		$name = $this->get_faker()->randomElement( $this->labels() );
 
 		return array(
 			'name'     => array(
