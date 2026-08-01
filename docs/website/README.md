@@ -28,6 +28,41 @@ content is written up here it should be *moved*, leaving the guide as a pointer 
 If that decision is ever reversed and the guides become canonical for good, the honest fix is to have
 this site read them directly rather than restate them.
 
+## Do not delete `.astro/` while `yarn dev` is running
+
+The dev server watches it. Removing it mid-run makes Astro restart, fail to import
+`.astro/content-assets.mjs`, and then report the content collection as empty — after which every
+request logs `The slug "…" specified in the Starlight sidebar config does not exist` for pages that
+exist perfectly well on disk.
+
+Nothing is actually broken at that point and no amount of editing fixes it. Stop the server and start
+it again.
+
+If you do need to clear the cache, stop `yarn dev` first.
+
+## When a page renders a title and no content
+
+Almost always a malformed `:::` directive. Starlight needs the content on the line *below* the
+opener:
+
+```md
+:::note
+Content here.
+:::
+```
+
+With the text on the opener line instead, the **whole document body** renders as nothing — the page
+still builds and still appears in the nav. `yarn dev` gives the real error where `yarn build` does
+not:
+
+```
+[ERROR] [starlight-docs-loader] Error rendering guides/recipes.md: node.children is not iterable
+```
+
+Something in this repository reflows long lines in Markdown files, which is how two pages came to
+have collapsed directives at once. If you have Markdown reformat-on-save enabled, that is the
+suspect.
+
 ## Adding a page
 
 1. Write `src/content/docs/<section>/<slug>.md` with `title` and `description` front matter.
