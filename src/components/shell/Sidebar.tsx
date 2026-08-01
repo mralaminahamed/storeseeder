@@ -158,7 +158,7 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
           to="/recipes"
           label="Recipes"
           ic="store"
-          active={pathname === "/recipes"}
+          active={pathname.startsWith("/recipes")}
           collapsed={collapsed}
           testId="nav-recipes"
           badge="New"
