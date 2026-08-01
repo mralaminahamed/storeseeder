@@ -1,5 +1,5 @@
 import apiFetch from "@wordpress/api-fetch";
-import { __, sprintf } from "@wordpress/i18n";
+import { __ } from "@wordpress/i18n";
 import type {
   Capability,
   ParameterConfig,
@@ -79,23 +79,18 @@ export function findPlatform(state: PlatformState, id: string | null): PlatformI
 /**
  * The label to show for the current selection.
  *
- * On auto this names what auto resolved to, so the target is never invisible —
- * "Auto" alone tells you nothing about where rows are going.
+ * Auto is always the word "Auto", never "Auto · Fluent Cart". It used to carry what it
+ * resolved to, on the reasoning that the target should never be invisible — but the option
+ * is a *mode*, and a mode whose name changes with the store it happens to have picked reads
+ * as a different option each time the picker is opened. Where the rows are going is on the
+ * control's tooltip and on the Settings page instead.
  */
 export function targetLabel(state: PlatformState, selected: string): string {
   if (selected !== AUTO && selected !== "") {
     return findPlatform(state, selected)?.label ?? selected;
   }
 
-  const resolved = findPlatform(state, state.resolved);
-
-  if (!resolved) return __("Auto", "storeseeder");
-
-  return sprintf(
-    /* translators: %s: name of the platform that Auto resolved to. */
-    __("Auto · %s", "storeseeder"),
-    resolved.label,
-  );
+  return __("Auto", "storeseeder");
 }
 
 /**

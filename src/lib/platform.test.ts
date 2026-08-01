@@ -95,14 +95,15 @@ describe("findPlatform", () => {
 
 describe("targetLabel", () => {
   /**
-   * "Auto" alone says nothing about where rows are going, which is the one thing this
-   * label exists to answer.
+   * Auto is a mode, not a store. It used to read "Auto · Fluent Cart", which renamed the
+   * option every time the resolution changed — the same entry appearing under a different
+   * name each time the picker is opened. What it resolves to is on the control's tooltip.
    */
-  it("names what Auto resolved to", () => {
-    expect(targetLabel(state(), AUTO)).toBe("Auto · Fluent Cart");
+  it("is always the plain word Auto, whatever it resolved to", () => {
+    expect(targetLabel(state(), AUTO)).toBe("Auto");
   });
 
-  it("says plain Auto when nothing is resolved", () => {
+  it("says Auto when nothing is resolved either", () => {
     expect(targetLabel(state({ resolved: null }), AUTO)).toBe("Auto");
   });
 
@@ -116,7 +117,7 @@ describe("targetLabel", () => {
   });
 
   it("treats an empty selection as Auto", () => {
-    expect(targetLabel(state(), "")).toBe("Auto · Fluent Cart");
+    expect(targetLabel(state(), "")).toBe("Auto");
   });
 });
 

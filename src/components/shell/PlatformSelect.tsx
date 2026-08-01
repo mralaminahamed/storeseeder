@@ -1,5 +1,5 @@
 import React from "react";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 
 import { FieldSelect } from "@/components/generator/fields/FieldSelect";
 import { AUTO } from "@/lib/platform";
@@ -21,9 +21,12 @@ import { usePlatform } from "@/providers/PlatformProvider";
  * draws its list in the operating system's chrome — a light menu over a dark app.
  */
 export function PlatformSelect() {
-  const { active, selected, label, setTarget, ambiguous } = usePlatform();
+  const { active, selected, label, setTarget, ambiguous, state } = usePlatform();
 
   if (active.length < 2) return null;
+
+  // Only meaningful while Auto is selected; an explicit choice is already named on the pill.
+  const resolvedLabel = active.find((platform) => platform.id === state.resolved)?.label ?? "";
 
   return (
     <FieldSelect
@@ -31,10 +34,19 @@ export function PlatformSelect() {
       icon="store"
       testId="platform-select"
       ariaLabel={__("Target platform", "storeseeder")}
-      title={__("Which store generated data is written to", "storeseeder")}
+      title={
+        selected === AUTO && resolvedLabel
+          ? sprintf(
+              /* translators: %s: name of the platform Auto currently resolves to. */
+              __("Which store generated data is written to — currently %s", "storeseeder"),
+              resolvedLabel,
+            )
+          : __("Which store generated data is written to", "storeseeder")
+      }
       value={selected}
-      // Auto first, labelled with what it resolved to, so the target is never hidden
-      // behind the word "Auto".
+      // Auto is always first and always reads "Auto" — it is a mode, and a mode renamed
+      // after whichever store it currently resolves to reads as a different option every
+      // time the list is opened. What it resolved to is on the tooltip.
       options={[
         { value: AUTO, label },
         ...active.map((platform) => ({

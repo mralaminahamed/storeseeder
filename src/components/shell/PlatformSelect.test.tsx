@@ -104,14 +104,18 @@ describe("PlatformSelect", () => {
       ]);
     });
 
-    it("names what Auto resolved to, so the target is never hidden behind a word", async () => {
+    it("keeps the first option named Auto, whatever it resolved to", async () => {
       mount({ ...two, resolved: "fluent-cart", ambiguous: false });
 
       await userEvent.click(screen.getByRole("combobox"));
 
+      const options = screen.getAllByRole("option");
+
+      expect(options[0]).toHaveAccessibleName("Auto");
+      // And not renamed after the store it happens to be pointing at.
       expect(
-        screen.getByRole("option", { name: "Auto · Fluent Cart" }),
-      ).toBeInTheDocument();
+        screen.queryByRole("option", { name: /Auto · / }),
+      ).not.toBeInTheDocument();
     });
 
     it("sends the platform id when one is chosen", async () => {
