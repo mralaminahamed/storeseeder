@@ -56,6 +56,7 @@ export function RecipeSkeleton() {
         <Skeleton width={132} height={29} radius={8} />
         <Skeleton width={180} height={11} />
         <span className="fp-recipe-actions">
+          <Skeleton width={78} height={38} radius={8} />
           <Skeleton width={150} height={38} radius={8} />
         </span>
       </div>

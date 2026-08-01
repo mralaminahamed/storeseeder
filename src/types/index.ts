@@ -7,6 +7,8 @@ declare global {
       restNonce?: string;
       version?: string;
       ajaxUrl?: string;
+      /** The site's front page, for a link to the store that was just built. */
+      homeUrl?: string;
       adminColors?: Record<string, string>;
       colorScheme?: string;
       locale?: {

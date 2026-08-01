@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "@wordpress/element";
+import React, {
+  createInterpolateElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "@wordpress/element";
 import apiFetch from "@wordpress/api-fetch";
 import { __, _n, sprintf } from "@wordpress/i18n";
 
@@ -46,6 +52,18 @@ interface RunProgress {
 type Stage = "pick" | "running" | "done";
 
 /**
+ * The page's own description.
+ *
+ * A constant because the loading state shows it too — it is known before any request, so
+ * withholding it would make the header grow a line when the data lands. Two copies of the sentence
+ * is how the two states drift apart.
+ */
+const DESCRIPTION = __(
+  "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order.",
+  "storeseeder",
+);
+
+/**
  * Build a whole shop in one click.
  *
  * The generator pages answer "make me two hundred products". This answers "make me a shop", which
@@ -60,6 +78,7 @@ export default function RecipesPage() {
 
   const locale =
     getSettings().defaultLocale ?? window.storeseederApi?.locale?.faker ?? "en_US";
+  const homeUrl = window.storeseederApi?.homeUrl ?? "";
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [downloaded, setDownloaded] = useState(true);
@@ -266,7 +285,10 @@ export default function RecipesPage() {
   if (loading) {
     return (
       <div className="fp-recipes-page fp-enter">
-        <PageHead title={__("Recipes", "storeseeder")} />
+        <PageHead
+          title={__("Recipes", "storeseeder")}
+          description={DESCRIPTION}
+        />
         <RecipeSkeleton />
       </div>
     );
@@ -294,7 +316,8 @@ export default function RecipesPage() {
               {sprintf(
                 /* translators: %s: recipe name, e.g. Corner grocer. */
                 __("Building %s", "storeseeder"),
-                recipe.name,
+                // Lower-cased: the name is mid-sentence here, not a heading of its own.
+                recipe.name.toLocaleLowerCase(),
               )}
             </div>
             <div className="fp-recipe-run-sub">
@@ -334,9 +357,12 @@ export default function RecipesPage() {
                   {done && <Icon name="check" size={11} />}
                 </span>
                 <span>{labelFor(step.resource)}</span>
-                <span className="fp-recipe-step-n mono">
-                  {written.toLocaleString()} / {wanted.toLocaleString()}
-                </span>
+                {/*
+                  One number, the way the mock had it: the rows this step will create. A running
+                  "40 / 240" invites reading the pair as progress within the step, which it is
+                  not — the bar above is the progress, and the dot says which state this row is in.
+                */}
+                <span className="fp-recipe-step-n mono">{wanted.toLocaleString()}</span>
               </div>
             );
           })}
@@ -423,6 +449,21 @@ export default function RecipesPage() {
         )}
 
         <div className="fp-recipe-done-foot">
+          {/*
+            The front page rather than a per-driver storefront route: every platform puts its shop
+            somewhere different, and a link that guesses wrong is worse than one that lands
+            somewhere true. Hidden entirely when the site did not inline a URL.
+          */}
+          {!undone && homeUrl && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(homeUrl, "_blank", "noopener,noreferrer")}
+            >
+              <Icon name="external" size={13} />
+              {__("View the store", "storeseeder")}
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -442,7 +483,7 @@ export default function RecipesPage() {
               disabled={undoing}
               onClick={() => void undo()}
             >
-              <Icon name="refresh" size={13} />
+              <Icon name="undo" size={13} />
               {undoing
                 ? __("Undoing…", "storeseeder")
                 : __("Undo this recipe", "storeseeder")}
@@ -537,10 +578,7 @@ export default function RecipesPage() {
     <div className="fp-recipes-page fp-enter">
       <PageHead
         title={__("Recipes", "storeseeder")}
-        description={__(
-          "A recipe is a vocabulary — names, categories, brands, price bands — that makes every generator produce one coherent shop. Pick one and it fills the store in dependency order.",
-          "storeseeder",
-        )}
+        description={DESCRIPTION}
       />
 
       {body()}
@@ -568,13 +606,22 @@ export default function RecipesPage() {
             </div>
           </div>
 
+          {/*
+            The row count and the recipe name are what a second glance is looking for, so they are
+            the two things set in the text colour while the rest stays quiet. `createInterpolateElement`
+            rather than concatenation: a translator has to be able to move the emphasis, and in
+            several languages the order changes.
+          */}
           <div className="fp-recipe-summary">
-            {sprintf(
-              /* translators: 1: row count, 2: resource count, 3: recipe name. */
-              __("%1$s rows across %2$s resources · %3$s", "storeseeder"),
-              totalRows(recipe, size).toLocaleString(),
-              String(runnableSteps(recipe).length),
-              recipe.name,
+            {createInterpolateElement(
+              sprintf(
+                /* translators: 1: row count, 2: resource count, 3: recipe name. */
+                __("<b>%1$s</b> rows across %2$s resources · <n>%3$s</n>", "storeseeder"),
+                totalRows(recipe, size).toLocaleString(),
+                String(runnableSteps(recipe).length),
+                recipe.name,
+              ),
+              { b: <strong />, n: <strong /> },
             )}
           </div>
 
