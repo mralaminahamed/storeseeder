@@ -22,17 +22,17 @@ defaults:
 # ---------------------------------------------------------------------------
 # Pipeline DAG (StoreSeeder — no Freemius):
 #
-#   meta ──┬── lint ────────────────┐
-#          ├── phpstan ──────────────┤
-#          └── assets ──┬── i18n ────┼── package ── deploy
-#                       └────────────┘
+#   meta ──┬── lint ──────────┐
+#          ├── phpstan ───────┤
+#          └── assets ── i18n ┴── package ── deploy
 #
 #   meta     : resolve slug, validate tag == header version, prerelease flag
 #   lint     : PHP syntax + sensitive scan + PHPCS (WPCS)  — gate, parallel
 #   phpstan  : PHPStan (level 7)                           — gate, parallel
 #   assets   : wp-scripts build -> build/                  — producer, parallel
 #   i18n     : wp i18n make-pot -> languages/              — producer, after assets
-#   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip
+#   package  : composer --no-dev + .distignore rsync -> dist/<slug>, zip — waits on the
+#              gates too, so a rejected commit is never packaged
 #   deploy   : 10up SVN deploy (BUILD_DIR) + .wordpress-org assets + GH release
 # ---------------------------------------------------------------------------
 jobs:
@@ -223,7 +223,11 @@ jobs:
   package:
     name: "Package: assemble + zip"
     runs-on: ubuntu-latest
-    needs: [meta, assets, i18n]
+    # The gates are in `needs` as well as the producers: packaging is the expensive half of the
+    # run — a production install, an rsync of the whole tree and a zip — and there is no reason to
+    # spend it on a commit PHPCS or PHPStan has already rejected. `deploy` waited on them before,
+    # so a failure could never ship; it could only waste the packaging first.
+    needs: [meta, lint, phpstan, assets, i18n]
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
