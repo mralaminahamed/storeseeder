@@ -70,8 +70,14 @@ export default function RecipePicker() {
               "storeseeder",
             )}
           </p>
-          <Button disabled={syncing} onClick={() => void sync()}>
-            <Icon name="refresh" size={14} />
+          <Button
+            variant="primary"
+            size="lg"
+            icon="refresh"
+            type="button"
+            disabled={syncing}
+            onClick={() => void sync()}
+          >
             {syncing
               ? __("Downloading…", "storeseeder")
               : __("Download the recipes", "storeseeder")}
@@ -103,7 +109,13 @@ export default function RecipePicker() {
                 incomplete.join(", "),
               )}
             </span>
-            <Button variant="outline" size="sm" disabled={syncing} onClick={() => void sync()}>
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              disabled={syncing}
+              onClick={() => void sync()}
+            >
               {syncing ? __("Syncing…", "storeseeder") : __("Sync", "storeseeder")}
             </Button>
           </div>
@@ -172,16 +184,19 @@ export default function RecipePicker() {
           </div>
 
           <div className="fp-recipe-actions">
-            <Button variant="outline" onClick={() => setPicked(null)}>
+            <Button variant="outline" size="lg" type="button" onClick={() => setPicked(null)}>
               {__("Clear", "storeseeder")}
             </Button>
             <Button
+              variant="primary"
+              size="lg"
+              icon="play"
+              type="button"
               data-testid="recipe-run"
               disabled={isBlocked(recipe) || !resolved}
               title={blockedReason(recipe, resolved)}
               onClick={() => void run(recipe)}
             >
-              <Icon name="play" size={14} />
               {__("Create the store", "storeseeder")}
             </Button>
           </div>
