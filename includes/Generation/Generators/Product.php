@@ -53,6 +53,25 @@ class Product extends Generator {
 	}
 
 	/**
+	 * A product's name, from the active vocabulary.
+	 *
+	 * Shared with the preview row, which used to draw its own from `words( 3 )` — Lorem, on the one
+	 * screen whose job is showing what a run will do. One method so the two cannot say different
+	 * things about the same product again.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string
+	 */
+	private function title(): string {
+		$sample_data = $this->load_sample_data();
+		$adjectives  = $sample_data['adjectives'] ?? array( 'Amazing', 'Premium', 'Deluxe', 'Professional' );
+		$products    = $sample_data['products'] ?? array( 'Widget', 'Gadget', 'Tool', 'Device', 'System' );
+
+		return $this->get_faker()->randomElement( $adjectives ) . ' ' . $this->get_faker()->randomElement( $products );
+	}
+
+	/**
 	 * The words a product is named from.
 	 *
 	 * This override was missing, and its absence is why every product in every locale was called
@@ -87,11 +106,7 @@ class Product extends Generator {
 	 * @return array<string, mixed> Canonical product entity.
 	 */
 	protected function build_entity() {
-		$sample_data = $this->load_sample_data();
-		$adjectives  = $sample_data['adjectives'] ?? array( 'Amazing', 'Premium', 'Deluxe', 'Professional' );
-		$products    = $sample_data['products'] ?? array( 'Widget', 'Gadget', 'Tool', 'Device', 'System' );
-
-		$title = $this->get_faker()->randomElement( $adjectives ) . ' ' . $this->get_faker()->randomElement( $products );
+		$title = $this->title();
 
 		$fulfillment_type = $this->get_faker()->randomElement( array( 'physical', 'digital' ) );
 		$price            = $this->price();
@@ -336,7 +351,11 @@ class Product extends Generator {
 			'name'   => array(
 				// words() without the $asText flag returns an array, which joins
 				// cleanly — asking for the string form types as array|string.
-				'v'    => ucwords( implode( ' ', (array) $faker->words( 3 ) ) ),
+				// `title()`, the same path `build_entity()` names a product with. This was
+				// `words( 3 )` — Lorem — so the preview said "Voluptatem Quia Dolor" while the run
+				// produced "Organic Rolled Oats", and the one screen whose job is showing what a
+				// recipe does showed the opposite of it.
+				'v'    => $this->title(),
 				'kind' => 'text',
 			),
 			'sku'    => array(

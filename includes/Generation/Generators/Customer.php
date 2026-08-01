@@ -956,7 +956,11 @@ class Customer extends Generator {
 				'kind' => 'badge',
 			),
 			'orders'  => array(
-				'v'    => $faker->numberBetween( 0, 50 ),
+				// Zero when history is switched off, which is the whole point of the switch. The
+				// literal 0–50 showed a lifetime of purchases for a run that would create none of
+				// them, so the parameter looked broken on the only screen that could have shown it
+				// working.
+				'v'    => $this->history_enabled() ? $faker->numberBetween( 1, 50 ) : 0,
 				'kind' => 'num',
 			),
 		);

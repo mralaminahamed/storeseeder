@@ -348,7 +348,8 @@ class Order extends Generator {
 				'kind' => 'text',
 			),
 			'items'    => array(
-				'v'    => $faker->numberBetween( 1, 8 ),
+				// `items_per_order()`, so a run asked for one-item orders previews as one.
+				'v'    => $this->items_per_order(),
 				'kind' => 'num',
 			),
 			'total'    => array(
@@ -356,7 +357,9 @@ class Order extends Generator {
 				'kind' => 'money',
 			),
 			'status'   => array(
-				'v'    => $faker->randomElement( array( 'completed', 'processing', 'on-hold', 'refunded', 'failed' ) ),
+				// `status()`, which honours `status_distribution`. The literal list also held
+				// WooCommerce's spelling — `on-hold` — in a canonical context.
+				'v'    => $this->status(),
 				'kind' => 'status',
 			),
 		);
