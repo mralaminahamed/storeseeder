@@ -1,5 +1,9 @@
 name: SVN Cleanup
 
+# Deletes paths from the plugin's WordPress.org SVN — for when something that should never have
+# shipped reached trunk or a tag. Manual only, and it commits to a public directory, so the dry run
+# is the default and has to be turned off deliberately.
+
 on:
   workflow_dispatch:
     inputs:
@@ -12,11 +16,23 @@ on:
         required: true
         default: "src docs"
       dry_run:
+        # Defaults to a preview. This commits deletions to a public SVN repository, and the cost of
+        # an accidental run is higher than the cost of running it twice.
         description: "Dry run — preview deletions without committing"
         required: false
-        default: "false"
+        default: "true"
         type: choice
-        options: ["false", "true"]
+        options: ["true", "false"]
+
+# Read-only against this repository; the SVN credentials are what grant write, and they go to
+# WordPress.org.
+permissions:
+  contents: read
+
+# Never two SVN conversations at once, and never interrupt one mid-commit.
+concurrency:
+  group: svn-cleanup
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -26,6 +42,7 @@ jobs:
   cleanup:
     name: "Remove paths from SVN ${{ github.event.inputs.target }}"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Install Subversion
@@ -38,8 +55,10 @@ jobs:
           SVN_USERNAME: ${{ vars.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           TARGET:       ${{ github.event.inputs.target }}
+          # Derived, not hardcoded — svn-deploy.yml resolves the slug the same way, and a
+          # literal here is a second place to forget if the repository is ever renamed.
+          PLUGIN_SLUG:  ${{ github.event.repository.name }}
         run: |
-          PLUGIN_SLUG="storeseeder"
           SVN_URL="https://plugins.svn.wordpress.org/${PLUGIN_SLUG}/${TARGET}"
           echo "Checking out: ${SVN_URL}"
           svn checkout "$SVN_URL" svn-target \

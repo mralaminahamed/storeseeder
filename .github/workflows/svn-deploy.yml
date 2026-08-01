@@ -43,6 +43,7 @@ jobs:
   meta:
     name: "Meta: validate version"
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       plugin_slug: ${{ steps.info.outputs.plugin_slug }}
       version:     ${{ steps.info.outputs.version }}
@@ -77,6 +78,7 @@ jobs:
   lint:
     name: "Lint: PHPCS"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: meta
     steps:
       - uses: actions/checkout@v6
@@ -121,6 +123,7 @@ jobs:
   phpstan:
     name: "PHPStan: static analysis"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: meta
     steps:
       - uses: actions/checkout@v6
@@ -149,19 +152,22 @@ jobs:
   assets:
     name: "Assets: build bundles"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: meta
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          # Matches ci.yml. These drifted apart, so the bundle shipped to WordPress.org was built
+          # on a runtime no CI job had ever run `yarn build` on.
+          node-version: "24"
       - name: Cache Yarn + node_modules
         if: ${{ env.ACT != 'true' }}
         uses: actions/cache@v5
         with:
-          path: |
-            .yarn/cache
-            node_modules
+          # `node_modules` only: .yarnrc.yml sets `nodeLinker: node-modules` and leaves Yarn 4's
+          # global cache enabled, so no `.yarn/cache` is ever written in the workspace.
+          path: node_modules
           key: yarn-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-${{ runner.os }}-
       - name: Yarn install
@@ -186,6 +192,7 @@ jobs:
   i18n:
     name: "i18n: translations"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [meta, assets]
     steps:
       - uses: actions/checkout@v6
@@ -223,6 +230,7 @@ jobs:
   package:
     name: "Package: assemble + zip"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # The gates are in `needs` as well as the producers: packaging is the expensive half of the
     # run — a production install, an rsync of the whole tree and a zip — and there is no reason to
     # spend it on a commit PHPCS or PHPStan has already rejected. `deploy` waited on them before,
@@ -306,6 +314,7 @@ jobs:
   deploy:
     name: "Deploy: WP.org SVN + GitHub release"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [meta, lint, phpstan, package]
     steps:
       - name: Checkout (provides .wordpress-org for SVN assets/)

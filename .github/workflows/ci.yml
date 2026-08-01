@@ -8,6 +8,11 @@ on:
     branches:
       - trunk
 
+# Read-only. CI checks out, builds and tests; it never writes to the repository, and the default
+# token permission for a repo can be read/write.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -25,6 +30,7 @@ jobs:
   lint:
     name: "PHP Lint (PHPCS)"
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -60,6 +66,7 @@ jobs:
   analyze:
     name: "PHP Static Analysis (PHPStan)"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -95,15 +102,21 @@ jobs:
   test:
     name: "PHP Tests (PHP ${{ matrix.php }})"
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
+        # 7.4 is the floor the plugin header declares; the top of the range is what WordPress
+        # runs on today. Development happens on 8.5, so leaving the matrix at 8.3 meant the
+        # version the code is written against was the one version CI never exercised.
         php:
           - "7.4"
           - "8.0"
           - "8.1"
           - "8.2"
           - "8.3"
+          - "8.4"
+          - "8.5"
     services:
       mysql:
         image: mysql:8.0
@@ -185,6 +198,7 @@ jobs:
   build:
     name: "Frontend Lint & Build"
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -221,7 +235,7 @@ jobs:
 
       - name: Install Node dependencies
         run: |
-          corepack enable yarn
+          corepack enable
           yarn install --immutable
 
       - name: Run ESLint
