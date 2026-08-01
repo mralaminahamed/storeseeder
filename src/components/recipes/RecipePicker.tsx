@@ -141,11 +141,26 @@ export default function RecipePicker() {
 
       {body()}
 
-      {!recipe ? (
+      {bar()}
+    </>
+  );
+
+  function bar() {
+    // Nothing at all when there is nothing to pick. "Pick a recipe to continue" under a page that
+    // says the recipes have not been downloaded is an instruction the reader cannot follow, sitting
+    // directly below the button that would actually help — so it competes with the one thing on
+    // screen worth pressing.
+    if (0 === recipes.length) return null;
+
+    if (!recipe) {
+      return (
         <div className="fp-recipe-bar idle">
           {__("Pick a recipe to continue.", "storeseeder")}
         </div>
-      ) : (
+      );
+    }
+
+    return (
         <div className="fp-recipe-bar">
           <div className="fp-recipe-sizes">
             <span className="fp-recipe-sizes-label">{__("Size", "storeseeder")}</span>
@@ -239,7 +254,6 @@ export default function RecipePicker() {
             </div>
           )}
         </div>
-      )}
-    </>
-  );
+    );
+  }
 }

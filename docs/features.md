@@ -42,6 +42,96 @@ generated records carry the same validation, relationships and money handling as
 Generators that build on others say so when a prerequisite is missing, naming what to generate
 first rather than failing opaquely.
 
+## Recipes
+
+A recipe builds a whole shop in one click — a corner grocer, a fashion boutique, a home & garden
+store — instead of a resource at a time.
+
+StoreSeeder could always generate any volume. What it could not do was make two hundred products
+that look like **one business**: every store came out as the same generic catalogue, so someone
+testing a boutique got *Premium Wireless Headphones · Size: XL*. No parameter closes that, because a
+parameter changes how many, not what kind of shop.
+
+### A vocabulary, not a dataset
+
+A recipe supplies the words and the numeric bands that make every generator produce one coherent
+shop, and then the existing pipeline runs unchanged. It is never records.
+
+That distinction is the design rather than a detail. Dumped records would bypass the generator layer,
+and the generator layer is where every invariant lives — money as integer minor units, the canonical
+status vocabulary, no platform names in an entity, a fixed seed reproducing the same data everywhere.
+A vocabulary pack re-implements none of it, and every existing parameter keeps working on top of one:
+`price_range`, `locale`, the entity pickers, the ledger.
+
+### What ships
+
+| Recipe | Shop | Rows at Medium | Good for |
+|---|---|---|---|
+| `grocery` | Corner grocer | 1,794 | Cheap lines, high order counts, weight-based variations |
+| `fashion` | Fashion boutique | 3,466 | Deep size × colour trees — 1,440 variations over 240 products |
+| `home-garden` | Home & garden | 1,225 | Shipping classes that genuinely differ, the widest price band |
+
+Each supplies all six things the completeness bar requires: product names, a category tree, brand
+names, tag labels, a price band and variation axes. A recipe that swapped the nouns and left the rest
+generic would be worse than none — grocery products priced $9.99–$999.99 in Size/Color is a plausible
+lie, and a plausible lie is harder to notice than an obvious one.
+
+### They live in their own repository
+
+[storeseeder-recipes](https://github.com/mralaminahamed/storeseeder-recipes), downloaded once behind
+the consent prompt that already governs the sample data. Content and code move at different speeds —
+a typo in the grocer's category list should not need a plugin release — and recipes × locales is
+exactly the growth that must never sit in a wp.org zip.
+
+The cost is stated rather than hidden: nothing works until an administrator fetches. A recipe running
+on default vocabulary would name grocery products after consumer electronics, so the page offers a
+download button instead of cards that quietly lie.
+
+### The run is ordered, chunked and undoable
+
+The endpoint caps a request at 100 rows, so a 900-order step is nine calls — which is a feature
+twice over: one PHP request writing 5,000 rows times out, and chunking makes progress real rather
+than animated.
+
+The order is the manifest's, and it is a **dependency** order. Brands and categories before products;
+products and customers before orders. Fan out and you get orders with no line items.
+
+Every row a run writes carries a `run_id` in the ledger, so **Undo this recipe** removes exactly that
+run and nothing else — one action rather than nine separate purges.
+
+### What a card tells you before you click
+
+- **The itemised counts**, per resource, rescaling live with Small / Medium / Large. There is no
+  preview table here on purpose: a preview shows one resource and a recipe spans nine, so the counts
+  do that job.
+- **What the target refuses.** WooCommerce records payment on the order, so transactions are struck
+  through with the driver's own reason rather than silently producing zero.
+- **Which locales it ships.** A recipe that does not carry the chosen one says so before the run, not
+  after.
+- **Where it came from** — the StoreSeeder archive, or a plugin that registered it.
+
+### Shipping your own
+
+You do not need the archive at all:
+
+```php
+add_filter( 'storeseeder_recipes', function ( $manifests ) {
+    $manifests[] = json_decode( file_get_contents( __DIR__ . '/my-recipe/recipe.json' ), true );
+
+    return $manifests;
+} );
+
+add_filter( 'storeseeder_recipe_directories', function ( $dirs ) {
+    $dirs['my-recipe'] = __DIR__ . '/my-recipe';
+
+    return $dirs;
+} );
+```
+
+A manifest that will not parse is dropped with a debug line rather than thrown — a broken
+third-party recipe must not take the admin down with it. `storeseeder_recipes_source` repoints the
+archive at a fork; change both URLs it returns, since `repo_url` is what the consent prompt shows.
+
 ## Multi-platform
 
 StoreSeeder writes through a **platform driver**, so the same generators can seed different

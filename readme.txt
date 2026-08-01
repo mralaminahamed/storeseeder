@@ -203,7 +203,7 @@ StoreSeeder connects to GitHub and to WordPress.org. Nothing is contacted on act
 
 **1. GitHub — sample data repository**
 
-Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator accepts the consent prompt on the plugin admin page — that prompt is the only way permission is granted. Until it is, "Sync now" and "Force re-sync" on the Settings page open the prompt instead of downloading. Once permission is on record, opening the admin page re-fetches the files if they are missing. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
+Locale-specific reference data (product names, addresses, customer tags) used to make generated content more realistic. Downloaded only after an administrator accepts the consent prompt on the plugin admin page — that prompt is the only way permission is granted. Until it is, "Sync now" and "Force re-sync" on the Settings page open the prompt instead of downloading. Once permission is on record, "Sync now" downloads; nothing is fetched on page load or on a schedule. Declining leaves every generator working from built-in defaults, and the decision can be changed from Settings at any time.
 
 **2. WordPress.org — plugin directory API**
 

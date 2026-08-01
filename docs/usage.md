@@ -44,6 +44,70 @@ A generator the target cannot represent is dimmed and, on its page, explains why
 plugin that would enable it where one exists. Those cards remain clickable, because a card that
 swallows clicks reads as broken.
 
+## Building a whole shop with a recipe
+
+**StoreSeeder → Recipes.**
+
+A recipe fills the store with one coherent shop rather than one resource at a time. Pick a card, pick
+a size, press **Create the store**.
+
+### The first time
+
+Recipes are downloaded from a separate repository, so a fresh install shows a **Download the
+recipes** button instead of cards. It is about 90 KB, fetched once, and then everything works
+offline. It reuses the consent decision the sample data already asked for — if you have never
+accepted that prompt, accept it on the Settings page first.
+
+Nothing is fetched on page load or on a schedule. The only download is a button press.
+
+### Choosing
+
+Each card shows what it will create, per resource, and the counts rescale as you switch **Small**
+(×0.25), **Medium** or **Large** (×4). There is no preview table: a preview shows one resource and a
+recipe spans nine, so the itemised counts are the preview.
+
+Watch for three things on a card:
+
+- **A struck-through count** is a resource your target refuses, with the driver's reason beside it.
+  On WooCommerce that is transactions — it records payment on the order, so there is no separate
+  record to create.
+- **"Product names stay en_US"** means the recipe ships no vocabulary for your chosen locale. Names
+  and addresses will still be local; the product titles come from English.
+- **A red note** means the recipe would build a store that misrepresents itself — usually a download
+  that did not finish. **Create the store** is disabled until it is resolved.
+
+If more than one store is active and none is chosen, the button is disabled and says so: StoreSeeder
+will not guess which store to write nine resources into.
+
+### While it runs
+
+Resources run in dependency order — brands and categories before products, products and customers
+before orders — because an order needs something to point at. The step counter is real: it counts
+completed requests, not an animation. You can leave the page and come back to a build still going.
+
+### Afterwards
+
+The result panel names what it made and links each count to that resource's admin screen, so you can
+go and look at the products you just created.
+
+**Undo this recipe** removes exactly what that run wrote and nothing else — every row carries a run
+id in the ledger. From the command line the same run id works:
+
+```bash
+wp storeseeder cleanup --run_id=rcp_grocery_ab12cd
+```
+
+### From WP-CLI
+
+```bash
+wp storeseeder recipe list
+wp storeseeder recipe run grocery
+wp storeseeder recipe run fashion --size=small --platform=woocommerce
+```
+
+The command runs the same ordered plan through the same endpoints as the admin, and prints the run id
+to undo with.
+
 ## Running a generator
 
 Common controls, on every generator:

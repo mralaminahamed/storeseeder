@@ -5,9 +5,9 @@
 # StoreSeeder
 
 **Realistic test data for WordPress e-commerce platforms.**
-21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
+Whole shops from a recipe, 21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
 [![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
 [![Tested up to 7.0](https://img.shields.io/badge/tested%20up%20to-7.0-blue?style=flat-square)](readme.txt)
 [![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-8892BF?style=flat-square)](https://php.net/)
@@ -23,9 +23,13 @@
 
 ## What It Does
 
-Pick a generator, configure its parameters, click **Generate**. Every record is created through the
-target platform's own models, so it respects the same schema, relationships, validation, and money
-handling as real data — and stays compatible across that platform's updates.
+Pick a **recipe** and click once for a whole coherent shop — a corner grocer, a fashion boutique, a
+home & garden store — filled across nine resources in dependency order. Or pick a single generator,
+configure its parameters, and click **Generate**.
+
+Either way, every record is created through the target platform's own models, so it respects the same
+schema, relationships, validation, and money handling as real data — and stays compatible across that
+platform's updates.
 
 Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
 that, and the same twenty-one generators feed every driver. Fluent Cart and WooCommerce ship today.
