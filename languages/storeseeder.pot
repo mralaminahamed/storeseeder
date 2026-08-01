@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T09:34:48+00:00\n"
+"POT-Creation-Date: 2026-08-01T09:37:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -97,31 +97,31 @@ msgstr ""
 msgid "No target platform to search. Choose one first."
 msgstr ""
 
-#: class-storeseeder.php:1705
+#: class-storeseeder.php:1717
 msgid "Recipes are downloaded from GitHub, which needs an administrator to accept the prompt on the Settings screen first."
 msgstr ""
 
-#: class-storeseeder.php:1715
+#: class-storeseeder.php:1727
 msgid "Could not download the recipes. Check that the site can reach github.com."
 msgstr ""
 
-#: class-storeseeder.php:1726
+#: class-storeseeder.php:1738
 msgid "The recipe archive downloaded but holds no index. It may be a fork without a recipes.json."
 msgstr ""
 
 #. translators: %s: comma-separated list of supported e-commerce platforms.
-#: class-storeseeder.php:1965
+#: class-storeseeder.php:1977
 #, php-format
 msgid "StoreSeeder needs a supported e-commerce platform to seed. Install and activate one of: %s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: class-storeseeder.php:1985
+#: class-storeseeder.php:1997
 #, php-format
 msgid "StoreSeeder MCP server: the %1$smcp-adapter%2$s plugin is not installed. Install it to let AI clients (Claude Desktop, VS Code Copilot, and similar) run the generators."
 msgstr ""
 
-#: class-storeseeder.php:2063
+#: class-storeseeder.php:2075
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -3424,6 +3424,10 @@ msgstr ""
 
 #: build/admin-app.js:15
 msgid "Large"
+msgstr ""
+
+#: build/admin-app.js:15
+msgid "From a plugin"
 msgstr ""
 
 #. translators: %s: locale code, e.g. en_US.

@@ -27,6 +27,7 @@ function recipe(plan: RecipeStep[], over: Partial<Recipe> = {}): Recipe {
     locales: ["en_US"],
     plan,
     icon_uri: "",
+    bundled: true,
     locale_shipped: true,
     fallback_locale: "en_US",
     issues: [],
