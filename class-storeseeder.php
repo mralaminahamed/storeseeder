@@ -22,8 +22,10 @@ use StoreSeeder\MCP\MCP_Server;
 use StoreSeeder\MCP\Settings as MCP_Settings;
 use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Platform_Driver;
+use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver as Platform_Resolver;
+use StoreSeeder\Platforms\Resource;
 use StoreSeeder\Rest\Registry as Rest_Registry;
 
 /**
@@ -675,6 +677,52 @@ class StoreSeeder {
 		);
 
 		// Register the platform endpoints.
+		// Existing records in the target store, for the admin's entity pickers. Read-only, and
+		// behind the same gate as everything else: it names customers and products, which is not
+		// something to hand to a logged-in subscriber.
+		register_rest_route(
+			'storeseeder/v1',
+			'/lookup',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_lookup' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'resource' => array(
+						'description'       => __( 'Which kind of record to look for.', 'storeseeder' ),
+						'type'              => 'string',
+						'required'          => true,
+						'enum'              => array( Resource::PRODUCT, Resource::CUSTOMER ),
+						'sanitize_callback' => 'sanitize_key',
+						// Explicit: WordPress does not apply schema validation to hand-written
+						// `args` on its own, so without this the enum is decoration and an
+						// unsupported resource answers 200 with an empty list instead of 400.
+						'validate_callback' => 'rest_validate_request_arg',
+					),
+					'search'   => array(
+						'description'       => __( 'What the user typed. Empty returns the first few.', 'storeseeder' ),
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'platform' => array(
+						'description'       => __( 'Which platform to read. Defaults to the resolved target.', 'storeseeder' ),
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+					),
+					'limit'    => array(
+						'description'       => __( 'Maximum results.', 'storeseeder' ),
+						'type'              => 'integer',
+						'default'           => 20,
+						'minimum'           => 1,
+						'maximum'           => 50,
+						'sanitize_callback' => 'absint',
+						'validate_callback' => 'rest_validate_request_arg',
+					),
+				),
+			)
+		);
+
 		register_rest_route(
 			'storeseeder/v1',
 			'/platforms',
@@ -1002,6 +1050,55 @@ class StoreSeeder {
 	 *
 	 * @return WP_REST_Response
 	 */
+	/**
+	 * Existing records in the target store, for an admin control that has to name one.
+	 *
+	 * `customer_id` and `product_id` are foreign keys, and the admin used to render them as a
+	 * number box — answerable only by someone who already knew the id. This is what the picker
+	 * reads.
+	 *
+	 * Only the resolved platform is searched. A driver that cannot search returns nothing, which
+	 * the picker shows as "no suggestions" while still accepting a typed id.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function rest_lookup( WP_REST_Request $request ) {
+		$requested = (string) $request->get_param( 'platform' );
+		$platform  = '' !== $requested
+			? $this->platforms()->get( $requested )
+			: $this->platform_resolver()->resolve();
+
+		if ( ! $platform instanceof Platform_Interface ) {
+			return new WP_Error(
+				'storeseeder_platform_required',
+				__( 'No target platform to search. Choose one first.', 'storeseeder' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		// `search()` lives on the abstract rather than the interface, so a third-party driver
+		// written against the interface keeps loading. One that has not implemented it simply
+		// offers nothing.
+		if ( ! $platform instanceof Platform_Driver ) {
+			return new WP_REST_Response( array( 'results' => array() ) );
+		}
+
+		return new WP_REST_Response(
+			array(
+				'platform' => $platform->id(),
+				'results'  => $platform->search(
+					(string) $request->get_param( 'resource' ),
+					(string) $request->get_param( 'search' ),
+					(int) $request->get_param( 'limit' )
+				),
+			)
+		);
+	}
+
 	public function rest_platforms(): WP_REST_Response {
 		$registry = $this->platforms();
 		$resolver = $this->platform_resolver();

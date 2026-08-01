@@ -357,6 +357,22 @@
    base rule rather than two fixed columns leaving whitespace on a wide monitor. */
 @media (min-width:1441px){ .fp-root .fp-gen-wrap{ grid-template-columns:minmax(460px,620px) 1fr; } }
 
+/* ===== entity picker ===== */
+/* A search box that resolves a name to an id. The list is positioned rather than a portal: it sits
+   inside a scrolling config column, and an overlay would detach from the field on scroll. */
+.fp-root .fp-entity { position:relative; }
+.fp-root .fp-entity-input { position:relative; display:flex; align-items:center; gap:8px; }
+.fp-root .fp-entity-input > svg { position:absolute; left:10px; color:var(--text-3); pointer-events:none; }
+.fp-root .fp-entity-input .fp-input { width:100%; padding-left:30px; padding-right:30px; }
+.fp-root .fp-entity-clear { position:absolute; right:6px; display:grid; place-items:center; width:20px; height:20px; border:0; border-radius:var(--r-sm); background:transparent; color:var(--text-3); cursor:pointer; }
+.fp-root .fp-entity-clear:hover { background:var(--surface-2); color:var(--text); }
+.fp-root .fp-entity-list { position:absolute; z-index:30; top:calc(100% + 4px); left:0; right:0; max-height:240px; overflow-y:auto; padding:5px; border:1px solid var(--border); border-radius:var(--r-md); background:var(--surface); box-shadow:var(--shadow-lg); }
+.fp-root .fp-entity-item { display:block; width:100%; text-align:left; padding:calc(var(--pad-row-y) - 2px) 9px; border:0; border-radius:var(--r-sm); background:transparent; color:var(--text); font-size:var(--fs-ctl); cursor:pointer; }
+.fp-root .fp-entity-item:hover { background:var(--surface-2); }
+.fp-root .fp-entity-item.on { background:var(--accent-soft); color:var(--accent); }
+.fp-root .fp-entity-note { padding:calc(var(--pad-row-y) - 2px) 9px; color:var(--text-3); font-size:var(--fs-sm); }
+.fp-root .fp-entity-hint { margin-top:5px; color:var(--text-3); font-size:var(--fs-sm); }
+
 /* ===== settings ===== */
 .fp-root .fp-settings-col { max-width:680px; }
 

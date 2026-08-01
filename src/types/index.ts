@@ -141,6 +141,11 @@ export interface ParameterConfig {
   properties?: Record<string, ParameterConfig>;
   dependsOn?: Record<string, unknown>;
   format?: string;
+  /**
+   * Marks an id field as a foreign key into the target store, so the admin can offer a searchable
+   * list instead of a number box. The value sent is still the id.
+   */
+  entity?: "product" | "customer";
 }
 
 export interface Generator {

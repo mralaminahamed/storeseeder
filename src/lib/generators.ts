@@ -225,6 +225,7 @@ export const generators: Generator[] = [
       customer_id: {
         description: __("Attach every order to this customer, to give one account an order history", "storeseeder"),
         type: "integer",
+        entity: "customer",
         minimum: 1,
         dependsOn: { include_customer: true },
       },
@@ -396,6 +397,7 @@ export const generators: Generator[] = [
       product_id: {
         description: __("Attach every variation to this product, to build out one option matrix", "storeseeder"),
         type: "integer",
+        entity: "product",
         minimum: 1,
       },
       exclude_product_ids: {
@@ -574,6 +576,7 @@ export const generators: Generator[] = [
       customer_id: {
         description: __("Only draw parent orders belonging to this customer", "storeseeder"),
         type: "integer",
+        entity: "customer",
         minimum: 1,
       },
       order_status_filter: {
@@ -603,6 +606,7 @@ export const generators: Generator[] = [
       customer_id: {
         description: __("Attach every cart to this customer", "storeseeder"),
         type: "integer",
+        entity: "customer",
         minimum: 1,
       },
       guest_cart_ratio: {

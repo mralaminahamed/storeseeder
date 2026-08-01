@@ -8,7 +8,11 @@ export type FieldType =
   | "range"
   | "select"
   | "number"
-  | "text";
+  | "text"
+  | "entity";
+
+/** The kinds of record an `entity` field can point at. */
+export type EntityKind = "product" | "customer";
 
 export interface FieldDescriptor {
   /** Dot-path into the params object, e.g. "price_range" or "inventory.manage_stock" */
@@ -29,6 +33,8 @@ export interface FieldDescriptor {
   default?: unknown;
   /** If present the render layer should hide this field unless the condition is met */
   dependsOn?: Record<string, unknown>;
+  /** For `entity` fields: which kind of record the id points at. */
+  entity?: EntityKind;
 }
 
 export interface FieldSection {
@@ -50,6 +56,23 @@ export function humanize(key: string): string {
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+/**
+ * The caption for one schema node.
+ *
+ * An entity field loses the `_id` suffix: the control names a record rather than asking for a
+ * number, so "Customer" is what is being chosen and the id is the field's own business.
+ *
+ * Used for the section heading as well as the field, because ConfigColumn hides a caption that
+ * merely repeats its section — and it can only tell when the two strings match.
+ */
+function labelForKey(key: string, config: ParameterConfig): string {
+  if (config.title) return config.title;
+
+  const leaf = key.split(".").pop() ?? key;
+
+  return humanize(config.entity ? leaf.replace(/_ids?$/, "") : leaf);
 }
 
 /**
@@ -129,8 +152,7 @@ export function optionLabel(value: string): string {
     .split("_")
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
+    .join(" ");}
 
 /**
  * A schema `default` is untyped JSON, so a numeric bound has to be checked before
@@ -202,7 +224,7 @@ function descriptorFromNode(
   config: ParameterConfig,
   section: string,
 ): FieldDescriptor | FieldDescriptor[] {
-  const label = config.title ?? humanize(key.split(".").pop()!);
+  const label = labelForKey(key, config);
 
   // ── string + enum → select ─────────────────────────────────────────────
   if (config.type === "string" && config.enum) {
@@ -275,6 +297,21 @@ function descriptorFromNode(
     };
   }
 
+  // ── integer + entity → searchable picker ──────────────────────────────
+  // Before the type existed these rendered as a number box, so choosing a customer meant knowing
+  // their id. The value is still the id; only the way it is chosen changes.
+  if (config.type === "integer" && config.entity) {
+    return {
+      key,
+      type: "entity",
+      label,
+      section,
+      entity: config.entity,
+      default: config.default,
+      ...(config.dependsOn ? { dependsOn: config.dependsOn } : {}),
+    };
+  }
+
   // ── integer / number (no enum) → number ───────────────────────────────
   if (config.type === "integer" || config.type === "number") {
     return {
@@ -334,8 +371,9 @@ export function fieldsFromSchema(
   };
 
   for (const [key, nodeConfig] of Object.entries(config)) {
-    // Section for top-level entry: use title or humanize the key
-    const topSection = nodeConfig.title ?? humanize(key);
+    // Section for a top-level entry. Same rule as the field's own caption, so the two match for a
+    // single-field section and ConfigColumn can drop the repeat.
+    const topSection = labelForKey(key, nodeConfig);
 
     const result = descriptorFromNode(key, nodeConfig, topSection);
 
