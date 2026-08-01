@@ -31,6 +31,9 @@ storeseeder/
 │   │   ├── Settings.php         #   the three switches: AI surface, preview, generate
 │   │   ├── Ability.php          #   abstract base: dispatches through the REST API
 │   │   └── Abilities/           #   21 self-describing abilities, one per resource
+│   ├── Recipes/                 # What a whole shop is made of
+│   │   ├── Recipe.php           #   one validated manifest
+│   │   └── Registry.php         #   owns storeseeder_recipes
 │   └── Platforms/               # Where data goes
 │       ├── Platform_Interface.php  # what a platform must answer
 │       ├── Platform_Driver.php     # abstract base for shipped drivers
@@ -314,6 +317,66 @@ the admin stuck behind an error it has no way to clear.
 The target is a site option, not a browser preference, so two administrators cannot
 unknowingly seed different platforms.
 
+## 🧺 Recipes
+
+A **recipe** is a vocabulary, not a dataset. StoreSeeder could always generate any volume; what it
+could not do was make two hundred products that look like one business. A recipe supplies the words
+and the numeric bands that do — a grocer, a boutique — and the generators build every row from them.
+
+Shipping records instead would bypass the generator layer, and that layer is where every invariant
+lives: minor units, canonical statuses, no platform names in an entity, fixed-seed reproducibility.
+A vocabulary pack needs none of it re-implemented, and every existing parameter keeps working on
+top of one.
+
+### Where they live, and why not here
+
+`wp-content/uploads/storeseeder-recipes/`, downloaded from
+[storeseeder-recipes](https://github.com/mralaminahamed/storeseeder-recipes) after the same consent
+prompt the sample data uses. Not bundled: content and code move at different speeds — a typo in the
+grocer's category list should not need a release — and recipes × locales is exactly the growth that
+should never be in a wp.org zip.
+
+The cost is honest and worth stating: nothing works until an administrator accepts and fetches. A
+recipe running on the default vocabulary would name grocery products after consumer electronics and
+price them like groceries, so the page gates on the download rather than offering cards that lie.
+
+### The run is client-side, ordered, and chunked
+
+`Controller::get_generation_params()` caps `count` at 100, so a 900-order step is nine calls. That
+is a feature twice over: one PHP request writing 5,000 rows times out, and chunking makes progress
+real rather than animated.
+
+The order is the manifest's, and it is a dependency order. Brands and categories before products,
+products and customers before orders — fan out and you get orders with no line items.
+
+### An audit, because every failure here is quiet
+
+A manifest is a set of claims. `Registry::audit()` checks them against the files beside them,
+because each way they can be wrong produces *data* rather than an error:
+
+| What | Effect if unsaid |
+|---|---|
+| No vocabulary at all | A "grocery" store full of consumer electronics. Blocking |
+| A locale claimed but not shipped | The card says translated, the run serves English |
+| A planned resource with no words | The shop is right, its categories are generic |
+
+Only the first refuses to run. The others are reported, because a recipe with generic categories is
+still more useful than no recipe, and deciding otherwise for the user would be deciding something
+they can see.
+
+### Undo is one action
+
+Every row a recipe writes carries a `run_id` in the ledger — set once per request in the controller
+rather than threaded through eighteen writers, since `Generator::write_entity()` is the only place
+that records. `Purge::run()` takes the same id, so undoing a recipe is one button instead of nine.
+
+### Marks are untrusted
+
+A recipe may ship an `icon.svg`, and a site may have repointed the archive at a fork, so it is
+third-party markup rendering in wp-admin. It is filtered against a shape-only allowlist *and*
+rendered inside an `<img>`, which is a passive context. Either alone has a bad failure mode; both
+together mean a bypass of the filter still cannot run script.
+
 ## 🎨 Design patterns in use
 
 ### Abstract base classes
@@ -416,6 +479,9 @@ administrator). Both are written through REST rather than read from the admin di
 | `storeseeder_mcp_ability_definition` | filter | Amend one ability's definition — label, description, input schema, callbacks — without replacing the class |
 | `storeseeder_admin_payload` | filter | Add to the data inlined as `window.storeseederApi`, so a driver's own configuration is there on first paint |
 | `storeseeder_sample_data_source` | filter | Where sample data is downloaded from. Change `repo_url` and `zip_url` together: the first is what the consent prompt shows |
+| `storeseeder_recipes` | filter | Register a store recipe from your own plugin. Append a manifest array; a malformed one is dropped with a debug line rather than thrown |
+| `storeseeder_recipe_directories` | filter | Where one recipe's vocabulary lives, keyed by id. The other half of `storeseeder_recipes`, which registers the manifest but not the words |
+| `storeseeder_recipes_source` | filter | Where the recipe archive is downloaded from. Change both URLs, for the same reason as the sample data |
 | `storeseeder_rest_message` / `storeseeder_rest_response` | filter | Shape the REST response |
 | `storeseeder_{resource}_generation_result` | filter | Per-resource result payload |
 
@@ -436,6 +502,7 @@ const router = createHashRouter([
     element: <RootLayout />,
     children: [
       { index: true,             element: <HomePage />      },
+      { path: 'recipes',         element: <RecipesPage />   },
       { path: 'generator/:type', element: <GeneratorPage /> },
       { path: 'settings',        element: <SettingsPage />  },
       { path: 'plugins',         element: <PluginsPage />   },

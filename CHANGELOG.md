@@ -7,6 +7,49 @@ the WordPress plugin directory format, and links back here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-08-01
+
+### Added
+
+- **Recipes.** A new page below Overview builds a whole shop in one click — a corner grocer, a
+  fashion boutique, a home & garden store — rather than a resource at a time. StoreSeeder could
+  already generate any volume; what it could not do was make two hundred products that look like
+  one business. A recipe is the *vocabulary* that fixes that: product names, a category tree, brand
+  names, tag labels, a price band and variation axes, applied across nine resources in dependency
+  order. It is words and numbers, never records, so every generator invariant still holds and every
+  existing parameter still works on top of one.
+- **Three recipes ship**, from
+  [storeseeder-recipes](https://github.com/mralaminahamed/storeseeder-recipes), downloaded once
+  behind the consent prompt that already governs the sample data. A separate repository so that
+  adding a shop type — or translating one — needs no plugin release.
+- **`storeseeder_recipes`** registers a recipe from your own plugin with no download at all, and
+  **`storeseeder_recipe_directories`** says where its words live. `storeseeder_recipes_source`
+  repoints the archive at a fork.
+- **`wp storeseeder recipe list` and `wp storeseeder recipe run <id>`**, running the same ordered
+  plan through the same endpoints as the admin.
+- **Undo a whole recipe.** Every row a run writes carries a run id in the ledger, so removing one
+  is a single button rather than nine separate purges. `wp storeseeder cleanup --run_id=` does the
+  same from the command line.
+
+### Fixed
+
+- **Seventy-two of seventy-three locales were generating "Widget" and "Gadget".**
+  `Generator::get_sample_data_path()` built one path and stopped, so any locale without a sample
+  data file fell through to the inline literals each generator carried, with a `WP_DEBUG_LOG`
+  warning as the only sign. Vocabulary now falls back to `en_US` — and when a recipe advertises a
+  locale it does not actually ship, the admin says so *before* the run instead of quietly serving
+  English.
+- Categories, tags and brand names were hardcoded constants and could not vary by shop type. They
+  read from vocabulary now, with the constants kept as the offline fallback.
+
+### Changed
+
+- The dashboard's four stat tiles match the generator tiles: same size, radius and accent. The
+  per-card hues implied a distinction the data does not have, and the inline tint had no
+  dark-theme step, so the tiles came out visibly washed out beside the generator grid.
+- "Fake data" is "test data" throughout — in the docs, the npm keywords, and the permission error a
+  user actually reads. Fake means counterfeit; these are real rows in real tables.
+
 ## [1.1.0] - 2026-08-01
 
 ### Added

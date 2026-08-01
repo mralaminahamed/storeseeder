@@ -43,12 +43,13 @@ final class Purge {
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param string $only  Canonical resource to limit to, or '' for every resource.
-	 * @param int    $limit Maximum rows to delete in this call.
+	 * @param string $only   Canonical resource to limit to, or '' for every resource.
+	 * @param int    $limit  Maximum rows to delete in this call.
+	 * @param string $run_id Limit to one recipe run, or '' for every recorded row.
 	 *
 	 * @return array{deleted: int, remaining: int, by_resource: array<string, int>, errors: array<int, string>}
 	 */
-	public static function run( string $only = '', int $limit = self::BATCH ): array {
+	public static function run( string $only = '', int $limit = self::BATCH, string $run_id = '' ): array {
 		$limit     = max( 1, $limit );
 		$deleted   = 0;
 		$by_scope  = array();
@@ -75,7 +76,7 @@ final class Purge {
 					break 2;
 				}
 
-				$batch = Ledger::batch( $platform_id, $resource_type, $limit - $deleted );
+				$batch = Ledger::batch( $platform_id, $resource_type, $limit - $deleted, $run_id );
 
 				if ( array() === $batch ) {
 					continue;
@@ -124,7 +125,7 @@ final class Purge {
 
 		return array(
 			'deleted'     => $deleted,
-			'remaining'   => self::remaining( $only ),
+			'remaining'   => '' === $run_id ? self::remaining( $only ) : Ledger::count_for_run( $run_id ),
 			'by_resource' => $by_scope,
 			'errors'      => $errors,
 		);

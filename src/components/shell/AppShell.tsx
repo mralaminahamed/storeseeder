@@ -31,6 +31,7 @@ function getNavCollapsedInit(): boolean {
 
 function deriveCrumb(pathname: string): string {
   if (pathname === "/") return "Overview";
+  if (pathname === "/recipes") return "Recipes";
   if (pathname === "/settings") return "Settings";
   if (pathname === "/plugins") return "Our Plugins";
   if (pathname.startsWith("/generator/")) {

@@ -78,6 +78,7 @@ final class Registry {
 			Commands\Preview::class,
 			Commands\Platforms::class,
 			Commands\Locales::class,
+			Commands\Recipe::class,
 			Commands\Sample_Data::class,
 			Commands\Cleanup::class,
 		);

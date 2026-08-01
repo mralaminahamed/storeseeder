@@ -108,6 +108,32 @@ class Product_Category extends Generator {
 	}
 
 	/**
+	 * Top-level category names, from the recipe's vocabulary or the shipped default.
+	 *
+	 * A grocer's departments are not a boutique's, and a recipe that renamed the products but left
+	 * "Electronics" and "Home & Kitchen" above them would be a half-recipe — the thing the
+	 * completeness bar exists to refuse.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string[]
+	 */
+	protected function departments(): array {
+		return $this->vocabulary( 'product_categories', 'departments', self::DEPARTMENTS );
+	}
+
+	/**
+	 * Child category names, from the recipe's vocabulary or the shipped default.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string[]
+	 */
+	protected function subsections(): array {
+		return $this->vocabulary( 'product_categories', 'subsections', self::SUBSECTIONS );
+	}
+
+	/**
 	 * Build a canonical product category
 	 *
 	 * @since 1.1.0
@@ -116,9 +142,9 @@ class Product_Category extends Generator {
 	 */
 	protected function build_entity() {
 		$nested = $this->get_faker()->boolean( $this->nested_ratio() );
-		$name   = $nested
-			? $this->get_faker()->randomElement( self::SUBSECTIONS )
-			: $this->get_faker()->randomElement( self::DEPARTMENTS );
+		$name   = $this->get_faker()->randomElement(
+			$nested ? $this->subsections() : $this->departments()
+		);
 
 		return array(
 			'name'        => $name,
@@ -173,8 +199,8 @@ class Product_Category extends Generator {
 		$faker  = $this->get_faker();
 		$nested = $faker->boolean( $this->nested_ratio() );
 		$name   = $nested
-			? $faker->randomElement( self::SUBSECTIONS )
-			: $faker->randomElement( self::DEPARTMENTS );
+			? $faker->randomElement( $this->subsections() )
+			: $faker->randomElement( $this->departments() );
 
 		return array(
 			'name'     => array(

@@ -14,6 +14,7 @@ namespace StoreSeeder\Rest;
 
 use StoreSeeder\Access;
 use StoreSeeder\Generation\Generator;
+use StoreSeeder\Generation\Ledger;
 use StoreSeeder\Platforms\Capability;
 use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Platform_Driver;
@@ -21,6 +22,7 @@ use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver;
 use StoreSeeder\Platforms\Resource;
+use StoreSeeder\Recipes\Registry as Recipe_Registry;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -229,7 +231,7 @@ abstract class Controller extends WP_REST_Controller {
 	 */
 	public function preview_items( WP_REST_Request $request ) {
 		$generator = $this->get_generator_instance();
-		$params    = $request->get_params();
+		$params    = $this->apply_recipe_params( $request->get_params() );
 
 		$generator->set_locale( $this->resolve_locale( $params, $generator ) );
 		$generator->set_faker();
@@ -238,6 +240,45 @@ abstract class Controller extends WP_REST_Controller {
 		$count = isset( $params['count'] ) ? (int) $params['count'] : 10;
 
 		return rest_ensure_response( $this->name_pinned_entities( $generator->preview( $count ), $params ) );
+	}
+
+	/**
+	 * Fold a recipe's parameters in under the request's own.
+	 *
+	 * A recipe is a vocabulary, but a vocabulary alone is a half-recipe: grocery product names at
+	 * $9.99–$999.99 in Size/Color is not a grocery store. So a manifest also carries ordinary
+	 * generation parameters — `price_range`, `variation_types` — and they arrive here.
+	 *
+	 * Ordinary is the point. There is no new mechanism to honour, no fourth surface to keep in
+	 * step: the recipe sets its price band the same way a caller does, through a parameter the
+	 * generator already reads.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param array<string, mixed> $params Request parameters.
+	 *
+	 * @return array<string, mixed> Parameters with the recipe's defaults filled in.
+	 */
+	protected function apply_recipe_params( array $params ): array {
+		$requested = isset( $params['recipe'] ) ? (string) $params['recipe'] : '';
+
+		if ( '' === $requested ) {
+			return $params;
+		}
+
+		$recipe = Recipe_Registry::instance()->get( $requested );
+
+		// An unknown recipe is not an error. The id also reaches `Generator::sample_data_recipe()`,
+		// which discards it the same way, so the run produces default-vocabulary data rather than
+		// failing — a stale saved configuration should not become an unusable one.
+		if ( null === $recipe ) {
+			return $params;
+		}
+
+		// Union, not array_merge: the request wins. A recipe proposes a price band; a caller who
+		// set one meant it, and silently overriding them would make the parameter they declared
+		// stop changing the output — the exact defect the parameter campaign existed to remove.
+		return $params + $recipe->params_for( $this->get_resource_type() );
 	}
 
 	/**
@@ -387,7 +428,7 @@ abstract class Controller extends WP_REST_Controller {
 		}
 
 		// Pass all request parameters to the generator.
-		$params    = $request->get_params();
+		$params    = $this->apply_recipe_params( $request->get_params() );
 		$generator = $this->get_generator_instance();
 
 		// Which store the rows land in is a property of the request, not of the
@@ -406,7 +447,16 @@ abstract class Controller extends WP_REST_Controller {
 		$generator->set_faker();
 		$generator->set_generation_params( $params );
 
+		// Tag the ledger rows this request writes. Set here rather than passed down because
+		// `Generator::write_entity()` is the single place that records, and threading an argument
+		// through eighteen writers would be eighteen chances to drop it.
+		Ledger::set_run( isset( $params['recipe_run'] ) ? (string) $params['recipe_run'] : '' );
+
 		$result = $generator->generate( (int) $count );
+
+		// Cleared immediately: the static outlives the request under WP-CLI and in tests, and a
+		// leaked run id would quietly file unrelated rows under a recipe someone could then undo.
+		Ledger::set_run( '' );
 
 		if ( is_wp_error( $result ) ) {
 			$generator->log( 'Generation failed: ' . $result->get_error_message(), 'error', $params );
@@ -663,6 +713,24 @@ abstract class Controller extends WP_REST_Controller {
 				'type'              => 'integer',
 				'minimum'           => 1,
 				'sanitize_callback' => 'absint',
+			),
+			'recipe'        => array(
+				// Not enumerated, for the same reason `platform` is not: the registry is
+				// filterable, so an enum here would reject a valid third-party recipe. An
+				// unregistered id is ignored rather than rejected — a recipe is a preference
+				// for a vocabulary, and a run that cannot find it should still produce data.
+				'description'       => __( 'Store recipe whose vocabulary this run should use, e.g. grocery. Falls back to the default vocabulary when unknown.', 'storeseeder' ),
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_key',
+			),
+			'recipe_run'    => array(
+				// Stamped on every ledger row the run writes, so undoing a whole recipe is one
+				// action rather than one purge per resource. Opaque to the server: the client
+				// mints it, because a recipe is many requests and only the client knows they
+				// belong together.
+				'description'       => __( 'Groups the rows written by one recipe run so they can be removed together.', 'storeseeder' ),
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_key',
 			),
 			'platform'      => array(
 				// Not enumerated: the set of drivers is extensible through the

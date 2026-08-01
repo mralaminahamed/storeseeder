@@ -70,7 +70,11 @@ export function getStats(type: string): number {
 
 export function incrementStats(type: string, count: number): void {
   try {
-    localStorage.setItem(`ec_fp_stats_${type}`, String(getStats(type) + count));
+    // Floored: a negative count is how a recipe undo takes its rows back, and a counter that
+    // drifted high once would otherwise render "-40 products" forever after.
+    const next = Math.max(0, getStats(type) + count);
+
+    localStorage.setItem(`ec_fp_stats_${type}`, String(next));
   } catch {
     // ignore write failures
   }

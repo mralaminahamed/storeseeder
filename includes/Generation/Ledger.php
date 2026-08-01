@@ -39,7 +39,7 @@ final class Ledger {
 	 * @since 1.1.0
 	 * @var string
 	 */
-	const DB_VERSION = '1';
+	const DB_VERSION = '2';
 
 	/**
 	 * Option holding the installed schema version.
@@ -48,6 +48,47 @@ final class Ledger {
 	 * @var string
 	 */
 	const DB_VERSION_OPTION = 'storeseeder_ledger_db_version';
+
+	/**
+	 * The run every subsequent record() belongs to, or '' for none.
+	 *
+	 * Ambient rather than a parameter on `record()`, and deliberately: a recipe is many requests
+	 * across nine resources, and threading an id from the controller down through eighteen writers
+	 * would mean eighteen chances to forget it. `Generator::write_entity()` already calls
+	 * `record()` in exactly one place, so one static set at the top of the request reaches every
+	 * row that request writes.
+	 *
+	 * Rows written outside a recipe keep '' — which is also every row written before this column
+	 * existed, so a purge that ignores the field keeps working on them unchanged.
+	 *
+	 * @since 1.2.0
+	 * @var string
+	 */
+	private static $run_id = '';
+
+	/**
+	 * Tag every subsequent record() with a run.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $run_id Opaque run identifier, or '' to stop tagging.
+	 *
+	 * @return void
+	 */
+	public static function set_run( string $run_id ): void {
+		self::$run_id = sanitize_key( $run_id );
+	}
+
+	/**
+	 * The run subsequent rows will be tagged with.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string
+	 */
+	public static function current_run(): string {
+		return self::$run_id;
+	}
 
 	/**
 	 * The prefixed table name.
@@ -89,10 +130,12 @@ final class Ledger {
 				platform varchar(50) NOT NULL DEFAULT '',
 				resource varchar(50) NOT NULL DEFAULT '',
 				object_id varchar(191) NOT NULL DEFAULT '',
+				run_id varchar(64) NOT NULL DEFAULT '',
 				created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 				PRIMARY KEY  (id),
 				KEY platform_resource (platform, resource),
-				KEY object (object_id)
+				KEY object (object_id),
+				KEY run (run_id)
 			) {$collate};"
 		);
 
@@ -145,12 +188,35 @@ final class Ledger {
 				'platform'   => $platform,
 				'resource'   => $resource_type,
 				'object_id'  => $object_id,
+				'run_id'     => self::$run_id,
 				'created_at' => current_time( 'mysql', true ),
 			),
-			array( '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		return false !== $written;
+	}
+
+	/**
+	 * How many rows one recipe run wrote and has not had removed.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $run_id Run identifier.
+	 *
+	 * @return int
+	 */
+	public static function count_for_run( string $run_id ): int {
+		global $wpdb;
+
+		if ( '' === $run_id ) {
+			return 0;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var(
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE run_id = %s', self::table(), $run_id )
+		);
 	}
 
 	/**
@@ -234,25 +300,41 @@ final class Ledger {
 	 * @param string $platform      Platform id.
 	 * @param string $resource_type Canonical resource name.
 	 * @param int    $limit         How many rows to return.
+	 * @param string $run_id        Limit to one recipe run, or '' for every row.
 	 *
 	 * @return array<int, array{id: int, object_id: string}>
 	 */
-	public static function batch( string $platform, string $resource_type, int $limit = 100 ): array {
+	public static function batch( string $platform, string $resource_type, int $limit = 100, string $run_id = '' ): array {
 		global $wpdb;
 
 		$limit = max( 1, $limit );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT id, object_id FROM %i WHERE platform = %s AND resource = %s ORDER BY id DESC LIMIT %d',
-				self::table(),
-				$platform,
-				$resource_type,
-				$limit
-			),
-			ARRAY_A
-		);
+		if ( '' === $run_id ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, object_id FROM %i WHERE platform = %s AND resource = %s ORDER BY id DESC LIMIT %d',
+					self::table(),
+					$platform,
+					$resource_type,
+					$limit
+				),
+				ARRAY_A
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, object_id FROM %i WHERE platform = %s AND resource = %s AND run_id = %s ORDER BY id DESC LIMIT %d',
+					self::table(),
+					$platform,
+					$resource_type,
+					$run_id,
+					$limit
+				),
+				ARRAY_A
+			);
+		}
 
 		return array_map(
 			static function ( array $row ): array {

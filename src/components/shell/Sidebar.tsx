@@ -37,9 +37,15 @@ interface NavItemProps {
    * and a nav item that refuses to respond reads as broken.
    */
   unavailable?: string;
+  /**
+   * A short word shown where the count usually sits — "New" while a feature is still
+   * being discovered. Distinct from `count` because it is a label, not a number, and the
+   * two must never appear together and fight for the same space.
+   */
+  badge?: string;
 }
 
-function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable }: NavItemProps) {
+function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable, badge }: NavItemProps) {
   const navigate = useNavigate();
 
   return (
@@ -52,7 +58,8 @@ function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable 
     >
       <Icon name={ic} size={17} className="fp-nav-ic" stroke={1.7} />
       <span className="fp-nav-text">{label}</span>
-      {"number" === typeof count && count > 0 && (
+      {badge && !collapsed && <span className="fp-nav-badge">{badge}</span>}
+      {!badge && "number" === typeof count && count > 0 && (
         <span className="fp-nav-count tnum">{count}</span>
       )}
     </button>
@@ -141,6 +148,20 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
           active={pathname === "/"}
           collapsed={collapsed}
           testId="nav-overview"
+        />
+
+        {/* Below Overview and above the generators, because it is the other way in: one click
+            for a whole shop, or a generator at a time. The badge is not decoration — this is a
+            new second entry point into a plugin whose users know the generator list, and nothing
+            else on the page says it arrived. */}
+        <NavItem
+          to="/recipes"
+          label="Recipes"
+          ic="store"
+          active={pathname === "/recipes"}
+          collapsed={collapsed}
+          testId="nav-recipes"
+          badge="New"
         />
 
         {/* Groups. Order and grouping come from lib/generators, which the dashboard grid

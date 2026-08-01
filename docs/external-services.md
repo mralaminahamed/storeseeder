@@ -12,6 +12,7 @@ This page is the full disclosure required by the
 | Service | Purpose | Triggered by | Optional |
 |---------|---------|--------------|----------|
 | [GitHub](#1-github--sample-data-repository) | Download locale sample data | Administrator accepting the consent prompt | Yes — generators fall back to built-in defaults |
+| [GitHub](#3-github--recipe-repository) | Download store recipes | Administrator accepting the same consent prompt, then choosing to download on the Recipes page | Yes — the rest of the plugin is unaffected |
 | [WordPress.org](#2-wordpressorg--plugin-directory-api) | List the author's other plugins | Administrator opening the **Our Plugins** page | Yes — the page is informational only |
 
 ## 1. GitHub — sample data repository
@@ -94,6 +95,39 @@ ratings and install counts. It is purely informational — nothing on that page 
 | **Terms of Service** | https://wordpress.org/about/ |
 | **Privacy Policy** | https://wordpress.org/about/privacy/ |
 
+## 3. GitHub — recipe repository
+
+A **recipe** is the vocabulary that makes every generator produce one coherent shop — a grocer, a
+boutique. It is words and price bands, never records; the plugin's own generators still build every
+row.
+
+Recipes live in a second repository so that adding a shop type, or translating one, does not need a
+plugin release. Gated by the **same consent record** as the sample data, and deliberately one record
+rather than two: an administrator who has agreed to an outbound request to GitHub for this plugin's
+content has answered the question, and asking twice for the same answer trains people to click
+through prompts.
+
+Unlike the sample data, this download never happens on its own. It starts only when someone presses
+the button on the Recipes page, because a recipe is a feature you opt into rather than a fallback
+the plugin needs.
+
+| | |
+|---|---|
+| **Service** | GitHub |
+| **Endpoint** | `https://github.com/mralaminahamed/storeseeder-recipes/archive/refs/heads/trunk.zip` |
+| **When the request happens** | Only on **Download the recipes** or **Sync** on the Recipes page, and only once consent is already on record. Never on activation, never on a schedule, never implicitly. |
+| **What is sent** | An unauthenticated HTTP GET. No site URL, no user data, no store data, no telemetry. GitHub logs the request the way it logs any download — the requesting IP and user agent. |
+| **What comes back** | A ZIP of about 90 KB: JSON word lists, one `recipe.json` per recipe, and an optional `icon.svg` each. Extracted to `wp-content/uploads/storeseeder-recipes/` and read locally thereafter. |
+| **If it fails** | The Recipes page says so and offers the button again. Nothing else in the plugin is affected. |
+| **Filter** | `storeseeder_recipes_source` — point it at a fork. Change both `repo_url` and `zip_url`: the first is what the consent prompt shows, so changing only the second would misrepresent what was agreed to. |
+
+The archive's `icon.svg` files are treated as untrusted markup regardless of where they came from —
+filtered server-side against a shape-only allowlist and rendered inside an `<img>`, which cannot
+execute script. A fork cannot inject anything into wp-admin through them.
+
+You do not need this repository at all: `storeseeder_recipes` registers a recipe from your own
+plugin, with no download involved.
+
 ## What StoreSeeder does not do
 
 - **No analytics, telemetry, or phoning home.** There is no usage reporting of any kind.
@@ -110,4 +144,6 @@ Generated content is fictional and does not represent real individuals or transa
 - [`readme.txt`](../readme.txt) — WordPress.org plugin directory metadata
 - [`SECURITY.md`](../SECURITY.md) — vulnerability reporting and the plugin's security measures
 - [Usage](usage.md) — the Settings page, including the sample data consent control
+- [storeseeder-recipes](https://github.com/mralaminahamed/storeseeder-recipes) — the recipe archive
+- [storeseeder-sample-data-fluent-cart](https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart) — the default vocabulary
 - [Architecture](architecture.md) — where the sample data loader sits in the generation flow

@@ -17,7 +17,9 @@ use Exception;
 use Faker\Factory;
 use Faker\Generator as Faker_Generator;
 use Faker\Provider\DateTime;
+use StoreSeeder\Platforms\Locale;
 use StoreSeeder\Platforms\Platform_Interface;
+use StoreSeeder\Recipes\Registry as Recipe_Registry;
 use WP_Error;
 use wpdb;
 
@@ -768,8 +770,8 @@ abstract class Generator {
 	/**
 	 * Get sample data file path for a specific resource and locale
 	 *
-	 * Constructs the file path for sample data JSON files based on resource type
-	 * and locale. Provides a standardized way to locate sample data files.
+	 * Returns the first candidate that exists, or — when none do — the most specific one, so a
+	 * caller that wants to report a miss still has a path to name.
 	 *
 	 * @since 1.0.0
 	 *
@@ -779,9 +781,133 @@ abstract class Generator {
 	 * @return string Full path to the sample data file.
 	 */
 	protected function get_sample_data_path( string $resource_type, string $filename ): string {
+		$candidates = $this->sample_data_candidates( $resource_type, $filename );
+
+		foreach ( $candidates as $candidate ) {
+			if ( file_exists( $candidate ) ) {
+				return $candidate;
+			}
+		}
+
+		return $candidates[0];
+	}
+
+	/**
+	 * Every place a sample data file could be, most specific first.
+	 *
+	 * Two axes, and they are deliberately ordered rather than merged. A recipe is a *vocabulary*
+	 * — the words that make one coherent shop — and it overrides only what it ships, so a fashion
+	 * recipe silently inherits postcode patterns it has no business redefining.
+	 *
+	 * The locale axis is the one that had a bug. This method used to build a single path and stop,
+	 * so a locale with no data file fell through `load_json_file()`'s null to whatever inline
+	 * literals the generator carried — every non-`en_US` store came out full of "Widget" and
+	 * "Gadget", with a `WP_DEBUG_LOG` line as the only signal. Seventy-two of the seventy-three
+	 * locales the admin offers. The same shape as the bug `Platforms\Locale` exists to prevent, and
+	 * the reason a translated recipe is a content problem rather than a code one now.
+	 *
+	 * Bundled data is searched before the downloaded archive: a recipe ships with the plugin and
+	 * needs no consent, while the remote repository is an optional extra that may never have been
+	 * fetched.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $resource_type The resource type (e.g., 'products', 'customers').
+	 * @param string $filename      The filename without extension.
+	 *
+	 * @return string[] Absolute paths, most specific first. Never empty.
+	 */
+	protected function sample_data_candidates( string $resource_type, string $filename ): array {
 		$locale     = $this->get_faker_locale();
 		$upload_dir = wp_upload_dir();
-		return $upload_dir['basedir'] . "/storeseeder-sample-data-fluent-cart/{$resource_type}/{$locale}/{$filename}.json";
+		$remote     = $upload_dir['basedir'] . '/storeseeder-sample-data-fluent-cart';
+		$bundled    = STORESEEDER_PLUGIN_PATH . 'data';
+
+		$locales = array_unique( array( $locale, Locale::DEFAULT_LOCALE ) );
+		$recipe  = $this->sample_data_recipe();
+
+		$candidates = array();
+
+		foreach ( $locales as $code ) {
+			if ( '' !== $recipe ) {
+				$candidates[] = "{$bundled}/recipes/{$recipe}/{$resource_type}/{$code}/{$filename}.json";
+			}
+		}
+
+		foreach ( $locales as $code ) {
+			$candidates[] = "{$bundled}/default/{$resource_type}/{$code}/{$filename}.json";
+			$candidates[] = "{$remote}/{$resource_type}/{$code}/{$filename}.json";
+		}
+
+		return $candidates;
+	}
+
+	/**
+	 * One named word list, from the active recipe or the caller's own default.
+	 *
+	 * The default is passed in rather than looked up because it is a constant on the generator —
+	 * `Product_Tag::LABELS`, `Brand::STEMS`. Those constants stay: they are the shipped vocabulary,
+	 * and moving them into JSON would mean a store with no recipe reading a file to learn words
+	 * the class already knows.
+	 *
+	 * A recipe file that exists but holds nothing usable falls back too. An empty list would reach
+	 * `randomElement()` and fail on every item, which is a worse answer than generic words.
+	 *
+	 * @since 1.2.0
+	 *
+	 * The directory is named rather than derived from the resource. `product_category` would
+	 * pluralise to `product_categorys`, and no rule that handles it also handles
+	 * `shipping_classes` — the same reason generators carry an explicit `resource` alongside their
+	 * REST route instead of deriving one from the other.
+	 *
+	 * @param string   $directory Vocabulary directory, e.g. `products`.
+	 * @param string   $filename  JSON file name, without the extension.
+	 * @param string[] $fallback  Words to use when the recipe ships none.
+	 *
+	 * @return string[] Never empty, as long as $fallback is not.
+	 */
+	protected function vocabulary( string $directory, string $filename, array $fallback ): array {
+		$loaded = $this->load_json_file( $this->get_sample_data_path( $directory, $filename ) );
+
+		if ( null === $loaded ) {
+			return $fallback;
+		}
+
+		// A file may hold either a bare list or a map of lists; take the named key when the file
+		// is a map, so one file can carry several lists the way `product_names.json` does.
+		$words = isset( $loaded[ $filename ] ) && is_array( $loaded[ $filename ] ) ? $loaded[ $filename ] : $loaded;
+
+		$words = array_values(
+			array_filter(
+				$words,
+				static function ( $word ): bool {
+					return is_string( $word ) && '' !== trim( $word );
+				}
+			)
+		);
+
+		return array() === $words ? $fallback : $words;
+	}
+
+	/**
+	 * The recipe whose vocabulary this run should prefer, or '' for none.
+	 *
+	 * Validated against the registry rather than trusted, because the value reaches a filesystem
+	 * path. `sanitize_key()` already forbids a separator, and matching a registered id forbids
+	 * everything else.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return string Registered recipe id, or ''.
+	 */
+	protected function sample_data_recipe(): string {
+		$requested = sanitize_key( (string) ( $this->generation_params['recipe'] ?? '' ) );
+
+		if ( '' === $requested ) {
+			return '';
+		}
+
+		return null === Recipe_Registry::instance()->get( $requested ) ? '' : $requested;
 	}
 
 	/**

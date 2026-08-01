@@ -26,6 +26,7 @@ use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Platforms\Registry as Platform_Registry;
 use StoreSeeder\Platforms\Resolver as Platform_Resolver;
 use StoreSeeder\Platforms\Resource;
+use StoreSeeder\Recipes\Registry as Recipe_Registry;
 use StoreSeeder\Rest\Registry as Rest_Registry;
 
 /**
@@ -723,6 +724,44 @@ class StoreSeeder {
 			)
 		);
 
+		// The store recipes, with each plan entry answered against the resolved target. Read-only;
+		// running one is nine ordinary generate calls, so there is no recipe write endpoint.
+		register_rest_route(
+			'storeseeder/v1',
+			'/recipes',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'rest_recipes' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+				'args'                => array(
+					'platform' => array(
+						'description'       => __( 'Which platform to answer for. Defaults to the resolved target.', 'storeseeder' ),
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+					),
+					'locale'   => array(
+						'description'       => __( 'Locale the run would use, so each recipe can say whether it carries vocabulary for it.', 'storeseeder' ),
+						'type'              => 'string',
+						'default'           => Locale::DEFAULT_LOCALE,
+						'sanitize_callback' => 'sanitize_text_field',
+					),
+				),
+			)
+		);
+
+		// Fetching the archive. A write, so DELETABLE/CREATABLE rather than a query parameter on
+		// the read above — a GET that downloads eighty kilobytes from GitHub is a GET that a
+		// prefetcher will fire on its own.
+		register_rest_route(
+			'storeseeder/v1',
+			'/recipes/sync',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'rest_sync_recipes' ),
+				'permission_callback' => array( $this, 'rest_permission_check' ),
+			)
+		);
+
 		register_rest_route(
 			'storeseeder/v1',
 			'/platforms',
@@ -791,6 +830,15 @@ class StoreSeeder {
 							'default' => 100,
 							'minimum' => 1,
 							'maximum' => 500,
+						),
+						// Undoes one recipe run rather than everything. A recipe writes
+						// thousands of rows over nine resources; without this, undoing it
+						// means nine separate purges and hoping nothing else was generated
+						// in between.
+						'run_id'   => array(
+							'type'              => 'string',
+							'default'           => '',
+							'sanitize_callback' => 'sanitize_key',
 						),
 						// Drops the records without touching the store, for a ledger that no
 						// longer matches reality. Named for what it does, because forgetting
@@ -993,7 +1041,11 @@ class StoreSeeder {
 			);
 		}
 
-		$result = Purge::run( $resource, (int) $request->get_param( 'limit' ) );
+		$result = Purge::run(
+			$resource,
+			(int) $request->get_param( 'limit' ),
+			(string) $request->get_param( 'run_id' )
+		);
 
 		$result['forgotten'] = 0;
 
@@ -1096,6 +1148,110 @@ class StoreSeeder {
 					(int) $request->get_param( 'limit' )
 				),
 			)
+		);
+	}
+
+	/**
+	 * The store recipes, answered against the target this run would write to.
+	 *
+	 * A recipe declares what it wants created; whether the store can create it is a property of
+	 * the *request*, so the annotation happens here rather than in the manifest. WooCommerce
+	 * records payment on the order and has no transaction record, so a grocery card promising nine
+	 * hundred transactions would be a promise the driver refuses — and a count that silently comes
+	 * back zero is exactly what `Capability::unsupported()` exists to prevent.
+	 *
+	 * No platform is not an error here, unlike `/lookup`. The page should still list what exists
+	 * and explain why nothing can run yet; answering 409 would leave it blank with no way to learn
+	 * what a recipe even is.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param WP_REST_Request $request The request.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function rest_recipes( WP_REST_Request $request ): WP_REST_Response {
+		$requested = (string) $request->get_param( 'platform' );
+		$platform  = '' !== $requested
+			? $this->platforms()->get( $requested )
+			: $this->platform_resolver()->resolve();
+
+		$supports = $platform instanceof Platform_Interface ? $platform->supports() : array();
+		$locale   = (string) $request->get_param( 'locale' );
+
+		$recipes = array();
+
+		foreach ( Recipe_Registry::instance()->all() as $recipe ) {
+			$payload = $recipe->to_array();
+			$plan    = array();
+
+			foreach ( $recipe->plan() as $entry ) {
+				$capability = $supports[ $entry['resource'] ] ?? null;
+
+				// Null when no platform is resolved: "we cannot say yet" is honest, where false
+				// would read as a refusal the driver never made. The rest of the shape is
+				// Capability's own, so the page reads a resource's answer the same way here as
+				// it does on the generator tiles.
+				$plan[] = array(
+					'resource' => $entry['resource'],
+					'count'    => $entry['count'],
+				) + ( null === $capability
+					? array(
+						'supported'      => null,
+						'reason'         => '',
+						'extension'      => '',
+						'ignored_fields' => array(),
+					)
+					: $capability->to_array() );
+			}
+
+			$payload['plan']            = $plan;
+			$payload['locale_shipped']  = $recipe->has_locale( $locale );
+			$payload['fallback_locale'] = Locale::DEFAULT_LOCALE;
+			// '' when the archive ships no mark, and the admin falls back to the icon registry.
+			$payload['icon_uri']        = Recipe_Registry::icon_uri( $recipe->id() );
+			// What the manifest claims, checked against the files beside it. Every failure this
+			// finds produces data rather than an error, which is exactly why it is worth finding.
+			$payload['issues']          = Recipe_Registry::audit( $recipe, $locale );
+
+			$recipes[] = $payload;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'platform'   => $platform instanceof Platform_Interface ? $platform->id() : '',
+				'locale'     => $locale,
+				'downloaded' => Recipe_Registry::downloaded(),
+				// Named separately from an empty list: nothing downloaded yet and an archive that
+				// arrived half-written are different problems with different fixes.
+				'incomplete' => Recipe_Registry::missing(),
+				'recipes'    => $recipes,
+			)
+		);
+	}
+
+	/**
+	 * REST: download the recipe archive.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function rest_sync_recipes() {
+		$result = $this->ensure_recipes();
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return new WP_REST_Response(
+			array(
+				'success'    => true,
+				'downloaded' => Recipe_Registry::downloaded(),
+				'recipes'    => count( Recipe_Registry::instance()->all() ),
+				'incomplete' => Recipe_Registry::missing(),
+			),
+			200
 		);
 	}
 
@@ -1481,6 +1637,101 @@ class StoreSeeder {
 	}
 
 	/**
+	 * Where the recipe archive is downloaded from.
+	 *
+	 * A second repository rather than a folder inside the sample-data one, because the two answer
+	 * to different people: sample data is reference material the plugin needs, recipes are content
+	 * anyone may write. Splitting them means a recipe typo is a commit in a repository a
+	 * contributor can be given access to without also handing over the plugin's own fixtures.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return array{repo_url: string, zip_url: string} Repository page and archive URLs.
+	 */
+	private function get_recipes_source(): array {
+		$owner  = 'mralaminahamed';
+		$repo   = 'storeseeder-recipes';
+		$branch = 'trunk';
+
+		$source = array(
+			'repo_url' => "https://github.com/{$owner}/{$repo}",
+			'zip_url'  => "https://github.com/{$owner}/{$repo}/archive/refs/heads/{$branch}.zip",
+		);
+
+		/**
+		 * Filters where store recipes are downloaded from.
+		 *
+		 * Point it at a fork to ship your own catalogue of recipes. Consent is unaffected: nothing
+		 * is fetched from either URL until an administrator accepts the prompt, and `repo_url` is
+		 * what the admin shows them — so a filter that changes only `zip_url` would misrepresent
+		 * what they agreed to. Change both.
+		 *
+		 * @since 1.2.0
+		 * @hook  storeseeder_recipes_source
+		 *
+		 * @param mixed $source Repository page and archive URLs, an
+		 *                      array{repo_url: string, zip_url: string} when unfiltered. Typed
+		 *                      loosely because a filter may return anything; a return missing
+		 *                      either URL is discarded below.
+		 */
+		$filtered = apply_filters( 'storeseeder_recipes_source', $source );
+
+		if ( ! is_array( $filtered ) || empty( $filtered['repo_url'] ) || empty( $filtered['zip_url'] ) ) {
+			return $source;
+		}
+
+		return array(
+			'repo_url' => (string) $filtered['repo_url'],
+			'zip_url'  => (string) $filtered['zip_url'],
+		);
+	}
+
+	/**
+	 * Download the recipe archive.
+	 *
+	 * Gated by the same consent record as the sample data, and deliberately one record rather than
+	 * two: an administrator agreeing to an outbound request to GitHub for this plugin's content
+	 * has answered the question, and asking twice for the same answer trains people to click
+	 * through prompts.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @return bool|WP_Error True on success, WP_Error when consent is missing or the fetch failed.
+	 */
+	public function ensure_recipes() {
+		if ( 'granted' !== $this->get_sample_data_consent() ) {
+			return new WP_Error(
+				'storeseeder_consent_required',
+				__( 'Recipes are downloaded from GitHub, which needs an administrator to accept the prompt on the Settings screen first.', 'storeseeder' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$source = $this->get_recipes_source();
+
+		if ( ! $this->download_archive( $source['zip_url'], Recipe_Registry::directory() ) ) {
+			return new WP_Error(
+				'storeseeder_recipes_download_failed',
+				__( 'Could not download the recipes. Check that the site can reach github.com.', 'storeseeder' ),
+				array( 'status' => 502 )
+			);
+		}
+
+		// The registry caches what it resolved; a fresh archive has to be seen.
+		Recipe_Registry::instance()->reset();
+
+		if ( ! Recipe_Registry::downloaded() ) {
+			return new WP_Error(
+				'storeseeder_recipes_incomplete',
+				__( 'The recipe archive downloaded but holds no index. It may be a fork without a recipes.json.', 'storeseeder' ),
+				array( 'status' => 502 )
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Download sample data from remote repository
 	 *
 	 * Downloads the sample data archive from GitHub and extracts it to the local directory.
@@ -1492,11 +1743,38 @@ class StoreSeeder {
 	private function download_sample_data(): bool {
 		$source = $this->get_sample_data_source();
 
-		$download_url = $source['zip_url'];
+		if ( ! $this->download_archive( $source['zip_url'], $this->get_sample_data_directory() ) ) {
+			return false;
+		}
 
-		$sample_data_dir = $this->get_sample_data_directory();
-		$temp_zip_file   = $sample_data_dir . '/sample-data-temp.zip';
+		return $this->sample_data_exists();
+	}
+
+	/**
+	 * Fetch a zipped archive and unpack it into a directory.
+	 *
+	 * Shared by the sample data and the recipes, which are two archives with one procedure:
+	 * download, verify, unwrap GitHub's single top-level folder, move into place, tidy up. Two
+	 * copies would mean two chances to lose the zip-slip guard below, and the second copy is
+	 * always the one that loses it.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $zip_url    Archive URL.
+	 * @param string $target_dir Where the contents should end up.
+	 *
+	 * @return bool Whether the archive was unpacked.
+	 */
+	private function download_archive( string $zip_url, string $target_dir ): bool {
+		$download_url = $zip_url;
+
+		$sample_data_dir = $target_dir;
+		$temp_zip_file   = $sample_data_dir . '/archive-temp.zip';
 		$extracted_dir   = $sample_data_dir . '/temp-extract';
+
+		if ( ! wp_mkdir_p( $sample_data_dir ) ) {
+			return false;
+		}
 
 		// Initialize WordPress filesystem.
 		global $wp_filesystem;
@@ -1545,7 +1823,7 @@ class StoreSeeder {
 		$wp_filesystem->delete( $temp_zip_file );
 		$wp_filesystem->delete( $extracted_dir, true );
 
-		return $this->sample_data_exists();
+		return true;
 	}
 
 	/**

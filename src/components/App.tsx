@@ -9,6 +9,7 @@ import { PlatformProvider } from '@/providers/PlatformProvider';
 import GeneratorPage from '@/components/Pages/GeneratorPage';
 import HomePage from '@/components/Pages/HomePage';
 import PluginsPage from '@/components/Pages/PluginsPage';
+import RecipesPage from '@/components/Pages/RecipesPage';
 import RootLayout from '@/components/Pages/RootLayout';
 import SettingsPage from '@/components/Pages/SettingsPage';
 
@@ -18,6 +19,7 @@ const router = createHashRouter([
     element: <RootLayout />,
     children: [
       { index: true,              element: <HomePage />      },
+      { path: 'recipes',          element: <RecipesPage />   },
       { path: 'generator/:type',  element: <GeneratorPage /> },
       { path: 'settings',         element: <SettingsPage />  },
       { path: 'plugins',          element: <PluginsPage />   },
