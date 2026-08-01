@@ -2,6 +2,7 @@ import React from "@wordpress/element";
 import { __, sprintf } from "@wordpress/i18n";
 
 import { Icon } from "@/lib/icons";
+import { localeLabelWithCode } from "@/lib/locales";
 import type { IconName } from "@/lib/icons";
 import {
   labelFor,
@@ -59,16 +60,23 @@ export function RecipeCard({ recipe, size, selected, onSelect }: RecipeCardProps
       </div>
 
       <div className="fp-recipe-meta">
-        <span className="fp-recipe-chip mono">{recipe.locales.join(" · ")}</span>
+        <span className="fp-recipe-chip">
+          {recipe.locales.map(localeLabelWithCode).join(" · ")}
+        </span>
 
         {/*
           A recipe somebody's plugin registered, not one from the archive. Marked because it is
           not held to the archive's completeness bar, and because a user wondering where odd
           product names came from should be able to see the answer on the card.
         */}
-        {!recipe.bundled && (
-          <span className="fp-recipe-chip third">
+        {recipe.bundled ? (
+          <span className="fp-recipe-chip official">
             <Icon name="star" size={11} />
+            {__("StoreSeeder recipe", "storeseeder")}
+          </span>
+        ) : (
+          <span className="fp-recipe-chip third">
+            <Icon name="plug" size={11} />
             {__("From a plugin", "storeseeder")}
           </span>
         )}
@@ -83,9 +91,9 @@ export function RecipeCard({ recipe, size, selected, onSelect }: RecipeCardProps
           <span className="fp-recipe-chip warn">
             <Icon name="alert" size={11} />
             {sprintf(
-              /* translators: %s: locale code, e.g. en_US. */
+              /* translators: %s: locale name and code, e.g. English (en_US). */
               __("Product names stay %s", "storeseeder"),
-              recipe.fallback_locale,
+              localeLabelWithCode(recipe.fallback_locale),
             )}
           </span>
         )}

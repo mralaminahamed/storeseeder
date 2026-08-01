@@ -818,6 +818,12 @@
 }
 .fp-root[data-theme="dark"] .fp-recipe-chip.third { color:var(--sky); }
 
+/* Where a recipe came from, in both directions. The absence of a badge used to mean "official",
+   which is a signal nobody can see — and it made a plugin-registered recipe and a shipped one
+   indistinguishable at a glance. Accent for ours, sky for somebody else's: neither is a warning,
+   so neither borrows the amber. */
+.fp-root .fp-recipe-chip.official { background:var(--accent-soft); color:var(--accent); }
+
 /* The Recipes page sets its own gutters rather than borrowing `.fp-page`. Its cards are a
    full-width grid that wants the column padding, not the centred 1180px measure a reading page
    uses — and `.fp-scroll` supplies none of its own, so without this the grid sits flush against
