@@ -70,6 +70,7 @@ export default defineConfig({
             { label: 'Extension points', slug: 'reference/extension-points' },
             { label: 'External services', slug: 'reference/external-services' },
             { label: 'Support & troubleshooting', slug: 'reference/support' },
+            { label: 'Contributing', slug: 'reference/contributing' },
             // Generated from the repository's CHANGELOG.md on predev/prebuild — see
             // scripts/sync-changelog.mjs. Listed last because it is the longest page on the site.
             { label: 'Changelog', slug: 'reference/changelog' },
