@@ -6,6 +6,7 @@ import {
   filterLocales,
   isSupportedLocale,
   localeLabel,
+  localeLabelWithCode,
   localeMap,
   localeOptions,
 } from "./locales";
@@ -72,6 +73,29 @@ describe("locales", () => {
 
     it("falls back to the code rather than rendering blank", () => {
       expect(localeLabel("xx_XX")).toBe("xx_XX");
+    });
+  });
+
+  describe("localeLabelWithCode", () => {
+    /**
+     * For the run history, which stored `de_DE` and drew it verbatim. The code stays — it is what
+     * the run was made with — but it is no longer the only thing on screen.
+     */
+    it("names the language and keeps the code", () => {
+      expect(localeLabelWithCode("fr_FR")).toBe("French (fr_FR)");
+    });
+
+    /**
+     * The server's label already brackets the region. Keeping both would render
+     * "Arabic (Egypt) (ar_EG)", and the code carries the region anyway.
+     */
+    it("drops the region rather than bracketing twice", () => {
+      expect(localeLabelWithCode("bn_BD")).toBe("Bangla (bn_BD)");
+      expect(localeLabelWithCode("ja_JP")).toBe("Japanese (ja_JP)");
+    });
+
+    it("falls back to the bare code rather than an empty bracket", () => {
+      expect(localeLabelWithCode("xx_XX")).toBe("xx_XX");
     });
   });
 

@@ -1,3 +1,5 @@
+import { __ } from "@wordpress/i18n";
+
 import type { ParameterConfig, ParamValue } from "@/types";
 
 export type FieldType =
@@ -45,6 +47,86 @@ export interface FieldSection {
 export function humanize(key: string): string {
   return key
     .split(/[_\-]/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * Option values that Title Case gets wrong.
+ *
+ * Everything else in the enums reads correctly once the underscores are spaces, so this stays
+ * short on purpose — a lookup table of every value would be a second copy of the schema, and the
+ * next person to add an enum would have to know to update it.
+ */
+const OPTION_LABELS: Record<string, string> = {
+  cod: __("Cash on Delivery", "storeseeder"),
+  // Proper nouns, through gettext anyway: a locale that transliterates them should be able to.
+  paypal: __("PayPal", "storeseeder"),
+  authorize_net: __("Authorize.Net", "storeseeder"),
+  vip: __("VIP", "storeseeder"),
+};
+
+/**
+ * The admin's own language, for resolving country names into.
+ *
+ * WordPress puts the site language on `<html lang>`; the browser's is the fallback, and English
+ * the last resort. Read per call rather than cached — cheap, and a cached value would be wrong on
+ * the one screen that can change it.
+ */
+function displayLocale(): string {
+  return document.documentElement.lang || navigator.language || "en";
+}
+
+/**
+ * The country a two-letter code names, in the admin's language.
+ *
+ * `Intl.DisplayNames` rather than a table: a hardcoded map would cover only the twelve codes the
+ * schema happens to list today, in English only, and would need editing every time a driver adds a
+ * country. Returns the code unchanged if the runtime cannot resolve it, so nothing renders blank.
+ */
+export function countryLabel(code: string): string {
+  try {
+    return (
+      new Intl.DisplayNames([displayLocale()], {
+        type: "region",
+        // Explicit, though it is the default: an unassigned code comes back as itself rather
+        // than as undefined.
+        fallback: "code",
+      }).of(code) ?? code
+    );
+  } catch {
+    return code;
+  }
+}
+
+/**
+ * The label to show for one option value.
+ *
+ * Selects and chips were rendering the raw value: a payment method read `bank_transfer`, an order
+ * status `on_hold`, a coupon type `free_shipping`. The value still travels to the API — only what
+ * is drawn changes.
+ *
+ * Two things are left alone rather than titled:
+ * - anything starting with a digit, because `18-25` and `65+` are already readable and splitting
+ *   them on the hyphen would produce "18 25";
+ * - values that already carry a capital, which the schema author wrote as a label.
+ *
+ * A two-letter uppercase code is resolved to its country name instead.
+ *
+ * Only underscores separate words here. Hyphens do not, for the age-band reason above.
+ */
+export function optionLabel(value: string): string {
+  if (OPTION_LABELS[value]) return OPTION_LABELS[value];
+
+  if (/^\d/.test(value)) return value;
+  // A two-letter uppercase code is a country everywhere the schema uses one — "US" is not a word,
+  // and "United States" is what a reader is choosing between.
+  if (/^[A-Z]{2}$/.test(value)) return countryLabel(value);
+  if (/[A-Z]/.test(value)) return value;
+
+  return value
+    .split("_")
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
