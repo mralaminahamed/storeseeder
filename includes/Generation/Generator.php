@@ -18,6 +18,7 @@ use Faker\Factory;
 use Faker\Generator as Faker_Generator;
 use Faker\Provider\DateTime;
 use StoreSeeder\Platforms\Locale;
+use StoreSeeder\Storage;
 use StoreSeeder\Platforms\Platform_Interface;
 use StoreSeeder\Recipes\Registry as Recipe_Registry;
 use WP_Error;
@@ -818,9 +819,11 @@ abstract class Generator {
 	 * @return string[] Absolute paths, most specific first. Never empty.
 	 */
 	protected function sample_data_candidates( string $resource_type, string $filename ): array {
-		$locale     = $this->get_faker_locale();
-		$upload_dir = wp_upload_dir();
-		$remote     = $upload_dir['basedir'] . '/storeseeder-sample-data-fluent-cart';
+		$locale = $this->get_faker_locale();
+		// Asked of Storage, not built here. This and `class-storeseeder.php` were computing the same
+		// path independently, so moving the directory in one would have left the other reading an
+		// empty tree and falling back to the inline defaults without a word.
+		$remote = Storage::sample_data();
 
 		$locales = array_unique( array( $locale, Locale::DEFAULT_LOCALE ) );
 		$recipe  = $this->sample_data_recipe();

@@ -130,6 +130,8 @@ class StoreSeeder {
 		// activation hook, and an absent table means generated rows stop being recorded and
 		// the cleanup silently has nothing to offer.
 		add_action( 'admin_init', array( Ledger::class, 'maybe_install' ) );
+		// Moves the pre-1.2.0 upload directories under uploads/storeseeder/. Self-disabling once done.
+		add_action( 'admin_init', array( \StoreSeeder\Storage::class, 'migrate' ) );
 
 		add_action( 'admin_notices', array( $this, 'dependency_notice' ) );
 		add_action( 'wp_ajax_' . self::MCP_NOTICE_DISMISS_ACTION, array( $this, 'ajax_dismiss_mcp_notice' ) );
@@ -1495,8 +1497,7 @@ class StoreSeeder {
 	 * @return string Path to sample data directory.
 	 */
 	public function get_sample_data_directory(): string {
-		$upload_dir = wp_upload_dir();
-		return $upload_dir['basedir'] . '/storeseeder-sample-data-fluent-cart';
+		return \StoreSeeder\Storage::sample_data();
 	}
 
 	/**
