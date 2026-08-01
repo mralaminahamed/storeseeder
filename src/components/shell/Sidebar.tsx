@@ -6,6 +6,7 @@ import { Icon } from "@/lib/icons";
 import type { IconName } from "@/lib/icons";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 import { generatorsByCategory } from "@/lib/generators";
+import { DOCS_URL } from "@/lib/links";
 import { usePlatform } from "@/providers/PlatformProvider";
 
 // ---------------------------------------------------------------------------
@@ -24,7 +25,14 @@ export interface SidebarProps {
 // ---------------------------------------------------------------------------
 
 interface NavItemProps {
-  to: string;
+  /** An in-app route. Mutually exclusive with `href`. */
+  to?: string;
+  /**
+   * An external destination. Renders an anchor rather than a button, so the item keeps every
+   * affordance a link has — middle-click, copy address, the browser's own status bar — which a
+   * `navigate()` on a `<button>` throws away.
+   */
+  href?: string;
   label: string;
   ic: IconName;
   count?: number;
@@ -45,23 +53,62 @@ interface NavItemProps {
   badge?: string;
 }
 
-function NavItem({ to, label, ic, count, active, collapsed, testId, unavailable, badge }: NavItemProps) {
+function NavItem({
+  to,
+  href,
+  label,
+  ic,
+  count,
+  active,
+  collapsed,
+  testId,
+  unavailable,
+  badge,
+}: NavItemProps) {
   const navigate = useNavigate();
 
-  return (
-    <button
-      className={`fp-nav-item${active ? " active" : ""}${unavailable ? " unavailable" : ""}`}
-      onClick={() => void navigate(to)}
-      title={unavailable ?? (collapsed ? label : undefined)}
-      data-testid={testId}
-      data-unavailable={unavailable ? "true" : undefined}
-    >
+  const className = `fp-nav-item${active ? " active" : ""}${unavailable ? " unavailable" : ""}`;
+
+  const inner = (
+    <>
       <Icon name={ic} size={17} className="fp-nav-ic" stroke={1.7} />
       <span className="fp-nav-text">{label}</span>
+      {/* An outward arrow only on external items, so the one thing in this list that leaves the
+          admin does not look like the eighteen that do not. */}
+      {href && !collapsed && (
+        <Icon name="external" size={13} className="fp-nav-ext" stroke={1.7} />
+      )}
       {badge && !collapsed && <span className="fp-nav-badge">{badge}</span>}
       {!badge && "number" === typeof count && count > 0 && (
         <span className="fp-nav-count tnum">{count}</span>
       )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        className={className}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={collapsed ? label : undefined}
+        data-testid={testId}
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      className={className}
+      onClick={() => to && void navigate(to)}
+      title={unavailable ?? (collapsed ? label : undefined)}
+      data-testid={testId}
+      data-unavailable={unavailable ? "true" : undefined}
+    >
+      {inner}
     </button>
   );
 }
@@ -213,6 +260,18 @@ export function Sidebar({ collapsed, setCollapsed, counts, openCmd }: SidebarPro
           ic="plug"
           active={pathname === "/plugins"}
           collapsed={collapsed}
+        />
+        {/* The documentation, last and outward-pointing. Here rather than only on the Settings page
+            because every question this plugin raises — why a generator is dimmed, what a recipe is,
+            what deletion will and will not touch — is asked from somewhere else in the app, and the
+            answer being one persistent click away is the difference between reading it and guessing. */}
+        <NavItem
+          href={DOCS_URL}
+          label="Documentation"
+          ic="book"
+          active={false}
+          collapsed={collapsed}
+          testId="nav-docs"
         />
       </div>
     </nav>

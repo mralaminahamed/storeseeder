@@ -33,6 +33,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A run of more than 100 items failed outright.** The generate endpoint caps `count` at 100 in its
+  own schema, and WordPress rejects an over-cap argument during validation — so the admin, which sent
+  whatever the count stepper said, returned `Invalid parameter(s): count` and wrote nothing. The
+  stepper meanwhile allowed up to 100,000, offering three orders of magnitude more than the API would
+  take. Counts are split into requests of a hundred now, and the progress bar counts completed
+  requests rather than animating against a guessed duration — it used to reach 100% and stop while the
+  request was still in flight, and to *delay* the request by the length of its own animation. The
+  recipe runner had always chunked correctly; only the single-run and batch paths had not.
+- **"Add to batch" discarded everything the page was configured with.** A queued row carried only a
+  route and a count, so the resource parameters, the seed and the metadata switch were dropped: a
+  products row queued at $200–$900 ran at the schema default. Two queues of the same generator also
+  merged by summing their counts, so queueing cheap products and then expensive ones produced twice as
+  many cheap ones. A queued run is the same run, deferred.
+- **The topbar's platform picker listed one store twice and hid Auto.** With WooCommerce selected the
+  list read "WooCommerce · Fluent Cart · WooCommerce", because the Auto entry took its label from
+  whatever was currently selected. Auto was still there and still worked; it was no longer reachable
+  by name. An earlier fix had corrected the half of this that showed while Auto itself was selected.
+- **Settings sat against the left edge of the measure the other pages fill.** `.fp-settings-col`
+  capped itself at 680px without centring, so moving from Overview, Recipes or Our Plugins to Settings
+  shifted every card 220px leftwards and left 440px of empty page — the horizontal jump the shared
+  page measure exists to prevent.
 - **Seventy-two of seventy-three locales were generating "Widget" and "Gadget".**
   `Generator::get_sample_data_path()` built one path and stopped, so any locale without a sample
   data file fell through to the inline literals each generator carried, with a `WP_DEBUG_LOG`

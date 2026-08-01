@@ -353,6 +353,20 @@ test.describe('documentation screenshots', () => {
 
       await shot(page, 'generator-orders.png', '.fp-gen-wrap');
     });
+
+    /*
+     * What a refusal looks like, which the platform-support page had no way to show. Transactions on
+     * WooCommerce: payment is recorded on the order itself, so there is no separate record to create
+     * and no plugin that changes that — the `unsupported` kind rather than `missing_extension`.
+     *
+     * No `previewReady()` here: a refused resource has no preview to wait for, which is the point.
+     */
+    test('unsupported resource', async ({ page }) => {
+      await page.goto(`${PLUGIN_URL}#/generator/transactions`, { waitUntil: 'domcontentloaded' });
+      await ready(page, 'unsupported-notice');
+
+      await shot(page, 'unsupported-notice.png', '[data-testid="unsupported-notice"]');
+    });
   });
 
   test('run bar', async ({ page }) => {

@@ -20,6 +20,14 @@ import { cleanup } from "@testing-library/react";
 // `tsc --noEmit` would reject every matcher while the tests themselves passed.
 import "@testing-library/jest-dom/jest-globals";
 
+/*
+ * React only suppresses its "not wrapped in act(...)" warning when it can see it is in a test
+ * environment, and it reads this global to decide. Without it, any state update that lands after an
+ * awaited promise — a provider clearing its queue once a request resolves, say — prints a stack trace
+ * beside a passing test, which trains people to read warnings as noise.
+ */
+( globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean } ).IS_REACT_ACT_ENVIRONMENT = true;
+
 /** A minimal, realistic payload: the shape `class-storeseeder.php` actually inlines. */
 export const TEST_LOCALES: Record<string, string> = {
 	en_US: 'English (United States)',

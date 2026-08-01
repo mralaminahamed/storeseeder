@@ -24,6 +24,21 @@ const BANNERS = [
   { file: 'banner-1544x500.png', scale: 2 },
 ] as const;
 
+/**
+ * The three claims on the banner.
+ *
+ * A constant rather than inline markup, because the note that belongs with it cannot live inside the
+ * template literal: a comment mentioning `src/lib/generators.ts` in backticks terminates the string,
+ * which is how this file briefly stopped parsing at all.
+ *
+ * **21 is counted, not remembered.** It read `18 generators` for three releases after the count
+ * changed, on the one image every visitor to the listing sees. `src/lib/generators.ts` registers 21.
+ *
+ * `Recipes` replaced `WP-CLI` because it is the headline of 1.2.0 and the one feature somebody browsing
+ * the directory has no other way to learn about; WP-CLI is discoverable from the description.
+ */
+const PILLS = ['21 generators', 'Recipes', 'Live preview'] as const;
+
 /** The product rows on the mock table. Names come from the products generator. */
 const ROWS = [
   { name: 'Wireless Noise-Cancel<br>Headphones', type: 'Variable', price: '$199.00' },
@@ -153,9 +168,7 @@ function banner(scale: number): string {
       </div>
       <div class="sub">Realistic products, orders and customers &mdash;<br>seeded into your store in seconds.</div>
       <div class="pills">
-        <span class="pill">18 generators</span>
-        <span class="pill">Live preview</span>
-        <span class="pill">WP-CLI</span>
+        ${PILLS.map((pill) => `<span class="pill">${pill}</span>`).join('')}
       </div>
     </div>
 

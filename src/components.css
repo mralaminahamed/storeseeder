@@ -47,6 +47,10 @@
 .fp-root .fp-nav-item.active .fp-nav-ic { color:var(--accent); }
 .fp-root .fp-nav-ic { color:var(--text-3); }
 .fp-root .fp-nav-count { margin-left:auto; font-size:var(--fs-micro); font-family:var(--font-mono); color:var(--text-faint); background:var(--surface-inset); padding:1px 7px; border-radius:var(--r-full); }
+/* The one nav item that leaves the admin. Faint, and pushed to the trailing edge like a count,
+   so it reads as a property of the row rather than as part of the label. */
+.fp-root .fp-nav-ext { margin-left:auto; color:var(--text-faint); flex:none; }
+.fp-root .fp-nav-item:hover .fp-nav-ext { color:var(--text-3); }
 .fp-root .fp-nav-item.active .fp-nav-count { background:color-mix(in oklab, var(--accent) 16%, transparent); color:var(--accent); }
 
 .fp-root .fp-nav-foot { border-top:1px solid var(--border); padding:8px 10px; display:flex; flex-direction:column; gap:1px; }

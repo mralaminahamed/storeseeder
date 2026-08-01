@@ -1,6 +1,7 @@
 import apiFetch from "@wordpress/api-fetch";
 import { __ } from "@wordpress/i18n";
 
+import { CHUNK } from "@/lib/chunk";
 import { generators } from "@/lib/generators";
 
 /** One line of a recipe's plan, answered against the resolved target. */
@@ -138,8 +139,14 @@ export function labelFor(resource: string): string {
   return generators.find((g) => g.resource === resource)?.name ?? resource;
 }
 
-/** How many rows one POST may create. Mirrors the endpoint's own cap. */
-export const CHUNK = 100;
+/**
+ * How many rows one POST may create.
+ *
+ * Re-exported from `chunk.ts` rather than redeclared: the single-run and batch paths need the same cap,
+ * and two copies of a number that has to match the server's is how they drift. Kept exported from here
+ * because callers and tests already import it from this module.
+ */
+export { CHUNK };
 
 /** One POST the runner will make. */
 export interface RecipeCall {

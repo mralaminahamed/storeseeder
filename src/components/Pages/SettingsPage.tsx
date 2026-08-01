@@ -32,6 +32,13 @@ import {
 import type { GeneratedState } from "@/lib/generated";
 import { resourceLabel } from "@/lib/generators";
 import { requestTweaksPanel } from "@/lib/events";
+import {
+  DOCS,
+  DOCS_URL,
+  GITHUB_URL,
+  ISSUES_URL,
+  SAMPLE_DATA_REPO_URL,
+} from "@/lib/links";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
@@ -45,13 +52,6 @@ import { useTheme, type Density, type Theme } from "@/theme/useTheme";
 // Localized from STORESEEDER_VERSION; the fallback only shows if the script
 // data is missing, which would mean the admin app failed to enqueue properly.
 const PLUGIN_VERSION = window.storeseederApi?.version || "—";
-const GITHUB_URL = "https://github.com/mralaminahamed/storeseeder";
-const SAMPLE_DATA_REPO_URL =
-  "https://github.com/mralaminahamed/storeseeder-sample-data-fluent-cart";
-const SUPPORT_URL =
-  "https://github.com/mralaminahamed/storeseeder/issues";
-const DOCS_URL =
-  "https://github.com/mralaminahamed/storeseeder#readme";
 // Automattic's remote-MCP proxy: the package a desktop client is pointed at, and the place
 // the connection details are documented. Linked rather than restated, because the config
 // format is theirs to change.
@@ -1062,11 +1062,20 @@ export default function SettingsPage() {
               {/* A client needs a proxy and an application password, neither of which this
                   page can hand out. Automattic's package documents both, and is where the
                   config format is kept up to date. */}
-              <a href={MCP_CLIENT_URL} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="sm" icon="external" type="button">
-                  {__("How to connect a client", "storeseeder")}
-                </Button>
-              </a>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <a href={MCP_CLIENT_URL} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" icon="external" type="button">
+                    {__("How to connect a client", "storeseeder")}
+                  </Button>
+                </a>
+                {/* What the two tool families are for and what each switch withdraws. The three
+                    switches above are easy to operate and hard to reason about from the page alone. */}
+                <a href={DOCS.mcp} target="_blank" rel="noopener noreferrer">
+                  <Button variant="ghost" size="sm" icon="book" type="button">
+                    {__("Read the AI tools guide", "storeseeder")}
+                  </Button>
+                </a>
+              </div>
             </div>
           </SetCard>
         )}
@@ -1138,7 +1147,7 @@ export default function SettingsPage() {
               )}
             </div>
 
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
               {/* The server reports the repository, which storeseeder_sample_data_source
                   can change; the constant is only a fallback for a failed status call. */}
               <a
@@ -1151,6 +1160,13 @@ export default function SettingsPage() {
                     "View sample data repository",
                     "storeseeder",
                   )}
+                </Button>
+              </a>
+              {/* Exactly what is requested, when, and what declining costs. The consent prompt states
+                  it once at the moment of asking; this is where somebody comes back to check. */}
+              <a href={DOCS.externalServices} target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm" icon="book" type="button">
+                  {__("What gets downloaded", "storeseeder")}
                 </Button>
               </a>
             </div>
@@ -1391,7 +1407,7 @@ export default function SettingsPage() {
                 {__("Documentation", "storeseeder")}
               </Button>
             </a>
-            <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+            <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm" icon="external" type="button">
                 {__("Support", "storeseeder")}
               </Button>
@@ -1406,6 +1422,17 @@ export default function SettingsPage() {
           desc={__("These actions cannot be undone.", "storeseeder")}
           danger
         >
+          {/* Before the buttons, not after. Four irreversible actions whose differences matter —
+              deleting rows, forgetting the record of rows, clearing local history, resetting
+              preferences — and the page has room for one line about each. */}
+          <div style={{ marginBottom: 14 }}>
+            <a href={DOCS.cleanup} target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm" icon="book" type="button">
+                {__("What each of these removes", "storeseeder")}
+              </Button>
+            </a>
+          </div>
+
           <div>
             {/* First, because it is the only action here that touches the store. The count
                 comes from the plugin's own ledger of rows it wrote, so this deletes what

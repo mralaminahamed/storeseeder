@@ -2,11 +2,15 @@ import { test } from '@playwright/test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { BRAND, glassField } from '../../brand';
+import { PLUGIN_URL, seedRuns, setTargetInOwnContext } from '../../admin';
 
-const PLUGIN_URL = '/wp-admin/admin.php?page=storeseeder';
+/** The store the write captures target. Restored to `Auto` in `afterAll`. */
+const TARGET = 'WooCommerce';
 const ASSET_DIR = join(__dirname, '..', '..', '..', '..', '.wordpress-org');
 
 /** Palette shared with the icon and the banners. See tests/e2e/brand.ts. */
+
+/** Where the listing assets live. */
 
 /** Final canvas. The plugin directory renders screenshots in a fixed carousel. */
 const CANVAS = { width: 1200, height: 900 };
@@ -197,27 +201,65 @@ const SHOTS = [
     capture: '.fp-page',
     kicker: 'Dashboard',
     title: 'Overview',
+    /*
+     * Run first, so the dashboard has something to show. The counts and the activity list come from
+     * this browser's own local storage, not from the server's ledger, so a fresh Playwright context
+     * always saw an empty dashboard however much the store held — and the first image on the listing
+     * read "Nothing generated yet" four times over.
+     */
+    seed: [
+      { route: 'products', count: 24 },
+      { route: 'customers', count: 18 },
+      { route: 'orders', count: 12 },
+    ],
   },
+  /*
+   * Second, immediately after the dashboard. Recipes is the headline of 1.2.0 and the only feature a
+   * browser of the directory cannot infer from the others — five shots of generators described a
+   * plugin that had grown a second, larger way in and did not show it.
+   */
   {
     file: 'screenshot-2.png',
+    hash: '#/recipes',
+    ready: 'nav-recipes',
+    // `[data-recipe]` rather than `.fp-recipe`: the skeleton borrows the card's class, so waiting on
+    // the class alone photographs the placeholder.
+    settled: '.fp-recipe[data-recipe]',
+    capture: '.fp-recipes-page',
+    kicker: 'One click',
+    title: 'Recipes',
+    /*
+     * Narrower than the other captures, and the number is measured rather than reasoned about.
+     *
+     * The frame's card is 1084x580 — about 1.87:1 — and fills it with `object-fit: cover`, so a source
+     * wider than that ratio is cropped left and right. At the standard 1720 the recipes page is
+     * 1320x600, which is 2.2:1, and the crop took the outer two cards' labels with it.
+     *
+     * The first attempt at fixing this used 1560 and barely moved, because the page was measured
+     * *before* `hideWpChrome()` runs. Hiding the admin menu widens the content area by around 250px,
+     * so the ratio to match is the one after that, not before: 1560 is still 2.18:1.
+     *
+     * At 1300 the page is 1048x641, or 1.63:1 — narrower than the card, so `cover` scales to the width
+     * and trims the bottom instead. With `object-position: top center` what it trims is the empty
+     * "Pick a recipe to continue" band, which is the part worth losing. Three columns still fit; the
+     * grid drops to two below about 1100.
+     */
+    viewport: { width: 1300, height: 1010 },
+  },
+  {
+    file: 'screenshot-3.png',
     hash: '#/generator/products',
     ready: 'preview-table',
+    settled: '[data-testid="preview-table"] tbody tr',
     capture: '.fp-gen-wrap',
     kicker: 'Generator',
     title: 'Products',
   },
   {
-    file: 'screenshot-3.png',
-    hash: '#/generator/customers',
-    ready: 'preview-table',
-    capture: '.fp-gen-wrap',
-    kicker: 'Generator',
-    title: 'Customers',
-  },
-  {
     file: 'screenshot-4.png',
     hash: '#/generator/orders',
     ready: 'preview-table',
+    settled: '[data-testid="preview-table"] tbody tr',
     capture: '.fp-gen-wrap',
     kicker: 'Generator',
     title: 'Orders',
@@ -246,8 +288,25 @@ test.describe('Screenshots', () => {
   // The listing icon itself, so the frames cannot show a stale copy of the mark.
   const iconSvg = readFileSync(join(ASSET_DIR, 'icon.svg'), 'utf-8');
 
+  /*
+   * A target, chosen once and put back afterwards. `Auto` refuses to guess with several stores
+   * installed and every write control is disabled while it cannot resolve, so the seeded runs behind
+   * the dashboard capture would be impossible — and the generator captures would each carry a "Choose
+   * where to write" prompt where their parameters should be.
+   */
+  test.beforeAll(async ({ browser }) => {
+    await setTargetInOwnContext(browser, TARGET);
+  });
+
+  test.afterAll(async ({ browser }) => {
+    await setTargetInOwnContext(browser, 'Auto');
+  });
+
   for (const [index, shot] of SHOTS.entries()) {
     test(`${index + 1}. ${shot.file}`, async ({ page }) => {
+      // Generous: the dashboard capture runs three real generations before it photographs anything.
+      test.setTimeout(180_000);
+
       await page.setViewportSize('viewport' in shot ? shot.viewport : CAPTURE_VIEWPORT);
 
       if ('collapseNav' in shot && shot.collapseNav) {
@@ -258,11 +317,27 @@ test.describe('Screenshots', () => {
         );
       }
 
+      if ('seed' in shot && shot.seed) {
+        await seedRuns(page, shot.seed);
+      }
+
       await page.goto(`${PLUGIN_URL}${shot.hash}`, { waitUntil: 'domcontentloaded' });
       await page.getByTestId(shot.ready).waitFor({ timeout: 20_000 });
+
+      /*
+       * The content, not the container that will hold it.
+       *
+       * `preview-table` is the table element, which renders immediately with a skeleton inside it, and
+       * the live preview round-trips the REST API for several seconds after that — so the fixed 1.2s
+       * wait below was a coin toss. The docs screenshots lost it and shipped three images of grey bars.
+       */
+      if ('settled' in shot && shot.settled) {
+        await page.locator(shot.settled).first().waitFor({ timeout: 30_000 });
+      }
+
       await hideWpChrome(page);
-      // Let the live preview request settle so no row renders mid-fetch.
-      await page.waitForTimeout(1200);
+      // A beat after the rows arrive, so nothing is captured mid-fade.
+      await page.waitForTimeout(600);
 
       // 'viewport' captures the frame-shaped region rather than an element: for a page taller
       // than the card, an element capture either crops arbitrarily or shrinks to a thumbnail.
