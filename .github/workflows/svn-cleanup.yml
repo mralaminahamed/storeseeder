@@ -35,7 +35,7 @@ jobs:
 
       - name: Checkout SVN target (immediates only)
         env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_USERNAME: ${{ vars.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           TARGET:       ${{ github.event.inputs.target }}
         run: |
@@ -50,7 +50,7 @@ jobs:
 
       - name: Delete specified paths
         env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_USERNAME: ${{ vars.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           PATHS:        ${{ github.event.inputs.paths }}
           TARGET:       ${{ github.event.inputs.target }}

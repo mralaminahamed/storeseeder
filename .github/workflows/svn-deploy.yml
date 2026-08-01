@@ -317,7 +317,13 @@ jobs:
         with:
           generate-zip: true
         env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          # A repository *variable*, not a secret. The wp.org username is public — readme.txt
+          # publishes it as `Contributors:` and it is on the plugin's directory page — and while it
+          # was a secret Actions redacted every occurrence of that string in logs and job
+          # summaries. Since it is also the GitHub owner name, the release link in the summary came
+          # out as `https://github.com/***/storeseeder/releases/tag/1.1.0`. The password stays a
+          # secret; a username is not a credential on its own.
+          SVN_USERNAME: ${{ vars.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG:         ${{ needs.meta.outputs.plugin_slug }}
           BUILD_DIR:    ./dist/${{ needs.meta.outputs.plugin_slug }}
