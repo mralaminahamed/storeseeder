@@ -1,10 +1,11 @@
-import React from "@wordpress/element";
+import React, { useState } from "@wordpress/element";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { __, _n, sprintf } from "@wordpress/i18n";
 
 import { Icon } from "@/lib/icons";
 import { labelFor } from "@/lib/recipes";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { useRecipes } from "@/components/recipes/context";
 
 /** What a run produced. `/recipes/:id/done`. */
@@ -12,6 +13,8 @@ export default function RecipeDoneView() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const { recipes, progress, undoing, undo, homeUrl, adminUrls } = useRecipes();
+
+  const [confirming, setConfirming] = useState(false);
 
   const recipe = recipes.find((r) => r.id === id) ?? null;
 
@@ -197,11 +200,57 @@ export default function RecipeDoneView() {
             ),
             runId,
           )}
-          onClick={() => void undo()}
+          onClick={() => setConfirming(true)}
         >
           {undoing ? __("Undoing…", "storeseeder") : __("Undo this recipe", "storeseeder")}
         </Button>
       </div>
+
+      {/*
+        Asked, because this is thousands of rows across nine resources and the button sits two
+        pixels from "Build another". The count is in the question rather than the abstract: "1,794
+        rows" is a thing someone can weigh, where "this recipe" is not.
+      */}
+      {confirming && (
+        <ConfirmDialog
+          testId="confirm-undo-recipe"
+          icon="undo"
+          title={__("Undo this recipe?", "storeseeder")}
+          body={
+            <>
+              <p>
+                {sprintf(
+                  /* translators: 1: row count, 2: resource count, 3: recipe name. */
+                  __(
+                    "This permanently removes the %1$s rows across %2$s resources that %3$s created.",
+                    "storeseeder",
+                  ),
+                  written.toLocaleString(),
+                  String(resources),
+                  recipe.name,
+                )}
+              </p>
+              <p>
+                {__(
+                  "Nothing else is touched — only rows this run recorded creating are removed, and anything you or another run created stays.",
+                  "storeseeder",
+                )}
+              </p>
+            </>
+          }
+          confirmLabel={sprintf(
+            /* translators: %s: number of rows. */
+            __("Yes, remove %s rows", "storeseeder"),
+            written.toLocaleString(),
+          )}
+          busyLabel={__("Removing…", "storeseeder")}
+          busy={undoing}
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            void undo().then(() => setConfirming(false));
+          }}
+        />
+      )}
     </div>
   );
 }
