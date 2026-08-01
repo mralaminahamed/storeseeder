@@ -21,12 +21,12 @@ export default defineConfig({
     { name: 'setup', testMatch: 'auth.setup.ts', use: { channel: 'chrome' } },
     {
       name: 'banners',
-      testMatch: 'banners.spec.ts',
+      testMatch: 'assets/wporg-banners.spec.ts',
       use: { channel: 'chrome' },
     },
     {
       name: 'shots',
-      testMatch: 'screenshots.spec.ts',
+      testMatch: 'assets/wporg-shots.spec.ts',
       dependencies: ['setup'],
       use: {
         channel: 'chrome',

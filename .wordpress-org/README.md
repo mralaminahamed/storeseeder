@@ -45,7 +45,7 @@ for s in 128 256 512; do rsvg-convert -w $s -h $s icon.svg -o "icon-${s}x${s}.pn
 the admin UI. Change one, change the other; `tests/php/src/AdminMenuIconTest.php`
 catches drift in the glyph, not in the colours.
 
-**Banners** — composed from markup in `tests/e2e/specs/banners.spec.ts`. One
+**Banners** — composed from markup in `tests/e2e/specs/assets/wporg-banners.spec.ts`. One
 layout in 772x250 units, scaled for the retina size, so the two files cannot
 disagree. Needs no WordPress:
 
@@ -54,7 +54,7 @@ yarn shots:banners
 ```
 
 **Screenshots** — real captures of the plugin, inset in a branded frame by
-`tests/e2e/specs/screenshots.spec.ts`. This one does need a WordPress install with
+`tests/e2e/specs/assets/wporg-shots.spec.ts`. This one does need a WordPress install with
 the plugin active, Fluent Cart present, and credentials in `tests/e2e/.env.test`:
 
 ```sh

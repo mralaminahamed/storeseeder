@@ -3,7 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 /**
  * Raw screenshots for the documentation site.
  *
- * Deliberately not `screenshots.spec.ts`. That one composites each capture onto a glass card with a
+ * Deliberately not `wporg-shots.spec.ts`. That one composites each capture onto a glass card with a
  * kicker and a title, because the WordPress.org carousel renders images at a fixed size and needs
  * them to read at a glance. Those decorations are wrong on a documentation page, where the caption
  * is the prose beside the image and a branded plate is just a thing to scroll past.

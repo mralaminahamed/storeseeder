@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { BRAND, glassField } from '../brand';
+import { BRAND, glassField } from '../../brand';
 
 const PLUGIN_URL = '/wp-admin/admin.php?page=storeseeder';
-const ASSET_DIR = join(__dirname, '..', '..', '..', '.wordpress-org');
+const ASSET_DIR = join(__dirname, '..', '..', '..', '..', '.wordpress-org');
 
 /** Palette shared with the icon and the banners. See tests/e2e/brand.ts. */
 

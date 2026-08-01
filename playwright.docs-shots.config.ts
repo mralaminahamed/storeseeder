@@ -29,12 +29,12 @@ export default defineConfig({
     {
       // Markup only — no WordPress, so no auth dependency.
       name: 'banner',
-      testMatch: 'docs-banner.spec.ts',
+      testMatch: 'assets/docs-banner.spec.ts',
       use: { channel: 'chrome' },
     },
     {
       name: 'docs',
-      testMatch: 'docs-shots.spec.ts',
+      testMatch: 'assets/docs-shots.spec.ts',
       dependencies: ['setup'],
       use: {
         channel: 'chrome',

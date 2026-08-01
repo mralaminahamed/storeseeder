@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { join } from 'path';
-import { BRAND, glassField, markSvg } from '../brand';
+import { BRAND, glassField, markSvg } from '../../brand';
 
 /**
  * Regenerates the two WordPress.org banners.
@@ -12,9 +12,9 @@ import { BRAND, glassField, markSvg } from '../brand';
  * one layout authored in 772x250 units, scaled up for the retina size, so the two
  * files cannot disagree and neither can drift from the icon's palette.
  *
- * Needs no WordPress — nothing here talks to a site, unlike screenshots.spec.ts.
+ * Needs no WordPress — nothing here talks to a site, unlike `assets/wporg-shots.spec.ts`.
  */
-const ASSET_DIR = join(__dirname, '..', '..', '..', '.wordpress-org');
+const ASSET_DIR = join(__dirname, '..', '..', '..', '..', '.wordpress-org');
 
 /** Base canvas. The 1544x500 banner is exactly this at 2x. */
 const BASE = { width: 772, height: 250 };
