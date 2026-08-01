@@ -4,6 +4,7 @@ import { __ } from "@wordpress/i18n";
 import { Icon } from "@/lib/icons";
 import { StatusPill } from "@/components/ui/status-pill";
 import { generators } from "@/lib/generators";
+import { localeLabelWithCode } from "@/lib/locales";
 import type { GlobalRun } from "@/types";
 
 function timeAgo(ts: number): string {
@@ -39,7 +40,9 @@ export function RecentActivity({ runs }: RecentActivityProps) {
         const iconName = gen?.iconName ?? "box";
         const name = gen?.name ?? run.route;
 
-        const localePart = run.locale ? run.locale.split(" (")[0] : "";
+        // The run stored a code. Drawn verbatim it read "de_DE", which names the language only to
+        // someone who already knows the code.
+        const localePart = run.locale ? localeLabelWithCode(run.locale) : "";
         const seedPart = run.seed
           ? `· ${__("seed", "storeseeder")} ${run.seed}`
           : `· ${__("random seed", "storeseeder")}`;

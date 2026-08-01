@@ -1,5 +1,6 @@
 import React, { useId } from "react";
 import type { FieldDescriptor } from "@/lib/fieldsFromSchema";
+import { optionLabel } from "@/lib/fieldsFromSchema";
 import type { ParamValue } from "@/types";
 import { Toggle } from "@/components/generator/fields/Toggle";
 import { Chips } from "@/components/generator/fields/Chips";
@@ -144,7 +145,12 @@ export function Field({
         <FieldSelect
           id={controlId}
           value={asText(value) || (f.default as string) || ""}
-          options={f.options ?? []}
+          // Pairs, not bare strings: the value stays as the schema spells it and only the
+          // label is made readable. FieldSelect keys its selection on the value.
+          options={(f.options ?? []).map((option) => ({
+            value: option,
+            label: optionLabel(option),
+          }))}
           onChange={onChange}
           width={320}
         />

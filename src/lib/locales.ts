@@ -43,6 +43,28 @@ export function localeLabel(code: string): string {
   return localeMap()[code] ?? code;
 }
 
+/**
+ * A locale as "German (de_DE)" — the language named in full, with the code that was actually used.
+ *
+ * For anywhere a code is the only thing on screen. The run history stored `de_DE` and drew it
+ * verbatim, which tells a reader nothing unless they already know the code; the code still belongs
+ * there, because it is what the run was made with and what reproducing it needs.
+ *
+ * The region is dropped from the server's label — "Arabic (Egypt)" becomes "Arabic (ar_EG)" —
+ * because the code already carries it and two sets of brackets read as a mistake.
+ *
+ * An unknown code renders as itself rather than as an empty bracket.
+ */
+export function localeLabelWithCode(code: string): string {
+  const label = localeMap()[code];
+
+  if (!label) return code;
+
+  const language = label.split(" (")[0];
+
+  return `${language} (${code})`;
+}
+
 /** Whether a code is one the server will accept. */
 export function isSupportedLocale(code: string): boolean {
   return code in localeMap();
