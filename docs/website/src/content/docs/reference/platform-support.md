@@ -6,6 +6,11 @@ description: What each driver can write, and what it refuses — with reasons.
 Support is **computed per request**, never cached. Caching it in an option would mean activating a plugin failed to register — so this table is what the shipped drivers answer today, and the plugin's
 own **Settings → Platforms** is always authoritative for your site.
 
+A refusal is stated where you would meet it, in the platform's own terms rather than as a disabled
+control with no explanation:
+
+![A generator refused by the target, explaining that WooCommerce records payment on the order itself](../../../assets/screenshots/unsupported-notice.png)
+
 ## The matrix
 
 | Resource          | Fluent Cart                                      | WooCommerce                              |

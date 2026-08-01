@@ -5,6 +5,8 @@ description: Two tools per generator, gated at registration rather than at call 
 
 StoreSeeder exposes its generators over the **Model Context Protocol**, so an assistant can preview and create test data directly.
 
+![The AI tools card — the endpoint, the live tool count, and the three switches](../../../assets/screenshots/settings-mcp.png)
+
 Twenty-one generators, two tools each:
 
 |                       |                            |

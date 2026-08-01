@@ -5,7 +5,15 @@ description: The ledger, never a heuristic.
 
 **Settings → Danger zone → Delete generated data.**
 
-![The danger zone's delete control, showing the recorded row count](../../../assets/screenshots/danger-zone.png)
+![The danger zone's delete control, itemising the recorded rows per resource](../../../assets/screenshots/danger-zone.png)
+
+The count on the button is the ledger's, and the list beneath it is itemised per resource — so you can
+see what a purge would take before you press it.
+
+![The confirmation, naming the exact number of rows and what it will not touch](../../../assets/screenshots/confirm-delete.png)
+
+The confirmation names the number and states the bound. Cancel takes focus, Tab is trapped inside the
+dialog, and Escape is refused while the deletion is running.
 
 ```mermaid
 flowchart LR

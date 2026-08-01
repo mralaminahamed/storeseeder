@@ -5,6 +5,11 @@ description: Seventy-five locales, one list, and the bug that comes from having 
 
 Pick a locale in the topbar or set a default in Settings. Names, addresses, phone numbers, postcodes and company names all follow it.
 
+![The locale picker — searchable, with each locale's code beside its name](../../../assets/screenshots/locale-picker.png)
+
+The picker is searchable by name or by code, and the code is shown beside each one because that is what
+the REST API, WP-CLI and the MCP tools take.
+
 ## One list, and why that matters
 
 `Platforms\Locale` is the only locale list in the plugin. PHP reads it there; TypeScript reads the codes the server inlines.

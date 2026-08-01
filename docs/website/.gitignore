@@ -1,5 +1,8 @@
 # build output
 dist/
+# generated from the repository's CHANGELOG.md by scripts/sync-changelog.mjs on predev/prebuild.
+# Not committed: a second copy of the changelog in the tree is a second changelog somebody will edit.
+src/content/docs/reference/changelog.md
 # generated types
 .astro/
 # deps

@@ -11,6 +11,11 @@ Two ways in.
 
 **A generator** builds one resource at a time, with a live preview and parameters that reach the output.
 
+![The StoreSeeder overview — the generator grid, the sidebar, and the target named under the wordmark](../../../assets/screenshots/overview.png)
+
+The sidebar lists both: Recipes above, then the twenty-one generators grouped into core and advanced.
+Under the wordmark is the store everything will be written to.
+
 ## It is not single-platform
 
 Which store the data lands in is a choice, not a build-time assumption. A **platform driver** owns that decision, and the same twenty-one generators feed every driver — so a fixed seed produces

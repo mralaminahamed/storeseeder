@@ -5,6 +5,8 @@ description: Where the data lands, and why StoreSeeder asks rather than guesses.
 
 Pick the target in the topbar, or in **Settings → This site**. The choice is stored site-wide, so two administrators cannot unknowingly seed different stores.
 
+![The topbar's target picker, open, with Auto ticked and both active stores listed](../../../assets/screenshots/target-platform.png)
+
 ## Auto, and why it sometimes refuses
 
 **Auto** resolves to the only active platform. With more than one active and none chosen, it is deliberately ambiguous and StoreSeeder asks instead of picking.

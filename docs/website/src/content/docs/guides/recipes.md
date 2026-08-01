@@ -35,6 +35,27 @@ A vocabulary pack re-implements none of it, and every parameter you already had 
 Each supplies all six things the completeness bar requires. A recipe that swapped the nouns and left the rest generic would be worse than none: grocery products priced $9.99–$999.99 in Size/Color is a
 *plausible* lie, and a plausible lie is harder to notice than an obvious one.
 
+## Start to finish
+
+The whole flow, then the detail behind each part.
+
+1. **Open Recipes** in the sidebar. On a fresh install you get a **Download the recipes** button
+   instead of cards — see [The first run](#the-first-run).
+2. **Choose a target store** if more than one is active. `Create the store` stays disabled until you
+   do, and will not guess.
+3. **Read the card.** The counts are itemised per resource, and anything your platform refuses is
+   struck through with the reason beside it.
+4. **Pick a card.** The run bar appears beneath the grid with the size, the row total, and any guard
+   that applies.
+5. **Pick a size** — Small (×0.25), Medium, or Large (×4). The counts on every card rescale live.
+6. **Press Create the store.** It moves to its own screen and starts working through the plan in
+   dependency order.
+7. **Wait, or leave.** The progress is real and the run survives you navigating away.
+8. **Read the result**, and use **Undo this recipe** if it was not what you wanted.
+
+Each step is undoable, and the whole run is undoable as a unit, so there is no point in the flow where
+you are committed to keeping it.
+
 ## The first run
 
 Recipes are downloaded from [their own repository](https://github.com/mralaminahamed/storeseeder-recipes), so a fresh install shows a **Download the recipes** button rather than cards. It is about 90
@@ -73,8 +94,17 @@ shops interleaved.
 
 ## While it runs
 
+![A recipe building — the progress bar, and the plan with completed steps ticked](../../../assets/screenshots/recipe-running.png)
+
 Resources run in **dependency order** — brands and categories before products, products and customers before orders — because an order needs something real to point at. Fan them out and you get orders
 with no line items.
+
+The plan is listed with a dot per step: filled and ticked when done, highlighted while running. A
+resource your platform refuses stays in the list, struck through — dropping it silently would make the
+step list disagree with the card you just read.
+
+Each step shows the number of rows it will create, not a running `40 / 240`. The bar above is the
+progress; the number is the size of the job.
 
 The step counter is real. It counts completed requests, not an animation against a guessed duration, so a long step looks long instead of looking finished. You can leave the page and come back to a
 build still going.
@@ -83,7 +113,13 @@ Requests are capped at 100 rows each, so a 900-order step is nine calls. That is
 
 ## Afterwards
 
+![A finished recipe — what it created, with each count linking to that resource's admin screen](../../../assets/screenshots/recipe-done.png)
+
 The result names what it made and links each count to that resource's admin screen, so you can go and look at the products you just created.
+
+Anything that failed is listed rather than summarised away. A recipe reports partial success as partial
+success: the steps that worked stay, and you can undo the run and try again once whatever blocked the
+rest is fixed.
 
 **Undo this recipe** removes exactly what that run wrote and nothing else — every row carries a run id in StoreSeeder's ledger. The same id works from the command line:
 

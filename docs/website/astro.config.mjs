@@ -52,6 +52,7 @@ export default defineConfig({
           items: [
             { label: 'Recipes', slug: 'guides/recipes' },
             { label: 'Running a generator', slug: 'guides/generators' },
+            { label: 'The batch queue', slug: 'guides/batch' },
             { label: 'Deleting generated data', slug: 'guides/cleanup' },
             { label: 'Locales', slug: 'guides/locales' },
             { label: 'AI and MCP', slug: 'guides/mcp' },
@@ -68,6 +69,10 @@ export default defineConfig({
             { label: 'REST API', slug: 'reference/rest-api' },
             { label: 'Extension points', slug: 'reference/extension-points' },
             { label: 'External services', slug: 'reference/external-services' },
+            { label: 'Support & troubleshooting', slug: 'reference/support' },
+            // Generated from the repository's CHANGELOG.md on predev/prebuild — see
+            // scripts/sync-changelog.mjs. Listed last because it is the longest page on the site.
+            { label: 'Changelog', slug: 'reference/changelog' },
           ],
         },
       ],
