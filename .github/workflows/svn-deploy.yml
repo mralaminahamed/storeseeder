@@ -3,7 +3,10 @@ name: Release Plugin to WP.org
 on:
   push:
     tags:
-      - "*"
+      # `v1.2.0` is the convention. Bare `1.0.0` and `1.1.0` shipped before it and stay valid,
+      # since the meta job strips a leading `v` and compares against the plugin header either way.
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "[0-9]+.[0-9]+.[0-9]+*"
 
 permissions:
   contents: write # Required to create a GitHub release
@@ -318,6 +321,10 @@ jobs:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG:         ${{ needs.meta.outputs.plugin_slug }}
           BUILD_DIR:    ./dist/${{ needs.meta.outputs.plugin_slug }}
+          # The stripped version, not the git ref. Without this the action names the SVN tag
+          # after the git tag verbatim, so `v1.2.0` would publish to `tags/v1.2.0` while
+          # readme.txt points `Stable tag` at `1.2.0` — and wp.org would serve nothing.
+          VERSION:      ${{ needs.meta.outputs.version }}
           ASSETS_DIR:   .wordpress-org
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
