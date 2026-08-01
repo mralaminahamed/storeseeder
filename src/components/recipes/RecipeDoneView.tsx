@@ -11,7 +11,7 @@ import { useRecipes } from "@/components/recipes/context";
 export default function RecipeDoneView() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
-  const { recipes, progress, undoing, undo, homeUrl } = useRecipes();
+  const { recipes, progress, undoing, undo, homeUrl, adminUrls } = useRecipes();
 
   const recipe = recipes.find((r) => r.id === id) ?? null;
 
@@ -25,57 +25,127 @@ export default function RecipeDoneView() {
   const written = Object.values(progress.rows).reduce((t, n) => t + n, 0);
   const resources = Object.keys(progress.rows).length;
 
+  // ── undone ─────────────────────────────────────────────────────────────────
+  // Its own small panel rather than the built one with four things hidden. Nothing was created, so
+  // a tally of what was created, a link to look at it and a button to remove it are all answers to
+  // questions that no longer exist — and a card that is mostly gaps reads as broken rather than as
+  // finished.
+  if (undone) {
+    return (
+      <div className="fp-card fp-recipe-undone">
+        <span className="fp-recipe-done-ic undone">
+          <Icon name="undo" size={21} stroke={2.2} />
+        </span>
+        <div className="fp-recipe-run-title">{__("Recipe undone", "storeseeder")}</div>
+        <p className="fp-recipe-run-sub">
+          {sprintf(
+            /* translators: %s: recipe name. */
+            __(
+              "Every row %s created has been removed. The store is back where it started.",
+              "storeseeder",
+            ),
+            recipe.name,
+          )}
+        </p>
+        <Button
+          variant="primary"
+          size="lg"
+          type="button"
+          onClick={() => void navigate("/recipes")}
+        >
+          {__("Build another", "storeseeder")}
+        </Button>
+      </div>
+    );
+  }
+
+  // ── built ──────────────────────────────────────────────────────────────────
   return (
     <div className="fp-card fp-recipe-done">
       <div className="fp-recipe-done-head">
-        <span className={`fp-recipe-done-ic${undone ? " undone" : ""}`}>
-          <Icon name={undone ? "undo" : "check"} size={21} stroke={2.2} />
+        <span className="fp-recipe-done-ic">
+          <Icon name="check" size={21} stroke={2.2} />
         </span>
         <div>
           <div className="fp-recipe-run-title">
-            {undone
-              ? __("Recipe undone", "storeseeder")
-              : sprintf(
-                  /* translators: %s: recipe name. */
-                  __("%s built", "storeseeder"),
-                  recipe.name,
-                )}
+            {sprintf(
+              /* translators: %s: recipe name. */
+              __("%s built", "storeseeder"),
+              recipe.name,
+            )}
           </div>
           <div className="fp-recipe-run-sub">
-            {undone
-              ? __("Every row it created has been removed.", "storeseeder")
-              : sprintf(
-                  /* translators: 1: row count, 2: resource count. */
-                  _n(
-                    "%1$s row across %2$s resource.",
-                    "%1$s rows across %2$s resources.",
-                    resources,
-                    "storeseeder",
-                  ),
-                  written.toLocaleString(),
-                  String(resources),
-                )}
+            {sprintf(
+              /* translators: 1: row count, 2: resource count. */
+              _n(
+                "%1$s row across %2$s resource.",
+                "%1$s rows across %2$s resources.",
+                resources,
+                "storeseeder",
+              ),
+              written.toLocaleString(),
+              String(resources),
+            )}
           </div>
         </div>
       </div>
 
-      {progress.errors.length > 0 && !undone && (
+      {/*
+        A list, not a joined string. Three failed resources ran together behind a middle dot into
+        one unreadable line, which is the shape that gets skipped.
+      */}
+      {progress.errors.length > 0 && (
         <div className="fp-recipe-guard">
           <Icon name="alert" size={14} />
-          <span>{progress.errors.join(" · ")}</span>
+          <ul className="fp-recipe-errors">
+            {progress.errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {!undone && (
-        <div className="fp-recipe-tally">
-          {Object.entries(progress.rows).map(([resource, n]) => (
-            <div key={resource}>
-              <div className="fp-recipe-tally-k">{labelFor(resource)}</div>
-              <div className="fp-recipe-tally-v mono">{n.toLocaleString()}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/*
+        The counts are the navigation. Someone who has just been told there are 180 new products
+        wants to look at them, and eight numbers that go nowhere is a receipt where a door belongs.
+        A resource whose driver has no screen for it stays plain text rather than becoming a link
+        that lands somewhere unrelated.
+      */}
+      <div className="fp-recipe-tally">
+        {Object.entries(progress.rows).map(([resource, n]) => {
+          const label = labelFor(resource);
+          const href = adminUrls[resource];
+          const count = <span className="fp-recipe-tally-v mono">{n.toLocaleString()}</span>;
+
+          if (!href) {
+            return (
+              <div key={resource}>
+                <div className="fp-recipe-tally-k">{label}</div>
+                {count}
+              </div>
+            );
+          }
+
+          return (
+            <a
+              key={resource}
+              className="fp-recipe-tally-link fp-focusable"
+              href={href}
+              title={sprintf(
+                /* translators: %s: resource name, e.g. Products. */
+                __("Open %s", "storeseeder"),
+                label,
+              )}
+            >
+              <span className="fp-recipe-tally-k">
+                {label}
+                <Icon name="external" size={11} />
+              </span>
+              {count}
+            </a>
+          );
+        })}
+      </div>
 
       <div className="fp-recipe-done-foot">
         {/*
@@ -83,7 +153,7 @@ export default function RecipeDoneView() {
           somewhere different, and a link that guesses wrong is worse than one that lands
           somewhere true. Hidden entirely when the site did not inline a URL.
         */}
-        {!undone && homeUrl && (
+        {homeUrl && (
           <Button
             variant="outline"
             size="sm"
@@ -102,20 +172,35 @@ export default function RecipeDoneView() {
         >
           {__("Build another", "storeseeder")}
         </Button>
+
         <span className="fp-recipe-spacer" />
-        <span className="fp-recipe-runid mono">{runId}</span>
-        {!undone && (
-          <Button
-            variant="outline"
-            size="sm"
-            icon="undo"
-            type="button"
-            disabled={undoing}
-            onClick={() => void undo()}
-          >
-            {undoing ? __("Undoing…", "storeseeder") : __("Undo this recipe", "storeseeder")}
-          </Button>
-        )}
+
+        {/*
+          Danger, and alone on its side of the bar. It is the only control here that removes
+          anything, and it was the same outline button as the two that do not.
+
+          The run id rides on it rather than standing as its own column between the actions. It is
+          a handle for `wp storeseeder cleanup --run_id=`, useful to roughly nobody in the moment,
+          and it previously had equal weight with the buttons.
+        */}
+        <Button
+          variant="danger"
+          size="sm"
+          icon="undo"
+          type="button"
+          disabled={undoing}
+          title={sprintf(
+            /* translators: %s: the run identifier, e.g. rcp_grocery_ab12cd. */
+            __(
+              "Removes only what this run created. From the command line: wp storeseeder cleanup --run_id=%s",
+              "storeseeder",
+            ),
+            runId,
+          )}
+          onClick={() => void undo()}
+        >
+          {undoing ? __("Undoing…", "storeseeder") : __("Undo this recipe", "storeseeder")}
+        </Button>
       </div>
     </div>
   );

@@ -38,6 +38,8 @@ export interface RecipesContext {
   incomplete: string[];
   /** False when more than one store is active and none was chosen. */
   resolved: boolean;
+  /** Where each resource lives in wp-admin on the resolved target, so a result can link to it. */
+  adminUrls: Record<string, string>;
   syncing: boolean;
   sync: () => Promise<void>;
 

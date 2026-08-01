@@ -225,6 +225,48 @@ final class Platform extends Platform_Driver {
 	}
 
 	/**
+	 * WooCommerce's own admin screens.
+	 *
+	 * Not derivable from the resource name, which is the reason this is a driver method. Orders
+	 * moved to their own page under high-performance order storage while products stayed on
+	 * `edit.php`; the taxonomies share one screen distinguished only by a query argument; and
+	 * shipping classes live inside a settings tab rather than a list table at all.
+	 *
+	 * Variations, refunds and tax rates are absent deliberately — they have no list of their own,
+	 * and pointing at a parent screen would be a link that does not go where it says.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return string|null
+	 */
+	protected function admin_path( string $resource_type ): ?string {
+		$screens = array(
+			Resource::PRODUCT          => 'edit.php?post_type=product',
+			Resource::PRODUCT_CATEGORY => 'edit-tags.php?taxonomy=product_cat&post_type=product',
+			Resource::PRODUCT_TAG      => 'edit-tags.php?taxonomy=product_tag&post_type=product',
+			Resource::BRAND            => 'edit-tags.php?taxonomy=product_brand&post_type=product',
+			Resource::CUSTOMER         => 'admin.php?page=wc-admin&path=%2Fcustomers',
+			Resource::COUPON           => 'edit.php?post_type=shop_coupon',
+			Resource::SHIPPING_CLASS   => 'admin.php?page=wc-settings&tab=shipping&section=classes',
+			Resource::TAX_CLASS        => 'admin.php?page=wc-settings&tab=tax',
+			Resource::SUBSCRIPTION     => 'edit.php?post_type=shop_subscription',
+		);
+
+		if ( Resource::ORDER === $resource_type ) {
+			// HPOS moves orders off `edit.php`. Asked rather than assumed: a site can still be on
+			// post storage, and a link to the wrong one lands on an empty list.
+			return class_exists( '\\Automattic\\WooCommerce\\Utilities\\OrderUtil' )
+				&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()
+				? 'admin.php?page=wc-orders'
+				: 'edit.php?post_type=shop_order';
+		}
+
+		return $screens[ $resource_type ] ?? null;
+	}
+
+	/**
 	 * Products and customers a WooCommerce store already has.
 	 *
 	 * Through the CRUD layer rather than a direct query, for the same reason the writers use it:

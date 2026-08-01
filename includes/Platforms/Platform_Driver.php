@@ -219,6 +219,66 @@ abstract class Platform_Driver implements Platform_Interface {
 	}
 
 	/**
+	 * Where a resource lives in wp-admin, or null when it has no screen of its own.
+	 *
+	 * A recipe finishes by telling someone it made 180 products. The next thing they want is to
+	 * look at them, and until now the completion panel was eight numbers that went nowhere — a
+	 * receipt where a door belonged.
+	 *
+	 * Only the driver can answer: WooCommerce's orders moved to `admin.php?page=wc-orders` under
+	 * HPOS while its products stayed on `edit.php`, and Fluent Cart's are hash routes inside one
+	 * page. Deriving any of that from a resource name would be guessing.
+	 *
+	 * Concrete and returning null rather than abstract, the same way `Writer::delete()` and
+	 * `search()` are: a driver written against `Platform_Interface` before this existed keeps
+	 * loading, and its counts render as plain text exactly as they do today.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return string|null Absolute admin URL, or null.
+	 */
+	public function admin_url( string $resource_type ): ?string {
+		$path = $this->admin_path( $resource_type );
+
+		/**
+		 * Filters where a resource's admin screen is, for one platform.
+		 *
+		 * @since 1.2.0
+		 * @hook  storeseeder_platform_admin_url_{$platform}
+		 *
+		 * @param mixed  $path          Admin-relative path, or null when the driver has no screen
+		 *                              for this resource.
+		 * @param string $resource_type Canonical resource name.
+		 */
+		$filtered = apply_filters( "storeseeder_platform_admin_url_{$this->id()}", $path, $resource_type );
+
+		if ( ! is_string( $filtered ) || '' === $filtered ) {
+			return null;
+		}
+
+		// `admin_url()` rather than concatenation: a site in a subdirectory, or one where wp-admin
+		// has been moved, still gets a link that works.
+		return admin_url( $filtered );
+	}
+
+	/**
+	 * One driver's own admin screens, admin-relative. Overridden by drivers that have them.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return string|null Path relative to wp-admin, or null.
+	 */
+	protected function admin_path( string $resource_type ): ?string {
+		unset( $resource_type );
+
+		return null;
+	}
+
+	/**
 	 * One driver's own search. Overridden by drivers that can offer suggestions.
 	 *
 	 * @since 1.1.0

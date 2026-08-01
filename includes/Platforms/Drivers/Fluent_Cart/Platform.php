@@ -213,6 +213,35 @@ final class Platform extends Platform_Driver {
 	}
 
 	/**
+	 * Fluent Cart's own admin screens.
+	 *
+	 * One page and a hash router rather than WordPress list tables, so every path shares a prefix
+	 * and differs only after the `#`. Taken from the plugin's own submenu registration rather than
+	 * guessed, since a route it does not know simply renders its dashboard — a link that appears to
+	 * work while going nowhere in particular.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param string $resource_type Canonical resource name.
+	 *
+	 * @return string|null
+	 */
+	protected function admin_path( string $resource_type ): ?string {
+		$routes = array(
+			Resource::PRODUCT      => 'products',
+			Resource::ORDER        => 'orders',
+			Resource::CUSTOMER     => 'customers',
+			Resource::SUBSCRIPTION => 'subscriptions',
+		);
+
+		if ( ! isset( $routes[ $resource_type ] ) ) {
+			return null;
+		}
+
+		return 'admin.php?page=fluent-cart#/' . $routes[ $resource_type ];
+	}
+
+	/**
 	 * Products and customers a Fluent Cart store already has.
 	 *
 	 * Through its Eloquent models, which is where the data lives — a product is a `wp_posts` row
