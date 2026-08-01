@@ -865,3 +865,32 @@
   padding:44px 30px;
 }
 .fp-root .fp-recipe-undone .fp-recipe-run-sub { max-width:52ch; }
+
+/* ===== confirmation dialog =====
+   Narrower than the consent prompt and centred, because it asks one question and the body is two
+   sentences. Borrows `.fp-overlay` for the scrim, so it dims and blurs the page the same way every
+   other layer does. */
+.fp-root .fp-confirm {
+  width:min(440px, calc(100vw - 40px)); margin:auto;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-pop); padding:24px 24px 20px;
+  display:flex; flex-direction:column; gap:12px;
+  animation:fp-confirm-in .16s cubic-bezier(.2,.7,.2,1) both;
+}
+/* Red, not accent: this is the one dialog whose answer removes something, and the mark is the
+   first thing read. */
+.fp-root .fp-confirm-ic {
+  width:var(--tile-lg); height:var(--tile-lg); border-radius:11px; display:grid; place-items:center;
+  background:color-mix(in oklab, var(--red) 12%, var(--surface)); color:var(--red);
+}
+.fp-root .fp-confirm-title { margin:0; font-size:var(--fs-h2); font-weight:600; letter-spacing:-.01em; color:var(--text); }
+.fp-root .fp-confirm-body { display:flex; flex-direction:column; gap:9px; }
+.fp-root .fp-confirm-body p { margin:0; font-size:var(--fs-ctl-sm); line-height:1.6; color:var(--text-2); }
+/* Cancel first in the DOM so it takes focus and Tab reaches it first; the destructive answer sits
+   on the right, where the eye lands last. */
+.fp-root .fp-confirm-foot { display:flex; justify-content:flex-end; gap:10px; margin-top:4px; }
+
+@keyframes fp-confirm-in { from { opacity:0; transform:translateY(6px) scale(.98); } }
+@media (prefers-reduced-motion: reduce) {
+  .fp-root .fp-confirm { animation:none; }
+}

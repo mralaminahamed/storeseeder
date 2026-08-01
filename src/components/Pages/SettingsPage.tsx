@@ -35,6 +35,7 @@ import { requestTweaksPanel } from "@/lib/events";
 import { DEFAULT_LOCALE, localeOptions } from "@/lib/locales";
 import { AUTO } from "@/lib/platform";
 import { usePlatform } from "@/providers/PlatformProvider";
+import { ConfirmDialog } from "@/components/overlays/ConfirmDialog";
 import { PageHead } from "@/components/ui/PageHead";
 import { useStats } from "@/providers/StatsProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -210,6 +211,11 @@ export default function SettingsPage() {
   // Two-step rather than a browser confirm(): a native dialog blocks the page and looks
   // nothing like the rest of the admin.
   const [confirmPurge, setConfirmPurge] = useState(false);
+  // Two actions here had no confirmation at all, and both are irreversible: forgetting ledger
+  // records leaves rows in the store with nothing that knows StoreSeeder put them there, and
+  // clearing the history takes the counts and the run log with it.
+  const [confirmForget, setConfirmForget] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [purgeNote, setPurgeNote] = useState("");
   const [purgeErrors, setPurgeErrors] = useState<string[]>([]);
 
@@ -1374,40 +1380,15 @@ export default function SettingsPage() {
                 StoreSeeder created and nothing that resembles it. */}
             <div className="fp-danger-act" data-testid="danger-generated">
               <div>
-                {confirmPurge ? (
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <Button
-                      variant="danger"
-                      icon="trash"
-                      onClick={() => void handlePurge()}
-                      disabled={purging}
-                      data-testid="delete-generated-confirm"
-                    >
-                      {sprintf(
-                        /* translators: %s: number of rows. */
-                        __("Yes, delete %s rows", "storeseeder"),
-                        (generated?.total ?? 0).toLocaleString(),
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setConfirmPurge(false)}
-                      disabled={purging}
-                    >
-                      {__("Cancel", "storeseeder")}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="danger"
-                    icon="trash"
-                    onClick={() => setConfirmPurge(true)}
-                    disabled={purging || 0 === (generated?.total ?? 0)}
-                    data-testid="delete-generated"
-                  >
-                    {purgeButtonLabel()}
-                  </Button>
-                )}
+                <Button
+                  variant="danger"
+                  icon="trash"
+                  onClick={() => setConfirmPurge(true)}
+                  disabled={purging || 0 === (generated?.total ?? 0)}
+                  data-testid="delete-generated"
+                >
+                  {purgeButtonLabel()}
+                </Button>
               </div>
 
               <p className="fp-set-hint" style={{ marginTop: 7 }}>
@@ -1462,7 +1443,8 @@ export default function SettingsPage() {
                     variant="outline"
                     size="sm"
                     icon="x"
-                    onClick={() => void handleForget()}
+                    type="button"
+                    onClick={() => setConfirmForget(true)}
                     disabled={purging}
                   >
                     {__("Forget the remaining records", "storeseeder")}
@@ -1473,7 +1455,12 @@ export default function SettingsPage() {
 
             <div className="fp-danger-act">
               <div>
-                <Button variant="danger" icon="trash" onClick={handleClearData}>
+                <Button
+                  variant="danger"
+                  icon="trash"
+                  type="button"
+                  onClick={() => setConfirmClear(true)}
+                >
                   {__(
                     "Clear run history & stats",
                     "storeseeder",
@@ -1512,6 +1499,106 @@ export default function SettingsPage() {
         </SetSection>
 
       </div>
+
+      {/*
+        All three at the end rather than beside their buttons: a dialog is a layer over the page,
+        and nesting one inside a card that scrolls means it inherits that card's clipping.
+      */}
+      {confirmPurge && (
+        <ConfirmDialog
+          testId="confirm-purge"
+          title={__("Delete the generated data?", "storeseeder")}
+          body={
+            <>
+              <p>
+                {sprintf(
+                  /* translators: %s: number of rows. */
+                  __(
+                    "This permanently removes the %s rows StoreSeeder recorded creating, along with what hangs off them.",
+                    "storeseeder",
+                  ),
+                  (generated?.total ?? 0).toLocaleString(),
+                )}
+              </p>
+              <p>
+                {__(
+                  "Your own data is never matched on. Only rows in StoreSeeder's own ledger are touched, so a catalogue restored from production is safe.",
+                  "storeseeder",
+                )}
+              </p>
+            </>
+          }
+          confirmLabel={sprintf(
+            /* translators: %s: number of rows. */
+            __("Yes, delete %s rows", "storeseeder"),
+            (generated?.total ?? 0).toLocaleString(),
+          )}
+          busyLabel={__("Deleting…", "storeseeder")}
+          busy={purging}
+          onCancel={() => setConfirmPurge(false)}
+          onConfirm={() => void handlePurge()}
+        />
+      )}
+
+      {confirmForget && (
+        <ConfirmDialog
+          testId="confirm-forget"
+          icon="x"
+          title={__("Forget the remaining records?", "storeseeder")}
+          body={
+            <>
+              <p>
+                {__(
+                  "This drops StoreSeeder's record of those rows without deleting them. They stay in your store.",
+                  "storeseeder",
+                )}
+              </p>
+              <p>
+                {__(
+                  "Afterwards nothing knows StoreSeeder created them, so they can never be removed automatically — you would have to find and delete them yourself.",
+                  "storeseeder",
+                )}
+              </p>
+            </>
+          }
+          confirmLabel={__("Yes, forget them", "storeseeder")}
+          busy={purging}
+          onCancel={() => setConfirmForget(false)}
+          onConfirm={() => {
+            setConfirmForget(false);
+            void handleForget();
+          }}
+        />
+      )}
+
+      {confirmClear && (
+        <ConfirmDialog
+          testId="confirm-clear-history"
+          title={__("Clear the run history and stats?", "storeseeder")}
+          body={
+            <>
+              <p>
+                {__(
+                  "This clears the dashboard counts, the sparklines and the recent-activity list.",
+                  "storeseeder",
+                )}
+              </p>
+              <p>
+                {__(
+                  "Nothing is deleted from your store — but StoreSeeder's own ledger is separate from this, so the Delete option above keeps working afterwards.",
+                  "storeseeder",
+                )}
+              </p>
+            </>
+          }
+          confirmLabel={__("Yes, clear the history", "storeseeder")}
+          onCancel={() => setConfirmClear(false)}
+          onConfirm={() => {
+            setConfirmClear(false);
+            handleClearData();
+          }}
+        />
+      )}
     </div>
   );
 }
