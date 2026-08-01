@@ -260,7 +260,7 @@ POST /wp-json/storeseeder/v1/download-sample/consent
 ```
 
 The REST base is not always the resource name — `cart_session` is served at `cart-sessions`,
-`tax_class` at `tax_classes`. [Usage](usage.md#rest-api) lists all eighteen with the response
+`tax_class` at `tax_classes`. [Usage](usage.md#rest-api) lists all twenty-one with the response
 shape.
 
 ## Extensibility

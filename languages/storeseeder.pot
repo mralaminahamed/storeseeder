@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StoreSeeder 1.0.0\n"
+"Project-Id-Version: StoreSeeder 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/storeseeder\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T23:30:33+00:00\n"
+"POT-Creation-Date: 2026-08-01T05:16:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -31,7 +31,7 @@ msgstr ""
 
 #. Description of the plugin
 #: storeseeder.php
-msgid "Realistic test data for WordPress e-commerce platforms. Eighteen generators — products, customers, orders, coupons and more — write through a platform driver, so the same data can seed any supported store. Fluent Cart ships; other platforms can register their own driver. For development, testing, and demos."
+msgid "Realistic test data for WordPress e-commerce platforms. Twenty-one generators — products, customers, orders, coupons and more — write through a platform driver, so the same data can seed any supported store. Fluent Cart and WooCommerce ship; other platforms can register their own driver. For development, testing, and demos."
 msgstr ""
 
 #. Author of the plugin

@@ -9,7 +9,7 @@ Generate realistic test data for WordPress e-commerce stores. Start with the
 |------|----------------|
 | [Installation](installation.md) | Requirements, install from a release zip or from source, choosing a target platform |
 | [Usage](usage.md) | Running generators, live preview, the batch queue, settings, run history, and the REST API |
-| [Features](features.md) | The 18 generators and what each one writes into the store |
+| [Features](features.md) | The 21 generators and what each one writes into the store |
 
 ## Building on StoreSeeder
 
@@ -36,7 +36,7 @@ Generate realistic test data for WordPress e-commerce stores. Start with the
   and the sample-data routes. All require `manage_options`, or whatever `storeseeder_capability`
   returns. The REST base is
   not always the resource name: `cart_session` is served at `cart-sessions` and `tax_class` at
-  `tax_classes`. [Usage](usage.md#rest-api) lists all eighteen.
+  `tax_classes`. [Usage](usage.md#rest-api) lists all twenty-one.
 - **Hooks** — filters and actions across the generation lifecycle, described in
   [architecture.md](architecture.md#extension-points) with copy-paste examples in the
   [README](../README.md#extensibility)

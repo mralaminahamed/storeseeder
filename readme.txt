@@ -1,10 +1,10 @@
-=== StoreSeeder – eCommerce Test Data Generator for Fluent Cart ===
+=== StoreSeeder – eCommerce Test Data Generator for WooCommerce & Fluent Cart ===
 Contributors: mralaminahamed
-Tags: test data, dummy data, demo content, ecommerce, faker
+Tags: test data, dummy data, demo content, woocommerce, faker
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,7 +109,7 @@ Generators produce platform-neutral records; a writer for the chosen platform pe
 Yes, from your own plugin and without patching this one. Register a driver on the `storeseeder_platforms` filter and the generators, REST API, and admin pick it up. A driver answers what it is called, whether it is active, which resources it supports, and which writer handles each one. See the architecture documentation for the full contract.
 
 = How many generators are included? =
-Seventeen: products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs.
+Twenty-one: products, product variations, product categories, product tags, brands, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
 
 = Some generators need existing data. Why? =
 Several generators build on others: orders need products and customers; refunds need charge transactions; order tax lines need orders and tax rates; product downloads and subscriptions need products and orders. Generate the prerequisites first, and each generator reports clearly when something is missing.
@@ -141,9 +141,6 @@ Yes, with WP-CLI: `wp storeseeder generate products --count=20 --locale=de_DE --
 = Is the plugin translatable? =
 Yes. All strings — PHP and the React admin — go through gettext, a `.pot` template ships in `languages/`, and that directory is registered for both PHP and JavaScript translations. Loco Translate can therefore translate it in place, and WPML String Translation picks the strings up once a language is active. Translating the plugin does not change the language of *generated data*; that is what the locale setting is for, and it offers 75 locales.
 
-= How do I remove generated data? =
-Use your platform's own deletion tools, WordPress's, or a cleanup plugin. Back up before removing.
-
 == Screenshots ==
 
 1. Dashboard — run totals, recent activity, and all 21 generators grouped by category.
@@ -158,6 +155,18 @@ Only the four most recent releases are listed here. The complete history, in Kee
 
 [Read the full changelog on GitHub](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
 
+= 1.1.0 =
+* **Multi-platform.** Where data lands is decided by a platform driver; Fluent Cart and WooCommerce both ship, and `storeseeder_platforms` registers another from a separate plugin. The same generators feed every driver, so a fixed seed produces identical data wherever it is written.
+* **WooCommerce driver** — 18 of 21 resources through WC_Product, WC_Order, WC_Customer and WC_Coupon rather than direct database writes.
+* **Four new resources** — product categories, product tags, brands, and licences. 21 generators in total.
+* **Ledger-based cleanup** — Settings → Danger zone and `wp storeseeder cleanup delete` remove only rows the plugin recorded creating. Nothing is matched on for resembling test data.
+* **WP-CLI** — generate, preview, platforms, locales, sample-data and cleanup commands, dispatched through the same controllers as the REST API.
+* **MCP gets a read-only preview tool per generator**, and three switches that decide which kinds are registered at all.
+* **75 locales**, one list shared by the admin picker, the REST enum and the MCP schema.
+* **Every declared parameter now changes the output.** Forty-nine parameters across eight resources were declared and read by nothing — a price range that never moved a price, an item count that never changed an order. Ones that could not be honoured were removed rather than left decorative.
+* Fixes: WooCommerce tax classes taxed every order twice; generated WooCommerce customers had no billing name, company or email; WooCommerce discarded shipping on every order; Fluent Cart stored lifetime spend a hundred times small; Fluent Cart coupons could never combine; every Fluent Cart shipping method landed in one worldwide zone.
+* Translatable admin — React strings are extracted and the plugin's `languages/` directory is registered for both PHP and JavaScript.
+
 = 1.0.0 =
 * Initial release.
 * 17 generators — products, product variations, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, and activity logs — all persisting through native Fluent Cart models.
@@ -169,6 +178,9 @@ Only the four most recent releases are listed here. The complete history, in Kee
 * Filters and actions across the generation lifecycle.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds WooCommerce support, four new generators, ledger-based cleanup and WP-CLI. Parameters that were previously accepted and ignored now take effect, so a saved configuration can produce different data than it did on 1.0.0 — review your presets before a large run.
 
 = 1.0.0 =
 Initial release.
