@@ -172,7 +172,11 @@ Only the four most recent releases are listed here. The complete history, in Kee
 * Recipes download once from a separate repository, behind the consent prompt that already governs the sample data, so a new shop type needs no plugin update.
 * **Undo a whole recipe** in one action — every row it wrote is tagged with a run id in the ledger.
 * **`wp storeseeder recipe list` / `run`**, and `wp storeseeder cleanup --run_id=` to undo.
+* **Fixed: a run of more than 100 items failed outright.** The endpoint accepts 100 per request and the admin sent whatever the count box said — which allowed up to 100,000 — so anything larger returned "Invalid parameter(s): count" and created nothing. Larger counts are split automatically now, and the progress bar counts real requests instead of animating against a guess.
+* **Fixed: "Add to batch" ignored the settings on the page.** A queued generator kept only its count, so parameters, the seed and the metadata switch were dropped and the run used defaults. Two queues of the same generator also merged into one.
 * **Fixed: 72 of 73 locales were generating "Widget" and "Gadget".** Vocabulary had no locale fallback, so any locale without a data file silently used each generator's inline defaults.
+* Fixed: the topbar's platform list showed one store twice and no longer offered "Auto" by name once a platform was chosen.
+* Settings is centred in the same measure the other pages use, instead of sitting against the left edge.
 * Dashboard stat tiles now match the generator tiles, including in dark mode.
 
 = 1.1.0 =
@@ -200,7 +204,7 @@ Only the four most recent releases are listed here. The complete history, in Kee
 == Upgrade Notice ==
 
 = 1.2.0 =
-Adds Recipes, which build a coherent shop in one click. Also fixes a locale bug: 72 of the 73 offered locales were silently generating placeholder product names, so a non-English run will now produce different data than it did on 1.1.0.
+Adds Recipes, which build a coherent shop in one click. Two fixes worth knowing about: a run of more than 100 items used to fail with "Invalid parameter(s): count" and now splits automatically, and 72 of the 73 offered locales were silently generating placeholder product names — so a non-English run will produce different data than it did on 1.1.0.
 
 = 1.1.0 =
 Adds WooCommerce support, four new generators, ledger-based cleanup and WP-CLI. Parameters that were previously accepted and ignored now take effect, so a saved configuration can produce different data than it did on 1.0.0 — review your presets before a large run.

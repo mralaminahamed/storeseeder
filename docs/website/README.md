@@ -74,7 +74,7 @@ suspect.
 Both are generated, never hand-placed:
 
 ```bash
-yarn shots:docs          # the seven admin screenshots, from a real install
+yarn shots:docs          # every admin screenshot, from a real install
 yarn shots:docs-banner   # the hero banner
 ```
 

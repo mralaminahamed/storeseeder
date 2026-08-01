@@ -14,11 +14,16 @@ This directory contains assets for the WordPress.org plugin repository.
 - `icon-512x512.png` - Plugin icon ultra-high-res (512x512px)
 
 ### Screenshots
-- `screenshot-1.png` - Main admin interface
-- `screenshot-2.png` - Product generator
-- `screenshot-3.png` - Customer generator
-- `screenshot-4.png` - Order generator (if applicable)
-- `screenshot-5.png` - Settings/configuration (if applicable)
+- `screenshot-1.png` — Dashboard. Runs three real generations first, so the tiles and the activity
+  list are populated rather than reading "Nothing generated yet".
+- `screenshot-2.png` — Recipes. Second because it is the feature a directory visitor has no other way
+  to learn about.
+- `screenshot-3.png` — Products generator, with the live preview holding real rows.
+- `screenshot-4.png` — Orders generator.
+- `screenshot-5.png` — Settings: where data is written and who may write it.
+
+The captions shown on the listing live in `readme.txt` under `== Screenshots ==`, numbered to match.
+Change one and change the other.
 
 ## Guidelines
 
