@@ -760,3 +760,10 @@
 .fp-root .fp-recipe-step.skip { color:var(--text-faint); }
 .fp-root .fp-recipe-step.skip .fp-recipe-step-dot { border-style:dashed; }
 .fp-root .fp-recipe-step.skip .fp-recipe-step-n { text-decoration:line-through; }
+
+/* A card standing in for one that has not arrived. Same geometry, none of the affordances —
+   a placeholder that lifts on hover invites a click that does nothing. */
+.fp-root .fp-recipe.is-skeleton { cursor:default; pointer-events:none; box-shadow:var(--shadow-sm); }
+.fp-root .fp-recipe.is-skeleton:hover { transform:none; box-shadow:var(--shadow-sm); border-color:var(--border); }
+.fp-root .fp-recipe.is-skeleton .fp-recipe-head { gap:0; }
+.fp-root .fp-recipe.is-skeleton .fp-recipe-count { gap:10px; }

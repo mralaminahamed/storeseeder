@@ -322,8 +322,12 @@ final class Registry {
 
 		$without_locale = array();
 
+		$owned = array_flip( self::VOCABULARY_RESOURCES );
+
 		foreach ( $manifest as $resource => $locales ) {
-			if ( ! in_array( $locale, $locales, true ) ) {
+			// Only the directories this recipe is answerable for. A shared one it happens to carry
+			// is a bonus, not a promise.
+			if ( isset( $owned[ $resource ] ) && ! in_array( $locale, $locales, true ) ) {
 				$without_locale[] = $resource;
 			}
 		}
@@ -373,7 +377,16 @@ final class Registry {
 	}
 
 	/**
-	 * Which vocabulary directory speaks for which resource.
+	 * The resources whose words decide what kind of shop this is.
+	 *
+	 * Deliberately not every resource with a vocabulary directory. `customers` holds country
+	 * lists, phone patterns and postcode formats — locale reference data that a grocer and a
+	 * boutique share, and that the sample-data archive already supplies. Demanding it of every
+	 * recipe put "No words shipped for customer" on all three cards, which is a false alarm about
+	 * correct behaviour, and a false alarm is worse than the lost nuance.
+	 *
+	 * These five are the completeness bar restated: product names, a category tree, tag labels and
+	 * brand names are what make a grocer look like a grocer.
 	 *
 	 * Named rather than derived. `product_category` does not pluralise to `product_categories` by
 	 * any rule that also handles `shipping_classes`, which is the same reason generators carry an
@@ -384,7 +397,6 @@ final class Registry {
 	 */
 	const VOCABULARY_RESOURCES = array(
 		'product'          => 'products',
-		'customer'         => 'customers',
 		'brand'            => 'brands',
 		'product_category' => 'product_categories',
 		'product_tag'      => 'product_tags',
