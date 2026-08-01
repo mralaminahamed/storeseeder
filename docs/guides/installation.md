@@ -109,7 +109,7 @@ There is no plugin-specific debug constant.
 ### Getting Help
 
 - [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
-- [SUPPORT.md](../SUPPORT.md) — where to ask, what to include, what is out of scope
+- [Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/) — where to ask, what to include, what is out of scope
 
 ## Updating
 

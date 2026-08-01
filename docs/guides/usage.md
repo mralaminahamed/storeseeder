@@ -462,4 +462,4 @@ plugin-specific debug constant.
 ## Support
 
 - [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues)
-- [`SUPPORT.md`](../SUPPORT.md) — where to ask and what to include
+- [Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/) — where to ask and what to include

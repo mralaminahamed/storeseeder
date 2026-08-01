@@ -17,11 +17,11 @@ By taking part in this project you agree to the [Code of Conduct](CODE_OF_CONDUC
 ## Local Setup
 
 Requirements: PHP 7.4+, Composer, Node.js 16+, and a WordPress install with one supported
-e-commerce platform active — [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) is the driver
-shipped today.
+e-commerce platform active — [WooCommerce](https://wordpress.org/plugins/woocommerce/) and
+[Fluent Cart](https://wordpress.org/plugins/fluent-cart/) are the drivers shipped today.
 
 There is no `Requires Plugins` header, deliberately: it would have made WordPress refuse activation
-without Fluent Cart specifically, which would put every other platform out of reach. StoreSeeder
+without one named plugin, which would put every other platform out of reach. StoreSeeder
 activates either way and reports what is missing, so a driver can be developed against a store
 plugin that is not installed yet.
 

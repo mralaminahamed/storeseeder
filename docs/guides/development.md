@@ -742,6 +742,6 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 ## 📞 Support & Resources
 
 - [GitHub Issues](https://github.com/mralaminahamed/storeseeder/issues) — bugs and feature requests
-- [`SUPPORT.md`](../SUPPORT.md) — where to ask, what to include, what is out of scope
+- [Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/) — where to ask, what to include, what is out of scope
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — branching, commit conventions, quality gates
 - [`CLAUDE.md`](../CLAUDE.md) — architecture invariants and the traps that have no compiler behind them

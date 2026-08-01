@@ -1,6 +1,6 @@
 === StoreSeeder – eCommerce Test Data Generator for WooCommerce & Fluent Cart ===
 Contributors: mralaminahamed
-Tags: test data, dummy data, demo content, woocommerce, faker
+Tags: woocommerce, test data, dummy data, demo content, fluent cart
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
@@ -8,11 +8,13 @@ Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic e-commerce test data with 21 generators, a platform driver per store plugin, a modern React admin, and optional MCP integration.
+Generate realistic WooCommerce and Fluent Cart test data — products, orders, customers — with live preview, 21 generators and one-click cleanup.
 
 == Description ==
 
-StoreSeeder generates realistic test data for WordPress e-commerce platforms. It helps developers, agencies, and store owners build sophisticated datasets for testing, demos, and performance evaluation — without hand-crafting records.
+StoreSeeder generates realistic test data for **WooCommerce** and **Fluent Cart** — products with real prices and stock, customers with plausible addresses, and orders that point at both. It helps developers, agencies and store owners build datasets for testing, client demos and performance work without hand-crafting records.
+
+Build a whole coherent shop in one click with a **recipe** — a corner grocer, a fashion boutique, a home & garden store — or generate one resource at a time with a live preview of exactly what a run will create.
 
 Where the data lands is decided by a **platform driver**, and the same twenty-one generators feed every driver. **Fluent Cart and WooCommerce are included today**; drivers for other platforms are planned, and the registration filter is public, so a third party can add one from their own plugin without changes here.
 
@@ -99,6 +101,15 @@ The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable t
 
 == Frequently Asked Questions ==
 
+= How do I create dummy products in WooCommerce? =
+Install StoreSeeder, open the **StoreSeeder** menu, and choose **Products**. Set the price range, stock and product type, check the live preview, then press Generate. Products are created through `WC_Product`, so they behave exactly like products you added by hand. For a whole catalogue with categories, brands, variations and orders against it, use a recipe instead.
+
+= How do I add test orders to Fluent Cart or WooCommerce? =
+Use the **Orders** generator. Orders need products and customers to exist first — they draw from what is in the store rather than inventing it — so generate those two first, or run a recipe, which fills nine resources in dependency order for you. Order totals are the sum of the real catalogue prices of the products each order points at, so revenue reports agree with the store.
+
+= Can I delete the test data afterwards? =
+Yes, exactly. Every row StoreSeeder writes is recorded in its own ledger, and **Settings → Danger zone → Delete generated data** removes what it created and nothing else. No date ranges, no name matching — a staging site restored from production keeps its real catalogue.
+
 = Which e-commerce platforms are supported? =
 Fluent Cart and WooCommerce today. Fluent Cart covers 20 of 21 resources — licences need Fluent Cart Pro, which owns the licensing tables, and StoreSeeder says so rather than hiding the generator. WooCommerce covers 18: subscriptions need WooCommerce Subscriptions, and transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent for them and no plugin changes that. Support is provided by a platform driver rather than wired into the generators, so more can be added. With one platform active it is selected automatically; with several, StoreSeeder asks which store to write to before it runs anything.
 
@@ -106,7 +117,7 @@ Fluent Cart and WooCommerce today. Fluent Cart covers 20 of 21 resources — lic
 Generators produce platform-neutral records; a writer for the chosen platform persists them through that platform's own models — Eloquent models for Fluent Cart, the CRUD objects (WC_Product, WC_Order, WC_Customer) for WooCommerce — preserving validation, relationships, and business logic. Raw database writes are avoided so generated data behaves like real data, and so it stays valid across that platform's updates.
 
 = Can I add support for my own platform? =
-Yes, from your own plugin and without patching this one. Register a driver on the `storeseeder_platforms` filter and the generators, REST API, and admin pick it up. A driver answers what it is called, whether it is active, which resources it supports, and which writer handles each one. See the architecture documentation for the full contract.
+Yes, from your own plugin and without patching this one. Register a driver on the `storeseeder_platforms` filter and the generators, REST API, and admin pick it up. A driver answers what it is called, whether it is active, which resources it supports, and which writer handles each one. See https://mralaminahamed.github.io/storeseeder/reference/extension-points/ for the full contract.
 
 = How many generators are included? =
 Twenty-one: products, product variations, product categories, product tags, brands, customers, orders, transactions, refunds, coupons, shipping plans, shipping classes, tax classes, order tax lines, attributes, cart sessions, labels, product downloads, subscriptions, licences, and activity logs.
@@ -144,16 +155,16 @@ Yes. All strings — PHP and the React admin — go through gettext, a `.pot` te
 == Screenshots ==
 
 1. Dashboard — run totals, recent activity, and all 21 generators grouped by category.
-2. Product generator — price range, categories, and attributes, with a live preview of the rows the run will create.
-3. Customer generator — customer types, age groups, and address preferences, previewed before anything is written.
-4. Order generator — order status mix, line items, and date range, with the preview updating as settings change.
-5. Settings — the target platform, generation defaults (pre-filled batch size, locale, and a fixed seed for reproducible runs), and appearance.
+2. Recipes — three ready-made shops, each itemised per resource, built in dependency order from one click.
+3. Product generator — product type, price range, inventory and content options, with a live preview of the rows the run will create.
+4. Order generator — status mix, items per order, payment methods and geography, with the preview updating as settings change.
+5. Settings — where data is written, who may write it, and the AI tool switches.
 
 == Changelog ==
 
 Only the four most recent releases are listed here. The complete history, in Keep a Changelog format, is maintained in the repository:
 
-[Read the full changelog on GitHub](https://github.com/mralaminahamed/storeseeder/blob/trunk/CHANGELOG.md)
+[Read the full changelog](https://mralaminahamed.github.io/storeseeder/reference/changelog/)
 
 = 1.2.0 =
 * **Recipes.** One click builds a whole shop — a corner grocer, a fashion boutique, a home & garden store — across nine resources in dependency order, instead of a generator at a time.
@@ -223,9 +234,9 @@ The minified JavaScript and CSS in `build/` is compiled from the TypeScript and 
 
 [Browse the StoreSeeder source on GitHub](https://github.com/mralaminahamed/storeseeder)
 
-Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS, configured by `webpack.config.js`, `tsconfig.json`, and `postcss.config.js` in the repository root. The build steps are listed under "Development Setup" above; local setup, the full toolchain, and the quality gates are documented in the contributing guide:
+Build tooling is webpack (via @wordpress/scripts), TypeScript, and Tailwind CSS, configured by `webpack.config.js`, `tsconfig.json`, and `postcss.config.js` in the repository root. The build steps are listed under "Development Setup" above; local setup, the full toolchain, and the quality gates are documented here:
 
-[Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
+[Read the contributing guide](https://mralaminahamed.github.io/storeseeder/reference/contributing/)
 
 
 == Privacy ==
@@ -236,6 +247,6 @@ The plugin makes two outbound requests, both administrator-initiated and both ca
 
 == Contributing ==
 
-Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Bug reports, feature requests, and pull requests are all welcome — the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) is the place to start. Branching, commit conventions, quality gates, and pull request expectations are all documented in the contributing guide:
+Development happens on [GitHub](https://github.com/mralaminahamed/storeseeder). Bug reports, feature requests, and pull requests are all welcome — the [issue tracker](https://github.com/mralaminahamed/storeseeder/issues) is the place to start. Setting up, the quality gates, and how to add a platform driver, a generator or a recipe are documented here:
 
-[Read the contributing guide](https://github.com/mralaminahamed/storeseeder/blob/trunk/CONTRIBUTING.md)
+[Read the contributing guide](https://mralaminahamed.github.io/storeseeder/reference/contributing/)

@@ -43,10 +43,13 @@ Built for:
 
 ## Quick Start
 
-StoreSeeder is heading to the WordPress.org plugin directory; releases are cut from this repository by
-pushing a version tag (see [Releases](#releases)). Until the listing is live, install from a
-[release zip](https://github.com/mralaminahamed/storeseeder/releases) via **Plugins → Add New → Upload
-Plugin**, then **Activate**. It appears as **StoreSeeder** in the admin menu.
+Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/storeseeder/) —
+**Plugins → Add New**, search for StoreSeeder, **Install Now**, **Activate**. It appears as
+**StoreSeeder** in the admin menu.
+
+Releases are cut from this repository by pushing a version tag (see [Releases](#releases)), so a
+[release zip](https://github.com/mralaminahamed/storeseeder/releases) installed via **Plugins → Add
+New → Upload Plugin** is equivalent if you want a specific version.
 
 To run from source:
 
@@ -59,10 +62,11 @@ yarn build
 ```
 
 **Requirements** — WordPress 6.5+, PHP 7.4+ (8.0+ recommended), and one supported e-commerce
-platform active. Today that means [Fluent Cart](https://wordpress.org/plugins/fluent-cart/).
+platform active. Today that means [WooCommerce](https://wordpress.org/plugins/woocommerce/) or
+[Fluent Cart](https://wordpress.org/plugins/fluent-cart/).
 
 There is deliberately **no `Requires Plugins` header**: it would make WordPress refuse activation
-without Fluent Cart specifically, so no other platform could ever be reached. StoreSeeder activates
+without one named plugin, so no other platform could ever be reached. StoreSeeder activates
 regardless and says what is missing instead. Budget 256MB of memory, or 512MB for large datasets. The
 plugin header and [`readme.txt`](readme.txt) are the source of truth for these numbers.
 
@@ -148,15 +152,21 @@ Full per-generator detail on [the documentation site](https://mralaminahamed.git
 | [Documentation site](https://mralaminahamed.github.io/storeseeder/) | Everything below, rendered and searchable |
 | [Installation](https://mralaminahamed.github.io/storeseeder/getting-started/installation/) | Requirements, install paths, and choosing a target platform |
 | [Recipes](https://mralaminahamed.github.io/storeseeder/guides/recipes/) | Building a whole coherent shop in one click |
-| [Generators](https://mralaminahamed.github.io/storeseeder/guides/generators/) | One resource at a time, with a preview that tells the truth |
+| [Generators](https://mralaminahamed.github.io/storeseeder/guides/generators/) | One resource at a time, step by step, with a preview that tells the truth |
+| [The batch queue](https://mralaminahamed.github.io/storeseeder/guides/batch/) | Queue several generators and run them in one go |
+| [Deleting generated data](https://mralaminahamed.github.io/storeseeder/guides/cleanup/) | The ledger, and what each danger-zone action does and does not touch |
+| [Locales](https://mralaminahamed.github.io/storeseeder/guides/locales/) | Seventy-five locales, what follows them, and what falls back to English |
+| [Settings](https://mralaminahamed.github.io/storeseeder/guides/settings/) | Target, access, the AI surface, sample data, preferences |
+| [AI and MCP](https://mralaminahamed.github.io/storeseeder/guides/mcp/) | Two tools per generator, and the switches that withdraw them |
 | [Platform support](https://mralaminahamed.github.io/storeseeder/reference/platform-support/) | What each driver writes, and what it refuses |
 | [Architecture](https://mralaminahamed.github.io/storeseeder/reference/architecture/) | The driver layer, request flow, and where a decision is allowed to live |
 | [External services](https://mralaminahamed.github.io/storeseeder/reference/external-services/) | What is fetched, when, and on whose say-so |
 | [Development](docs/guides/development.md) | Local setup, build and test commands, adding a generator, release process |
-| [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commit conventions, quality gates, PR expectations |
+| [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record, also [rendered on the site](https://mralaminahamed.github.io/storeseeder/reference/changelog/) |
+| [Contributing](https://mralaminahamed.github.io/storeseeder/reference/contributing/) | Setting up, the quality gates, and adding a platform, generator or recipe |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commit conventions, PR expectations — the canonical process |
 | [SECURITY.md](SECURITY.md) | Private vulnerability reporting and the plugin's security measures |
-| [SUPPORT.md](SUPPORT.md) | Where to ask, what to include, what is out of scope |
+| [Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/) | Where to ask, what to include, what is out of scope |
 
 ## Architecture
 
@@ -345,7 +355,7 @@ Bug reports, feature requests, and pull requests are all welcome. Read
 [CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the checks a pull request needs to
 pass, and [docs/guides/development.md](docs/guides/development.md) for architecture detail. File issues on the
 [issue tracker](https://github.com/mralaminahamed/storeseeder/issues); for help using the plugin, see
-[SUPPORT.md](SUPPORT.md). Participation is covered by the
+[Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/). Participation is covered by the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Maintainer
