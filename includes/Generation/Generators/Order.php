@@ -287,8 +287,8 @@ class Order extends Generator {
 			'address_1' => $this->get_faker()->streetAddress(),
 			'address_2' => $this->get_faker()->optional( 0.3 )->secondaryAddress() ?? '',
 			'city'      => $this->get_faker()->city(),
-			// A US state abbreviation on a French address is the kind of detail that makes a
-			// generated order obviously fake, so it only accompanies the country it belongs to.
+			// A US state abbreviation on a French address is the kind of detail that gives a
+			// generated order away, so it only accompanies the country it belongs to.
 			'state'     => 'US' === $country ? $this->get_faker()->stateAbbr() : '',
 			'postcode'  => $this->get_faker()->postcode(),
 			'country'   => $country,

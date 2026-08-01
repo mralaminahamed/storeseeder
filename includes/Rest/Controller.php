@@ -617,7 +617,7 @@ abstract class Controller extends WP_REST_Controller {
 		if ( ! Access::current_user_can() ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'Sorry, you are not allowed to generate fake data.', 'storeseeder' ),
+				__( 'Sorry, you are not allowed to generate test data.', 'storeseeder' ),
 				array( 'status' => 403 )
 			);
 		}

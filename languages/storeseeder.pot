@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T07:11:48+00:00\n"
+"POT-Creation-Date: 2026-08-01T07:14:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: storeseeder\n"
@@ -930,7 +930,7 @@ msgid "Payment methods to distribute across orders. Default: [\"stripe\",\"paypa
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Orders.php:69
-msgid "Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is what makes generated data obviously fake."
+msgid "Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is the detail that gives generated data away."
 msgstr ""
 
 #: includes/MCP/Abilities/Generate_Orders.php:74
@@ -1877,7 +1877,7 @@ msgid "%1$s reports that it can generate %2$s but provides no writer for it. Thi
 msgstr ""
 
 #: includes/Rest/Controller.php:620
-msgid "Sorry, you are not allowed to generate fake data."
+msgid "Sorry, you are not allowed to generate test data."
 msgstr ""
 
 #: includes/Rest/Controller.php:643

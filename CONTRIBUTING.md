@@ -33,7 +33,7 @@ yarn install
 yarn build
 ```
 
-Work against a development or staging site only. StoreSeeder writes large volumes of fake data
+Work against a development or staging site only. StoreSeeder writes large volumes of test data
 straight into the store tables.
 
 ## Working on a Change

@@ -66,7 +66,7 @@ class Generate_Orders extends Ability {
 			),
 			'countries'        => array(
 				'type'        => 'array',
-				'description' => __( 'Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is what makes generated data obviously fake.', 'storeseeder' ),
+				'description' => __( 'Two-letter country codes to draw order addresses from. Default: US. A non-US address carries no state, since a US abbreviation on a French address is the detail that gives generated data away.', 'storeseeder' ),
 				'items'       => array( 'type' => 'string' ),
 			),
 			'include_customer' => array(

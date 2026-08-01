@@ -16,7 +16,7 @@
 </div>
 
 > [!WARNING]
-> StoreSeeder writes large volumes of fake data directly into your store. Use it only on development
+> StoreSeeder writes large volumes of test data directly into your store. Use it only on development
 > or staging sites, and back up your database before generating large datasets.
 
 ![StoreSeeder banner](.wordpress-org/banner-1544x500.png)

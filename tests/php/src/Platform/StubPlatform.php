@@ -17,7 +17,7 @@ use StoreSeeder\Platforms\Capability;
 use StoreSeeder\Platforms\Resource;
 
 /**
- * Configurable fake driver.
+ * Configurable stub driver.
  */
 class StubPlatform extends Platform_Driver {
 
