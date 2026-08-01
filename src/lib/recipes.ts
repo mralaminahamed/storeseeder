@@ -63,6 +63,8 @@ export interface RecipeIssue {
 
 export interface RecipesResponse {
   platform: string;
+  /** Where each resource lives in wp-admin on the resolved target. Absent for what has no screen. */
+  adminUrls: Record<string, string>;
   locale: string;
   /** Whether the archive has been fetched at all. */
   downloaded: boolean;

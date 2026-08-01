@@ -63,6 +63,7 @@ export default function RecipesLayout() {
   const [downloaded, setDownloaded] = useState(true);
   const [resolved, setResolved] = useState(true);
   const [incomplete, setIncomplete] = useState<string[]>([]);
+  const [adminUrls, setAdminUrls] = useState<Record<string, string>>({});
   const [syncing, setSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -87,6 +88,7 @@ export default function RecipesLayout() {
         setRecipes(data.recipes ?? []);
         setDownloaded(Boolean(data.downloaded));
         setIncomplete(data.incomplete ?? []);
+        setAdminUrls(data.adminUrls ?? {});
         // '' means Auto could not decide — more than one store is active and none was chosen.
         setResolved("" !== data.platform);
       } catch {
@@ -206,6 +208,7 @@ export default function RecipesLayout() {
       setRecipes(data.recipes ?? []);
       setDownloaded(Boolean(data.downloaded));
       setIncomplete(data.incomplete ?? []);
+      setAdminUrls(data.adminUrls ?? {});
       setResolved("" !== data.platform);
       toast(
         __("Recipes ready", "storeseeder"),
@@ -287,6 +290,7 @@ export default function RecipesLayout() {
     downloaded,
     incomplete,
     resolved,
+    adminUrls,
     syncing,
     sync,
     size,

@@ -1233,9 +1233,25 @@ class StoreSeeder {
 			$recipes[] = $payload;
 		}
 
+		// Where each resource lives in wp-admin on the resolved target, so a finished run can point
+		// at what it made rather than only counting it. Platform-wide rather than per recipe, and
+		// empty for a driver that has not implemented the seam.
+		$admin_urls = array();
+
+		if ( $platform instanceof Platform_Driver ) {
+			foreach ( array_keys( $supports ) as $resource_type ) {
+				$url = $platform->admin_url( (string) $resource_type );
+
+				if ( null !== $url ) {
+					$admin_urls[ $resource_type ] = $url;
+				}
+			}
+		}
+
 		return new WP_REST_Response(
 			array(
 				'platform'   => $platform instanceof Platform_Interface ? $platform->id() : '',
+				'adminUrls'  => $admin_urls,
 				'locale'     => $locale,
 				'downloaded' => Recipe_Registry::downloaded(),
 				// Named separately from an empty list: nothing downloaded yet and an archive that

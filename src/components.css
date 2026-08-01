@@ -838,3 +838,30 @@
    and shows `not-allowed`, the way the mock did. The click is a no-op regardless: `disabled`
    already prevents activation, `pointer-events` only prevented the pointer. */
 .fp-root .fp-recipes-page .fp-btn[disabled] { pointer-events:auto; cursor:not-allowed; }
+
+/* The tally as navigation. A count that leads somewhere has to look like it does, and a count that
+   does not must not — a driver with no screen for a resource renders the same plain cell as before,
+   so the underline and the arrow are the promise that this one goes somewhere. */
+.fp-root .fp-recipe-tally-link {
+  display:block; background:var(--surface); padding:12px 14px; text-decoration:none; color:inherit;
+  transition:background .12s;
+}
+.fp-root .fp-recipe-tally-link:hover { background:var(--accent-soft); }
+.fp-root .fp-recipe-tally-link:hover .fp-recipe-tally-k,
+.fp-root .fp-recipe-tally-link:hover .fp-recipe-tally-v { color:var(--accent); }
+.fp-root .fp-recipe-tally-link .fp-recipe-tally-k { display:flex; align-items:center; gap:5px; }
+/* Only on hover: eight arrows at rest is eight things competing with the numbers they annotate. */
+.fp-root .fp-recipe-tally-link .fp-recipe-tally-k svg { opacity:0; transition:opacity .12s; }
+.fp-root .fp-recipe-tally-link:hover .fp-recipe-tally-k svg,
+.fp-root .fp-recipe-tally-link:focus-visible .fp-recipe-tally-k svg { opacity:1; }
+.fp-root .fp-recipe-tally-link .fp-recipe-tally-v { display:block; }
+
+/* One failure per line. Joined with a middle dot, three of them were an unreadable run-on. */
+.fp-root .fp-recipe-errors { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; }
+
+/* Undone is its own outcome, not the built panel with four things missing. */
+.fp-root .fp-recipe-undone {
+  display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+  padding:44px 30px;
+}
+.fp-root .fp-recipe-undone .fp-recipe-run-sub { max-width:52ch; }
