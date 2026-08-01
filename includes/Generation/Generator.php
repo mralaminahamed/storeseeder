@@ -821,21 +821,26 @@ abstract class Generator {
 		$locale     = $this->get_faker_locale();
 		$upload_dir = wp_upload_dir();
 		$remote     = $upload_dir['basedir'] . '/storeseeder-sample-data-fluent-cart';
-		$bundled    = STORESEEDER_PLUGIN_PATH . 'data';
 
 		$locales = array_unique( array( $locale, Locale::DEFAULT_LOCALE ) );
 		$recipe  = $this->sample_data_recipe();
 
 		$candidates = array();
 
-		foreach ( $locales as $code ) {
-			if ( '' !== $recipe ) {
-				$candidates[] = "{$bundled}/recipes/{$recipe}/{$resource_type}/{$code}/{$filename}.json";
+		// Asked of the registry rather than built here. Two places computing the same path is how
+		// this broke once already: recipes moved out of the plugin and into the uploads directory,
+		// the registry followed and this did not, so every recipe ran to completion on default
+		// vocabulary — a "grocery" store full of consumer electronics, reported as a success.
+		// `RecipeVocabularyPathTest` now pins the two together.
+		if ( '' !== $recipe ) {
+			$dir = Recipe_Registry::vocabulary_directory( $recipe );
+
+			foreach ( $locales as $code ) {
+				$candidates[] = "{$dir}/{$resource_type}/{$code}/{$filename}.json";
 			}
 		}
 
 		foreach ( $locales as $code ) {
-			$candidates[] = "{$bundled}/default/{$resource_type}/{$code}/{$filename}.json";
 			$candidates[] = "{$remote}/{$resource_type}/{$code}/{$filename}.json";
 		}
 
