@@ -9,6 +9,7 @@
 namespace StoreSeeder\Platforms\Drivers\Woo_Commerce\Writers;
 
 use StoreSeeder\Platforms\Drivers\Woo_Commerce\Writer;
+use StoreSeeder\Platforms\Media;
 use StoreSeeder\Platforms\Resource;
 use WC_Product_Simple;
 use WP_Error;
@@ -59,10 +60,16 @@ final class Product extends Writer {
 		$manage_stock = ! isset( $entity['manage_stock'] ) || (bool) $entity['manage_stock'];
 		$stock        = $manage_stock ? (int) $entity['stock'] : null;
 
+		// Drawn before the save so the product is written once. Setting an image afterwards
+		// means a second save, and a second round of WooCommerce's lookup-table writes.
+		$images = $this->pick_images( $entity );
+
 		$product = new WC_Product_Simple();
 		$product->set_props(
 			array(
 				'name'               => $entity['title'],
+				'image_id'           => $images['image_id'],
+				'gallery_image_ids'  => $images['gallery'],
 				'slug'               => (string) ( $entity['slug'] ?? '' ),
 				'status'             => $this->map_post_status( (string) $entity['status'] ),
 				'description'        => $entity['description'],
@@ -175,6 +182,73 @@ final class Product extends Writer {
 			// that is otherwise complete.
 			return;
 		}
+	}
+
+	/**
+	 * A main image and a gallery for one product, drawn from the run's shared pool.
+	 *
+	 * The entity says how many pictures it wants; which attachments exist is this side of the
+	 * boundary, for the same reason `category_count` is.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param array<string, mixed> $entity Canonical product entity.
+	 *
+	 * @return array{image_id: string|int, gallery: array<int, int>}
+	 */
+	private function pick_images( array $entity ): array {
+		$none = array(
+			// WooCommerce reads an empty string as "no image"; a zero is an attachment id.
+			'image_id' => '',
+			'gallery'  => array(),
+		);
+
+		if ( (int) ( $entity['image_count'] ?? 0 ) < 1 ) {
+			return $none;
+		}
+
+		$pool = Media::pool(
+			'woocommerce',
+			(int) ( $entity['image_pool'] ?? Media::POOL_SIZE ),
+			(int) ( $entity['image_size'] ?? Media::SIZE )
+		);
+
+		if ( array() === $pool ) {
+			// No GD, or the uploads directory is not writable. A product without a picture is
+			// worth more than a failed run.
+			return $none;
+		}
+
+		$main = (int) $this->faker()->randomElement( $pool );
+
+		$wanted = (int) ( $entity['gallery_count'] ?? 0 );
+
+		if ( $wanted < 1 ) {
+			return array(
+				'image_id' => $main,
+				'gallery'  => array(),
+			);
+		}
+
+		// The gallery is the rest of the pool, so a product never shows the same picture twice.
+		// A pool smaller than the gallery asked for simply gives a shorter gallery.
+		$rest = array_values( array_diff( $pool, array( $main ) ) );
+
+		if ( array() === $rest ) {
+			return array(
+				'image_id' => $main,
+				'gallery'  => array(),
+			);
+		}
+
+		// Through the seeded Faker rather than shuffle(): the same seed has to produce the same
+		// store, and PHP's own generator is not part of that seed.
+		$gallery = (array) $this->faker()->randomElements( $rest, min( $wanted, count( $rest ) ) );
+
+		return array(
+			'image_id' => $main,
+			'gallery'  => array_map( 'intval', $gallery ),
+		);
 	}
 
 	/**

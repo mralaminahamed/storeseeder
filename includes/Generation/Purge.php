@@ -168,7 +168,10 @@ final class Purge {
 			return Resource::exists( $only ) ? array( $only ) : array();
 		}
 
-		$order = array_reverse( Resource::all() );
+		// Internal resources go last. A product carries its image as an attachment id, so the
+		// attachment outliving the product for the length of one batch is harmless, while the
+		// reverse would leave every product pointing at a file that is already gone.
+		$order = array_merge( array_reverse( Resource::all() ), Resource::internal() );
 
 		/**
 		 * Filters the order generated resources are deleted in.

@@ -176,6 +176,54 @@ class Product extends Controller {
 					),
 				),
 			),
+			'images'          => array(
+				'description' => __( 'Product imagery. Images are generated as identicons and shared across the run rather than created one per product.', 'storeseeder' ),
+				'type'        => 'object',
+				'properties'  => array(
+					'enabled'       => array(
+						'description' => __( 'Give generated products a main image.', 'storeseeder' ),
+						'type'        => 'boolean',
+						'default'     => true,
+					),
+					'pool_size'     => array(
+						'description' => __( 'How many distinct images the run creates and shares between products.', 'storeseeder' ),
+						'type'        => 'integer',
+						'minimum'     => 1,
+						'maximum'     => 60,
+						'default'     => 10,
+					),
+					'gallery_ratio' => array(
+						'description' => __( 'Percentage of products that also get a gallery.', 'storeseeder' ),
+						'type'        => 'integer',
+						'minimum'     => 0,
+						'maximum'     => 100,
+						'default'     => 10,
+					),
+					'gallery_count' => array(
+						'description' => __( 'How many extra images a gallery holds.', 'storeseeder' ),
+						'type'        => 'object',
+						'properties'  => array(
+							'min' => array(
+								'type'    => 'integer',
+								'minimum' => 1,
+								'default' => 2,
+							),
+							'max' => array(
+								'type'    => 'integer',
+								'minimum' => 1,
+								'default' => 4,
+							),
+						),
+					),
+					'size'          => array(
+						'description' => __( 'Edge length of a generated image, in pixels.', 'storeseeder' ),
+						'type'        => 'integer',
+						'minimum'     => 64,
+						'maximum'     => 2000,
+						'default'     => 700,
+					),
+				),
+			),
 		);
 	}
 

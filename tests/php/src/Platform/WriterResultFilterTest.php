@@ -36,9 +36,19 @@ class WriterResultFilterTest extends StoreSeederUnitTestCase {
 
 		$this->assertNotEmpty( $files );
 
+		// A writer with no result has nothing to filter. `Media` is the only one: attachments are
+		// created alongside products by `Platforms\Media`, never generated on their own, so its
+		// `write()` is unreachable and returns a WP_Error saying so. It exists because the purge
+		// resolves a deleter by resource name.
+		$resultless = array( 'Media.php' );
+
 		foreach ( (array) $files as $file ) {
 			$source = (string) file_get_contents( (string) $file );
 			$name   = basename( (string) $file );
+
+			if ( in_array( $name, $resultless, true ) ) {
+				continue;
+			}
 
 			// Either the writer calls it, or it returns a shared helper on the base class that
 			// does — `create_term_in()` is how brands, categories and tags all persist, and it

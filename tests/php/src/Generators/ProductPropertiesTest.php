@@ -292,4 +292,88 @@ class ProductPropertiesTest extends StoreSeederUnitTestCase {
 			$this->assertStringNotContainsString( $word, $serialised, $word );
 		}
 	}
+
+	// -----------------------------------------------------------------------------------
+	// Imagery. The entity says how many pictures it wants; which attachments exist is the
+	// writer's business, exactly as it is for `category_count`.
+	// -----------------------------------------------------------------------------------
+
+	public function test_the_entity_asks_for_an_image_by_default(): void {
+		$entity = $this->entity();
+
+		foreach ( array( 'image_count', 'gallery_count', 'image_pool', 'image_size' ) as $key ) {
+			$this->assertArrayHasKey( $key, $entity, $key );
+		}
+
+		$this->assertSame( 1, $entity['image_count'] );
+	}
+
+	public function test_images_can_be_switched_off(): void {
+		$this->with( array( 'images' => array( 'enabled' => false ) ) );
+
+		$entity = $this->entity();
+
+		$this->assertSame( 0, $entity['image_count'] );
+
+		// A gallery on a product with no main image would be a product page with pictures and
+		// an empty hero.
+		$this->assertSame( 0, $entity['gallery_count'] );
+	}
+
+	public function test_gallery_ratio_of_zero_means_no_galleries(): void {
+		$this->with( array( 'images' => array( 'gallery_ratio' => 0 ) ) );
+
+		for ( $i = 0; $i < 20; $i++ ) {
+			$this->assertSame( 0, $this->entity()['gallery_count'] );
+		}
+	}
+
+	public function test_gallery_count_stays_inside_the_requested_range(): void {
+		$this->with(
+			array(
+				'images' => array(
+					'gallery_ratio' => 100,
+					'gallery_count' => array(
+						'min' => 3,
+						'max' => 5,
+					),
+				),
+			)
+		);
+
+		for ( $i = 0; $i < 25; $i++ ) {
+			$count = $this->entity()['gallery_count'];
+
+			$this->assertGreaterThanOrEqual( 3, $count );
+			$this->assertLessThanOrEqual( 5, $count );
+		}
+	}
+
+	public function test_pool_size_and_image_size_reach_the_entity(): void {
+		$this->with(
+			array(
+				'images' => array(
+					'pool_size' => 24,
+					'size'      => 512,
+				),
+			)
+		);
+
+		$entity = $this->entity();
+
+		$this->assertSame( 24, $entity['image_pool'] );
+		$this->assertSame( 512, $entity['image_size'] );
+	}
+
+	/**
+	 * The imagery fields name no platform either: WooCommerce calls the main one `image_id` and
+	 * Fluent Cart hangs it off the post as a thumbnail, so the entity says neither.
+	 */
+	public function test_the_imagery_fields_name_no_platform(): void {
+		$serialised = (string) wp_json_encode( $this->entity() );
+
+		foreach ( array( 'image_id', 'gallery_image_ids', 'thumbnail_id', 'attachment' ) as $word ) {
+			$this->assertStringNotContainsString( $word, $serialised, $word );
+		}
+	}
 }

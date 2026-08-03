@@ -517,6 +517,8 @@ final class Platform extends Platform_Driver {
 			Resource::COUPON            => Writers\Coupon::class,
 			Resource::CUSTOMER          => Writers\Customer::class,
 			Resource::LOG               => Writers\Log::class,
+			// Not generated: created alongside products, registered so the purge can remove it.
+			Resource::MEDIA             => Writers\Media::class,
 			Resource::ORDER             => Writers\Order::class,
 			Resource::ORDER_TAX_RATE    => Writers\Order_Tax_Rate::class,
 			Resource::PRODUCT           => Writers\Product::class,
