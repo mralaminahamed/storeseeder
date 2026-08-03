@@ -272,8 +272,19 @@ class PurgeTest extends StoreSeederUnitTestCase {
 	public function test_order_covers_every_resource_exactly_once(): void {
 		$order = Purge::order();
 
-		$this->assertCount( count( Resource::all() ), $order );
+		// Internal resources count. They are not generated and never appear in a plan, but the
+		// purge is the one place that has to know about them: an attachment nobody deletes is a
+		// file left in uploads/ after the store it belonged to is gone.
+		$this->assertCount( count( Resource::all() ) + count( Resource::internal() ), $order );
 		$this->assertSame( $order, array_unique( $order ) );
+	}
+
+	public function test_order_includes_the_internal_resources(): void {
+		$order = Purge::order();
+
+		foreach ( Resource::internal() as $resource ) {
+			$this->assertContains( $resource, $order, $resource );
+		}
 	}
 
 	public function test_order_can_be_limited_to_one_resource(): void {
@@ -294,6 +305,6 @@ class PurgeTest extends StoreSeederUnitTestCase {
 		$this->assertSame( Resource::PRODUCT, $order[0] );
 		// Junk dropped, and everything the filter forgot appended rather than lost.
 		$this->assertNotContains( 'not-a-resource', $order );
-		$this->assertCount( count( Resource::all() ), $order );
+		$this->assertCount( count( Resource::all() ) + count( Resource::internal() ), $order );
 	}
 }
