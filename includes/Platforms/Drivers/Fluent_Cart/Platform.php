@@ -179,7 +179,12 @@ final class Platform extends Platform_Driver {
 		// Supported, minus one field. Fluent Cart's `backorders` is a boolean where the canonical
 		// vocabulary has three values, so "allow but notify the customer" cannot be stored — it
 		// becomes a plain yes. Reported rather than silently flattened.
-		$matrix[ Resource::PRODUCT ] = Capability::supported_except( array( 'backorders' ) );
+		//
+		// `gallery_count` joins it for a different reason. A Fluent Cart product is a post, so it
+		// takes a featured image the ordinary WordPress way, but there is no second image field
+		// to address without inventing one — and a gallery written where Fluent Cart never looks
+		// would present as a working feature and render nothing.
+		$matrix[ Resource::PRODUCT ] = Capability::supported_except( array( 'backorders', 'gallery_count' ) );
 
 		// `fct_order_addresses` has no company column — name, two street lines, city, state,
 		// postcode, country and a meta blob. A company name could be buried in the meta, but
@@ -410,6 +415,8 @@ final class Platform extends Platform_Driver {
 			Resource::LABEL             => Writers\Label::class,
 			Resource::LICENSE           => Writers\License::class,
 			Resource::LOG               => Writers\Log::class,
+			// Not generated: created alongside products, registered so the purge can remove it.
+			Resource::MEDIA             => Writers\Media::class,
 			Resource::ORDER             => Writers\Order::class,
 			Resource::ORDER_TAX_RATE    => Writers\Order_Tax_Rate::class,
 			Resource::PRODUCT           => Writers\Product::class,

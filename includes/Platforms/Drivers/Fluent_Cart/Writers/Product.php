@@ -11,6 +11,7 @@ namespace StoreSeeder\Platforms\Drivers\Fluent_Cart\Writers;
 use FluentCart\App\Models\Product as ProductModel;
 use FluentCart\App\Models\ProductDetail as ProductDetailModel;
 use FluentCart\App\Models\ProductVariation as ProductVariationModel;
+use StoreSeeder\Platforms\Media;
 use StoreSeeder\Platforms\Writer;
 use StoreSeeder\Platforms\Resource;
 use StoreSeeder\Platforms\Status;
@@ -119,6 +120,8 @@ final class Product extends Writer {
 			return new WP_Error( 'product_creation_failed', __( 'Failed to create product.', 'storeseeder' ) );
 		}
 
+		$this->attach_image( (int) $product_id, $entity );
+
 		$categories = $this->attach_categories( (int) $product_id, $data['category_count'] );
 
 		$result = array(
@@ -215,6 +218,43 @@ final class Product extends Writer {
 		}
 
 		return $sku;
+	}
+
+	/**
+	 * Give the product a featured image from the run's shared pool.
+	 *
+	 * A Fluent Cart product is a `fluent-products` post, so the featured image is WordPress's
+	 * own and `set_post_thumbnail()` is all it takes.
+	 *
+	 * No gallery. Fluent Cart has no second image field this writer can address without
+	 * inventing one, and a gallery written somewhere Fluent Cart does not read is worse than no
+	 * gallery — it looks like the feature works. The capability matrix says so rather than
+	 * leaving anyone to discover it from an empty product page.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param int                  $product_id The created post.
+	 * @param array<string, mixed> $entity     Canonical product entity.
+	 *
+	 * @return void
+	 */
+	private function attach_image( int $product_id, array $entity ): void {
+		if ( $product_id < 1 || (int) ( $entity['image_count'] ?? 0 ) < 1 ) {
+			return;
+		}
+
+		$pool = Media::pool(
+			'fluent-cart',
+			(int) ( $entity['image_pool'] ?? Media::POOL_SIZE ),
+			(int) ( $entity['image_size'] ?? Media::SIZE )
+		);
+
+		if ( array() === $pool ) {
+			// No GD, or uploads is not writable. A product without a picture beats a failed run.
+			return;
+		}
+
+		set_post_thumbnail( $product_id, (int) $this->faker()->randomElement( $pool ) );
 	}
 
 	/**

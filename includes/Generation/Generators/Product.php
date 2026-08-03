@@ -10,6 +10,7 @@
 namespace StoreSeeder\Generation\Generators;
 
 use StoreSeeder\Generation\Generator;
+use StoreSeeder\Platforms\Media;
 use StoreSeeder\Platforms\Status;
 
 defined( 'ABSPATH' ) || exit;
@@ -139,7 +140,86 @@ class Product extends Generator {
 			// the Product Categories generator — this only says how many to draw, because
 			// which ones exist is something only the platform knows.
 			'category_count'    => $this->categories_per_product(),
+			// How many pictures to hang on it, for the same reason as `category_count`: which
+			// attachments exist is something only the platform knows.
+			'image_count'       => $this->wants_image() ? 1 : 0,
+			'gallery_count'     => $this->gallery_count(),
+			'image_pool'        => $this->image_pool_size(),
+			'image_size'        => $this->image_size(),
 		);
+	}
+
+	/**
+	 * Whether this product gets a main image.
+	 *
+	 * On by default. A catalogue of grey placeholders is the first thing anyone notices about
+	 * generated data, and a store that has never rendered a product grid with pictures in it has
+	 * not seen the layout it will ship.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return bool
+	 */
+	private function wants_image(): bool {
+		$images = (array) ( $this->generation_params['images'] ?? array() );
+
+		return ! isset( $images['enabled'] ) || (bool) $images['enabled'];
+	}
+
+	/**
+	 * How many extra images this product carries beyond the main one.
+	 *
+	 * `gallery_ratio` is the share of products that get a gallery at all, because most products
+	 * in most shops have one photograph. What that share should be is a property of the trade:
+	 * a boutique shoots everything from four angles, a trade supplier ships one catalogue shot.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return int
+	 */
+	private function gallery_count(): int {
+		if ( ! $this->wants_image() ) {
+			return 0;
+		}
+
+		$images = (array) ( $this->generation_params['images'] ?? array() );
+		$ratio  = isset( $images['gallery_ratio'] ) ? (int) $images['gallery_ratio'] : 10;
+
+		if ( ! $this->get_faker()->boolean( max( 0, min( 100, $ratio ) ) ) ) {
+			return 0;
+		}
+
+		$range = (array) ( $images['gallery_count'] ?? array() );
+		$min   = isset( $range['min'] ) ? (int) $range['min'] : 2;
+		$max   = isset( $range['max'] ) ? (int) $range['max'] : 4;
+
+		return $this->get_faker()->numberBetween( max( 1, min( $min, $max ) ), max( 1, $min, $max ) );
+	}
+
+	/**
+	 * How many distinct attachments the run should draw product images from.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return int
+	 */
+	private function image_pool_size(): int {
+		$images = (array) ( $this->generation_params['images'] ?? array() );
+
+		return isset( $images['pool_size'] ) ? (int) $images['pool_size'] : Media::POOL_SIZE;
+	}
+
+	/**
+	 * Edge length, in pixels, of a generated image.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return int
+	 */
+	private function image_size(): int {
+		$images = (array) ( $this->generation_params['images'] ?? array() );
+
+		return isset( $images['size'] ) ? (int) $images['size'] : Media::SIZE;
 	}
 
 	/**

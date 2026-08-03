@@ -31,6 +31,7 @@ final class Resource {
 	const LABEL             = 'label';
 	const LICENSE           = 'license';
 	const LOG               = 'log';
+	const MEDIA             = 'media';
 	const ORDER             = 'order';
 	const ORDER_TAX_RATE    = 'order_tax_rate';
 	const PRODUCT           = 'product';
@@ -82,7 +83,28 @@ final class Resource {
 	}
 
 	/**
+	 * Resources that exist only as a side effect of writing something else.
+	 *
+	 * Deliberately not in `all()`. That list is what a recipe may put in a plan and what the
+	 * capability matrix describes, and neither is true of these: nothing generates a media
+	 * attachment on its own, and a recipe asking for two hundred of them is asking for nothing.
+	 * They still have to be deletable, so `exists()` knows them and the purge order carries them.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @return array<int, string>
+	 */
+	public static function internal(): array {
+		return array(
+			self::MEDIA,
+		);
+	}
+
+	/**
 	 * Whether a string is a known resource name.
+	 *
+	 * Internal resources count. The only caller is the purge, which has to be able to name
+	 * everything it might have to remove — including rows no generator ever produced directly.
 	 *
 	 * @since 1.1.0
 	 *
@@ -91,6 +113,7 @@ final class Resource {
 	 * @return bool
 	 */
 	public static function exists( string $resource_type ): bool {
-		return in_array( $resource_type, self::all(), true );
+		return in_array( $resource_type, self::all(), true )
+			|| in_array( $resource_type, self::internal(), true );
 	}
 }
