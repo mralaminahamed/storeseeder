@@ -654,6 +654,13 @@ class StoreSeeder {
 		// storeseeder_rest_controllers filter without patching this file.
 		Rest_Registry::instance()->register_routes();
 
+		/*
+		 * Not in the registry: that holds generators, and the Our Plugins
+		 * endpoint generates nothing. Registered here for the same reason
+		 * `/download-sample` below is.
+		 */
+		( new \StoreSeeder\Rest\Plugins() )->register_routes();
+
 		// Register the sample-data download endpoint.
 		register_rest_route(
 			'storeseeder/v1',
