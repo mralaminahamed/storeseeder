@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { join } from 'path';
-import { BRAND, glassField, markSvg } from '../../brand';
-import { RECIPES, recipeIcon } from '../../recipe-art';
+import { BRAND, glassField, markSvg } from './brand';
+import { RECIPES, recipeIcon } from './recipe-art';
 
 /**
  * Regenerates the two WordPress.org banners.
@@ -15,7 +15,7 @@ import { RECIPES, recipeIcon } from '../../recipe-art';
  *
  * Needs no WordPress — nothing here talks to a site, unlike `assets/wporg-shots.spec.ts`.
  */
-const ASSET_DIR = join(__dirname, '..', '..', '..', '..', '.wordpress-org');
+const ASSET_DIR = join(__dirname, '..', '..', '.wordpress-org');
 
 /** Base canvas. The 1544x500 banner is exactly this at 2x. */
 const BASE = { width: 772, height: 250 };

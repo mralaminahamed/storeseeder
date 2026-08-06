@@ -123,7 +123,7 @@ async function assertNotClipped(target: Locator, file: string): Promise<void> {
     throw new Error(
       `${file}: the target is ${clipped.height}px inside a ${clipped.limit}px scroller ` +
         `(.${clipped.scroller.split(' ').join('.')}), so everything past ${clipped.limit}px would ` +
-        `capture blank. Raise the viewport in playwright.docs-shots.config.ts, or capture a section.`,
+        `capture blank. Raise the viewport in playwright.assets.config.ts, or capture a section.`,
     );
   }
 }

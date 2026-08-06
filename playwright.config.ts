@@ -41,16 +41,11 @@ export default defineConfig({
       },
       dependencies: ['setup'],
       /*
-       * `specs/assets/` writes image files rather than asserting anything — the WordPress.org
-       * listing assets and the documentation site's, each driven by its own config. Matched here
-       * they ran on every `playwright test` and silently overwrote the shipped PNGs with whatever
-       * Faker had generated that minute.
-       *
-       * A directory rather than the four filenames it used to list: the next generator added is
-       * excluded by being in the right place, instead of by somebody remembering to extend a list
-       * whose omission is invisible until a run has already clobbered the artwork.
+       * The image generators used to live in `specs/assets/` and had to be ignored here, or an
+       * ordinary `playwright test` would overwrite the shipped PNGs with whatever Faker had
+       * generated that minute. They are in `tests/assets/` now, under their own config, so there is
+       * nothing left to ignore.
        */
-      testIgnore: ['specs/assets/**'],
       testMatch: 'specs/**/*.spec.ts',
     },
   ],

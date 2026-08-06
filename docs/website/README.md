@@ -81,8 +81,8 @@ yarn shots:docs-banner   # the hero banner
 The screenshots are raw captures — no branding plate, unlike the WordPress.org set, because here the
 caption is the prose beside the image.
 
-The banner is composed from markup in `tests/e2e/specs/assets/docs-banner.spec.ts`, from the same
-`tests/e2e/brand.ts` the plugin icon and the listing banners use. It deliberately carries **no
+The banner is composed from markup in `tests/assets/docs-banner.spec.ts`, from the same
+`tests/assets/brand.ts` the plugin icon and the listing banners use. It deliberately carries **no
 wordmark and no tagline**: the hero already prints both, and an image that repeats them says
 everything twice. It shows the idea instead — three recipes becoming a filled catalogue.
 

@@ -101,6 +101,7 @@ docs/superpowers/
 
 # Playwright
 tests/e2e/.auth/
+tests/assets/.auth/
 tests/e2e/report/
 tests/e2e/.env.test
 test-results/
