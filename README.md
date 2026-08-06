@@ -19,6 +19,9 @@ Whole shops from a recipe, 21 generators, one platform driver per store plugin, 
 > StoreSeeder writes large volumes of test data directly into your store. Use it only on development
 > or staging sites, and back up your database before generating large datasets.
 
+> This is the **contributor / technical** guide. For the public plugin listing — features,
+> screenshots, changelog, upgrade notices — see [`readme.txt`](readme.txt).
+
 ![StoreSeeder banner](.wordpress-org/banner-1544x500.png)
 
 ## What It Does
