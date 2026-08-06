@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { join } from 'node:path';
-import { BRAND, glassField, markSvg } from '../../brand';
-import { RECIPES, recipeIcon } from '../../recipe-art';
+import { BRAND, glassField, markSvg } from './brand';
+import { RECIPES, recipeIcon } from './recipe-art';
 
 /**
  * Regenerates the documentation site's hero banner.
@@ -23,7 +23,7 @@ import { RECIPES, recipeIcon } from '../../recipe-art';
  * Talks to no WordPress install.
  */
 
-const OUT = join(__dirname, '..', '..', '..', '..', 'docs', 'website', 'src', 'assets');
+const OUT = join(__dirname, '..', '..', 'docs', 'website', 'src', 'assets');
 
 /**
  * Authored in these units and scaled, so the file is crisp rather than resampled.
@@ -37,7 +37,7 @@ const BASE = { width: 1200, height: 360 };
 const SCALE = 3;
 
 /*
- * The recipes, their icons, their colours and their counts all come from `tests/e2e/recipe-art.ts`.
+ * The recipes, their icons, their colours and their counts all come from `tests/assets/recipe-art.ts`.
  * The WordPress.org banner draws the same cards, and two copies of a recipe's identity is how one
  * banner ends up green and the other teal.
  */

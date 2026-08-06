@@ -150,7 +150,7 @@ yarn shots:docs-banner      # regenerates the documentation site's hero banner
 
 The screenshot and banner specs are excluded from the default Playwright project so ordinary
 runs cannot overwrite the shipped WordPress.org images; they run through
-`playwright.wporg-shots.config.ts`.
+`playwright.assets.config.ts`.
 
 ## 📋 Coding standards
 

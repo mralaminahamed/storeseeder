@@ -1,14 +1,14 @@
 import { test } from '@playwright/test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { BRAND, glassField } from '../../brand';
-import { PLUGIN_URL, seedRuns, setTargetInOwnContext } from '../../admin';
+import { BRAND, glassField } from './brand';
+import { PLUGIN_URL, seedRuns, setTargetInOwnContext } from './admin';
 
 /** The store the write captures target. Restored to `Auto` in `afterAll`. */
 const TARGET = 'WooCommerce';
-const ASSET_DIR = join(__dirname, '..', '..', '..', '..', '.wordpress-org');
+const ASSET_DIR = join(__dirname, '..', '..', '.wordpress-org');
 
-/** Palette shared with the icon and the banners. See tests/e2e/brand.ts. */
+/** Palette shared with the icon and the banners. See tests/assets/brand.ts. */
 
 /** Where the listing assets live. */
 

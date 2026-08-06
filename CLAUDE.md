@@ -286,13 +286,14 @@ breaks every client pointed at `/wp-json/mcp/mcp-adapter-default-server`.
   add it back.
 - **`tests/e2e/setup.sh` resets the admin password.** Never run it, or `yarn test:e2e`
   against a site whose credentials matter, without asking first.
-- **`tests/e2e/specs/assets/` writes image files; it asserts nothing.** Four generators live
-  there — the WordPress.org listing's banners and screenshots, the documentation site's banner
-  and screenshots — and `playwright.config.ts` excludes the whole directory from the default
-  project, because matched there they overwrite shipped artwork on every `yarn test:e2e`. It is
-  a directory rather than a list of filenames so the next one added is excluded by where it
-  sits. Drive them through `playwright.wporg-shots.config.ts` and
-  `playwright.docs-shots.config.ts`, or the four `yarn shots:*` scripts.
+- **`tests/assets/` writes image files; it asserts nothing.** Four generators live there — the
+  WordPress.org listing's banners and screenshots, the documentation site's banner and
+  screenshots — with their helpers (`brand.ts`, `admin.ts`, `recipe-art.ts`) beside them. They
+  sit outside `tests/e2e/` deliberately: when they lived in `tests/e2e/specs/assets/` the base
+  config needed a `testIgnore` to stop an ordinary `yarn test:e2e` from overwriting shipped
+  artwork with whatever Faker had generated that minute, and a rule like that holds only while
+  somebody remembers it. Drive them through `playwright.assets.config.ts` — one config, four
+  projects — or the `yarn shots:*` scripts.
 - **The capability gate is `StoreSeeder\Access`, not a literal `manage_options`.** Four
   surfaces check it — admin menu, REST, MCP, AJAX — and a site that grants the routes but not
   the page has a broken plugin. It lives at the root of `includes/` rather than in a layer
