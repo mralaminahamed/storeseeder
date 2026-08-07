@@ -4,14 +4,15 @@ name: Plugin asset/readme update
 # the WordPress.org SVN, without touching the plugin code in trunk. It fires on a merge to trunk, so
 # the directory listing can be corrected without cutting a release.
 #
-# This publishes `Stable tag` too, which is why it reads readme.txt from the latest release tag rather
-# than from trunk. Trunk's readme describes the version being developed; the directory has to describe
-# the version people can install. Syncing trunk's copy pointed the listing at 1.2.0 while only 1.0.0
-# and 1.1.0 existed as tags — and WordPress serves downloads from /tags/<stable tag>/, so the listing
-# resolved to nothing until it was reverted by hand.
+# This publishes `Stable tag` too, and that one line is the only part of readme.txt that must not come
+# from trunk: trunk names the version being developed, and WordPress serves downloads from
+# /tags/<stable tag>/, so publishing it pointed the listing at 1.2.0 while only 1.0.0 and 1.1.0 existed
+# as tags — the listing resolved to nothing until it was reverted by hand.
 #
-# Assets under .wordpress-org/ still come from trunk. Artwork has no version to be wrong about, and
-# fixing a banner should not need a release.
+# So the whole file is taken from trunk and `Stable tag` alone is rewritten to the newest release tag.
+# Taking the entire file from the tag instead was the first fix, and it overcorrected: every
+# description, tag and screenshot caption then sat unpublishable until the next release, which is the
+# opposite of what a workflow that exists to fix a listing without cutting one is for.
 
 on:
   push:
@@ -20,6 +21,7 @@ on:
       - 'readme.txt'
     branches:
       - trunk
+  workflow_dispatch:
 
 # Read-only against this repository. The SVN credentials are what grant write, and they go to
 # WordPress.org, not to GitHub.
@@ -45,7 +47,7 @@ jobs:
           # Tags are needed to find the latest release; a shallow clone has none.
           fetch-depth: 0
 
-      - name: Take readme.txt from the latest release tag
+      - name: Pin Stable tag to the latest release tag
         run: |
           set -euo pipefail
 
@@ -57,8 +59,9 @@ jobs:
             exit 0
           fi
 
-          echo "::notice::Publishing readme.txt from tag ${TAG}"
-          git show "${TAG}:readme.txt" > readme.txt
+          VERSION="${TAG#v}"
+          echo "::notice::Publishing trunk's readme.txt, Stable tag pinned to ${VERSION}"
+          sed -i -E "s/^Stable tag:[[:space:]]*.*/Stable tag: ${VERSION}/" readme.txt
 
           # State it in the log, because a mismatch here is the whole failure mode this guards.
           grep -m1 '^Stable tag:' readme.txt
