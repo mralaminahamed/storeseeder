@@ -72,6 +72,25 @@ The plugin can optionally expose each generator as two MCP tools so AI clients (
 
 The tools are served at `/wp-json/storeseeder-mcp/mcp`, and are also reachable through the `mcp-adapter` plugin's own default server for clients already configured against it. A desktop client connects through Automattic's `mcp-wordpress-remote` proxy (https://github.com/Automattic/mcp-wordpress-remote), using an application password for a user who has StoreSeeder access; that repository documents the setup and the current config format. This requires the WordPress Abilities API (bundled in WordPress 6.9+, or installable separately) and the `mcp-adapter` plugin. MCP is entirely optional and degrades gracefully — the plugin works normally when these dependencies are absent.
 
+= More from us =
+
+Other free plugins by the same author, all on WordPress.org.
+
+**If you are seeding a store, you may also want**
+
+* [EasyCommerce FakerPress](https://wordpress.org/plugins/easycommerce-fakerpress/) - The same idea for an EasyCommerce store, with a live preview before anything is written.
+* [StoreSheet](https://wordpress.org/plugins/storesheet/) - Sync WooCommerce products, orders and coupons to a Google spreadsheet, one way and in the background.
+
+**For a WooCommerce store**
+
+* [Warranty Cart](https://wordpress.org/plugins/warranty-cart/) - Sell extended warranties on your products, then handle the claims and renewals that follow.
+* [Vendor Tasks for Dokan & ClickUp](https://wordpress.org/plugins/alamin-vendor-tasks-dokan-clickup/) - Turn Dokan vendor events into ClickUp tasks — registrations, approvals, withdrawals.
+
+**For any site**
+
+* [Swift Menu Duplicator](https://wordpress.org/plugins/swift-menu-duplicator/) - Duplicate menus in one click, snapshot revisions, export and import, WP-CLI and REST.
+* [Author Profile Blocks](https://wordpress.org/plugins/author-profile-blocks/) - Author and team profiles as Gutenberg blocks — grid, carousel, list and single.
+
 == Installation ==
 
 = Automatic Installation =
@@ -159,25 +178,6 @@ Yes. All strings — PHP and the React admin — go through gettext, a `.pot` te
 3. Product generator — product type, price range, inventory and content options, with a live preview of the rows the run will create.
 4. Order generator — status mix, items per order, payment methods and geography, with the preview updating as settings change.
 5. Settings — where data is written, who may write it, and the AI tool switches.
-
-== More from us ==
-
-Other free plugins by the same author, all on WordPress.org.
-
-**If you are seeding a store, you may also want**
-
-* [EasyCommerce FakerPress](https://wordpress.org/plugins/easycommerce-fakerpress/) - The same idea for an EasyCommerce store, with a live preview before anything is written.
-* [StoreSheet](https://wordpress.org/plugins/storesheet/) - Sync WooCommerce products, orders and coupons to a Google spreadsheet, one way and in the background.
-
-**For a WooCommerce store**
-
-* [Warranty Cart](https://wordpress.org/plugins/warranty-cart/) - Sell extended warranties on your products, then handle the claims and renewals that follow.
-* [Vendor Tasks for Dokan & ClickUp](https://wordpress.org/plugins/alamin-vendor-tasks-dokan-clickup/) - Turn Dokan vendor events into ClickUp tasks — registrations, approvals, withdrawals.
-
-**For any site**
-
-* [Swift Menu Duplicator](https://wordpress.org/plugins/swift-menu-duplicator/) - Duplicate menus in one click, snapshot revisions, export and import, WP-CLI and REST.
-* [Author Profile Blocks](https://wordpress.org/plugins/author-profile-blocks/) - Author and team profiles as Gutenberg blocks — grid, carousel, list and single.
 
 == Changelog ==
 
