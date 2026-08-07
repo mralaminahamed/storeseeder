@@ -1,4 +1,4 @@
-=== StoreSeeder – eCommerce Test Data Generator for WooCommerce & Fluent Cart ===
+=== StoreSeeder – Dummy & Test Data Generator for WooCommerce & Fluent Cart ===
 Contributors: mralaminahamed
 Tags: woocommerce, test data, dummy data, demo content, fluent cart
 Requires at least: 6.5
@@ -8,7 +8,7 @@ Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generate realistic WooCommerce and Fluent Cart test data — products, orders, customers — with live preview, 21 generators and one-click cleanup.
+Generate realistic dummy products, orders and customers for WooCommerce and Fluent Cart — live preview, 21 generators, one-click cleanup.
 
 == Description ==
 
