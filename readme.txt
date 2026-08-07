@@ -160,6 +160,25 @@ Yes. All strings — PHP and the React admin — go through gettext, a `.pot` te
 4. Order generator — status mix, items per order, payment methods and geography, with the preview updating as settings change.
 5. Settings — where data is written, who may write it, and the AI tool switches.
 
+== More from us ==
+
+Other free plugins by the same author, all on WordPress.org.
+
+**If you are seeding a store, you may also want**
+
+* [EasyCommerce FakerPress](https://wordpress.org/plugins/easycommerce-fakerpress/) - The same idea for an EasyCommerce store, with a live preview before anything is written.
+* [StoreSheet](https://wordpress.org/plugins/storesheet/) - Sync WooCommerce products, orders and coupons to a Google spreadsheet, one way and in the background.
+
+**For a WooCommerce store**
+
+* [Warranty Cart](https://wordpress.org/plugins/warranty-cart/) - Sell extended warranties on your products, then handle the claims and renewals that follow.
+* [Vendor Tasks for Dokan & ClickUp](https://wordpress.org/plugins/alamin-vendor-tasks-dokan-clickup/) - Turn Dokan vendor events into ClickUp tasks — registrations, approvals, withdrawals.
+
+**For any site**
+
+* [Swift Menu Duplicator](https://wordpress.org/plugins/swift-menu-duplicator/) - Duplicate menus in one click, snapshot revisions, export and import, WP-CLI and REST.
+* [Author Profile Blocks](https://wordpress.org/plugins/author-profile-blocks/) - Author and team profiles as Gutenberg blocks — grid, carousel, list and single.
+
 == Changelog ==
 
 Only the four most recent releases are listed here. The complete history, in Keep a Changelog format, is maintained in the repository:
