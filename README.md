@@ -1,367 +1,203 @@
 <div align="center">
 
-<img src=".wordpress-org/icon-256x256.png" alt="StoreSeeder icon" width="128" height="128">
+<img src=".wordpress-org/icon-256x256.png" alt="StoreSeeder icon" width="96" height="96">
 
-# StoreSeeder
+# StoreSeeder — Developer Guide
 
-**Realistic test data for WordPress e-commerce platforms.**
-Whole shops from a recipe, 21 generators, one platform driver per store plugin, live preview, batch queue, and a modern admin UI.
+**Realistic test data for WordPress e-commerce — twenty-one generators writing through a platform driver, so the same recipe seeds any supported store.**
 
-[![Version](https://img.shields.io/badge/version-1.2.0-green?style=flat-square)](https://github.com/mralaminahamed/storeseeder/releases)
-[![WordPress 6.5+](https://img.shields.io/badge/WordPress-6.5%2B-blue?style=flat-square)](https://wordpress.org/)
-[![Tested up to 7.0](https://img.shields.io/badge/tested%20up%20to-7.0-blue?style=flat-square)](readme.txt)
-[![PHP 7.4+](https://img.shields.io/badge/PHP-7.4%2B-8892BF?style=flat-square)](https://php.net/)
-[![License GPL v2 or later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue?style=flat-square)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.2.0-21759b.svg)](https://github.com/mralaminahamed/storeseeder)
+[![WordPress](https://img.shields.io/badge/WordPress-6.5%2B-21759b.svg?logo=wordpress&logoColor=white)](https://wordpress.org/)
+[![WooCommerce](https://img.shields.io/badge/WooCommerce-HPOS%20ready-96588A.svg)](https://woocommerce.com/)
+[![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)](https://php.net/)
+[![PHPStan](https://img.shields.io/badge/PHPStan-Level%207-brightgreen.svg)](https://phpstan.org/)
+[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-green.svg)](LICENSE)
 
 </div>
 
-> [!WARNING]
-> StoreSeeder writes large volumes of test data directly into your store. Use it only on development
-> or staging sites, and back up your database before generating large datasets.
+> This is the **contributor / technical** guide. For the public plugin listing — features, screenshots, changelog, upgrade notices — see [`readme.txt`](readme.txt).
 
-![StoreSeeder banner](.wordpress-org/banner-1544x500.png)
+| Requirement     | Minimum | Tested up to |
+|-----------------|---------|--------------|
+| **WordPress**   | 6.5     | 7.1          |
+| **PHP**         | 7.4     | —            |
 
-## What It Does
+Current version **1.2.0** · License **GPL-2.0-or-later** · Tooling **Yarn** + Composer · Delivered free on WordPress.org
 
-Pick a **recipe** and click once for a whole coherent shop — a corner grocer, a fashion boutique, a
-home & garden store — filled across nine resources in dependency order. Or pick a single generator,
-configure its parameters, and click **Generate**.
+---
 
-Either way, every record is created through the target platform's own models, so it respects the same
-schema, relationships, validation, and money handling as real data — and stays compatible across that
-platform's updates.
+## What it is
 
-Which store the data lands in is a choice, not a build-time assumption: a **platform driver** owns
-that, and the same twenty-one generators feed every driver. Fluent Cart and WooCommerce ship today.
+Testing a store needs a store: products with variations, customers who have ordered, coupons
+that have been redeemed, refunds against real orders. Building that by hand is slow, and
+building it with a throwaway script means rebuilding it on the next machine.
 
-Built for:
+StoreSeeder generates it — and generates it **through a driver**, not against one plugin's
+API. A generator says "make an order"; the driver for the active platform decides what that
+means. WooCommerce and Fluent Cart ship, and a third platform is a driver away rather than a
+fork.
 
-- Developing features that need a store with existing data
-- Testing plugins, themes, and integrations against realistic datasets
-- Building client demos with populated catalogs and order histories
-- Performance testing at volume
+Everything it creates is recorded in a **ledger**, so a seeded store can be un-seeded exactly:
+cleanup removes what StoreSeeder made and leaves what you made.
 
-## Quick Start
+---
 
-Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/storeseeder/) —
-**Plugins → Add New**, search for StoreSeeder, **Install Now**, **Activate**. It appears as
-**StoreSeeder** in the admin menu.
+## What ships
 
-Releases are cut from this repository by pushing a version tag (see [Releases](#releases)), so a
-[release zip](https://github.com/mralaminahamed/storeseeder/releases) installed via **Plugins → Add
-New → Upload Plugin** is equivalent if you want a specific version.
+| Surface        | Provided                                                                     |
+|----------------|-------------------------------------------------------------------------------|
+| **Generators** | 21 — products, variations, categories, tags, brands, attributes, downloads, customers, orders, refunds, coupons, subscriptions, transactions, carts, licences, labels, logs, tax classes and rates, shipping classes and plans |
+| **Platforms**  | WooCommerce and Fluent Cart drivers; others register through `Platforms\Registry` |
+| **Recipes**    | A whole shop from one definition, rather than generator-by-generator          |
+| **REST**       | `storeseeder/v1` — the admin SPA talks to nothing else                       |
+| **WP-CLI**     | `generate`, `recipe`, `preview`, `sample-data`, `cleanup`, `platforms`        |
+| **MCP**        | Abilities exposed to an MCP client, so an agent can seed a store              |
+| **Ledger**     | Records every generated object so cleanup is exact, not a guess               |
 
-To run from source:
-
-```bash
-git clone https://github.com/mralaminahamed/storeseeder.git
-cd storeseeder
-composer install
-yarn install
-yarn build
-```
-
-**Requirements** — WordPress 6.5+, PHP 7.4+ (8.0+ recommended), and one supported e-commerce
-platform active. Today that means [WooCommerce](https://wordpress.org/plugins/woocommerce/) or
-[Fluent Cart](https://wordpress.org/plugins/fluent-cart/).
-
-There is deliberately **no `Requires Plugins` header**: it would make WordPress refuse activation
-without one named plugin, so no other platform could ever be reached. StoreSeeder activates
-regardless and says what is missing instead. Budget 256MB of memory, or 512MB for large datasets. The
-plugin header and [`readme.txt`](readme.txt) are the source of truth for these numbers.
-
-## Platforms
-
-| Platform | Status |
-|----------|--------|
-| [Fluent Cart](https://wordpress.org/plugins/fluent-cart/) | Shipped — 20 of 21 resources; licences need Fluent Cart Pro, and it has no product tags |
-| [WooCommerce](https://wordpress.org/plugins/woocommerce/) | Shipped — 18 of 21 resources; subscriptions need WooCommerce Subscriptions. Transactions, labels and licences are reported unsupported with the reason, because WooCommerce has no equivalent |
-| EasyCommerce, StoreEngine | Planned |
-| Anything else | A third party can register a driver from their own plugin, with no changes here |
-
-The target is chosen in the topbar and in **Settings**, and defaults to `Auto`. One platform active
-resolves silently; with several active there is no safe default, so the generator page asks before it
-runs — writing rows into the wrong store is not a failure you would notice afterwards. The choice is
-stored **site-wide**, so two administrators cannot unknowingly seed different platforms.
-
-Support is computed per request, never cached, because it is conditional: WooCommerce has no
-subscriptions until WooCommerce Subscriptions is active, and StoreEngine gates several resources
-behind addons. A resource the target cannot represent is dimmed with its reason — naming the plugin
-that would enable it — and the REST API answers 400 rather than reporting success and writing
-nothing.
-
-## Generators
-
-Twenty-one generators, grouped by category in the admin, all platform-neutral — a generator names no
-platform, which is what lets one of them feed every driver and lets a fixed seed produce identical
-data on all of them. Several build on others — orders need products and customers, refunds need charge
-transactions — and each one reports clearly when a prerequisite is missing.
-
-| Generator | Category | What it creates |
-|-----------|----------|-----------------|
-| Products | Core | Sellable products — post, product detail, and variation rows with pricing, stock, and SKUs |
-| Customers | Core | Customer profiles with billing and shipping addresses, demographics, and purchase history |
-| Orders | Core | Complete orders with line items, addresses, applied coupons, payment, shipping, and tax |
-| Coupons | Core | Discount codes (fixed, percentage, free shipping) with usage limits and restrictions |
-| Product Variations | Advanced | Additional priced variations attached to existing products, with unique SKUs |
-| Attributes | Advanced | Attribute groups and terms, linked to real product variations |
-| Product Categories | Advanced | Categories, nested where asked, with existing products filed under them. `product_cat` on WooCommerce, `product-categories` on Fluent Cart |
-| Product Tags | Advanced | Tags applied to existing products. WooCommerce only — Fluent Cart registers no tag taxonomy and reports the resource unsupported |
-| Brands | Advanced | Product brands attached to existing products, optionally nested as sub-brands. `product_brand` on WooCommerce, `product-brands` on Fluent Cart |
-| Product Downloads | Advanced | Downloadable files for products, with download permissions on existing orders |
-| Cart Sessions | Advanced | Abandoned and completed cart sessions with real product foreign keys |
-| Transactions | Advanced | Payment transactions tied to real orders, with gateways and statuses |
-| Refunds | Advanced | Full and partial refunds against existing charge transactions |
-| Subscriptions | Advanced | Subscription records against existing orders (on Fluent Cart, active billing requires Pro) |
-| Licenses | Advanced | Software licences against existing orders — keys, site limits, activation counts and expiry. Requires Fluent Cart Pro, which owns the licensing tables |
-| Labels | Advanced | Labels (tags) attached to existing orders and customers |
-| Tax Classes | Advanced | Tax classes with the geographic rate rows the platform applies to orders |
-| Order Tax Lines | Advanced | Per-order tax lines linking orders to tax rates with collected tax |
-| Shipping Plans | Advanced | Shipping methods and zones with fixed and free-shipping rates |
-| Shipping Classes | Advanced | Classes that group products with similar shipping requirements |
-| Logs | Advanced | Activity log entries across orders, products, customers, and system events |
-
-Full per-generator detail on [the documentation site](https://mralaminahamed.github.io/storeseeder/).
-
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| Live preview | A read-only REST route returns real faker rows without persisting anything; the table refreshes as you change settings and re-rolls on Shuffle |
-| Schema-driven forms | Each generator renders its own fields from a parameter schema — nested options, ranges, toggles, sensible defaults |
-| Batch queue | Queue multiple generators and run them sequentially from the batch tray, with live progress |
-| Command palette | <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>K</kbd> to jump to any generator or page |
-| Run history | Per-generator run log in browser `localStorage`; recent runs in the sidebar, all-time stats on the dashboard |
-| Design-token UI | Light/dark themes, accent palettes, and comfortable/compact density — all scoped to the plugin, so WordPress chrome is never restyled |
-| Multi-platform | One driver per store plugin; the target is site-wide, and capabilities are resolved per request rather than declared once |
-| 75 locales | Every locale FakerPHP ships a provider for, searchable by name or code. The picker offers exactly what the REST API accepts |
-| Settings | Grouped by scope — site-wide (target platform, who may generate, sample data) and per-browser (defaults, appearance, run history), saved as you change them |
-| Access control | Grant roles from Settings, or set the capability in code. Administrators cannot be locked out, and only they can grant others |
-| Sample data | Optional, consent-gated download of locale reference data; declining leaves generators on built-in defaults |
-| Delete generated data | One action clears what StoreSeeder created — tracked in its own ledger, so your data is never matched on |
-| REST API | 21 controllers under `storeseeder/v1`, each with `generate` and `preview` routes |
-| WP-CLI | `wp storeseeder generate\|preview\|platforms\|locales\|sample-data\|cleanup`, dispatching through the same REST controllers |
-| Translation-ready | Textdomain and JS translations both resolve from the plugin's own `languages/`, so Loco Translate and WPML String Translation find every string |
-| MCP integration | Optional — two AI tools per generator, one read-only and one that writes, with a Settings switch per risk class. Clients connect through [`mcp-wordpress-remote`](https://github.com/Automattic/mcp-wordpress-remote) |
-| Hook system | Filters and actions across the generation lifecycle, plus one filter for the capability required to use the plugin |
-
-## Documentation
-
-| Page | What it covers |
-|------|----------------|
-| [Documentation site](https://mralaminahamed.github.io/storeseeder/) | Everything below, rendered and searchable |
-| [Installation](https://mralaminahamed.github.io/storeseeder/getting-started/installation/) | Requirements, install paths, and choosing a target platform |
-| [Recipes](https://mralaminahamed.github.io/storeseeder/guides/recipes/) | Building a whole coherent shop in one click |
-| [Generators](https://mralaminahamed.github.io/storeseeder/guides/generators/) | One resource at a time, step by step, with a preview that tells the truth |
-| [The batch queue](https://mralaminahamed.github.io/storeseeder/guides/batch/) | Queue several generators and run them in one go |
-| [Deleting generated data](https://mralaminahamed.github.io/storeseeder/guides/cleanup/) | The ledger, and what each danger-zone action does and does not touch |
-| [Locales](https://mralaminahamed.github.io/storeseeder/guides/locales/) | Seventy-five locales, what follows them, and what falls back to English |
-| [Settings](https://mralaminahamed.github.io/storeseeder/guides/settings/) | Target, access, the AI surface, sample data, preferences |
-| [AI and MCP](https://mralaminahamed.github.io/storeseeder/guides/mcp/) | Two tools per generator, and the switches that withdraw them |
-| [Platform support](https://mralaminahamed.github.io/storeseeder/reference/platform-support/) | What each driver writes, and what it refuses |
-| [Architecture](https://mralaminahamed.github.io/storeseeder/reference/architecture/) | The driver layer, request flow, and where a decision is allowed to live |
-| [External services](https://mralaminahamed.github.io/storeseeder/reference/external-services/) | What is fetched, when, and on whose say-so |
-| [Development](docs/guides/development.md) | Local setup, build and test commands, adding a generator, release process |
-| [CHANGELOG.md](CHANGELOG.md) | Full version history — the canonical record, also [rendered on the site](https://mralaminahamed.github.io/storeseeder/reference/changelog/) |
-| [Contributing](https://mralaminahamed.github.io/storeseeder/reference/contributing/) | Setting up, the quality gates, and adding a platform, generator or recipe |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commit conventions, PR expectations — the canonical process |
-| [SECURITY.md](SECURITY.md) | Private vulnerability reporting and the plugin's security measures |
-| [Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/) | Where to ask, what to include, what is out of scope |
+---
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A["React admin<br/><code>src/</code>"]
-    B["Controller<br/><code>generate_items()</code>"]
-    R{"Resolver<br/>which platform?"}
-    C["Generator<br/><code>build_entity()</code>"]
-    E(["Canonical entity<br/>minor-unit money<br/>canonical statuses"])
-    W["Writer<br/>one per platform"]
-    M["Platform models<br/>Fluent Cart, …"]
-    D[("WordPress<br/>database")]
+### PHP — `includes/` (PSR-4 `StoreSeeder\`)
 
-    A -->|"POST /storeseeder/v1/&lt;base&gt;/generate"| B
-    B -->|"JSON Schema validation"| R
-    R -->|"target platform"| C
-    C -->|"FakerPHP only —<br/>names no platform"| E
-    E --> W
-    W -->|"resolves FKs,<br/>maps statuses"| M
-    M --> D
-    W -.->|"{ message, &lt;resource&gt;: [ … ] }"| A
+| Dir            | Responsibility                                                  | Start here              |
+|----------------|-----------------------------------------------------------------|-------------------------|
+| `Generation/`  | The 21 generators, the batch runner, the ledger, and purge       | `Generator.php`         |
+| `Platforms/`   | Driver contract, capability probing, resolver, per-store drivers | `Platform_Interface.php`|
+| `Recipes/`     | Whole-shop definitions built from generators                     | `Recipe.php`            |
+| `Rest/`        | REST controllers (`storeseeder/v1`) behind one registry          | `Registry.php`          |
+| `CLI/`         | WP-CLI commands sharing the same generators as the UI            | `Commands/`             |
+| `MCP/`         | Abilities and server wiring for MCP clients                      | `MCP_Server.php`        |
+| `Access.php`   | Capability checks — seeding is destructive, so it is gated       | —                       |
+| `Storage.php`  | Options and schema migration                                     | —                       |
 
-    style E stroke-dasharray: 4 4
+The seam worth knowing is `Platforms\Platform_Interface`. Generators never call WooCommerce
+or Fluent Cart directly; they describe an object and the resolved driver writes it. That is
+why the same recipe produces a comparable store on either platform, and why adding a third
+does not touch the generators.
+
+**HPOS:** orders are written through `WC_Order` CRUD and read with `wc_get_orders()`, and the
+admin link branches on `OrderUtil::custom_orders_table_usage_is_enabled()`. Compatibility is
+declared from the plugin file, before the autoloader guard, so it still happens if the
+autoloader is missing.
+
+### JavaScript / TypeScript — `src/` (React + Tailwind)
+
+| Dir           | Responsibility                            | Built by     |
+|---------------|-------------------------------------------|--------------|
+| `components/` | Admin SPA screens and shared UI           | `yarn build` |
+| `providers/`  | React context providers                   | `yarn build` |
+| `lib/`        | API client and helpers                    | `yarn build` |
+| `theme/`      | Design tokens                             | `yarn build` |
+| `types/`      | Shared TypeScript types                   | `yarn build` |
+
+### Repo map
+
+```
+storeseeder.php        Bootstrap: constants, HPOS declaration, autoloader guard
+includes/              PHP (PSR-4 StoreSeeder\)
+src/                   Admin SPA sources
+build/                 Compiled assets — generated, do not edit
+tests/php/             PHPUnit
+tests/e2e/             Playwright specs
+tests/assets/          Screenshot + banner generation
+docs/                  Longer-form documentation
+.wordpress-org/        Directory assets: icon, banners, screenshots, blueprints
 ```
 
-The entity in the middle is the whole point: a generator produces platform-neutral data, and a
-writer is the only thing that knows what store it is going into. That is what lets the same
-twenty-one generators seed any supported platform, and what lets a fixed seed produce identical
-data on all of them.
+---
 
-PHP lives under the PSR-4 namespace `StoreSeeder\`:
-
-```
-storeseeder.php           Plugin bootstrap
-class-storeseeder.php     Singleton orchestrator
-includes/
-  Access.php                         One capability gate: menu, REST, MCP, AJAX
-  Generation/Generator.php           Base generator (FakerPHP, batch, preview, logging)
-  Generation/Generators/             17 concrete generators — no platform knowledge
-  Rest/Controller.php                Base REST controller (WP_REST_Controller)
-  Rest/Controllers/                  17 REST controllers
-  Rest/Registry.php                  Controller registry — storeseeder_rest_controllers
-  Platforms/                         Platform layer: registry, resolver, capabilities
-  Platforms/Locale.php               The 75 generatable locales
-  Platforms/Writer.php               Base writer — persists one resource
-  Platforms/Drivers/Fluent_Cart/     Driver: capability matrix + 20 writers
-  Platforms/Drivers/Woo_Commerce/    Driver: matrix + shared Writer base + 18 writers
-  MCP/                               MCP server + abilities
-```
-
-The admin app is React 18, React Router v7, Radix UI, and Tailwind CSS v4, entered at
-`src/index.tsx` and built to `build/`. The compiled bundle is the only JavaScript shipped; the
-readable source lives in this repository.
-
-## Command line
-
-Every command goes through the same REST controllers the admin uses, so the two cannot
-disagree about what a parameter means or what is valid.
+## Getting started
 
 ```bash
-# Generate. Any parameter the resource's endpoint accepts works as a flag.
-wp storeseeder generate products --count=20 --locale=de_DE --user=1
-wp storeseeder generate products --count=5 --price_range='{"min":5,"max":500}' --user=1
-wp storeseeder generate orders --count=100 --seed=42 --payment_methods=stripe,paypal --user=1
-
-# Look before you write: same rows, nothing persisted, no target platform needed.
-wp storeseeder preview products --count=3 --format=json --user=1
-
-# Where data goes, and what can be generated in it.
-wp storeseeder platforms --user=1
-wp storeseeder platforms --set=fluent-cart --user=1
-wp storeseeder locales --search=german
-
-# Act on a consent decision already recorded; it never grants one.
-wp storeseeder sample-data --user=1
-wp storeseeder sample-data sync --force --user=1
+composer install     # PHP dependencies + dev tooling
+yarn install         # JS dependencies
+yarn build           # compile the admin SPA
 ```
 
-`--user` is required for anything that writes. StoreSeeder writes rows into a live store, so
-the command verifies a real user's capability rather than treating shell access as consent to
-write to this particular site — and that keeps one answer to "who may generate?" across the
-admin, REST, MCP and the CLI. `wp storeseeder locales` needs no user, because it only reports
-what the plugin can do.
+The plugin will not run without `vendor/autoload.php`. If it is missing, it says so in the
+admin rather than activating and doing nothing.
 
-Both spellings of a resource work: `cart-sessions` (the REST base) and `cart_session` (the
-canonical name). A typo lists the valid ones; an unknown flag lists the parameters that
-endpoint accepts.
+---
 
-## Development
+## Build
 
 ```bash
-# Frontend
-yarn start                   # webpack watch mode
-yarn build                   # production build
-yarn test:e2e                # Playwright end-to-end suite
-yarn test:e2e:ui             # Playwright UI mode
-
-# PHP
-composer test                # PHPUnit
-composer test:coverage       # HTML coverage report
-composer lint                # WordPress coding standards (phpcs)
-composer format              # Auto-fix coding standards (phpcbf)
-composer analyse             # Static analysis (PHPStan, level 7)
-composer phpcs:plugin-review # WordPress.org plugin review ruleset
-composer makepot             # Regenerate the translation template (needs build/, so yarn build first)
-composer release             # Lint + analyse + build + makepot + zip
-composer zip:dev             # Development zip at release/dev/storeseeder.zip
+yarn build           # production build
+yarn start           # watch mode
+yarn lint:js         # lint JS
 ```
 
-Node and Yarn are pinned: `packageManager` fixes Yarn at 4.18, provisioned by Corepack, and CI builds
-on Node 24. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup and the checks a pull request
-has to pass.
+---
 
-## Extensibility
+## Testing
 
-```php
-// Register a platform from your own plugin. This is the whole surface needed:
-// the generators, REST API and admin pick it up with no changes to StoreSeeder.
-add_filter( 'storeseeder_platforms', function ( array $platforms ): array {
-    $platforms[] = new My_Store_Driver(); // extends StoreSeeder\Platforms\Platform_Driver
-    return $platforms;
-} );
-
-// Change generated data before it is written — the entity is platform-neutral here,
-// so this applies to every platform equally. Drop the _entity suffix for one resource.
-add_filter( 'storeseeder_canonical_entity', function ( array $entity, string $resource ): array {
-    $entity['meta']['seeded_by'] = 'nightly-fixture';
-    return $entity;
-}, 10, 2 );
-
-// Widen who may generate. Governs the admin menu, REST, MCP and AJAX together.
-add_filter( 'storeseeder_capability', fn() => 'edit_shop_orders' );
-
-// Observe a write, per platform and resource. Fires for failures too.
-add_action( 'storeseeder_after_write_fluent-cart_product', function ( $result, $entity ) {
-    // custom logic
-}, 10, 2 );
+```bash
+composer test              # PHPUnit
+composer test:coverage     # with coverage
+yarn test:unit             # JS unit tests
+yarn test:e2e              # Playwright
+yarn test:e2e:ui           # Playwright, headed
 ```
 
-The full table — every filter and action, with what each receives — is in
-[the extension points reference](https://mralaminahamed.github.io/storeseeder/reference/extension-points/).
+Some suites skip when a platform is not installed — Fluent Cart tests, for example, skip on a
+site that only has WooCommerce. A skip is not a pass; check what it says before assuming
+coverage.
 
-## External Services
+---
 
-Two outbound requests, both administrator-initiated. Neither sends any site, user, or store data, and
-neither fires on activation.
+## Code quality
 
-| Service | Endpoint | Triggered by |
-|---------|----------|--------------|
-| GitHub | `github.com/mralaminahamed/storeseeder-sample-data-fluent-cart/archive/refs/heads/<branch>.zip` | An administrator granting consent — the prompt on the plugin admin page, or **Sync now** in Settings. `storeseeder_sample_data_source` points it elsewhere |
-| WordPress.org | `api.wordpress.org/plugins/info/1.2/` | An administrator opening the **Our Plugins** page; requested by the browser |
+```bash
+composer phpcs                 # WordPress Coding Standards
+composer phpcbf                # auto-fix
+composer phpstan               # static analysis, level 7
+composer phpcs:plugin-review   # the stricter directory-review ruleset
+```
 
-Full disclosure — exactly what each request sends and receives, provider terms and privacy policies,
-and what StoreSeeder deliberately does not do — in
-[the external services disclosure](https://mralaminahamed.github.io/storeseeder/reference/external-services/).
+---
 
-## Security
+## Internationalization
 
-- Every REST endpoint, MCP ability and admin screen requires `manage_options` — or whatever
-  `storeseeder_capability` returns, or a role allowed in Settings, all governed together so access
-  cannot be widened for one surface and not another
-- Granting access is itself restricted to `manage_options`, so a role allowed to generate cannot
-  allow further roles
-- Parameters are validated against JSON Schema before processing
-- Sample-data archives are validated entry by entry before extraction, rejecting absolute paths and
-  `..` traversal segments (zip-slip)
-- Generated data stays in your own database — no analytics, telemetry, or phoning home
-- Generated content is fictional and intended for non-production use only
+```bash
+composer makepot
+```
 
-Report vulnerabilities privately — see the [security policy](SECURITY.md).
+Text domain `storeseeder`. Translations live in `languages/`.
 
-## Releases
+---
 
-Pushing a version tag from this repository triggers
-[`svn-deploy.yml`](.github/workflows/svn-deploy.yml), which validates that the tag matches the plugin
-header version, runs the lint and static-analysis gates, builds the assets and translation template,
-packages the plugin, deploys it to the WordPress.org SVN repository, and publishes the GitHub release.
+## Release
 
-Version history lives in [CHANGELOG.md](CHANGELOG.md); [`readme.txt`](readme.txt) carries the four
-most recent releases in the WordPress plugin format.
+```bash
+composer release     # build, generate assets, package
+composer zip:dev     # development zip
+```
 
-## Contributing
+Directory assets are generated rather than hand-drawn:
 
-Bug reports, feature requests, and pull requests are all welcome. Read
-[CONTRIBUTING.md](CONTRIBUTING.md) for setup, coding standards, and the checks a pull request needs to
-pass, and [docs/guides/development.md](docs/guides/development.md) for architecture detail. File issues on the
-[issue tracker](https://github.com/mralaminahamed/storeseeder/issues); for help using the plugin, see
-[Support & troubleshooting](https://mralaminahamed.github.io/storeseeder/reference/support/). Participation is covered by the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+```bash
+yarn shots:wporg     # WordPress.org screenshots
+yarn shots:banners   # banners
+```
 
-## Maintainer
+---
 
-Al Amin Ahamed — [alaminahamed.com](https://alaminahamed.com) · [@mralaminahamed](https://github.com/mralaminahamed)
+## Links
 
-## License
+- [WordPress.org listing](https://wordpress.org/plugins/storeseeder/)
+- [Documentation site](https://mralaminahamed.github.io/storeseeder)
+- [Public readme](readme.txt) — features, screenshots, changelog
+- [`docs/`](docs/) — longer-form documentation
 
-[GPL-2.0-or-later](LICENSE)
+---
+
+## Contributing · Security · License
+
+Issues and pull requests are welcome. Please run `composer phpcs`, `composer phpstan` and
+`composer test` before opening one.
+
+StoreSeeder writes and deletes store data by design. Report security issues privately rather
+than in a public issue.
+
+GPL-2.0-or-later. See [`LICENSE`](LICENSE).
